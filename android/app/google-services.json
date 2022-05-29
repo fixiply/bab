@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "955480665092",
+    "firebase_url": "https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "brasseur-bordelais",
+    "storage_bucket": "brasseur-bordelais.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:955480665092:android:e3b7bd21ccd6fa5759d951",
+        "android_client_info": {
+          "package_name": "com.fixiply.bb"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "955480665092-lf0h09hgfkav0oo005d19r2146s5d1dc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJWa2a4Ge5DDfD2oIqdRecHF7q1fJAFd0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "955480665092-lf0h09hgfkav0oo005d19r2146s5d1dc.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
