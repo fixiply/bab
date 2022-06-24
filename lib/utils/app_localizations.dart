@@ -1,9 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-
-import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
+// External package
+import 'package:intl/intl.dart';
 
 class AppLocalizations {
   final Locale locale;

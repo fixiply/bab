@@ -1,27 +1,39 @@
 import 'dart:async';
-import 'dart:io';
-
-import 'package:bb/models/user_model.dart';
-import 'package:bb/utils/database.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
+// Internal package
+import 'package:bb/controller/account_page.dart';
 import 'package:bb/controller/home_page.dart';
 import 'package:bb/controller/receipts_page.dart';
-import 'package:bb/controller/user_page.dart';
+import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
+import 'package:bb/utils/edition_notifier.dart';
+
+// External package
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+final EditionNotifier editionNotifier = EditionNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  runApp(MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => editionNotifier)
+      ],
+      child: MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -57,13 +69,19 @@ class _AppState extends State<MyApp> {
     final ThemeData theme = ThemeData(
       fontFamily: 'Montserrat',
       brightness: Brightness.light,
-      primaryColor: primaryColor,
+      primaryColor: PrimaryColor,
+      primaryColorLight: PrimaryColorLight,
+      primaryColorDark: PrimaryColorDark,
+      toggleableActiveColor: PrimaryColor,
+      bottomAppBarColor: PrimaryColor,
+      backgroundColor: PrimaryColor,
     );
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
       debugShowCheckedModeBanner: false,
       theme: theme.copyWith(
-        colorScheme: theme.colorScheme.copyWith(secondary: primaryColor),
+        colorScheme: theme.colorScheme.copyWith(secondary: PrimaryColor),
+        appBarTheme: theme.appBarTheme.copyWith(backgroundColor: PrimaryColor),
       ),
       home: MyHomePage(),
       builder: EasyLoading.init(),
@@ -80,10 +98,10 @@ class _AppState extends State<MyApp> {
     );
   }
   _initialize() async {
-    // final provider = Provider.of<EditionNotifier>(context, listen: false);
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // provider.setEdition(prefs.getBool(EDITION_MODE_KEY) ?? false);
-    // provider.setEditable(prefs.getBool(EDIT_KEY) ?? false);
+    final provider = Provider.of<EditionNotifier>(context, listen: false);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    provider.setEdition(prefs.getBool(EDITION_MODE_KEY) ?? false);
+    provider.setEditable(prefs.getBool(EDIT_KEY) ?? false);
   }
 
   _authStateChanges() async {
@@ -136,12 +154,12 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
             label: AppLocalizations.of(context)!.text('home'),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.local_drink_outlined),
+            icon: Icon(Icons.search),
             label: AppLocalizations.of(context)!.text('receipts'),
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person_outline),
-            label: AppLocalizations.of(context)!.text('user'),
+            label: AppLocalizations.of(context)!.text('my_account'),
           ),
         ],
         currentIndex: _selectedIndex,
@@ -161,7 +179,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     switch (_selectedIndex) {
       case 0: return HomePage();
       case 1: return ReceiptsPage();
-      case 2: return UserPage();
+      case 2: return AccountPage();
     }
   }
 }

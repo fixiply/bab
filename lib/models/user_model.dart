@@ -1,11 +1,16 @@
-import 'package:firebase_auth/firebase_auth.dart';
+// Internal package
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/date_helper.dart';
+
+// External package
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UserModel<T> {
   String? uuid;
   DateTime? inserted_at;
   DateTime? updated_at;
+  String? full_name;
+  String? email;
   User? user;
   Roles? role;
 
@@ -13,8 +18,10 @@ class UserModel<T> {
     this.uuid,
     this.inserted_at,
     this.updated_at,
+    this.full_name,
+    this.email,
     this.user,
-    this.role = Roles.editor,
+    this.role = Roles.customer,
   }) {
     if(inserted_at == null) { inserted_at = DateTime.now(); }
   }
@@ -31,6 +38,8 @@ class UserModel<T> {
     if (map.containsKey('uuid')) this.uuid = map['uuid'];
     this.inserted_at = DateHelper.parse(map['inserted_at']);
     this.updated_at = DateHelper.parse(map['updated_at']);
+    this.full_name = map['full_name'];
+    this.email = map['email'];
     this.role = Roles.values.elementAt(map['role']);
   }
 
@@ -38,6 +47,8 @@ class UserModel<T> {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at!.toIso8601String(),
       'updated_at': DateTime.now().toIso8601String(),
+      'full_name': this.full_name,
+      'email': this.email,
       'role': this.role!.index,
     };
     if (persist == true) {
@@ -51,6 +62,8 @@ class UserModel<T> {
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
+      full_name: this.full_name,
+      email: this.email,
       user: this.user,
       role: this.role,
     );

@@ -45,36 +45,9 @@ class ClassHelper {
     }
   }
 
-  static bool hasBooking(dynamic d) {
-    try {
-      d.booking;
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
   static bool hasLayout(dynamic d) {
     try {
       d.layout;
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static bool hasProducts(dynamic d) {
-    try {
-      d.products;
-      return true;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  static bool hasRecipient(dynamic d) {
-    try {
-      d.recipient;
       return true;
     } catch (e) {
       return false;

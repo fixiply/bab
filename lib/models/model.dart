@@ -1,3 +1,4 @@
+// Internal package
 import 'package:bb/utils/date_helper.dart';
 
 class Model<T> {

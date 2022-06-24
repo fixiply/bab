@@ -1,281 +1,490 @@
-import 'package:bb/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
+// Internal package
+import 'package:bb/controller/forms/form_receipt_page.dart';
+import 'package:bb/controller/receipt_page.dart';
+import 'package:bb/models/receipt_model.dart';
+import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
+import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/containers/filter_receipt_container.dart';
+import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/image_animate_rotate.dart';
+import 'package:expandable_text/expandable_text.dart';
+
+// External package
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sprintf/sprintf.dart';
 
 class ReceiptsPage extends StatefulWidget {
   ReceiptsPage({Key? key}) : super(key: key);
   _ReceiptsPageState createState() => new _ReceiptsPageState();
 }
 
-class _SliderIndicatorPainter extends CustomPainter {
-  final double position;
-  _SliderIndicatorPainter(this.position);
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawCircle(Offset(20, position), 12, Paint()..color = Colors.black);
-  }
-  @override
-  bool shouldRepaint(_SliderIndicatorPainter old) {
-    return true;
-  }
-}
-
 class _ReceiptsPageState extends State<ReceiptsPage> {
-  final List<Color> _colors = [
-    Color.fromARGB(255, 250, 250, 210),
-    Color.fromARGB(255, 250, 250, 160),
-    Color.fromARGB(255, 250, 250, 133),
-    Color.fromARGB(255, 250, 250, 105),
-    Color.fromARGB(255, 250, 250, 78),
-    Color.fromARGB(255, 245, 246, 50),
-    Color.fromARGB(255, 240, 238, 46),
-    Color.fromARGB(255, 235, 228, 47),
-    Color.fromARGB(255, 230, 218, 48),
-    Color.fromARGB(255, 224, 206, 50),
-    Color.fromARGB(255, 219, 196, 51),
-    Color.fromARGB(255, 214, 186, 52),
-    Color.fromARGB(255, 209, 176, 54),
-    Color.fromARGB(255, 204, 166, 55),
-    Color.fromARGB(255, 200, 156, 56),
-    Color.fromARGB(255, 197, 146, 56),
-    Color.fromARGB(255, 195, 139, 56),
-    Color.fromARGB(255, 192, 136, 56),
-    Color.fromARGB(255, 192, 132, 56),
-    Color.fromARGB(255, 192, 128, 56),
-    Color.fromARGB(255, 192, 124, 56),
-    Color.fromARGB(255, 192, 120, 56),
-    Color.fromARGB(255, 192, 116, 56),
-    Color.fromARGB(255, 192, 112, 56),
-    Color.fromARGB(255, 192, 109, 56),
-    Color.fromARGB(255, 188, 105, 56),
-    Color.fromARGB(255, 183, 101, 56),
-    Color.fromARGB(255, 178, 97, 56),
-    Color.fromARGB(255, 171, 94, 55),
-    Color.fromARGB(255, 164, 90, 53),
-    Color.fromARGB(255, 157, 86, 52),
-    Color.fromARGB(255, 149, 82, 51),
-    Color.fromARGB(255, 141, 77, 49),
-    Color.fromARGB(255, 134, 73, 46),
-    Color.fromARGB(255, 127, 69, 43),
-    Color.fromARGB(255, 119, 66, 39),
-    Color.fromARGB(255, 112, 62, 36),
-    Color.fromARGB(255, 105, 58, 31),
-    Color.fromARGB(255, 98, 54, 25),
-    Color.fromARGB(255, 91, 51, 19),
-    Color.fromARGB(255, 84, 47, 13),
-    Color.fromARGB(255, 77, 43, 8),
-    Color.fromARGB(255, 69, 39, 11),
-    Color.fromARGB(255, 62, 36, 13),
-    Color.fromARGB(255, 54, 31, 16),
-    Color.fromARGB(255, 47, 27, 19),
-    Color.fromARGB(255, 39, 24, 21),
-    Color.fromARGB(255, 36, 21, 20),
-    Color.fromARGB(255, 33, 20, 19),
-    Color.fromARGB(255, 31, 18, 17),
-    Color.fromARGB(255, 28, 16, 15),
-    Color.fromARGB(255, 28, 15, 14),
-    Color.fromARGB(255, 23, 13, 12),
-    Color.fromARGB(255, 21, 11, 10),
-    Color.fromARGB(255, 18, 10, 9),
-    Color.fromARGB(255, 16, 8, 7),
-    Color.fromARGB(255, 13, 6, 5),
-    Color.fromARGB(255, 11, 5, 4),
-    Color.fromARGB(255, 9, 3, 2),
-    Color.fromARGB(255, 6, 2, 1),
-  ];
+  TextEditingController _searchQueryController = TextEditingController();
+  Future<List<ReceiptModel>>? _receipts;
+  List<StyleModel>? _styles;
 
-  double _colorSliderPosition = 0;
-  Color? _currentColor;
-  RangeValues _ibu = RangeValues(0, 100);
-  RangeValues _alcohol = RangeValues(0, 100);
+  // Edition mode
+  bool _editable = false;
+  bool _remove = false;
+  bool _hidden = false;
+
+  double? _startSRM;
+  double? _endSRM;
+  double? _startIBU;
+  double? _endIBU;
+  double? _startAlcohol;
+  double? _endAlcohol;
+  double _minIBU = 0.0;
+  double _maxIBU = 0.0;
+  double _minAlcohol = 0.0;
+  double _maxAlcohol = 0.0;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
 
   @override
   Widget build(BuildContext context) {
-    SliderThemeData data = SliderTheme.of(context).copyWith(
-      activeTrackColor: Colors.white.withOpacity(1),
-      inactiveTrackColor: Colors.white.withOpacity(.5),
-      trackHeight: 4.0,
-      thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
-      overlayColor: Colors.white.withOpacity(.4),
-      thumbColor: primaryColor.withOpacity(.2),
-      activeTickMarkColor: Colors.white,
-    );
-    SliderThemeData data2 = SliderTheme.of(context).copyWith(
-      activeTrackColor: primaryColor.withOpacity(1),
-      inactiveTrackColor: primaryColor.withOpacity(.5),
-      trackShape: RoundedRectSliderTrackShape(),
-      trackHeight: 4.0,
-      thumbShape: RoundSliderThumbShape(enabledThumbRadius: 12.0),
-      thumbColor: primaryColor,
-      overlayColor: primaryColor.withAlpha(32),
-      overlayShape: RoundSliderOverlayShape(overlayRadius: 28.0),
-      tickMarkShape: RoundSliderTickMarkShape(),
-      activeTickMarkColor: primaryColor.withOpacity(1),
-      inactiveTickMarkColor: primaryColor.withOpacity(.5),
-      valueIndicatorShape: PaddleSliderValueIndicatorShape(),
-      valueIndicatorColor: primaryColor,
-      valueIndicatorTextStyle: TextStyle(
-        color: Colors.white,
-      ),
-    );
-    Decoration decoration = new BoxDecoration(
-      borderRadius: new BorderRadius.all(
-        Radius.circular((40 * .3)),
-      ),
-      gradient: new LinearGradient(
-          colors: [
-            primaryColor.withOpacity(.3),
-            primaryColor,
-          ],
-          begin: const FractionalOffset(0.0, 0.0),
-          end: const FractionalOffset(1.0, 1.00),
-          stops: [0.0, 1.0],
-          tileMode: TileMode.clamp
-      ),
-    );
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(AppLocalizations.of(context)!.text('receipts')),
-        backgroundColor: primaryColor,
-      ),
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Flexible(
-              flex: 3,
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Image.asset('assets/images/beer.png')
-                  ),
-                  GestureDetector(
-                    behavior: HitTestBehavior.opaque,
-                    onHorizontalDragStart: (DragStartDetails details) {
-                      print("_-------------------------STARTED DRAG");
-                      _colorChangeHandler(details.localPosition.dy);
-                    },
-                    onHorizontalDragUpdate: (DragUpdateDetails details) {
-                      _colorChangeHandler(details.localPosition.dy);
-                    },
-                    onTapDown: (TapDownDetails details) {
-                      _colorChangeHandler(details.localPosition.dy);
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.all(15),
-                      child: Container(
-                        height: MediaQuery.of(context).size.height,
-                        width: 40,
-                        decoration: BoxDecoration(
-                          // border: Border.all(width: 1),
-                          borderRadius: BorderRadius.circular(10),
-                          gradient: LinearGradient(
-                            colors: _colors,
-                            begin: Alignment.topCenter, end: Alignment.bottomCenter),
-                        ),
-                        child: CustomPaint(
-                          painter: _SliderIndicatorPainter(_colorSliderPosition),
-                        ),
-                      )
-                    ),
-                  )
-                ]
-              )
-            ),
-            Flexible(
-              flex: 1,
-              child:  Padding(
-                padding: EdgeInsets.all(15),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children:  [
-                    Container(
-                      height: 40,
-                      // decoration: decoration,
-                      child: SliderTheme(
-                        data: data2,
-                        child: SfRangeSlider(
-                          values: _ibu,
-                          min: 0,
-                          max: 100,
-                          onChanged: (value) {
-                            setState(() {
-                              _ibu = value;
-                            });
-                          },
-                        ),
-                      ),
-                    ),
-                    Container(
-                      height: 40,
-                      // decoration: decoration,
-                      child: SliderTheme(
-                        data: data2,
-                        child: RangeSlider(
-                          values: _alcohol,
-                          min: 0,
-                          max: 100,
-                          onChanged: (value) {
-                            setState(() {
-                              _alcohol = value;
-                            });
-                          },
-                        ),
-                      ),
-                    )
-                  ]
+        title: _buildSearchField(),
+        elevation: 0,
+        foregroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
+        actions: <Widget> [
+          if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
+            icon: Icon(Icons.edit_note),
+            onPressed: _new
+          ),
+          if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.text('display'),
+            onSelected: (value) async {
+              if (value == 1) {
+                await Database().publishAll();
+              } else if (value == 3) {
+                bool checked = !_remove;
+                if (checked) {
+                  _hidden = false;
+                }
+                setState(() { _remove = checked; });
+                _fetch();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+              PopupMenuItem(
+                value: 1,
+                child: Text(AppLocalizations.of(context)!.text('publish_everything')),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: SwitchListTile(
+                  value: _editable,
+                  title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
+                  onChanged: (value) async {
+                    bool checked = !_editable;
+                    Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool(EDIT_KEY, checked);
+                    setState(() { _editable = checked; });
+                    Navigator.pop(context);
+                  },
                 )
+              ),
+              PopupMenuItem(
+                enabled: false,
+                value: null,
+                child: Text(AppLocalizations.of(context)!.text('filtered')),
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('archives')),
+                value: 3,
+                checked: _remove,
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('hidden')),
+                value: 4,
+                checked: _hidden,
               )
+            ]
+          ),
+        ]
+      ),
+      drawer: _editable && currentUser != null && currentUser!.isEditor() ? CustomDrawer(context) : null,
+      body: FutureBuilder<List<ReceiptModel>>(
+        future: _receipts,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return CustomScrollView(
+              slivers: [
+                SliverAppBar(
+                  automaticallyImplyLeading: false,
+                  expandedHeight: MediaQuery.of(context).size.height / 2.4,
+                  backgroundColor: FillColor,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: FilterReceiptContainer(
+                      startSRM: _startSRM,
+                      endSRM: _endSRM,
+                      minIBU: _minIBU,
+                      maxIBU: _maxIBU,
+                      minAlcohol: _minAlcohol,
+                      maxAlcohol: _maxAlcohol,
+                      startIBU: _startIBU,
+                      endIBU: _endIBU,
+                      startAlcohol: _startAlcohol,
+                      endAlcohol: _endAlcohol,
+                      onColorChanged: (start, end) =>
+                          setState(() {
+                            _startSRM = start;
+                            _endSRM = end;
+                            _fetch();
+                          }),
+                      onIBUhanged: (start, end) =>
+                        setState(() {
+                          _startIBU = start;
+                          _endIBU = end;
+                          _fetch();
+                        }),
+                      onAlcoholhanged: (start, end) =>
+                        setState(() {
+                          _startAlcohol = start;
+                          _endAlcohol = end;
+                          _fetch();
+                        }),
+                      onReset: () => _clear()
+                    )
+                  )
+                ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 6.0),
+                    child: Center(
+                      child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : sprintf(AppLocalizations.of(context)!.text('beer(s)'), [snapshot.data!.length]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                    )
+                  )
+                ),
+                SliverList(
+                  delegate: SliverChildBuilderDelegate((
+                      BuildContext context, int index) {
+                    ReceiptModel model = snapshot.data![index];
+                    return _item(model);
+                  }, childCount: snapshot.data!.length)
+                )
+              ]
+            );
+          }
+          if (snapshot.hasError) {
+            return ErrorContainer(snapshot.error.toString());
+          }
+          return Center(
+            child: ImageAnimateRotate(
+              child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
             )
-          ],
-        )
+          );
+        }
       )
     );
   }
 
-  _colorChangeHandler(double position) {
-    print("New pos: $position");
+  Widget _buildSearchField() {
+    return  Container(
+      margin: EdgeInsets.zero,
+      padding: EdgeInsets.zero,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(100),
+          color: FillColor
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Flexible(
+              child: TextField(
+                controller: _searchQueryController,
+                decoration: InputDecoration(
+                  icon: Padding(
+                      padding: EdgeInsets.only(left: 4.0),
+                      child: Icon(Icons.search, color: Theme.of(context).primaryColor)
+                  ),
+                  hintText: AppLocalizations.of(context)!.text('search_hint'),
+                  hintStyle: TextStyle(color: Theme.of(context).primaryColor),
+                  border: InputBorder.none
+                ),
+                style: TextStyle(fontSize: 16.0),
+                onChanged: (query) {
+                  return _fetch();
+                },
+              )
+          ),
+          Visibility(
+            visible: _searchQueryController.text.length > 0,
+            child: IconButton(
+                icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
+                onPressed: () {
+                  _searchQueryController.clear();
+                  _fetch();
+                }
+            )
+          )
+        ],
+      )
+    );
+  }
+
+  Widget _item(ReceiptModel model) {
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      child: Column(
+        children: [
+          ListTile(
+            leading: Stack(
+              children: [
+                Container(
+                  // color: SRM[model.getSRM()],
+                  child: Image.asset('assets/images/beer3.png',
+                    color: SRM[model.getSRM()],
+                    // colorBlendMode: BlendMode.modulate
+                  ),
+                  width: 30,
+                  height: 50,
+                ),
+                Container(
+                  // color: SRM[model.getSRM()],
+                  child: Image.asset('assets/images/beer2.png'),
+                  width: 30,
+                  height: 50,
+                ),
+                Visibility(
+                  visible: model.status == Status.pending,
+                  child: Positioned(
+                    top: 4.0,
+                    right: 4.0,
+                    child: Container(
+                      padding: EdgeInsets.all(4),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(100),
+                        color: Theme.of(context).primaryColor
+                      ),
+                      child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
+                    )
+                  )
+                ),
+              ]
+            ),
+            // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
+            title: FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                model.title!,
+                style: TextStyle(  fontSize: 16, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.left,
+              ),
+            ),
+            subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  textAlign: TextAlign.left,
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: <TextSpan>[
+                      TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(text: ' - '),
+                      TextSpan(
+                          style: DefaultTextStyle.of(context).style,
+                          children: <TextSpan>[
+                            TextSpan(text: ' IBU: '),
+                            TextSpan(text: model.ibu.toString()),
+                            TextSpan(text: '    ' +model.alcohol.toString() + '°'),
+                          ]
+                      )
+                    ],
+                  ),
+                ),
+                Foundation.kIsWeb ?
+                  MarkdownBody(
+                    data: model.text!,
+                    fitContent: true,
+                    shrinkWrap: true,
+                    softLineBreak: true,
+                    styleSheet: MarkdownStyleSheet(
+                        textAlign: WrapAlignment.start
+                    )
+                  ) :
+                  ExpandableText(
+                    model.text!,
+                    linkColor: Theme.of(context).primaryColor,
+                    expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
+                    collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
+                    maxLines: 3,
+                  )
+              ],
+            ),
+            // subtitle: model.text != null ? Text(model.text!, style: TextStyle(fontSize: 14)) : null,
+            // trailing: _editable && currentUser != null && currentUser!.isAdmin() ? PopupMenuButton<String>(
+            //     icon: Icon(Icons.more_vert),
+            //     tooltip: AppLocalizations.of(context)!.text('options'),
+            //     onSelected: (value) {
+            //       if (value == 'edit') {
+            //         _edit(model);
+            //       } else if (value == 'remove') {
+            //         DeleteDialog.model(context, model, forced: true);
+            //       }
+            //     },
+            //     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            //       PopupMenuItem(
+            //         value: 'edit',
+            //         child: Text(AppLocalizations.of(context)!.text('edit')),
+            //       ),
+            //       PopupMenuItem(
+            //         value: 'remove',
+            //         child: Text(AppLocalizations.of(context)!.text('remove')),
+            //       ),
+            //     ]
+            // ) : null,
+            onTap: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return ReceiptPage(model);
+              }));
+            },
+          ),
+          if (model.hasRating()) Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  flex: 2,
+                  child: RatingBar.builder(
+                    initialRating: model.rating(),
+                    direction: Axis.horizontal,
+                    allowHalfRating: true,
+                    itemCount: 5,
+                    itemSize: 18,
+                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
+                    itemBuilder: (context, _) => Icon(
+                      Icons.star,
+                      color: Colors.amber,
+                    ),
+                    onRatingUpdate: (rating) {
+                      print(rating);
+                    },
+                  )
+                ),
+                Flexible(
+                  flex: 1,
+                  child: TextButton(
+                    onPressed: () {
+
+                    },
+                    style: TextButton.styleFrom(shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                    )),
+                    child: Text('Achetez', style: TextStyle(color: Theme.of(context).primaryColor)),
+                  )
+                )
+              ]
+            )
+          )
+        ]
+      )
+    );
+  }
+
+  Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> receipts) async {
+    List<ReceiptModel>? values = [];
+    String? search =  _searchQueryController.text;
+    for (ReceiptModel model in receipts) {
+      _setFilter(model);
+      if (search != null && search.length > 0) {
+        if (!(model.title!.toLowerCase().contains(search.toLowerCase()))) {
+          continue;
+        }
+      }
+      if (_startSRM != null && _startSRM! > model.getSRM()) continue;
+      if (_endSRM != null && _endSRM! < model.getSRM()) continue;
+      if (_startIBU != null && _startIBU! > model.ibu!) continue;
+      if (_endIBU != null && _endIBU! < model.ibu!) continue;
+      if (_startAlcohol != null && _startAlcohol! > model.alcohol!) continue;
+      if (_endAlcohol != null && _endAlcohol! < model.alcohol!) continue;
+      values.add(model);
+    }
+    return values;
+  }
+
+  _setFilter(ReceiptModel model) {
+    if (_minIBU == 0.0 || model.ibu! < _minIBU)  _minIBU = model.ibu!;
+    if (_maxIBU == 0.0 || model.ibu! > _maxIBU) _maxIBU = model.ibu!;
+    if (_minAlcohol == 0.0 || model.alcohol! < _minAlcohol) _minAlcohol = model.alcohol!;
+    if (_maxAlcohol == 0.0 || model.alcohol! > _maxAlcohol)  _maxAlcohol = model.alcohol!;
+  }
+
+  _clear() async {
     setState(() {
-      _colorSliderPosition = position;
-      _currentColor = _calculateSelectedColor(_colorSliderPosition);
+      _startSRM = 0;
+      _endSRM = SRM.length.toDouble();
+      _startIBU = _minIBU;
+      _endIBU = _maxIBU;
+      _startAlcohol = _minAlcohol;
+      _endAlcohol = _maxAlcohol;
+    });
+    _fetch();
+  }
+
+  String _style(String? uuid) {
+    for (StyleModel model in _styles!) {
+      if (model.uuid == uuid) {
+        return model.title!;
+      }
+    }
+    return '';
+  }
+
+
+  _initialize() async {
+    final provider = Provider.of<EditionNotifier>(context, listen: false);
+    _editable = provider.editable;
+    _fetch();
+  }
+
+  _fetch() async {
+    _styles = await Database().getStyles(ordered: true);
+    List<ReceiptModel> receipts  = await Database().getReceipts(ordered: true);
+    setState(() {
+      _receipts = _filter(receipts);
     });
   }
 
-  Color? _calculateSelectedColor(double position) {
-    //determine color
-    double positionInColorArray = (position * (_colors.length - 1));
-    print(positionInColorArray);
-    int index = positionInColorArray.truncate();
-    print(index);
-    /*
-    double remainder = positionInColorArray - index;
-    if (remainder == 0.0) {
-      _currentColor = _colors[index];
-    } else {
-      //calculate new color
-      int redValue = _colors[index].red == _colors[index + 1].red
-          ? _colors[index].red
-          : (_colors[index].red +
-          (_colors[index + 1].red - _colors[index].red) * remainder)
-          .round();
-      int greenValue = _colors[index].green == _colors[index + 1].green
-          ? _colors[index].green
-          : (_colors[index].green +
-          (_colors[index + 1].green - _colors[index].green) * remainder)
-          .round();
-      int blueValue = _colors[index].blue == _colors[index + 1].blue
-          ? _colors[index].blue
-          : (_colors[index].blue +
-          (_colors[index + 1].blue - _colors[index].blue) * remainder)
-          .round();
-      _currentColor = Color.fromARGB(255, redValue, greenValue, blueValue);
-    }
-    */
-    return _currentColor;
+  _new() async {
+    ReceiptModel newArticle = ReceiptModel();
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormReceiptPage(newArticle);
+    })).then((value) {
+      _fetch();
+    });
+  }
+
+  _edit(ReceiptModel model) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormReceiptPage(model);
+    })).then((value) { _fetch(); });
   }
 }
 
