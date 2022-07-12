@@ -11,6 +11,8 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/widgets/builders/beers_carousel_builder.dart';
+import 'package:bb/widgets/builders/markdown_builder.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,6 +20,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,6 +58,7 @@ class _AppState extends State<MyApp> {
     _initialize();
     _authStateChanges();
     _subscribe();
+    _initBuilders();
   }
 
   void onLocaleChange(Locale locale) {
@@ -82,6 +86,7 @@ class _AppState extends State<MyApp> {
       theme: theme.copyWith(
         colorScheme: theme.colorScheme.copyWith(secondary: PrimaryColor),
         appBarTheme: theme.appBarTheme.copyWith(backgroundColor: PrimaryColor),
+        // inputDecorationTheme: theme.inputDecorationTheme.copyWith(focusColor: PrimaryColor),
       ),
       home: MyHomePage(),
       builder: EasyLoading.init(),
@@ -97,6 +102,7 @@ class _AppState extends State<MyApp> {
       ]
     );
   }
+
   _initialize() async {
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -127,6 +133,22 @@ class _AppState extends State<MyApp> {
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       });
     }
+  }
+
+  _initBuilders() async {
+    var registry = JsonWidgetRegistry.instance;
+    registry.registerCustomBuilder(
+      BeersCarouselBuilder.type,
+      JsonWidgetBuilderContainer(
+        builder: BeersCarouselBuilder.fromDynamic
+      ),
+    );
+    registry.registerCustomBuilder(
+      MarkdownBuilder.type,
+      JsonWidgetBuilderContainer(
+          builder: MarkdownBuilder.fromDynamic
+      ),
+    );
   }
 }
 

@@ -1,12 +1,14 @@
 import 'package:flutter/widgets.dart';
 
 // Internal package
+import 'package:bb/models/beer_model.dart';
+import 'package:bb/models/company_model.dart';
 import 'package:bb/models/event_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/user_model.dart';
-import 'package:bb/utils/class_helper.dart';
+import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/utils/constants.dart';
 
 // External package
@@ -16,6 +18,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 class Database {
   static final firestore = FirebaseFirestore.instance;
 
+  final beers = firestore.collection("beers");
+  final companies = firestore.collection("companies");
   final events = firestore.collection("events");
   final receipts = firestore.collection("receipts");
   final styles = firestore.collection("styles");
@@ -25,7 +29,11 @@ class Database {
   final _auth = FirebaseAuth.instance;
 
   CollectionReference<Map<String, dynamic>>? getTableName(dynamic o) {
-    if (o is EventModel) {
+    if (o is BeerModel) {
+      return beers;
+    } else if (o is CompanyModel) {
+      return companies;
+    } else if (o is EventModel) {
       return events;
     } else if (o is ReceiptModel) {
       return receipts;
@@ -86,6 +94,7 @@ class Database {
           d.creator = _auth.currentUser!.email;
         }
       }
+      debugPrint('update ${d.toMap()}');
       await getTableName(d)!.doc(d.uuid).update(d.toMap());
     }
     catch (e, s) {
@@ -217,6 +226,25 @@ class Database {
     return list;
   }
 
+
+  Future<List<CompanyModel>> getCompanies({bool ordered = false}) async {
+    List<CompanyModel> list = [];
+    Query query = companies;
+    query = query.orderBy('updated_at', descending: true);
+    await query.get().then((result) {
+      result.docs.forEach((doc) {
+        CompanyModel model = CompanyModel();
+        model.uuid = doc.id;
+        model.fromMap(doc.data() as Map<String, dynamic>);
+        list.add(model);
+      });
+    });
+    if (ordered == true) {
+      list.sort((a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
+    }
+    return list;
+  }
+
   Future<List<StyleModel>> getStyles({bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
@@ -224,6 +252,27 @@ class Database {
     await query.get().then((result) {
       result.docs.forEach((doc) {
         StyleModel model = StyleModel();
+        model.uuid = doc.id;
+        model.fromMap(doc.data() as Map<String, dynamic>);
+        list.add(model);
+      });
+    });
+    if (ordered == true) {
+      list.sort((a, b) => a.title!.toLowerCase().compareTo(b.title!.toLowerCase()));
+    }
+    return list;
+  }
+
+  Future<List<BeerModel>> getBeers({String? company, bool ordered = false}) async {
+    List<BeerModel> list = [];
+    Query query = beers;
+    if (company != null) {
+      query = query.where('company', isEqualTo: company);
+    }
+    query = query.orderBy('updated_at', descending: true);
+    await query.get().then((result) {
+      result.docs.forEach((doc) {
+        BeerModel model = BeerModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);

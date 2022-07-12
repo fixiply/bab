@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/gallery_page.dart';
+import 'package:bb/controller/beers_page.dart';
 import 'package:bb/controller/styles_page.dart';
+import 'package:bb/controller/companies_page.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/constants.dart';
 
 class CustomDrawer<Object> extends Drawer {
   CustomDrawer(BuildContext context, {Key? key}) : super(
@@ -29,6 +32,30 @@ class CustomDrawer<Object> extends Drawer {
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return GalleryPage([]);
+            })).then((value) {
+              Navigator.pop(context);
+            });
+          },
+        ),
+        ListTile(
+          title: Text(AppLocalizations.of(context)!.text('beers'),
+            style: TextStyle(fontSize: 18)
+          ),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return BeersPage();
+            })).then((value) {
+              Navigator.pop(context);
+            });
+          },
+        ),
+        if (currentUser != null && currentUser!.isAdmin()) ListTile(
+          title: Text(AppLocalizations.of(context)!.text('companies'),
+              style: TextStyle(fontSize: 18)
+          ),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return CompaniesPage();
             })).then((value) {
               Navigator.pop(context);
             });

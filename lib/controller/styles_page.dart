@@ -17,7 +17,7 @@ class StylesPage extends StatefulWidget {
 class _StylesPageState extends State<StylesPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
-  Future<List<StyleModel>>? _dataset;
+  Future<List<StyleModel>>? _styles;
 
   @override
   void initState() {
@@ -47,7 +47,7 @@ class _StylesPageState extends State<StylesPage> {
           child: RefreshIndicator(
               onRefresh: () => _fetch(),
               child: FutureBuilder<List<StyleModel>>(
-                  future: _dataset,
+                  future: _styles,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       if (snapshot.data!.length == 0) {
@@ -106,7 +106,7 @@ class _StylesPageState extends State<StylesPage> {
 
   _fetch() async {
     setState(() {
-      _dataset = Database().getStyles(ordered: true);
+      _styles = Database().getStyles(ordered: true);
     });
   }
 

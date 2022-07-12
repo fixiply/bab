@@ -65,8 +65,8 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text('Vous avez un compte ?', style: TextStyle(color: AccentColor)),
-                          Text('Identifiez-vous', style: TextStyle(color: AccentColor)),
+                          Text('Vous avez un compte ?', style: TextStyle(color: Theme.of(context).primaryColor)),
+                          Text('Identifiez-vous', style: TextStyle(color: Theme.of(context).primaryColor)),
                         ],
                       ),
                       onTap: () {
@@ -86,6 +86,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: _fullNameController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                    ),
                     isDense: true,
                     contentPadding: EdgeInsets.all(12),
                   ),
@@ -106,6 +109,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: _emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                    ),
                     isDense: true,
                     contentPadding: EdgeInsets.all(12),
                   ),
@@ -127,6 +133,9 @@ class _RegisterPageState extends State<RegisterPage> {
                   obscureText: !passwordVisible,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                    ),
                     isDense: true,
                     contentPadding: EdgeInsets.all(12),
                     suffixIcon: IconButton(
@@ -134,7 +143,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       splashRadius: 1,
                       icon: Icon(passwordVisible
                           ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined, size: 24, color: AccentColor),
+                          : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
                       onPressed: togglePassword,
                     ),
                   ),
@@ -154,7 +163,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       children: <TextSpan>[
                         TextSpan(
                             text: 'Conditions Générales d\'Utilisation',
-                            style: regular14pt.copyWith(color: AccentColor),
+                            style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
                             recognizer: TapGestureRecognizer()..onTap = () {
                               showDialog(
                                   context: context,
@@ -170,7 +179,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             children: <TextSpan>[
                               TextSpan(
                                   text: 'Politique de Confidentalié.',
-                                  style: regular14pt.copyWith(color: AccentColor),
+                                  style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
                                   recognizer: TapGestureRecognizer()..onTap = () {
                                     showDialog(
                                         context: context,
@@ -188,7 +197,7 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 18),
               CustomPrimaryButton(
                 textValue: 'S\'inscrire',
-                buttonColor: AccentColor,
+                buttonColor: Theme.of(context).primaryColor,
                 textColor: Colors.white,
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {

@@ -1,12 +1,15 @@
 // Internal package
-import 'package:bb/models/model.dart';
+import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/utils/constants.dart';
 
-class RatingModel<T> extends Model {
+class RatingModel<T> {
+  String? uuid;
+  DateTime? inserted_at;
+  DateTime? updated_at;
+  String? creator;
   Status? status;
-  String? user;
   double? rating;
-  String? text;
+  String? comment;
 
   RatingModel({
     String? uuid,
@@ -15,23 +18,33 @@ class RatingModel<T> extends Model {
     String? creator,
     this.status = Status.pending,
     this.rating,
-    this.text,
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
+    this.comment,
+  }) {
+    if(inserted_at == null) { inserted_at = DateTime.now(); }
+  }
 
   void fromMap(Map<String, dynamic> map) {
-    super.fromMap(map);
+    if (map.containsKey('uuid')) this.uuid = map['uuid'];
+    this.inserted_at = DateHelper.parse(map['inserted_at']);
+    this.updated_at = DateHelper.parse(map['updated_at']);
+    this.creator = map['creator'];
     this.status = Status.values.elementAt(map['status']);
     if (map['rating'] != null) this.rating = map['rating'].toDouble();
-    this.text = map['text'];
+    this.comment = map['comment'];
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
-    Map<String, dynamic> map = super.toMap(persist: persist);
-    map.addAll({
+    Map<String, dynamic> map = {
+      'inserted_at': this.inserted_at!.toIso8601String(),
+      'updated_at': DateTime.now().toIso8601String(),
+      'creator': this.creator,
       'status': this.status!.index,
       'rating': this.rating,
-      'text': this.text,
-    });
+      'comment': this.comment,
+    };
+    if (persist == true) {
+      map.addAll({'uuid': this.uuid});
+    }
     return map;
   }
 
@@ -43,7 +56,7 @@ class RatingModel<T> extends Model {
       creator: this.creator,
       status: this.status,
       rating: this.rating,
-      text: this.text,
+      comment: this.comment,
     );
   }
 
@@ -54,7 +67,7 @@ class RatingModel<T> extends Model {
 
   @override
   String toString() {
-    return 'Rating: $user, UUID: $uuid';
+    return 'Rating: $creator, UUID: $uuid';
   }
 
   static dynamic serialize(dynamic data) {

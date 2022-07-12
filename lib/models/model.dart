@@ -1,5 +1,5 @@
 // Internal package
-import 'package:bb/utils/date_helper.dart';
+import 'package:bb/helpers/date_helper.dart';
 
 class Model<T> {
   String? uuid;

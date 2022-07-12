@@ -2,26 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/models/receipt_model.dart';
+import 'package:bb/models/company_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
-import 'package:bb/widgets/forms/image_field.dart';
-import 'package:bb/widgets/forms/beer_style_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 
-class FormReceiptPage extends StatefulWidget {
-  final ReceiptModel model;
-  FormReceiptPage(this.model);
-  _FormReceiptPageState createState() => new _FormReceiptPageState();
+class FormCompanyPage extends StatefulWidget {
+  final CompanyModel model;
+  FormCompanyPage(this.model);
+  _FormCompanyPageState createState() => new _FormCompanyPageState();
 }
 
-class _FormReceiptPageState extends State<FormReceiptPage> {
+class _FormCompanyPageState extends State<FormCompanyPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -30,7 +28,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('receipt')),
+        title: Text(AppLocalizations.of(context)!.text('company')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -72,11 +70,11 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 if (value == 'information') {
                   await ModalBottomSheet.showInformation(context, widget.model);
                 } else if (value == 'duplicate') {
-                  ReceiptModel model = widget.model.copy();
+                  CompanyModel model = widget.model.copy();
                   model.uuid = null;
                   model.status = Status.pending;
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FormReceiptPage(model);
+                    return FormCompanyPage(model);
                   })).then((value) {
                     Navigator.pop(context);
                   });
@@ -102,15 +100,16 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              Divider(height: 10),
               TextFormField(
-                initialValue: widget.model.title,
+                initialValue: widget.model.name,
                 textCapitalization: TextCapitalization.sentences,
                 onChanged: (text) => setState(() {
-                  widget.model.title = text;
+                  widget.model.name = text;
                 }),
                 decoration: FormDecoration(
                     icon: const Icon(Icons.title),
-                    labelText: AppLocalizations.of(context)!.text('title'),
+                    labelText: AppLocalizations.of(context)!.text('name'),
                     border: InputBorder.none,
                     fillColor: FillColor, filled: true
                 ),
@@ -123,16 +122,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 }
               ),
               Divider(height: 10),
-              ImageField(
-                context: context,
-                image: widget.model.image,
-                height: null,
-                crop: true,
-                onChanged: (images) => setState(() {
-                  widget.model.image = images;
-                })
-              ),
-              Divider(height: 10),
               MarkdownTextInput(
                 (String value) => setState(() {
                   widget.model.text = value;
@@ -143,81 +132,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 actions: MarkdownType.values,
                 // controller: _controller,
                 validators: (value) {
-                  return null;
-                }
-              ),
-              Divider(height: 10),
-              BeerStyleField(
-                context: context,
-                dataset: widget.model.style,
-                title: AppLocalizations.of(context)!.text('style'),
-                onChanged: (value) => setState(() {
-                  widget.model.style = value;
-                }),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
-              ),
-              Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.alcohol != null ?  widget.model.alcohol.toString() :  '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) => setState(() {
-                  widget.model.alcohol = double.parse(value);
-                }),
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.percent),
-                  labelText: AppLocalizations.of(context)!.text('alcohol'),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
-              ),
-              Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.ibu != null ?  widget.model.ibu.toString() :  '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) => setState(() {
-                  widget.model.ibu = double.parse(value);
-                }),
-                decoration: FormDecoration(
-                    icon: const Text('IBU'),
-                    labelText: AppLocalizations.of(context)!.text('bitterness'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
-              ),
-              Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.ebc != null ?  widget.model.ebc.toString() :  '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) => setState(() {
-                  widget.model.ebc = double.parse(value);
-                }),
-                decoration: FormDecoration(
-                    icon: const Text('EBC'),
-                    labelText: AppLocalizations.of(context)!.text('color'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
                   return null;
                 }
               ),

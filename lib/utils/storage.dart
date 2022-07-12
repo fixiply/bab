@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 // Internal package
 import 'package:bb/helpers/model_helper.dart';
 import 'package:bb/models/image_model.dart';
-import 'package:bb/utils/class_helper.dart';
+import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 
@@ -192,7 +192,7 @@ class Storage {
         }
       } else if (ClassHelper.hasImages(model)) {
         bool found = false;
-        for(ImageModel image in model.images!) {
+        for(ImageModel image in model.model!) {
           if (ModelHelper.equals(fromUrl, image.url!))  {
             image.url = toUrl;
             found = true;
@@ -221,7 +221,7 @@ class Storage {
             }
           }
         } else if (ClassHelper.hasImages(model)) {
-          for(ImageModel image in model.images!) {
+          for(ImageModel image in model.model!) {
             Reference ref = await Storage().refFromURL(image.url!);
             String? newUrl = await broken(ref);
             if (newUrl != null) {
@@ -282,7 +282,7 @@ class Storage {
               break;
             }
           } else if (ClassHelper.hasImages(model)) {
-            for(ImageModel image in model.images!) {
+            for(ImageModel image in model.model!) {
               if (ModelHelper.equals(url, image.url!))  {
                 found = true;
                 break;

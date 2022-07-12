@@ -35,7 +35,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             pinned: true,
             expandedHeight: 250.0,
             foregroundColor: Theme.of(context).primaryColor,
-            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.1),
+            backgroundColor: Colors.white,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: EdgeInsets.only(left: 160),
               title: Text(widget.model.title!, style: TextStyle(color: Theme.of(context).primaryColor)),

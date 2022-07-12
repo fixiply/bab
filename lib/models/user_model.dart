@@ -1,6 +1,6 @@
 // Internal package
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/date_helper.dart';
+import 'package:bb/helpers/date_helper.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +13,7 @@ class UserModel<T> {
   String? email;
   User? user;
   Roles? role;
+  String? company;
 
   UserModel({
     this.uuid,
@@ -22,6 +23,7 @@ class UserModel<T> {
     this.email,
     this.user,
     this.role = Roles.customer,
+    this.company
   }) {
     if(inserted_at == null) { inserted_at = DateTime.now(); }
   }
@@ -41,6 +43,7 @@ class UserModel<T> {
     this.full_name = map['full_name'];
     this.email = map['email'];
     this.role = Roles.values.elementAt(map['role']);
+    this.company = map['company'];
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -50,6 +53,7 @@ class UserModel<T> {
       'full_name': this.full_name,
       'email': this.email,
       'role': this.role!.index,
+      'company': company,
     };
     if (persist == true) {
       map.addAll({'uuid': this.uuid});
@@ -66,6 +70,7 @@ class UserModel<T> {
       email: this.email,
       user: this.user,
       role: this.role,
+      company: this.company,
     );
   }
 

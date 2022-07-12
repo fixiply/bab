@@ -8,6 +8,8 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/carousel_field.dart';
+import 'package:bb/widgets/forms/text_style_field.dart';
+import 'package:bb/widgets/forms/widgets_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
@@ -29,7 +31,7 @@ class _FormEventPageState extends State<FormEventPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('style')),
+        title: Text(AppLocalizations.of(context)!.text('event')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -101,6 +103,48 @@ class _FormEventPageState extends State<FormEventPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              TextStyleField(
+                context: context,
+                initialValue: widget.model.top_left,
+                onChanged: (text) => setState(() {
+                  widget.model.top_left = text;
+                }),
+                decoration: FormDecoration(
+                  icon: Icon(Icons.border_left),
+                  labelText: AppLocalizations.of(context)!.text('top_left'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
+                )
+              ),
+              Divider(height: 10),
+              TextStyleField(
+                context: context,
+                initialValue: widget.model.top_right,
+                onChanged: (text) => setState(() {
+                  widget.model.top_right = text;
+                }),
+                decoration: FormDecoration(
+                  icon: Icon(Icons.border_right),
+                  labelText: AppLocalizations.of(context)!.text('top_right'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
+                )
+              ),
+              Divider(height: 10),
+              TextStyleField(
+                context: context,
+                initialValue: widget.model.bottom_left,
+                onChanged: (text) => setState(() {
+                  widget.model.bottom_left = text;
+                }),
+                decoration: FormDecoration(
+                  icon: const Icon(Icons.border_bottom),
+                  labelText: AppLocalizations.of(context)!.text('bottom_left'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
+                )
+              ),
+              Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.title,
                 textCapitalization: TextCapitalization.sentences,
@@ -108,19 +152,20 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.title = text;
                 }),
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.title),
-                    labelText: AppLocalizations.of(context)!.text('title'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
+                  icon: const Icon(Icons.title),
+                  labelText: AppLocalizations.of(context)!.text('title'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
                 ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
+                // autovalidateMode: AutovalidateMode.onUserInteraction,
+                // validator: (value) {
+                //   if (value!.isEmpty) {
+                //     return AppLocalizations.of(context)!.text('validator_field_required');
+                //   }
+                //   return null;
+                // }
               ),
+              Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.subtitle,
                 textCapitalization: TextCapitalization.sentences,
@@ -128,26 +173,55 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.subtitle = text;
                 }),
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.subtitles),
-                    labelText: AppLocalizations.of(context)!.text('subtitle'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
+                  icon: const Icon(Icons.subtitles),
+                  labelText: AppLocalizations.of(context)!.text('subtitle'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
                 )
               ),
               Divider(height: 10),
-              MarkdownTextInput(
-                (String value) => setState(() {
-                  widget.model.text = value;
+              WidgetsField(
+                context: context,
+                widgets: widget.model.widgets,
+                maxLines: 20,
+                onChanged: (text) => setState(() {
+                  widget.model.widgets = text;
                 }),
-                widget.model.text ?? '',
-                label: AppLocalizations.of(context)!.text('text'),
-                maxLines: 10,
-                actions: MarkdownType.values,
-                // controller: _controller,
-                validators: (value) {
-                  return null;
-                }
+                // decoration: FormDecoration(
+                //   icon: const Icon(Icons.source),
+                //   labelText: AppLocalizations.of(context)!.text('widget'),
+                //   border: InputBorder.none,
+                //   fillColor: FillColor, filled: true
+                // )
               ),
+              // MarkdownTextInput(
+              //   (String value) => setState(() {
+              //     widget.model.text = value;
+              //   }),
+              //   widget.model.text ?? '',
+              //   label: AppLocalizations.of(context)!.text('text'),
+              //   maxLines: 10,
+              //   actions: MarkdownType.values,
+              //   // controller: _controller,
+              //   validators: (value) {
+              //     return null;
+              //   }
+              // ),
+              // Divider(height: 10),
+              // CustomTextField(
+              //   context: context,
+              //   initialValue: widget.model.widget,
+              //   maxLines: 20,
+              //   onChanged: (text) => setState(() {
+              //     widget.model.widget = text;
+              //   }),
+              //   decoration: FormDecoration(
+              //     icon: const Icon(Icons.source),
+              //     labelText: AppLocalizations.of(context)!.text('widget'),
+              //     border: InputBorder.none,
+              //     fillColor: FillColor, filled: true
+              //   )
+              // ),
               Divider(height: 10),
               CarouselField(
                 context: context,

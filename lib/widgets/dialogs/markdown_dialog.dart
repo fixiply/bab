@@ -20,18 +20,17 @@ class MarkdownDialog extends StatelessWidget {
       child:  Column(
         children: [
           Expanded(
-              child: FutureBuilder(
-                future: Future.delayed(Duration(milliseconds: 150)).then((value) {
-                  return rootBundle.loadString('assets/$filename');
-                }),
-                builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-                  if (snapshot.hasData) {
-                    return Markdown(data: snapshot.data);
-                  }
-                  return Center(child: CircularProgressIndicator());
-                },
-
-              )
+            child: FutureBuilder(
+              future: Future.delayed(Duration(milliseconds: 150)).then((value) {
+                return rootBundle.loadString('assets/$filename');
+              }),
+              builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                if (snapshot.hasData) {
+                  return Markdown(data: snapshot.data);
+                }
+                return Center(child: CircularProgressIndicator());
+              },
+            )
           ),
           TextButton(
             child: Text(AppLocalizations.of(context)!.text('close')),

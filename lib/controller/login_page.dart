@@ -68,8 +68,8 @@ class _LoginPageState extends State<LoginPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('Pas encore inscrit ?', style: TextStyle(color: AccentColor)),
-                        Text('Inscrivez-vous', style: TextStyle(color: AccentColor)),
+                        Text('Pas encore inscrit ?', style: TextStyle(color: Theme.of(context).primaryColor)),
+                        Text('Inscrivez-vous', style: TextStyle(color: Theme.of(context).primaryColor)),
                       ],
                     ),
                     onTap: () {
@@ -94,6 +94,9 @@ class _LoginPageState extends State<LoginPage> {
                 controller: _emailController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                  ),
                   isDense: true,
                   contentPadding: EdgeInsets.all(12),
                 ),
@@ -115,13 +118,16 @@ class _LoginPageState extends State<LoginPage> {
                 obscureText: !passwordVisible,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                  ),
                   isDense: true,
                   contentPadding: EdgeInsets.all(12),
                   suffixIcon: IconButton(
                     color: TextGrey,
                     icon: Icon(passwordVisible
                         ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined, size: 24, color: AccentColor),
+                        : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
                     onPressed: togglePassword,
                   ),
                 ),
@@ -136,7 +142,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 6),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Mot de passe oublié ?', style: TextStyle(color: AccentColor)),
+                child: Text('Mot de passe oublié ?', style: TextStyle(color: Theme.of(context).primaryColor)),
               ),
               SizedBox(height: 18),
               Text.rich(
@@ -146,7 +152,7 @@ class _LoginPageState extends State<LoginPage> {
                       children: <TextSpan>[
                         TextSpan(
                             text: 'Conditions Générales d\'Utilisation',
-                            style: regular14pt.copyWith(color: AccentColor),
+                            style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
                             recognizer: TapGestureRecognizer()..onTap = () {
                               showDialog(
                                   context: context,
@@ -162,7 +168,7 @@ class _LoginPageState extends State<LoginPage> {
                           children: <TextSpan>[
                             TextSpan(
                               text: 'Politique de Confidentalié.',
-                              style: regular14pt.copyWith(color: AccentColor),
+                              style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
                               recognizer: TapGestureRecognizer()..onTap = () {
                                 showDialog(
                                     context: context,
@@ -180,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 18),
               CustomPrimaryButton(
                 textValue: 'Se connecter',
-                buttonColor: AccentColor,
+                buttonColor: Theme.of(context).primaryColor,
                 textColor: Colors.white,
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {

@@ -1,30 +1,29 @@
 // Internal package
 import 'package:bb/models/model.dart';
+import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/utils/constants.dart';
 
-class StyleModel<T> extends Model {
+class CompanyModel<T> extends Model {
   Status? status;
-  Fermentation? fermentation;
-  String? title;
+  String? name;
   String? text;
-  bool selected = false;
 
-  StyleModel({
+  CompanyModel({
     String? uuid,
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
     this.status = Status.pending,
-    this.fermentation = Fermentation.hight,
-    this.title,
+    this.name,
     this.text,
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
+  });
 
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.fermentation = Fermentation.values.elementAt(map['fermentation']);
-    this.title = map['title'];
+    this.inserted_at = DateHelper.parse(map['inserted_at']);
+    this.updated_at = DateHelper.parse(map['updated_at']);
+    this.name = map['name'];
     this.text = map['text'];
   }
 
@@ -32,33 +31,31 @@ class StyleModel<T> extends Model {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
-      'fermentation': this.fermentation!.index,
-      'title': this.title,
+      'name': this.name,
       'text': this.text,
     });
     return map;
   }
 
-  StyleModel copy() {
-    return StyleModel(
+  CompanyModel copy() {
+    return CompanyModel(
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
       creator: this.creator,
       status: this.status,
-      fermentation: this.fermentation,
-      title: this.title,
+      name: this.name,
       text: this.text,
     );
   }
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is StyleModel && other.uuid == uuid);
+    return (other is CompanyModel && other.uuid == uuid);
   }
 
   @override
   String toString() {
-    return 'Style: $title, UUID: $uuid';
+    return 'Company: $name, UUID: $uuid';
   }
 }

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/date_helper.dart';
+import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 class ModalBottomSheet {

@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/event_page.dart';
 import 'package:bb/controller/forms/form_event_page.dart';
 import 'package:bb/models/event_model.dart';
-import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
@@ -196,6 +196,9 @@ class _HomePageState extends State<HomePage> {
         elevation: 1.0,
         child: InkWell(
           onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return EventPage(model);
+            }));
           },
           onDoubleTap: currentUser != null && currentUser!.isEditor() ? () {
             _edit(model);
@@ -208,27 +211,16 @@ class _HomePageState extends State<HomePage> {
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  FutureBuilder<List<ImageModel>>(
-                    future: model.getImages(),
-                    builder: (context, snapshot) {
-                      List<ImageModel> images = snapshot.data ?? [];
-                      if (snapshot.connectionState == ConnectionState.active || snapshot.connectionState == ConnectionState.waiting) {
-                        if (model.images!.isNotEmpty) {
-                          images.add(model.images!.first);
-                        }
-                      }
-                      return Container(
-                        height: grid ? 140 : 180,
-                        width: double.infinity,
-                        child: ImageContainer(
-                          images,
-                          cache: currentUser != null && currentUser!.isEditor() == false,
-                          emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.cover)
-                        )
-                      );
-                    }
+                  Container(
+                    height: grid ? 180 : 220,
+                    width: double.infinity,
+                    child: ImageContainer(
+                      model.getImages(),
+                      cache: currentUser != null && currentUser!.isEditor() == false,
+                      emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.scaleDown)
+                    )
                   ),
-                  Flexible(
+                  if(model.title != null && model.title!.length > 0) Flexible(
                     child: Container(
                       padding: EdgeInsets.all(5),
                       child: FittedBox(
@@ -246,18 +238,15 @@ class _HomePageState extends State<HomePage> {
                       )
                     )
                   ),
-                  Flexible(
+                  if(model.subtitle != null && model.subtitle!.length > 0) Flexible(
                     child: _subtitle(model, grid),
                   )
                 ],
               ),
-              Visibility(
-                visible: currentUser != null && currentUser!.isEditor(),
-                child: Positioned(
-                  top: 4.0,
-                  right: 4.0,
-                  child: _indicator(model),
-                )
+              if (currentUser != null && currentUser!.isEditor()) Positioned(
+                top: 4.0,
+                right: 4.0,
+                child: _indicator(model),
               )
             ],
           ),
@@ -267,31 +256,28 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _subtitle(EventModel model, bool grid) {
-    return Visibility(
-        visible: model.subtitle != null && model.subtitle!.length > 0,
-        child: Container(
-            padding: EdgeInsets.all(5),
-            child: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                model.subtitle ?? '',
-                overflow: grid ? TextOverflow.ellipsis : null,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
-                textAlign: TextAlign.left,
-              ),
-            )
-        )
+    return Container(
+      padding: EdgeInsets.all(5),
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Text(
+          model.subtitle ?? '',
+          overflow: grid ? TextOverflow.ellipsis : null,
+          style: TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          textAlign: TextAlign.left,
+        ),
+      )
     );
   }
 
   Widget _indicator(EventModel model) {
     bool visible = false;
     Icon? icon;
-    Color color = AccentColor;
+    Color color = Theme.of(context).primaryColor;
     String message = '';
     if (model.status == Status.disabled) {
       visible = true;

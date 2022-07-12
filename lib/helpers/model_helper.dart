@@ -3,7 +3,7 @@ import 'package:bb/models/event_model.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
-import 'package:bb/utils/class_helper.dart';
+import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/utils/database.dart';
 
 class ModelHelper {
@@ -35,7 +35,7 @@ class ModelHelper {
           list.add(model);
         }
       } else if (ClassHelper.hasImages(model)) {
-        for(ImageModel image in model.images!) {
+        for(ImageModel image in model.model!) {
           if (equals(url, image.url!))  {
             list.add(model);
             break;

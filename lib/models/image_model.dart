@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 
+// Internal package
+import 'package:bb/models/text_model.dart';
+
 // External package
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -7,9 +10,9 @@ class ImageModel<T> {
   String? url;
   String? name;
   DateTime? updated_at;
-  String? left;
-  String? right;
-  String? bottom;
+  TextModel? left;
+  TextModel? right;
+  TextModel? bottom;
   int? size;
   Rect? rect;
   Reference? reference;
@@ -27,9 +30,6 @@ class ImageModel<T> {
   });
 
   void fromMap(Map<String, dynamic> map) {
-    // this.left = map['left'];
-    // this.right = map['right'];
-    // this.bottom = map['bottom'];
     if (map.containsKey('rect')) {
       this.rect = fromRect(map['rect']);
     }
@@ -39,9 +39,6 @@ class ImageModel<T> {
     Map<String, dynamic> map = {
       'url': this.url
     };
-    // if (left != null) map.addAll({'left': this.left});
-    // if (right != null) map.addAll({'right': this.right});
-    // if (bottom != null) map.addAll({'bottom': this.bottom});
     if (rect != null) map.addAll({'rect': toRect(rect!)});
     return map;
   }

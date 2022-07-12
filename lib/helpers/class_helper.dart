@@ -20,7 +20,7 @@ class ClassHelper {
 
   static bool hasImages(dynamic d) {
     try {
-      d.images;
+      d.model;
       return true;
     } catch (e) {
       return false;

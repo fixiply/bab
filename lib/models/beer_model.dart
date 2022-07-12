@@ -4,30 +4,30 @@ import 'package:bb/models/model.dart';
 import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/constants.dart';
 
-class ReceiptModel<T> extends Model {
+class BeerModel<T> extends Model {
   Status? status;
+  String? company;
+  String? receipt;
   String? title;
+  String? subtitle;
+  double? price;
   String? text;
   ImageModel? image;
-  String? style;
-  double? alcohol;
-  double? ibu;
-  double? ebc;
   List<RatingModel>? ratings;
 
-  ReceiptModel({
+  BeerModel({
     String? uuid,
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
     this.status = Status.pending,
+    this.company,
+    this.receipt,
     this.title,
+    this.subtitle,
+    this.price,
     this.text,
     this.image,
-    this.style,
-    this.alcohol,
-    this.ibu,
-    this.ebc,
     this.ratings,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     if (ratings == null) { ratings = []; }
@@ -36,13 +36,13 @@ class ReceiptModel<T> extends Model {
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
+    this.company = map['company'];
+    this.receipt = map['receipt'];
     this.title = map['title'];
+    this.subtitle = map['subtitle'];
+    if (map['price'] != null) this.price = map['price'].toDouble();
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
-    this.style = map['style'];
-    this.alcohol = map['alcohol'].toDouble();
-    this.ibu = map['ibu'].toDouble();
-    this.ebc = map['ebc'].toDouble();
     this.ratings = RatingModel.deserialize(map['ratings']);
   }
 
@@ -50,48 +50,44 @@ class ReceiptModel<T> extends Model {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
+      'company': this.company,
+      'receipt': this.receipt,
       'title': this.title,
+      'subtitle': this.subtitle,
+      'price': this.price,
       'text': this.text,
       'image': ImageModel.serialize(this.image),
-      'style': this.style,
-      'alcohol': this.alcohol,
-      'ibu': this.ibu,
-      'ebc': this.ebc,
       'ratings': RatingModel.serialize(this.ratings),
     });
     return map;
   }
 
-  ReceiptModel copy() {
-    return ReceiptModel(
+  BeerModel copy() {
+    return BeerModel(
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
       creator: this.creator,
       status: this.status,
+      company: this.company,
+      receipt: this.receipt,
       title: this.title,
+      subtitle: this.subtitle,
+      price: this.price,
       text: this.text,
       image: this.image,
-      style: this.style,
-      alcohol: this.alcohol,
-      ibu: this.ibu,
-      ebc: this.ebc,
       ratings: this.ratings,
     );
   }
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is ReceiptModel && other.uuid == uuid);
+    return (other is BeerModel && other.uuid == uuid);
   }
 
   @override
   String toString() {
-    return 'Receipt: $title, UUID: $uuid';
-  }
-
-  int getSRM() {
-    return (ebc! * 0.508).toInt();
+    return 'Beer: $title, UUID: $uuid';
   }
 
   int notice() {

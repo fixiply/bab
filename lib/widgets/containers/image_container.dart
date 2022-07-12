@@ -87,26 +87,21 @@ class _ImageContainerState extends State<ImageContainer> {
     if (image == null) {
       return null;
     }
-    if (value.left != null && value.left!.length > 0) {
+    if (value.left != null) {
       stacks.add(Positioned(
         top: 8.0,
         left: 6.0,
-        child: Card(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3.0)),
-          child: Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Text(
-              value.left! != null ? value.left! : '',
-              style: TextStyle(
-                fontSize: widget.fontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+        child: Text(
+          value.left!.text!,
+          style: TextStyle(
+            fontSize: value.left!.size!,
+            // fontWeight: FontWeight.bold,
+            color: Color(value.left!.color!)
           ),
         ),
       ));
     }
-    if (value.right != null && value.right!.length > 0) {
+    if (value.right != null) {
       stacks.add(Positioned(
         top: 8.0,
         right: 6.0,
@@ -115,7 +110,7 @@ class _ImageContainerState extends State<ImageContainer> {
           child: Padding(
             padding: EdgeInsets.all(5.0),
             child: Text(
-              value.right! != null ? value.right! : '',
+              value.right!.text!,
               style: TextStyle(
                 fontSize: (widget.fontSize! +2),
                 fontWeight: FontWeight.bold,
@@ -125,7 +120,7 @@ class _ImageContainerState extends State<ImageContainer> {
         ),
       ));
     }
-    if (value.bottom != null && value.bottom!.length > 0) {
+    if (value.bottom != null) {
       stacks.add(Positioned(
         bottom: 8.0,
         left: 6.0,
@@ -134,7 +129,7 @@ class _ImageContainerState extends State<ImageContainer> {
           child: Padding(
             padding: EdgeInsets.all(5.0),
             child: Text(
-              value.bottom! != null ? value.bottom! : '',
+              value.bottom!.text!,
               style: TextStyle(
                 fontSize: widget.fontSize,
               ),

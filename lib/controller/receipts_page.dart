@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -12,7 +13,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/containers/filter_receipt_container.dart';
+import 'package:bb/widgets/containers/filter_receipt_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
 import 'package:expandable_text/expandable_text.dart';
@@ -29,7 +30,7 @@ class ReceiptsPage extends StatefulWidget {
   _ReceiptsPageState createState() => new _ReceiptsPageState();
 }
 
-class _ReceiptsPageState extends State<ReceiptsPage> {
+class _ReceiptsPageState extends State<ReceiptsPage>  {
   TextEditingController _searchQueryController = TextEditingController();
   Future<List<ReceiptModel>>? _receipts;
   List<StyleModel>? _styles;
@@ -131,43 +132,37 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
           if (snapshot.hasData) {
             return CustomScrollView(
               slivers: [
-                SliverAppBar(
-                  automaticallyImplyLeading: false,
-                  expandedHeight: MediaQuery.of(context).size.height / 2.4,
-                  backgroundColor: FillColor,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: FilterReceiptContainer(
-                      startSRM: _startSRM,
-                      endSRM: _endSRM,
-                      minIBU: _minIBU,
-                      maxIBU: _maxIBU,
-                      minAlcohol: _minAlcohol,
-                      maxAlcohol: _maxAlcohol,
-                      startIBU: _startIBU,
-                      endIBU: _endIBU,
-                      startAlcohol: _startAlcohol,
-                      endAlcohol: _endAlcohol,
-                      onColorChanged: (start, end) =>
-                          setState(() {
-                            _startSRM = start;
-                            _endSRM = end;
-                            _fetch();
-                          }),
-                      onIBUhanged: (start, end) =>
-                        setState(() {
-                          _startIBU = start;
-                          _endIBU = end;
-                          _fetch();
-                        }),
-                      onAlcoholhanged: (start, end) =>
-                        setState(() {
-                          _startAlcohol = start;
-                          _endAlcohol = end;
-                          _fetch();
-                        }),
-                      onReset: () => _clear()
-                    )
-                  )
+                FilterReceiptAppBar(
+                  startSRM: _startSRM,
+                  endSRM: _endSRM,
+                  minIBU: _minIBU,
+                  maxIBU: _maxIBU,
+                  minAlcohol: _minAlcohol,
+                  maxAlcohol: _maxAlcohol,
+                  startIBU: _startIBU,
+                  endIBU: _endIBU,
+                  startAlcohol: _startAlcohol,
+                  endAlcohol: _endAlcohol,
+                  styles: _styles,
+                  onColorChanged: (start, end) =>
+                      setState(() {
+                        _startSRM = start;
+                        _endSRM = end;
+                        _fetch();
+                      }),
+                  onIBUhanged: (start, end) =>
+                    setState(() {
+                      _startIBU = start;
+                      _endIBU = end;
+                      _fetch();
+                    }),
+                  onAlcoholhanged: (start, end) =>
+                    setState(() {
+                      _startAlcohol = start;
+                      _endAlcohol = end;
+                      _fetch();
+                    }),
+                  onReset: () => _clear()
                 ),
                 SliverToBoxAdapter(
                   child: Container(
@@ -186,7 +181,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
                   }, childCount: snapshot.data!.length)
                 )
               ]
-            );
+          );
           }
           if (snapshot.hasError) {
             return ErrorContainer(snapshot.error.toString());
@@ -364,7 +359,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
               }));
             },
           ),
-          if (model.hasRating()) Padding(
+          if (model.notice() > 0) Padding(
             padding: EdgeInsets.symmetric(horizontal: 12),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -382,8 +377,8 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
                       Icons.star,
                       color: Colors.amber,
                     ),
+                    ignoreGestures: true,
                     onRatingUpdate: (rating) {
-                      print(rating);
                     },
                   )
                 ),
@@ -391,7 +386,6 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
                   flex: 1,
                   child: TextButton(
                     onPressed: () {
-
                     },
                     style: TextButton.styleFrom(shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(4.0),
@@ -457,7 +451,6 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
     return '';
   }
 
-
   _initialize() async {
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     _editable = provider.editable;
@@ -465,7 +458,11 @@ class _ReceiptsPageState extends State<ReceiptsPage> {
   }
 
   _fetch() async {
-    _styles = await Database().getStyles(ordered: true);
+    await Database().getStyles(ordered: true).then((values) {
+      setState(() {
+        _styles = values;
+      });
+    });
     List<ReceiptModel> receipts  = await Database().getReceipts(ordered: true);
     setState(() {
       _receipts = _filter(receipts);

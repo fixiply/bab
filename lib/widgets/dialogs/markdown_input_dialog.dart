@@ -6,44 +6,36 @@ import 'package:flutter/foundation.dart' as Foundation;
 // Internal package
 import 'package:bb/utils/app_localizations.dart';
 
-class TextInputDialog extends StatefulWidget {
+// External package
+import 'package:markdown_editable_textinput/markdown_text_input.dart';
+
+class MarkdownInputDialog extends StatefulWidget {
   String? initialValue;
-  final String? title;
+  final String title;
   final String? hintText;
   final int? maxLines;
-  TextInputDialog({this.initialValue, this.title, this.hintText, this.maxLines});
+  MarkdownInputDialog({this.initialValue, required this.title, this.hintText, this.maxLines : 10});
 
   @override
   State<StatefulWidget> createState() {
-    return _TextInputDialogState();
+    return _MarkdownInputDialogState();
   }
 }
 
-class _TextInputDialogState extends State<TextInputDialog> {
-  late TextEditingController _textFieldController;
-
-  @override
-  void initState() {
-    super.initState();
-    _textFieldController = TextEditingController(text: widget.initialValue ?? '');
-  }
+class _MarkdownInputDialogState extends State<MarkdownInputDialog> {
+  TextEditingController _textFieldController = TextEditingController();
 
   Widget build(BuildContext context) {
     if (!Foundation.kIsWeb && Platform.isIOS) {
       return CupertinoAlertDialog(
-        title: widget.title != null ? Text(widget.title!) : null,
-        content: TextField(
+        title: Text(widget.title),
+        content: MarkdownTextInput(
+          (String value) => setState(() {
+            widget.initialValue = value;
+          }),
+          widget.initialValue ?? '',
           maxLines: widget.maxLines,
           controller: _textFieldController,
-          keyboardType: TextInputType.multiline,
-          textInputAction: TextInputAction.newline,
-          decoration: InputDecoration(
-            hintText: widget.hintText,
-            border: OutlineInputBorder(),
-            focusedBorder: OutlineInputBorder(
-                borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
-            ),
-          )
         ),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
@@ -63,19 +55,14 @@ class _TextInputDialogState extends State<TextInputDialog> {
       );
     }
     return AlertDialog(
-      title: widget.title != null ? Text(widget.title!) : null,
-      content: TextField(
+      title: Text(widget.title),
+      content: MarkdownTextInput(
+        (String value) => setState(() {
+          widget.initialValue = value;
+        }),
+        widget.initialValue ?? '',
         maxLines: widget.maxLines,
         controller: _textFieldController,
-        keyboardType: TextInputType.multiline,
-        textInputAction: TextInputAction.newline,
-        decoration: InputDecoration(
-          hintText: widget.hintText,
-          border: OutlineInputBorder(),
-          focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
-          ),
-        )
       ),
       actions: <Widget>[
         TextButton(
@@ -86,7 +73,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {
-            Navigator.pop(context, false);
+            Navigator.pop(context);
           }
         ),
         TextButton(
@@ -97,7 +84,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {
-            Navigator.pop(context, _textFieldController.text);
+            Navigator.pop(context, widget.initialValue);
           }
         )
       ],

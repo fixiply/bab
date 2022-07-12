@@ -7,12 +7,12 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
-class StyleField extends FormField<String> {
+class BeerStyleField extends FormField<String> {
   final String? title;
   final void Function(String? value)? onChanged;
   final FormFieldValidator<String>? validator;
 
-  StyleField({Key? key, required BuildContext context, String? dataset, this.title, this.onChanged, this.validator}) : super(
+  BeerStyleField({Key? key, required BuildContext context, String? dataset, this.title, this.onChanged, this.validator}) : super(
       key: key,
       initialValue: dataset,
       builder: (FormFieldState<String> field) {
@@ -21,15 +21,15 @@ class StyleField extends FormField<String> {
   );
 
   @override
-  _StyleFieldState createState() => _StyleFieldState();
+  _BeerStyleFieldState createState() => _BeerStyleFieldState();
 }
 
-class _StyleFieldState extends FormFieldState<String> {
+class _BeerStyleFieldState extends FormFieldState<String> {
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
   Future<List<StyleModel>>? _style;
 
   @override
-  StyleField get widget => super.widget as StyleField;
+  BeerStyleField get widget => super.widget as BeerStyleField;
 
   @override
   void initState() {

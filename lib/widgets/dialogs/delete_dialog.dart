@@ -4,7 +4,7 @@ import 'package:flutter/widgets.dart';
 
 // Internal package
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/class_helper.dart';
+import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
@@ -28,9 +28,9 @@ class DeleteDialog extends StatefulWidget {
       context: context,
       builder: (BuildContext context) {
         return DeleteDialog(
-            title: title,
-            displayBody: archive != true,
-            okText: archive ? AppLocalizations.of(context)!.text('archive') : null
+          title: title,
+          displayBody: archive != true,
+          okText: archive ? AppLocalizations.of(context)!.text('archive') : null
         );
       }
     );
@@ -38,10 +38,10 @@ class DeleteDialog extends StatefulWidget {
       bool deleted = true;
       await Database().delete(model, forced: forced).onError((e, s) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-                content: Text(e.toString()),
-                duration: Duration(seconds: 10)
-            )
+          SnackBar(
+            content: Text(e.toString()),
+            duration: Duration(seconds: 10)
+          )
         );
         deleted = false;
       });
@@ -58,9 +58,9 @@ class _DeleteDialogState extends State<DeleteDialog> {
       title: widget.title ?? AppLocalizations.of(context)!.text('delete_item_title'),
       content: SingleChildScrollView(
         child: widget.displayBody == true ? ListBody(
-            children: <Widget>[
-              Text(AppLocalizations.of(context)!.text('remove_body')),
-            ]
+          children: <Widget>[
+            Text(AppLocalizations.of(context)!.text('remove_body')),
+          ]
         ) : null
       ),
     );
