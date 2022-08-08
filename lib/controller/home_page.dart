@@ -51,10 +51,6 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
-              icon: Icon(Icons.edit_note),
-              onPressed: _new
-          ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
               icon: Icon(Icons.more_vert),
               tooltip: AppLocalizations.of(context)!.text('display'),
@@ -76,19 +72,19 @@ class _HomePageState extends State<HomePage> {
                   child: Text(AppLocalizations.of(context)!.text('publish_everything')),
                 ),
                 PopupMenuItem(
-                    value: 2,
-                    child: SwitchListTile(
-                      value: _editable,
-                      title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
-                      onChanged: (value) async {
-                        bool checked = !_editable;
-                        Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool(EDIT_KEY, checked);
-                        setState(() { _editable = checked; });
-                        Navigator.pop(context);
-                      },
-                    )
+                  value: 2,
+                  child: SwitchListTile(
+                    value: _editable,
+                    title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
+                    onChanged: (value) async {
+                      bool checked = !_editable;
+                      Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      await prefs.setBool(EDIT_KEY, checked);
+                      setState(() { _editable = checked; });
+                      Navigator.pop(context);
+                    },
+                  )
                 ),
                 PopupMenuItem(
                   enabled: false,
@@ -141,6 +137,15 @@ class _HomePageState extends State<HomePage> {
           )
         ),
       ),
+      floatingActionButton: Visibility(
+        visible: _editable && currentUser != null && currentUser!.isEditor(),
+        child: FloatingActionButton(
+            onPressed: _new,
+            backgroundColor: Theme.of(context).primaryColor,
+            tooltip: AppLocalizations.of(context)!.text('new'),
+            child: const Icon(Icons.add)
+        )
+      )
     );
   }
 
@@ -173,15 +178,12 @@ class _HomePageState extends State<HomePage> {
               },
             )
           ),
-          Visibility(
-            visible: _searchQueryController.text.length > 0,
-            child: IconButton(
-              icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-              onPressed: () {
-                _searchQueryController.clear();
-                _fetch();
-              }
-            )
+          if (_searchQueryController.text.length > 0) IconButton(
+            icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
+            onPressed: () {
+              _searchQueryController.clear();
+              _fetch();
+            }
           )
         ],
       )
@@ -206,23 +208,35 @@ class _HomePageState extends State<HomePage> {
           onLongPress: currentUser != null && currentUser!.isEditor() ? () {
             _edit(model);
           } : null,
-          child: Stack(
+          child: _event(model, grid),
+        ),
+      ),
+    );
+  }
+
+  Widget _event(EventModel model, bool grid) {
+    if (!grid && model.axis == Axis.horizontal) {
+      return Stack(
+        children: <Widget>[
+          Row(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  Container(
-                    height: grid ? 180 : 220,
-                    width: double.infinity,
-                    child: ImageContainer(
-                      model.getImages(),
-                      cache: currentUser != null && currentUser!.isEditor() == false,
-                      emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.scaleDown)
-                    )
-                  ),
-                  if(model.title != null && model.title!.length > 0) Flexible(
-                    child: Container(
-                      padding: EdgeInsets.all(5),
+              Container(
+                height: 180,
+                width: MediaQuery.of(context).size.width / 2.5,
+                child: ImageContainer(
+                  model.getImages(),
+                  fit: null,
+                  cache: currentUser != null && currentUser!.isEditor() == false,
+                  emptyImage: Image.asset('assets/images/no_image.png')
+                )
+              ),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                       child: FittedBox(
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
@@ -236,41 +250,90 @@ class _HomePageState extends State<HomePage> {
                           textAlign: TextAlign.left,
                         ),
                       )
+                    ),
+                    if (model.subtitle != null) Container(
+                      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
+                      child: Text(
+                        model.subtitle ?? '',
+                        overflow: grid ? TextOverflow.ellipsis : null,
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        textAlign: TextAlign.left,
+                      )
                     )
-                  ),
-                  if(model.subtitle != null && model.subtitle!.length > 0) Flexible(
-                    child: _subtitle(model, grid),
-                  )
-                ],
-              ),
-              if (currentUser != null && currentUser!.isEditor()) Positioned(
-                top: 4.0,
-                right: 4.0,
-                child: _indicator(model),
+                  ],
+                )
               )
             ],
           ),
+          if (currentUser != null && currentUser!.isEditor()) Positioned(
+            top: 4.0,
+            right: 4.0,
+            child: _indicator(model),
+          )
+        ],
+      );
+    }
+    return Stack(
+      children: <Widget>[
+        Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Container(
+              height: grid ? 140 : 180,
+              width: double.infinity,
+              child: ImageContainer(
+                  model.getImages(),
+                  cache: currentUser != null && currentUser!.isEditor() == false,
+                  emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.scaleDown)
+              )
+            ),
+            if(model.title != null && model.title!.length > 0) Flexible(
+                child: Container(
+                    padding: EdgeInsets.all(5),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        model.title!,
+                        overflow: grid ? TextOverflow.ellipsis : null,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                        textAlign: TextAlign.left,
+                      ),
+                    )
+                )
+            ),
+            if(model.subtitle != null && model.subtitle!.length > 0) Flexible(
+              child: Container(
+                padding: EdgeInsets.all(5),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    model.subtitle ?? '',
+                    overflow: grid ? TextOverflow.ellipsis : null,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
+                )
+              )
+            )
+          ],
         ),
-      ),
-    );
-  }
-
-  Widget _subtitle(EventModel model, bool grid) {
-    return Container(
-      padding: EdgeInsets.all(5),
-      child: FittedBox(
-        fit: BoxFit.scaleDown,
-        alignment: Alignment.centerLeft,
-        child: Text(
-          model.subtitle ?? '',
-          overflow: grid ? TextOverflow.ellipsis : null,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
-          textAlign: TextAlign.left,
-        ),
-      )
+        if (currentUser != null && currentUser!.isEditor()) Positioned(
+          top: 4.0,
+          right: 4.0,
+          child: _indicator(model),
+        )
+      ],
     );
   }
 

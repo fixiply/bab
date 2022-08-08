@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/gallery_page.dart';
-import 'package:bb/controller/image_editor_page.dart';
+import 'package:bb/controller/image_crop_page.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/widgets/containers/image_container.dart';
@@ -38,17 +38,14 @@ class ImageField extends FormField<ImageModel> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Visibility(
-                    visible: crop,
-                    child: Tooltip(
-                      message: AppLocalizations.of(context)!.text('crop'),
-                      child: IconButton(
-                        icon:Icon(Icons.crop),
-                        onPressed: () async {
-                          state._showEditor();
-                        }
-                      )
-                    ),
+                  if (crop) Tooltip(
+                    message: AppLocalizations.of(context)!.text('crop'),
+                    child: IconButton(
+                      icon:Icon(Icons.crop),
+                      onPressed: () async {
+                        state._showResizing();
+                      }
+                    )
                   ),
                   IconButton(
                     icon:Icon(Icons.chevron_right),
@@ -98,10 +95,10 @@ class _ImageFieldState extends FormFieldState<ImageModel> {
     return ((bytes / pow(1024, i)).toStringAsFixed(fractionDigits)) + ' ' + suffixes[i];
   }
 
-  _showEditor() {
+  _showResizing() {
     if (widget.initialValue != null) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return ImageEditorPage(widget.initialValue!.url!, widget.initialValue!.rect);
+        return ImageCropPage(widget.initialValue!.url!, widget.initialValue!.rect);
       })).then((rect) {
         if (rect != null && rect == false) {
           return;

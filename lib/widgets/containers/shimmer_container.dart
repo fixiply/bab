@@ -13,7 +13,30 @@ class ShimmerContainer extends StatefulWidget {
   }
 }
 
-class _ShimmerContainerState extends State<ShimmerContainer> {
+class _ShimmerContainerState extends State<ShimmerContainer> with TickerProviderStateMixin {
+  late Animation<Color?> _animation;
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(seconds: 2),
+      vsync: this,
+    )..repeat(reverse: true);
+    _animation = ColorTween(begin: Colors.black.withOpacity(0.04), end: Colors.black.withOpacity(0.09)).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          // The state that has changed here is the animation object’s value.
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +58,7 @@ class _ShimmerContainerState extends State<ShimmerContainer> {
         )
       );
     }
-    for (var i = 0; i < (height / 270).round(); i++) {
+    for (var i = 0; i < (height / 246).round(); i++) {
       children.add(_buildEmpty());
     }
     return Container(
@@ -54,10 +77,10 @@ class _ShimmerContainerState extends State<ShimmerContainer> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            height: widget.crossAxisCount > 0 ? 180 : 220,
+            height: widget.crossAxisCount > 0 ? 140 : 180,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: FillColor
+                color: _animation.value
             )
           ),
           if (widget.crossAxisCount == 0) const SizedBox(height: 8),
@@ -66,7 +89,7 @@ class _ShimmerContainerState extends State<ShimmerContainer> {
             width: MediaQuery.of(context).size.height / 2.2,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: FillColor
+                color: _animation.value
             )
           ),
           const SizedBox(height: 8),
@@ -75,7 +98,7 @@ class _ShimmerContainerState extends State<ShimmerContainer> {
             width: MediaQuery.of(context).size.height / 3,
             decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: FillColor
+                color: _animation.value
             )
           ),
         ]

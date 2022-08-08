@@ -50,6 +50,8 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   double _maxIBU = 0.0;
   double _minAlcohol = 0.0;
   double _maxAlcohol = 0.0;
+  List<Fermentation> _selectedFermentations = [];
+  List<StyleModel> _selectedStyles = [];
 
   @override
   void initState() {
@@ -67,10 +69,6 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
-            icon: Icon(Icons.edit_note),
-            onPressed: _new
-          ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
             icon: Icon(Icons.more_vert),
             tooltip: AppLocalizations.of(context)!.text('display'),
@@ -143,25 +141,51 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                   endIBU: _endIBU,
                   startAlcohol: _startAlcohol,
                   endAlcohol: _endAlcohol,
+                  selectedFermentations: _selectedFermentations,
                   styles: _styles,
-                  onColorChanged: (start, end) =>
-                      setState(() {
-                        _startSRM = start;
-                        _endSRM = end;
-                        _fetch();
-                      }),
-                  onIBUhanged: (start, end) =>
+                  selectedStyles: _selectedStyles,
+                  onColorChanged: (start, end) {
+                    setState(() {
+                      _startSRM = start;
+                      _endSRM = end;
+                    });
+                    _fetch();
+                  },
+                  onIBUChanged: (start, end) {
                     setState(() {
                       _startIBU = start;
                       _endIBU = end;
-                      _fetch();
-                    }),
-                  onAlcoholhanged: (start, end) =>
+                    });
+                    _fetch();
+                  },
+                  onAlcoholChanged: (start, end) {
                     setState(() {
                       _startAlcohol = start;
                       _endAlcohol = end;
-                      _fetch();
-                    }),
+                    });
+                    _fetch();
+                  },
+                  onFermentationChanged: (value) {
+                    setState(() {
+                      if (_selectedFermentations.contains(value)) {
+                        _selectedFermentations.remove(value);
+                        _selectedStyles.clear();
+                      } else {
+                        _selectedFermentations.add(value);
+                      }
+                    });
+                    _fetch();
+                  },
+                  onStyleChanged: (value) {
+                    setState(() {
+                      if (_selectedStyles.contains(value)) {
+                        _selectedStyles.remove(value);
+                      } else {
+                        _selectedStyles.add(value);
+                      }
+                    });
+                    _fetch();
+                  },
                   onReset: () => _clear()
                 ),
                 SliverToBoxAdapter(
@@ -192,6 +216,15 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
             )
           );
         }
+      ),
+      floatingActionButton: Visibility(
+        visible: _editable && currentUser != null && currentUser!.isEditor(),
+        child: FloatingActionButton(
+          onPressed: _new,
+          backgroundColor: Theme.of(context).primaryColor,
+          tooltip: AppLocalizations.of(context)!.text('new'),
+          child: const Icon(Icons.add)
+        )
       )
     );
   }
@@ -225,15 +258,12 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                 },
               )
           ),
-          Visibility(
-            visible: _searchQueryController.text.length > 0,
-            child: IconButton(
-                icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-                onPressed: () {
-                  _searchQueryController.clear();
-                  _fetch();
-                }
-            )
+          if (_searchQueryController.text.length > 0) IconButton(
+            icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
+            onPressed: () {
+              _searchQueryController.clear();
+              _fetch();
+            }
           )
         ],
       )
@@ -263,19 +293,16 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                   width: 30,
                   height: 50,
                 ),
-                Visibility(
-                  visible: model.status == Status.pending,
-                  child: Positioned(
-                    top: 4.0,
-                    right: 4.0,
-                    child: Container(
-                      padding: EdgeInsets.all(4),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(100),
-                        color: Theme.of(context).primaryColor
-                      ),
-                      child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
-                    )
+                if (model.status == Status.pending) Positioned(
+                  top: 4.0,
+                  right: 4.0,
+                  child: Container(
+                    padding: EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: Theme.of(context).primaryColor
+                    ),
+                    child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
                   )
                 ),
               ]
@@ -402,34 +429,6 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
     );
   }
 
-  Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> receipts) async {
-    List<ReceiptModel>? values = [];
-    String? search =  _searchQueryController.text;
-    for (ReceiptModel model in receipts) {
-      _setFilter(model);
-      if (search != null && search.length > 0) {
-        if (!(model.title!.toLowerCase().contains(search.toLowerCase()))) {
-          continue;
-        }
-      }
-      if (_startSRM != null && _startSRM! > model.getSRM()) continue;
-      if (_endSRM != null && _endSRM! < model.getSRM()) continue;
-      if (_startIBU != null && _startIBU! > model.ibu!) continue;
-      if (_endIBU != null && _endIBU! < model.ibu!) continue;
-      if (_startAlcohol != null && _startAlcohol! > model.alcohol!) continue;
-      if (_endAlcohol != null && _endAlcohol! < model.alcohol!) continue;
-      values.add(model);
-    }
-    return values;
-  }
-
-  _setFilter(ReceiptModel model) {
-    if (_minIBU == 0.0 || model.ibu! < _minIBU)  _minIBU = model.ibu!;
-    if (_maxIBU == 0.0 || model.ibu! > _maxIBU) _maxIBU = model.ibu!;
-    if (_minAlcohol == 0.0 || model.alcohol! < _minAlcohol) _minAlcohol = model.alcohol!;
-    if (_maxAlcohol == 0.0 || model.alcohol! > _maxAlcohol)  _maxAlcohol = model.alcohol!;
-  }
-
   _clear() async {
     setState(() {
       _startSRM = 0;
@@ -438,6 +437,8 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
       _endIBU = _maxIBU;
       _startAlcohol = _minAlcohol;
       _endAlcohol = _maxAlcohol;
+      _selectedFermentations.clear();
+      _selectedStyles.clear();
     });
     _fetch();
   }
@@ -458,15 +459,49 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   }
 
   _fetch() async {
-    await Database().getStyles(ordered: true).then((values) {
-      setState(() {
-        _styles = values;
-      });
-    });
+    _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
     List<ReceiptModel> receipts  = await Database().getReceipts(ordered: true);
     setState(() {
       _receipts = _filter(receipts);
     });
+  }
+
+  Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> receipts) async {
+    List<ReceiptModel>? values = [];
+    String? search =  _searchQueryController.text;
+    for (ReceiptModel model in receipts) {
+      _setFilter(model);
+      if (search != null && search.length > 0) {
+        if (!(model.title!.toLowerCase().contains(search.toLowerCase()))) {
+          continue;
+        }
+      }
+      if (_startSRM != null && _startSRM! > model.getSRM()) continue;
+      if (_endSRM != null && _endSRM! < model.getSRM()) continue;
+      if (_startIBU != null && _startIBU! > model.ibu!) continue;
+      if (_endIBU != null && _endIBU! < model.ibu!) continue;
+      if (_startAlcohol != null && _startAlcohol! > model.alcohol!) continue;
+      if (_endAlcohol != null && _endAlcohol! < model.alcohol!) continue;
+      if (_selectedFermentations.isNotEmpty) {
+        if (!_styles!.contains(model.style)) {
+          continue;
+        }
+      };
+      if (_selectedStyles.isNotEmpty) {
+        if (!_selectedStyles.contains(model.style)) {
+          continue;
+        }
+      };
+      values.add(model);
+    }
+    return values;
+  }
+
+  _setFilter(ReceiptModel model) {
+    if (_minIBU == 0.0 || model.ibu! < _minIBU)  _minIBU = model.ibu!;
+    if (_maxIBU == 0.0 || model.ibu! > _maxIBU) _maxIBU = model.ibu!;
+    if (_minAlcohol == 0.0 || model.alcohol! < _minAlcohol) _minAlcohol = model.alcohol!;
+    if (_maxAlcohol == 0.0 || model.alcohol! > _maxAlcohol)  _maxAlcohol = model.alcohol!;
   }
 
   _new() async {

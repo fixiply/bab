@@ -35,13 +35,7 @@ class _StylesPageState extends State<StylesPage> {
           title: Text(AppLocalizations.of(context)!.text('styles')),
           elevation: 0,
           foregroundColor: Theme.of(context).primaryColor,
-          backgroundColor: Colors.white,
-          actions: <Widget> [
-            IconButton(
-                icon: Icon(Icons.edit_note),
-                onPressed: _new
-            )
-          ]
+          backgroundColor: Colors.white
         ),
         body: Container(
           child: RefreshIndicator(
@@ -96,6 +90,12 @@ class _StylesPageState extends State<StylesPage> {
                   }
               )
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _new,
+          backgroundColor: Theme.of(context).primaryColor,
+          tooltip: AppLocalizations.of(context)!.text('new'),
+          child: const Icon(Icons.add)
         )
     );
   }

@@ -197,8 +197,6 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(height: 18),
               CustomPrimaryButton(
                 textValue: 'S\'inscrire',
-                buttonColor: Theme.of(context).primaryColor,
-                textColor: Colors.white,
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {
                     await _createUserWithEmailAndPassword();

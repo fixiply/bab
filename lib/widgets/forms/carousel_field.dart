@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/gallery_page.dart';
-import 'package:bb/controller/image_editor_page.dart';
+import 'package:bb/controller/image_crop_page.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/widgets/containers/image_container.dart';
@@ -33,17 +33,14 @@ class CarouselField extends FormField<List<ImageModel>> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Visibility(
-                      visible: crop,
-                      child: Tooltip(
-                        message: AppLocalizations.of(context)!.text('crop'),
-                        child: IconButton(
-                          icon:Icon(Icons.crop),
-                          onPressed: () async {
-                            state._showEditor();
-                          }
-                        )
-                      ),
+                    if (crop) Tooltip(
+                      message: AppLocalizations.of(context)!.text('crop'),
+                      child: IconButton(
+                        icon:Icon(Icons.crop),
+                        onPressed: () async {
+                          state._showEditor();
+                        }
+                      )
                     ),
                     IconButton(
                       icon:Icon(Icons.chevron_right),
@@ -79,7 +76,7 @@ class _CarouselFieldState extends FormFieldState<List<ImageModel>> {
     if (widget.initialValue!.isNotEmpty) {
       ImageModel model = widget.initialValue!.first;
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return ImageEditorPage(model.url!, model.rect);
+        return ImageCropPage(model.url!, model.rect);
       })).then((rect) {
         if (rect != null && rect == false) {
           return;

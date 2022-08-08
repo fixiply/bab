@@ -1,3 +1,4 @@
+import 'package:bb/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class CustomPrimaryButton extends StatelessWidget {
@@ -9,7 +10,7 @@ class CustomPrimaryButton extends StatelessWidget {
 
   CustomPrimaryButton({this.buttonColor, required this.textValue, this.textColor, this.decoration, this.onTap}) {
     if(decoration == null) decoration = BoxDecoration(
-      color: buttonColor,
+      color: buttonColor ?? PrimaryColor,
       borderRadius: BorderRadius.circular(4.0),
     );
   }
@@ -30,7 +31,7 @@ class CustomPrimaryButton extends StatelessWidget {
             child: Center(
               child: Text(
                 textValue,
-                style: TextStyle(color: textColor),
+                style: TextStyle(color: textColor ?? Colors.white),
               ),
             ),
           ),

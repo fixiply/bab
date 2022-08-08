@@ -37,13 +37,7 @@ class _BeersPageState extends State<BeersPage> {
           title: Text(AppLocalizations.of(context)!.text('beers')),
           elevation: 0,
           foregroundColor: Theme.of(context).primaryColor,
-          backgroundColor: Colors.white,
-          actions: <Widget> [
-            IconButton(
-                icon: Icon(Icons.edit_note),
-                onPressed: _new
-            )
-          ]
+          backgroundColor: Colors.white
         ),
         body: Container(
           child: RefreshIndicator(
@@ -64,24 +58,21 @@ class _BeersPageState extends State<BeersPage> {
                           return ListTile(
                               contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                               leading: Stack(
-                                  children: [
-                                    _image(model.image),
-                                    Visibility(
-                                        visible: model.status == Status.pending,
-                                        child: Positioned(
-                                            top: 4.0,
-                                            right: 4.0,
-                                            child: Container(
-                                              padding: EdgeInsets.all(4),
-                                              decoration: BoxDecoration(
-                                                borderRadius: BorderRadius.circular(100),
-                                                color: Theme.of(context).primaryColor
-                                              ),
-                                              child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
-                                            )
-                                        )
-                                    ),
-                                  ]
+                                children: [
+                                  _image(model.image),
+                                  if (model.status == Status.pending) Positioned(
+                                    top: 4.0,
+                                    right: 4.0,
+                                    child: Container(
+                                      padding: EdgeInsets.all(4),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(100),
+                                        color: Theme.of(context).primaryColor
+                                      ),
+                                      child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
+                                    )
+                                  )
+                                ]
                               ),
                               // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
                               title: Text(model.title!),
@@ -118,6 +109,12 @@ class _BeersPageState extends State<BeersPage> {
                 }
               )
           ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: _new,
+          backgroundColor: Theme.of(context).primaryColor,
+          tooltip: AppLocalizations.of(context)!.text('new'),
+          child: const Icon(Icons.add)
         )
     );
   }

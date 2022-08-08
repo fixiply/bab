@@ -1,14 +1,17 @@
 // Internal package
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/models/text_model.dart';
+import 'package:bb/models/text_format_model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:flutter/material.dart';
 
 class EventModel<T> extends Model {
   Status? status;
-  TextModel? top_left;
-  TextModel? top_right;
-  TextModel? bottom_left;
+  Axis? axis;
+  bool? sliver;
+  TextFormatModel? top_left;
+  TextFormatModel? top_right;
+  TextFormatModel? bottom_left;
   String? title;
   String? subtitle;
   List<String>? widgets;
@@ -20,6 +23,8 @@ class EventModel<T> extends Model {
     DateTime? updated_at,
     String? creator,
     this.status = Status.pending,
+    this.axis = Axis.vertical,
+    this.sliver = true,
     this.top_left,
     this.top_right,
     this.bottom_left,
@@ -28,6 +33,9 @@ class EventModel<T> extends Model {
     this.widgets,
     this.images,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
+    if (top_left == null) top_left = TextFormatModel();
+    if (top_right == null) top_right = TextFormatModel();
+    if (bottom_left == null) bottom_left = TextFormatModel();
     if (widgets == null) { widgets = []; }
     if (images == null) { images = []; }
   }
@@ -35,9 +43,11 @@ class EventModel<T> extends Model {
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.top_left = TextModel.deserialize(map['top_left']);
-    this.top_right = TextModel.deserialize(map['top_right']);
-    this.bottom_left = TextModel.deserialize(map['bottom_left']);
+    if (map.containsKey('axis')) this.axis = Axis.values.elementAt(map['axis']);
+    if (map.containsKey('sliver')) this.sliver = map['sliver'];
+    this.top_left = TextFormatModel.deserialize(map['top_left']);
+    this.top_right = TextFormatModel.deserialize(map['top_right']);
+    this.bottom_left = TextFormatModel.deserialize(map['bottom_left']);
     this.title = map['title'];
     this.subtitle = map['subtitle'];
     if (map.containsKey('widgets')) this.widgets = map['widgets'].cast<String>();
@@ -48,9 +58,11 @@ class EventModel<T> extends Model {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
-      'top_left': TextModel.serialize(this.top_left),
-      'top_right': TextModel.serialize(this.top_right),
-      'bottom_left': TextModel.serialize(this.bottom_left),
+      'axis': this.axis!.index,
+      'sliver': this.sliver,
+      'top_left': TextFormatModel.serialize(this.top_left),
+      'top_right': TextFormatModel.serialize(this.top_right),
+      'bottom_left': TextFormatModel.serialize(this.bottom_left),
       'title': this.title,
       'subtitle': this.subtitle,
       'widgets': this.widgets,
@@ -66,6 +78,8 @@ class EventModel<T> extends Model {
       updated_at: this.updated_at,
       creator: this.creator,
       status: this.status,
+      axis: this.axis,
+      sliver: this.sliver,
       top_left: this.top_left,
       top_right: this.top_right,
       bottom_left:  this.bottom_left,
@@ -97,5 +111,18 @@ class EventModel<T> extends Model {
       });
     }
     return list;
+  }
+
+  String getTitle() {
+    if (title != null) {
+      return title!;
+    }
+    if (top_left != null) {
+      return top_left!.text!;
+    }
+    if (bottom_left != null) {
+      return bottom_left!.text!;
+    }
+    return '';
   }
 }

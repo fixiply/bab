@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/custom_image.dart';
+import 'package:bb/models/text_format_model.dart';
 
 // External package
 import 'package:carousel_slider/carousel_slider.dart';
@@ -87,7 +88,7 @@ class _ImageContainerState extends State<ImageContainer> {
     if (image == null) {
       return null;
     }
-    if (value.left != null) {
+    if (TextFormatModel.hasText(value.left)) {
       stacks.add(Positioned(
         top: 8.0,
         left: 6.0,
@@ -95,13 +96,15 @@ class _ImageContainerState extends State<ImageContainer> {
           value.left!.text!,
           style: TextStyle(
             fontSize: value.left!.size!,
-            // fontWeight: FontWeight.bold,
+            fontWeight: value.left!.isBold ? FontWeight.bold : null,
+            fontStyle: value.left!.isItalic ? FontStyle.italic : null,
+            decoration: value.left!.isUnderline ? TextDecoration.underline : null,
             color: Color(value.left!.color!)
           ),
         ),
       ));
     }
-    if (value.right != null) {
+    if (TextFormatModel.hasText(value.right)) {
       stacks.add(Positioned(
         top: 8.0,
         right: 6.0,
@@ -112,15 +115,18 @@ class _ImageContainerState extends State<ImageContainer> {
             child: Text(
               value.right!.text!,
               style: TextStyle(
-                fontSize: (widget.fontSize! +2),
-                fontWeight: FontWeight.bold,
+                fontSize: value.right!.size!,
+                fontWeight: value.right!.isBold ? FontWeight.bold : null,
+                fontStyle: value.right!.isItalic ? FontStyle.italic : null,
+                decoration: value.right!.isUnderline ? TextDecoration.underline : null,
+                color: Color(value.right!.color!)
               ),
             ),
           ),
         ),
       ));
     }
-    if (value.bottom != null) {
+    if (TextFormatModel.hasText(value.bottom)) {
       stacks.add(Positioned(
         bottom: 8.0,
         left: 6.0,
@@ -131,7 +137,11 @@ class _ImageContainerState extends State<ImageContainer> {
             child: Text(
               value.bottom!.text!,
               style: TextStyle(
-                fontSize: widget.fontSize,
+                fontSize: value.bottom!.size!,
+                fontWeight: value.bottom!.isBold ? FontWeight.bold : null,
+                fontStyle: value.bottom!.isItalic ? FontStyle.italic : null,
+                decoration: value.bottom!.isUnderline ? TextDecoration.underline : null,
+                color: Color(value.bottom!.color!)
               ),
             ),
           ),

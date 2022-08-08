@@ -24,10 +24,7 @@ class EmptyContainer extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Visibility(
-                  visible: (100 + 40) < netHeight,
-                  child: Image.asset('assets/images/logo.png', width: 100, height: 100, color: Theme.of(context).primaryColor)
-              ),
+              if ((100 + 40) < netHeight) Image.asset('assets/images/logo.png', width: 100, height: 100, color: Theme.of(context).primaryColor),
               Text(message != null ? message! : AppLocalizations.of(context)!.text('empty_list'),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.clip,

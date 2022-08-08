@@ -8,13 +8,12 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/carousel_field.dart';
-import 'package:bb/widgets/forms/text_style_field.dart';
+import 'package:bb/widgets/forms/switch_field.dart';
+import 'package:bb/widgets/forms/text_format_field.dart';
 import 'package:bb/widgets/forms/widgets_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
-import 'package:markdown_editable_textinput/format_markdown.dart';
-import 'package:markdown_editable_textinput/markdown_text_input.dart';
 
 class FormEventPage extends StatefulWidget {
   final EventModel model;
@@ -50,50 +49,44 @@ class _FormEventPageState extends State<FormEventPage> {
               }
             }
           ),
-          Visibility(
-            visible: widget.model.uuid != null,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              tooltip: AppLocalizations.of(context)!.text('remove'),
-              icon: const Icon(Icons.delete),
-              onPressed: () async {
-                // if (await _delete(widget.article)) {
-                //   Navigator.pop(context);
-                // }
-              }
-            )
+          if (widget.model.uuid != null) IconButton(
+            padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('remove'),
+            icon: const Icon(Icons.delete),
+            onPressed: () async {
+              // if (await _delete(widget.article)) {
+              //   Navigator.pop(context);
+              // }
+            }
           ),
-          Visibility(
-            visible: widget.model.uuid != null,
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              tooltip: AppLocalizations.of(context)!.text('tools'),
-              icon: const Icon(Icons.more_vert),
-              onSelected: (value) async {
-                if (value == 'information') {
-                  await ModalBottomSheet.showInformation(context, widget.model);
-                } else if (value == 'duplicate') {
-                  EventModel model = widget.model.copy();
-                  model.uuid = null;
-                  model.status = Status.pending;
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FormEventPage(model);
-                  })).then((value) {
-                    Navigator.pop(context);
-                  });
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                PopupMenuItem(
-                  value: 'information',
-                  child: Text(AppLocalizations.of(context)!.text('information')),
-                ),
-                PopupMenuItem(
-                  value: 'duplicate',
-                  child: Text(AppLocalizations.of(context)!.text('duplicate')),
-                )
-              ]
-            )
+          if (widget.model.uuid != null) PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('tools'),
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) async {
+              if (value == 'information') {
+                await ModalBottomSheet.showInformation(context, widget.model);
+              } else if (value == 'duplicate') {
+                EventModel model = widget.model.copy();
+                model.uuid = null;
+                model.status = Status.pending;
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormEventPage(model);
+                })).then((value) {
+                  Navigator.pop(context);
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem(
+                value: 'information',
+                child: Text(AppLocalizations.of(context)!.text('information')),
+              ),
+              PopupMenuItem(
+                value: 'duplicate',
+                child: Text(AppLocalizations.of(context)!.text('duplicate')),
+              )
+            ]
           )
         ]
       ),
@@ -103,7 +96,32 @@ class _FormEventPageState extends State<FormEventPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
-              TextStyleField(
+              DropdownButtonFormField<Axis>(
+                value: widget.model.axis,
+                decoration: FormDecoration(
+                    icon: const Icon(Icons.directions),
+                    labelText: AppLocalizations.of(context)!.text('direction')
+                ),
+                items: Axis.values.map((Axis display) {
+                  return DropdownMenuItem<Axis>(
+                      value: display,
+                      child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                }).toList(),
+                onChanged: (value) => setState(() {
+                  widget.model.axis = value;
+                })
+              ),
+              Divider(height: 10),
+              SwitchField(
+                value: widget.model.sliver!,
+                icon: Icon(Icons.expand),
+                hintText: AppLocalizations.of(context)!.text('show_sliver'),
+                onChanged: (value) => setState(() {
+                  widget.model.sliver = value;
+                })
+              ),
+              Divider(height: 10),
+              TextFormatField(
                 context: context,
                 initialValue: widget.model.top_left,
                 onChanged: (text) => setState(() {
@@ -117,7 +135,7 @@ class _FormEventPageState extends State<FormEventPage> {
                 )
               ),
               Divider(height: 10),
-              TextStyleField(
+              TextFormatField(
                 context: context,
                 initialValue: widget.model.top_right,
                 onChanged: (text) => setState(() {
@@ -131,7 +149,7 @@ class _FormEventPageState extends State<FormEventPage> {
                 )
               ),
               Divider(height: 10),
-              TextStyleField(
+              TextFormatField(
                 context: context,
                 initialValue: widget.model.bottom_left,
                 onChanged: (text) => setState(() {

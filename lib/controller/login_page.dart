@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
+  String? _email = Foundation.kDebugMode ? RECIPIENT : null;
+  late TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController();
 
   bool passwordVisible = false;
@@ -33,6 +35,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    _emailController = TextEditingController(text: _email);
     _initialize();
   }
 
@@ -186,8 +189,6 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 18),
               CustomPrimaryButton(
                 textValue: 'Se connecter',
-                buttonColor: Theme.of(context).primaryColor,
-                textColor: Colors.white,
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {
                     await _signInWithEmailAndPassword();

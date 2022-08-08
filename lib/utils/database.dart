@@ -245,16 +245,27 @@ class Database {
     return list;
   }
 
-  Future<List<StyleModel>> getStyles({bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
-        StyleModel model = StyleModel();
-        model.uuid = doc.id;
-        model.fromMap(doc.data() as Map<String, dynamic>);
-        list.add(model);
+        bool canBeAdded = true;
+        if (fermentations != null && fermentations.length > 0) {
+          canBeAdded = false;
+          Fermentation fermentation = Fermentation.values.elementAt(doc['fermentation']);
+          debugPrint('getStyles $fermentation');
+          if (fermentations.contains(fermentation)) {
+            canBeAdded = true;
+          }
+        }
+        if (canBeAdded) {
+          StyleModel model = StyleModel();
+          model.uuid = doc.id;
+          model.fromMap(doc.data() as Map<String, dynamic>);
+          list.add(model);
+        }
       });
     });
     if (ordered == true) {

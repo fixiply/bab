@@ -47,50 +47,44 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
               }
             }
           ),
-          Visibility(
-            visible: widget.model.uuid != null,
-            child: IconButton(
-              padding: EdgeInsets.zero,
-              tooltip: AppLocalizations.of(context)!.text('remove'),
-              icon: const Icon(Icons.delete),
-              onPressed: () async {
-                // if (await _delete(widget.article)) {
-                //   Navigator.pop(context);
-                // }
-              }
-            )
+          if (widget.model.uuid != null) IconButton(
+            padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('remove'),
+            icon: const Icon(Icons.delete),
+            onPressed: () async {
+              // if (await _delete(widget.article)) {
+              //   Navigator.pop(context);
+              // }
+            }
           ),
-          Visibility(
-            visible: widget.model.uuid != null,
-            child: PopupMenuButton<String>(
-              padding: EdgeInsets.zero,
-              tooltip: AppLocalizations.of(context)!.text('tools'),
-              icon: const Icon(Icons.more_vert),
-              onSelected: (value) async {
-                if (value == 'information') {
-                  await ModalBottomSheet.showInformation(context, widget.model);
-                } else if (value == 'duplicate') {
-                  CompanyModel model = widget.model.copy();
-                  model.uuid = null;
-                  model.status = Status.pending;
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FormCompanyPage(model);
-                  })).then((value) {
-                    Navigator.pop(context);
-                  });
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                PopupMenuItem(
-                  value: 'information',
-                  child: Text(AppLocalizations.of(context)!.text('information')),
-                ),
-                PopupMenuItem(
-                  value: 'duplicate',
-                  child: Text(AppLocalizations.of(context)!.text('duplicate')),
-                )
-              ]
-            )
+          if (widget.model.uuid != null) PopupMenuButton<String>(
+            padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('tools'),
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) async {
+              if (value == 'information') {
+                await ModalBottomSheet.showInformation(context, widget.model);
+              } else if (value == 'duplicate') {
+                CompanyModel model = widget.model.copy();
+                model.uuid = null;
+                model.status = Status.pending;
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormCompanyPage(model);
+                })).then((value) {
+                  Navigator.pop(context);
+                });
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem(
+                value: 'information',
+                child: Text(AppLocalizations.of(context)!.text('information')),
+              ),
+              PopupMenuItem(
+                value: 'duplicate',
+                child: Text(AppLocalizations.of(context)!.text('duplicate')),
+              )
+            ]
           )
         ]
       ),

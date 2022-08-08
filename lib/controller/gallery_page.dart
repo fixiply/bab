@@ -364,15 +364,12 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                   },
                 )
             ),
-            Visibility(
-                visible: _searchQueryController.text.length > 0,
-                child: IconButton(
-                    icon: Icon(Icons.clear),
-                    onPressed: () {
-                      _searchQueryController.clear();
-                      _fetch();
-                    }
-                )
+            if (_searchQueryController.text.length > 0) IconButton(
+              icon: Icon(Icons.clear),
+              onPressed: () {
+                _searchQueryController.clear();
+                _fetch();
+              }
             )
           ],
         )

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
@@ -28,7 +29,20 @@ final EditionNotifier editionNotifier = EditionNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  if (Foundation.kIsWeb)
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+          apiKey: "AIzaSyAAEsXWUis1p3rQSh7K7Xi6Rh2vD9utcXA",
+          authDomain: "brasseur-bordelais.firebaseapp.com",
+          databaseURL: "https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app",
+          projectId: "brasseur-bordelais",
+          storageBucket: "brasseur-bordelais.appspot.com",
+          messagingSenderId: "955480665092",
+          appId: "1:955480665092:web:b9943e1fe865871b59d951",
+          measurementId: "G-JDKVC86LYX"
+      ),
+    );
+  else await Firebase.initializeApp();
 
   runApp(
     MultiProvider(
@@ -147,6 +161,12 @@ class _AppState extends State<MyApp> {
       MarkdownBuilder.type,
       JsonWidgetBuilderContainer(
           builder: MarkdownBuilder.fromDynamic
+      ),
+    );
+    registry.registerCustomBuilder(
+      ImageEditorBuilder.type,
+      JsonWidgetBuilderContainer(
+          builder: ImageEditorBuilder.fromDynamic
       ),
     );
   }

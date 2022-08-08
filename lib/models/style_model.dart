@@ -7,7 +7,6 @@ class StyleModel<T> extends Model {
   Fermentation? fermentation;
   String? title;
   String? text;
-  bool selected = false;
 
   StyleModel({
     String? uuid,
@@ -54,7 +53,7 @@ class StyleModel<T> extends Model {
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is StyleModel && other.uuid == uuid);
+    return (other is StyleModel && other.uuid == uuid || other is String && other == uuid);
   }
 
   @override

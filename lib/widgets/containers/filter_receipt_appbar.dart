@@ -26,10 +26,14 @@ class FilterReceiptAppBar extends StatefulWidget {
   RangeValues? srm;
   SfRangeValues? ibu;
   SfRangeValues? alcohol;
+  List<Fermentation>? selectedFermentations = [];
   List<StyleModel>? styles;
+  List<StyleModel>? selectedStyles = [];
   final Function(double start, double end)? onColorChanged;
-  final Function(double start, double end)? onIBUhanged;
-  final Function(double start, double end)? onAlcoholhanged;
+  final Function(double start, double end)? onIBUChanged;
+  final Function(double start, double end)? onAlcoholChanged;
+  final Function(Fermentation value)? onFermentationChanged;
+  final Function(StyleModel value)? onStyleChanged;
   final Function()? onReset;
 
   FilterReceiptAppBar({Key? key,
@@ -45,13 +49,19 @@ class FilterReceiptAppBar extends StatefulWidget {
     this.endAlcohol,
     this.ibu,
     this.alcohol,
+    this.selectedFermentations,
     this.styles,
+    this.selectedStyles,
     this.onColorChanged,
-    this.onIBUhanged,
-    this.onAlcoholhanged,
+    this.onIBUChanged,
+    this.onAlcoholChanged,
+    this.onFermentationChanged,
+    this.onStyleChanged,
     this.onReset,
   }) : super(key: key) {
+    if (selectedFermentations == null) selectedFermentations = [];
     if (styles == null) styles = [];
+    if (selectedStyles == null) selectedStyles = [];
     if (srm == null) srm = RangeValues(startSRM ?? 0, endSRM ?? SRM.length.toDouble());
     if (ibu == null) ibu = SfRangeValues(startIBU ?? minIBU, endIBU ?? maxIBU);
     if (alcohol == null) alcohol = SfRangeValues(startAlcohol ?? minAlcohol, endAlcohol ?? maxAlcohol);
@@ -97,7 +107,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
             physics: NeverScrollableScrollPhysics(),
             children: [
               _flavor(),
-              _color2(),
+              _color(),
               _fermentation(),
               _styles()
             ],
@@ -108,8 +118,9 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              TextButton(
-                child: Text(AppLocalizations.of(context)!.text('erase_all')),
+              TextButton.icon(
+                icon: Icon(Icons.clear, size: 12),
+                label: Text(AppLocalizations.of(context)!.text('erase_all')),
                 style: TextButton.styleFrom(
                   primary: Theme.of(context).primaryColor,
                   backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
@@ -158,7 +169,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                           widget.startIBU = values.start;
                           widget.endIBU = values.end;
                         });
-                        widget.onIBUhanged?.call(values.start, values.end);
+                        widget.onIBUChanged?.call(values.start, values.end);
                       },
                     )
                   )
@@ -191,7 +202,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                         widget.startAlcohol = values.start;
                         widget.endAlcohol = values.end;
                       });
-                      widget.onAlcoholhanged?.call(values.start, values.end);
+                      widget.onAlcoholChanged?.call(values.start, values.end);
                     },
                     )
                 )
@@ -206,76 +217,83 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
 
   Widget _color() {
     return Container(
-        height:150,
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
-        child: SizedBox(
-            width:150, height:150,
-            child: SfRadialGauge(
-              axes: <RadialAxis>[RadialAxis(
-                ranges: <GaugeRange>[
-                  GaugeRange(startValue: 30,
-                    endValue: 65,
-                    gradient: const SweepGradient(
-                        colors: <Color>[Color(0xFFBC4E9C), Color(0xFFF80759)],
-                        stops: <double>[0.25, 0.75]),
-                    startWidth: 5,
-                    endWidth: 20
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(AppLocalizations.of(context)!.text('srm'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
+            Row(
+              children: [
+                SizedBox(width: 20, child: Text('${widget.startSRM != null ?  widget.startSRM!.round() : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
+                Expanded(
+                  child: SliderTheme(
+                    data: SliderThemeData(
+                      trackHeight: 5,
+                      rangeTrackShape: GradientRectRangeSliderTrackShape(),
+                      thumbColor: Theme.of(context).primaryColor,
+                      overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
+                      rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                    ),
+                    child: RangeSlider(
+                        onChanged: (values) {
+                          setState(() {
+                            widget.startSRM = values.start;
+                            widget.endSRM = values.end;
+                          });
+                          widget.onColorChanged?.call(values.start, values.end);
+                        },
+                        values: RangeValues(widget.startSRM ?? 0, widget.endSRM ?? SRM.length.toDouble()),
+                        min: 0,
+                        max: SRM.length.toDouble(),
+                        divisions: SRM.length
+                    )
                   )
-                ]
-              )
-              ],
+                ),
+                SizedBox(width: 20, child: Text('${widget.endSRM != null ? widget.endSRM!.round() : SRM.length}', softWrap: false, style: TextStyle(fontSize: 12))),
+              ]
             )
+          ]
         )
     );
   }
 
-  Widget _color2() {
-    return Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(AppLocalizations.of(context)!.text('color'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
-              Container(
-                  padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
-                  child: SliderTheme(
-                      data: SliderThemeData(
-                        trackHeight: 4,
-                        rangeTrackShape: GradientRectRangeSliderTrackShape(),
-                        thumbColor: Theme.of(context).primaryColor,
-                        overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                        rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
-                      ),
-                      child: RangeSlider(
-                          onChanged: (values) {
-                            setState(() {
-                              widget.startSRM = values.start;
-                              widget.endSRM = values.end;
-                            });
-                            widget.onColorChanged?.call(values.start, values.end);
-                          },
-                          values: RangeValues(widget.startSRM ?? 0, widget.endSRM ?? SRM.length.toDouble()),
-                          min: 0,
-                          max: SRM.length.toDouble(),
-                          divisions: SRM.length
-                      )
-                  )
-              )
-            ]
-        )
-    );
-  }
+  // Widget _color() {
+  //   return Container(
+  //       height: 70,
+  //       padding: EdgeInsets.only(left: 12, right: 12, top: 55),
+  //       child: SizedBox(
+  //           width:70, height:70,
+  //           child: SfRadialGauge(
+  //             axes: <RadialAxis>[
+  //               RadialAxis(
+  //                   ranges: <GaugeRange>[
+  //                     GaugeRange(
+  //                         startValue: widget.startSRM ?? 0,
+  //                         endValue: widget.endSRM ?? SRM.length.toDouble(),
+  //                         gradient: const SweepGradient(
+  //                             colors: <Color>[Color(0xFFBC4E9C), Color(0xFFF80759)],
+  //                             stops: <double>[0.25, 0.75]),
+  //                         startWidth: 5,
+  //                         endWidth: 20
+  //                     )
+  //                   ]
+  //               )
+  //             ],
+  //           )
+  //       )
+  //   );
+  // }
 
   Widget _fermentation() {
     return Container(
       padding: EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
-    child: Wrap(
-      spacing: 3.0,
-      runSpacing: 4.0,
-      direction: Axis.vertical,
-      children: Fermentation.values.map((e) {
-        return FilterChip(
-            selected: false,
+      child: Wrap(
+        spacing: 2.0,
+        runSpacing: 4.0,
+        direction: Axis.vertical,
+        children: Fermentation.values.map((e) {
+          return FilterChip(
+            selected: widget.selectedFermentations!.contains(e),
             padding: EdgeInsets.zero,
             label: Text(
               AppLocalizations.of(context)!.text(e.toString().toLowerCase()),
@@ -287,13 +305,11 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
             backgroundColor: FillColor,
             shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
             onSelected: (value) {
-              setState(() {
-                // e.selected = value;
-              });
+              widget.onFermentationChanged?.call(e);
             }
-        );
-      }).toList()
-    )
+          );
+        }).toList()
+      )
     );
   }
 
@@ -302,12 +318,12 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
       scrollDirection: Axis.horizontal,
       padding: EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
       child: Wrap(
-        spacing: 3.0,
+        spacing: 2.0,
         runSpacing: 4.0,
         direction: Axis.vertical,
         children: widget.styles!.map((e) {
           return FilterChip(
-            selected: e.selected,
+            selected: widget.selectedStyles!.contains(e),
             padding: EdgeInsets.zero,
             label: Text(
               e.title ?? '',
@@ -319,9 +335,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
             backgroundColor: FillColor,
             shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
             onSelected: (value) {
-              setState(() {
-                e.selected = value;
-              });
+              widget.onStyleChanged?.call(e);
             }
           );
         }).toList()
