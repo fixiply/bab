@@ -13,10 +13,12 @@ import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 class BeersCarouselBuilder extends JsonWidgetBuilder {
   static const type = 'beers-carousel';
 
-  String company;
+  String? company;
+  String? receipt;
 
   BeersCarouselBuilder({
-    required this.company,
+    this.company,
+    this.receipt,
   }) : super(numSupportedChildren: 1);
 
   static BeersCarouselBuilder fromDynamic(
@@ -28,6 +30,7 @@ class BeersCarouselBuilder extends JsonWidgetBuilder {
     }
     return BeersCarouselBuilder(
       company: map['company'],
+      receipt: map['receipt'],
     );
   }
 
@@ -39,7 +42,8 @@ class BeersCarouselBuilder extends JsonWidgetBuilder {
     Key? key,
   }) {
     return BeersCarousel(
-      company
+      company: company,
+      receipt: receipt
     );
   }
 }

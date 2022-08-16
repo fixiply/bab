@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/custom_thumb_shape.dart';
+import 'package:bb/widgets/paints/custom_thumb_shape.dart';
 import 'package:bb/widgets/gradient_rect_range_slider_track_shape.dart';
 
 // External package

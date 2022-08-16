@@ -16,6 +16,13 @@
             </list>
           </value>
         </entry>
+        <entry key="app_settings">
+          <value>
+            <list>
+              <option value="$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/app_settings-4.1.8/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="archive">
           <value>
             <list>
@@ -1239,6 +1246,7 @@
     <CLASSES>
       <root url="file://$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/_fe_analyzer_shared-38.0.0/lib" />
       <root url="file://$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/analyzer-3.4.1/lib" />
+      <root url="file://$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/app_settings-4.1.8/lib" />
       <root url="file://$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/archive-3.3.1/lib" />
       <root url="file://$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/args-2.3.1/lib" />
       <root url="file://$USER_HOME$/SDK/flutter/.pub-cache/hosted/pub.dartlang.org/asn1lib-1.1.0/lib" />

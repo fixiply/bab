@@ -1,4 +1,6 @@
 // Internal package
+import 'package:bb/models/adress_model.dart';
+import 'package:bb/models/payment_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/helpers/date_helper.dart';
 
@@ -14,6 +16,8 @@ class UserModel<T> {
   User? user;
   Roles? role;
   String? company;
+  List<AdressModel>? addresses;
+  List<PaymentModel>? payments;
 
   UserModel({
     this.uuid,
@@ -23,9 +27,13 @@ class UserModel<T> {
     this.email,
     this.user,
     this.role = Roles.customer,
-    this.company
+    this.company,
+    this.addresses,
+    this.payments
   }) {
     if(inserted_at == null) { inserted_at = DateTime.now(); }
+    if (addresses == null) { addresses = []; }
+    if (payments == null) { payments = []; }
   }
 
   bool isAdmin() {
@@ -44,6 +52,8 @@ class UserModel<T> {
     this.email = map['email'];
     this.role = Roles.values.elementAt(map['role']);
     this.company = map['company'];
+    this.addresses = AdressModel.deserialize(map['addresses']);
+    this.payments = PaymentModel.deserialize(map['payments']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -54,6 +64,8 @@ class UserModel<T> {
       'email': this.email,
       'role': this.role!.index,
       'company': company,
+      'addresses': AdressModel.serialize(this.addresses),
+      'payments': PaymentModel.serialize(this.payments),
     };
     if (persist == true) {
       map.addAll({'uuid': this.uuid});
@@ -70,7 +82,8 @@ class UserModel<T> {
       email: this.email,
       user: this.user,
       role: this.role,
-      company: this.company,
+      addresses: this.addresses,
+      payments: this.payments,
     );
   }
 

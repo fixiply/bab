@@ -51,6 +51,11 @@ class _HomePageState extends State<HomePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
+          IconButton(
+            icon: Icon(Icons.shopping_cart_outlined),
+            onPressed: () {
+            },
+          ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
               icon: Icon(Icons.more_vert),
               tooltip: AppLocalizations.of(context)!.text('display'),

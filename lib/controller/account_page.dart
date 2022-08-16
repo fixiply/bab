@@ -2,7 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/address_page.dart';
 import 'package:bb/controller/login_page.dart';
+import 'package:bb/controller/payments_page.dart';
+import 'package:bb/controller/purchases_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
@@ -10,6 +13,7 @@ import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 
 // External package
+import 'package:app_settings/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
 
@@ -36,10 +40,17 @@ class _AccountPageState extends State<AccountPage> {
       appBar: AppBar(
         // Here we take the value from the MyHomePage object that was created by
         // the App.build method, and use it to set our appbar title.
-        title: Text(AppLocalizations.of(context)!.text('account')),
+        title: Text(AppLocalizations.of(context)!.text('my_account')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.shopping_cart_outlined),
+            onPressed: () {
+            },
+          ),
+        ]
       ),
       drawer: _editable && currentUser != null && currentUser!.isEditor() ? CustomDrawer(context) : null,
       body: SingleChildScrollView(
@@ -70,7 +81,7 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
             if (currentUser == null) const SizedBox(height: 40),
-            Text('Mes paramètres', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context)!.text('my_settings'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Container(
               color: Colors.white,
               padding: EdgeInsets.zero,
@@ -81,37 +92,55 @@ class _AccountPageState extends State<AccountPage> {
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.local_offer_outlined),
-                    title: Text('Mes achats'),
+                    title: Text(AppLocalizations.of(context)!.text('my_purchases')),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return PurchasesPage();
+                      }));
+                    },
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.credit_card),
-                    title: Text('Méthodes de paiement'),
+                    title: Text(AppLocalizations.of(context)!.text('payment_methods')),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return PaymentsPage();
+                      }));
+                    },
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.local_shipping_outlined),
-                    title: Text('Adresses de livraison'),
+                    title: Text(AppLocalizations.of(context)!.text('delivery_addresses')),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return AddressPage();
+                      }));
+                    },
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.help_outline),
-                    title: Text('Support Client'),
+                    title: Text(AppLocalizations.of(context)!.text('customer_support')),
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.notifications),
-                    title: Text('Paramètres d\'Alerte'),
+                    title: Text(AppLocalizations.of(context)!.text('alert_settings')),
+                    onTap: () {
+                      AppSettings.openNotificationSettings();
+                    },
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.info_outline),
-                    title: Text('A propos de Brasseur Bordelais'),
+                    title: Text(AppLocalizations.of(context)!.text('about')),
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.cancel),
-                    title: Text('Déconnexion'),
+                    title: Text(AppLocalizations.of(context)!.text('logout')),
                     subtitle: Text(currentUser!.user!.email!),
                     onTap: () async {
                       bool confirm = await showDialog(

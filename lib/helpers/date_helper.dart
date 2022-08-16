@@ -71,6 +71,20 @@ class DateHelper {
     return '';
   }
 
+  static String formatShortDate(BuildContext context, DateTime? date) {
+    if (date != null) {
+      return MaterialLocalizations.of(context).formatShortDate(date);
+    }
+    return '';
+  }
+
+  static String formatFullDate(BuildContext context, DateTime? date) {
+    if (date != null) {
+      return MaterialLocalizations.of(context).formatFullDate(date);
+    }
+    return '';
+  }
+
   static String formatDateTime(BuildContext context, DateTime? date) {
     if (date != null) {
       Locale locale = AppLocalizations.of(context)!.locale;

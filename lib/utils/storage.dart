@@ -98,7 +98,12 @@ class Storage {
         if (image!.width > 640) {
           image = ImageLib.copyResize(image, width: 640);
         }
-        List<int> data = ImageLib.encodeJpg(image, quality: 80);
+        List<int> data = [];
+        if (file.mimeType == 'image/png') {
+          data = ImageLib.encodePng(image);
+        } else {
+          data = ImageLib.encodeJpg(image, quality: 80);
+        }
         await storage.ref('images/$path/${name}').putData(Uint8List.fromList(data), metadata);
       } else {
         await storage.ref('images/$path/${name}').putFile(File(file.path), metadata);

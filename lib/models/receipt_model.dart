@@ -13,7 +13,6 @@ class ReceiptModel<T> extends Model {
   double? alcohol;
   double? ibu;
   double? ebc;
-  List<RatingModel>? ratings;
 
   ReceiptModel({
     String? uuid,
@@ -27,11 +26,8 @@ class ReceiptModel<T> extends Model {
     this.style,
     this.alcohol,
     this.ibu,
-    this.ebc,
-    this.ratings,
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (ratings == null) { ratings = []; }
-  }
+    this.ebc
+  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
@@ -43,7 +39,6 @@ class ReceiptModel<T> extends Model {
     this.alcohol = map['alcohol'].toDouble();
     this.ibu = map['ibu'].toDouble();
     this.ebc = map['ebc'].toDouble();
-    this.ratings = RatingModel.deserialize(map['ratings']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -56,8 +51,7 @@ class ReceiptModel<T> extends Model {
       'style': this.style,
       'alcohol': this.alcohol,
       'ibu': this.ibu,
-      'ebc': this.ebc,
-      'ratings': RatingModel.serialize(this.ratings),
+      'ebc': this.ebc
     });
     return map;
   }
@@ -75,8 +69,7 @@ class ReceiptModel<T> extends Model {
       style: this.style,
       alcohol: this.alcohol,
       ibu: this.ibu,
-      ebc: this.ebc,
-      ratings: this.ratings,
+      ebc: this.ebc
     );
   }
 
@@ -92,20 +85,5 @@ class ReceiptModel<T> extends Model {
 
   int getSRM() {
     return (ebc! * 0.508).toInt();
-  }
-
-  int notice() {
-    return this.ratings != null ? this.ratings!.length : 0;
-  }
-
-  double rating() {
-    double rating = 0;
-    if (ratings != null && ratings!.length > 0) {
-      for(RatingModel model in ratings!) {
-        rating += model.rating!;
-      }
-      rating = rating / ratings!.length;
-    }
-    return rating;
   }
 }

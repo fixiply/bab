@@ -43,7 +43,7 @@ class MarkdownBuilder extends JsonWidgetBuilder {
     Key? key,
   }) {
     return Container(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.all(12.0),
       child: MarkdownBody(
         data: text,
         fitContent: true,

@@ -1,12 +1,15 @@
 // Internal package
+import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:flutter/material.dart';
 
 class CompanyModel<T> extends Model {
   Status? status;
   String? name;
   String? text;
+  ImageModel? image;
 
   CompanyModel({
     String? uuid,
@@ -16,6 +19,7 @@ class CompanyModel<T> extends Model {
     this.status = Status.pending,
     this.name,
     this.text,
+    this.image,
   });
 
   void fromMap(Map<String, dynamic> map) {
@@ -25,6 +29,8 @@ class CompanyModel<T> extends Model {
     this.updated_at = DateHelper.parse(map['updated_at']);
     this.name = map['name'];
     this.text = map['text'];
+    this.image = ImageModel.fromJson(map['image']);
+    debugPrint('CompanyModel rect: ${image!.rect}');
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -33,6 +39,7 @@ class CompanyModel<T> extends Model {
       'status': this.status!.index,
       'name': this.name,
       'text': this.text,
+      'image': ImageModel.serialize(this.image),
     });
     return map;
   }
@@ -46,6 +53,7 @@ class CompanyModel<T> extends Model {
       status: this.status,
       name: this.name,
       text: this.text,
+      image: this.image
     );
   }
 

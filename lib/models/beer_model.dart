@@ -13,7 +13,6 @@ class BeerModel<T> extends Model {
   double? price;
   String? text;
   ImageModel? image;
-  List<RatingModel>? ratings;
 
   BeerModel({
     String? uuid,
@@ -27,11 +26,8 @@ class BeerModel<T> extends Model {
     this.subtitle,
     this.price,
     this.text,
-    this.image,
-    this.ratings,
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (ratings == null) { ratings = []; }
-  }
+    this.image
+  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
@@ -43,7 +39,6 @@ class BeerModel<T> extends Model {
     if (map['price'] != null) this.price = map['price'].toDouble();
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
-    this.ratings = RatingModel.deserialize(map['ratings']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -56,8 +51,7 @@ class BeerModel<T> extends Model {
       'subtitle': this.subtitle,
       'price': this.price,
       'text': this.text,
-      'image': ImageModel.serialize(this.image),
-      'ratings': RatingModel.serialize(this.ratings),
+      'image': ImageModel.serialize(this.image)
     });
     return map;
   }
@@ -75,8 +69,7 @@ class BeerModel<T> extends Model {
       subtitle: this.subtitle,
       price: this.price,
       text: this.text,
-      image: this.image,
-      ratings: this.ratings,
+      image: this.image
     );
   }
 
@@ -89,19 +82,19 @@ class BeerModel<T> extends Model {
   String toString() {
     return 'Beer: $title, UUID: $uuid';
   }
-
-  int notice() {
-    return this.ratings != null ? this.ratings!.length : 0;
-  }
-
-  double rating() {
-    double rating = 0;
-    if (ratings != null && ratings!.length > 0) {
-      for(RatingModel model in ratings!) {
-        rating += model.rating!;
-      }
-      rating = rating / ratings!.length;
-    }
-    return rating;
-  }
+  //
+  // int notice() {
+  //   return this.ratings != null ? this.ratings!.length : 0;
+  // }
+  //
+  // double rating() {
+  //   double rating = 0;
+  //   if (ratings != null && ratings!.length > 0) {
+  //     for(RatingModel model in ratings!) {
+  //       rating += model.rating!;
+  //     }
+  //     rating = rating / ratings!.length;
+  //   }
+  //   return rating;
+  // }
 }

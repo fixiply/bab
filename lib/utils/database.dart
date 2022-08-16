@@ -1,3 +1,4 @@
+import 'package:bb/models/rating_model.dart';
 import 'package:flutter/widgets.dart';
 
 // Internal package
@@ -21,6 +22,7 @@ class Database {
   final beers = firestore.collection("beers");
   final companies = firestore.collection("companies");
   final events = firestore.collection("events");
+  final ratings = firestore.collection("ratings");
   final receipts = firestore.collection("receipts");
   final styles = firestore.collection("styles");
   final users = firestore.collection("users");
@@ -35,6 +37,8 @@ class Database {
       return companies;
     } else if (o is EventModel) {
       return events;
+    } else if (o is RatingModel) {
+      return ratings;
     } else if (o is ReceiptModel) {
       return receipts;
     } else if (o is StyleModel) {
@@ -48,7 +52,7 @@ class Database {
   Future<String> add(dynamic d) async {
     try {
       if (d is Model && _auth.currentUser != null) {
-        d.creator = _auth.currentUser!.email;
+        d.creator = _auth.currentUser!.uid;
       }
       DocumentReference document = await getTableName(d)!.add(d.toMap());
       d.uuid = document.id;
@@ -63,7 +67,7 @@ class Database {
   Future<bool> set(String id, dynamic d) async {
     try {
       if (d is Model && _auth.currentUser != null) {
-        d.creator = _auth.currentUser!.email;
+        d.creator = _auth.currentUser!.uid;
       }
       await getTableName(d)!.doc(id).set(d.toMap())
       .then((value) {
@@ -91,7 +95,7 @@ class Database {
           d.status = Status.pending;
         }
         if (d is Model && _auth.currentUser != null) {
-          d.creator = _auth.currentUser!.email;
+          d.creator = _auth.currentUser!.uid;
         }
       }
       debugPrint('update ${d.toMap()}');
@@ -117,7 +121,7 @@ class Database {
         Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
         if (_auth.currentUser != null) {
           String? creator = map['creator'];
-          canBeUpdated = creator == null || _auth.currentUser!.email == map['creator'];
+          canBeUpdated = creator == null || _auth.currentUser!.uid == map['creator'];
         }
         if (canBeUpdated) {
           collection.doc(doc.id).update({'status': Status.publied.index});
@@ -190,6 +194,17 @@ class Database {
     return list;
   }
 
+  Future<ReceiptModel?> getReceipt(String uuid) async {
+    DocumentSnapshot snapshot = await receipts.doc(uuid).get();
+    if (snapshot.exists) {
+      ReceiptModel model = ReceiptModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
   Future<List<ReceiptModel>> getReceipts({String? searchText, bool archived = false, bool all = false, bool ordered = true}) async {
     List<ReceiptModel> list = [];
     Query query = receipts;
@@ -226,6 +241,17 @@ class Database {
     return list;
   }
 
+  Future<CompanyModel?> getCompany(String uuid) async {
+    DocumentSnapshot snapshot = await companies.doc(uuid).get();
+    if (snapshot.exists) {
+      CompanyModel model = CompanyModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
 
   Future<List<CompanyModel>> getCompanies({bool ordered = false}) async {
     List<CompanyModel> list = [];
@@ -245,6 +271,17 @@ class Database {
     return list;
   }
 
+  Future<StyleModel?> getStyle(String uuid) async {
+    DocumentSnapshot snapshot = await styles.doc(uuid).get();
+    if (snapshot.exists) {
+      StyleModel model = StyleModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
   Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
@@ -255,7 +292,6 @@ class Database {
         if (fermentations != null && fermentations.length > 0) {
           canBeAdded = false;
           Fermentation fermentation = Fermentation.values.elementAt(doc['fermentation']);
-          debugPrint('getStyles $fermentation');
           if (fermentations.contains(fermentation)) {
             canBeAdded = true;
           }
@@ -274,11 +310,14 @@ class Database {
     return list;
   }
 
-  Future<List<BeerModel>> getBeers({String? company, bool ordered = false}) async {
+  Future<List<BeerModel>> getBeers({String? company, String? receipt, bool ordered = false}) async {
     List<BeerModel> list = [];
     Query query = beers;
     if (company != null) {
       query = query.where('company', isEqualTo: company);
+    }
+    if (receipt != null) {
+      query = query.where('receipt', isEqualTo: receipt);
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
@@ -292,6 +331,24 @@ class Database {
     if (ordered == true) {
       list.sort((a, b) => a.title!.toLowerCase().compareTo(b.title!.toLowerCase()));
     }
+    return list;
+  }
+
+  Future<List<RatingModel>> getRatings({String? beer, bool ordered = false}) async {
+    List<RatingModel> list = [];
+    Query query = ratings;
+    if (beer != null) {
+      query = query.where('beer', isEqualTo: beer);
+    }
+    query = query.orderBy('updated_at', descending: true);
+    await query.get().then((result) {
+      result.docs.forEach((doc) {
+        RatingModel model = RatingModel();
+        model.uuid = doc.id;
+        model.fromMap(doc.data() as Map<String, dynamic>);
+        list.add(model);
+      });
+    });
     return list;
   }
 }

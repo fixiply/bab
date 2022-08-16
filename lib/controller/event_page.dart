@@ -30,15 +30,22 @@ class _EventPageState extends State<EventPage> {
     var registry = JsonWidgetRegistry.instance;
     return Scaffold(
       appBar: widget.model.sliver == false ? AppBar(
-        titleSpacing: 15,
-        centerTitle: true,
-        backgroundColor: Theme.of(context).primaryColor,
+        elevation: 0,
+        foregroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
         title: FittedBox(
           fit: BoxFit.scaleDown,
           child: Text(
               widget.model.title!
           ),
         ),
+        actions: <Widget> [
+          IconButton(
+            icon: Icon(Icons.shopping_cart_outlined),
+            onPressed: () {
+            },
+          ),
+        ]
       ) : null,
       body: widget.model.sliver == false ? SingleChildScrollView(
         child: ListView.builder(
@@ -104,7 +111,14 @@ class _EventPageState extends State<EventPage> {
                   ),
                 ],
               ),
-            )
+            ),
+            actions: <Widget> [
+              IconButton(
+                icon: Icon(Icons.shopping_cart_outlined),
+                onPressed: () {
+                },
+              ),
+            ]
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate((BuildContext context, int index) {

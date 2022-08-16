@@ -148,6 +148,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
           ),
           Container(
             color: FillColor,
+            padding: EdgeInsets.all(12),
             child: Stack(
               children: [
                 AspectRatio(

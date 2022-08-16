@@ -69,6 +69,11 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
+          IconButton(
+            icon: Icon(Icons.shopping_cart_outlined),
+            onPressed: () {
+            },
+          ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
             icon: Icon(Icons.more_vert),
             tooltip: AppLocalizations.of(context)!.text('display'),
@@ -385,44 +390,6 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                 return ReceiptPage(model);
               }));
             },
-          ),
-          if (model.notice() > 0) Padding(
-            padding: EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Flexible(
-                  flex: 2,
-                  child: RatingBar.builder(
-                    initialRating: model.rating(),
-                    direction: Axis.horizontal,
-                    allowHalfRating: true,
-                    itemCount: 5,
-                    itemSize: 18,
-                    itemPadding: EdgeInsets.symmetric(horizontal: 4.0),
-                    itemBuilder: (context, _) => Icon(
-                      Icons.star,
-                      color: Colors.amber,
-                    ),
-                    ignoreGestures: true,
-                    onRatingUpdate: (rating) {
-                    },
-                  )
-                ),
-                Flexible(
-                  flex: 1,
-                  child: TextButton(
-                    onPressed: () {
-                    },
-                    style: TextButton.styleFrom(shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4.0),
-                      side: BorderSide(color: Theme.of(context).primaryColor),
-                    )),
-                    child: Text('Achetez', style: TextStyle(color: Theme.of(context).primaryColor)),
-                  )
-                )
-              ]
-            )
           )
         ]
       )

@@ -1,3 +1,4 @@
+import 'package:bb/widgets/forms/image_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -128,6 +129,16 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
                 validators: (value) {
                   return null;
                 }
+              ),
+              Divider(height: 10),
+              ImageField(
+                context: context,
+                image: widget.model.image,
+                height: null,
+                crop: true,
+                onChanged: (images) => setState(() {
+                  widget.model.image = images;
+                })
               ),
             ]
           ),
