@@ -38,15 +38,15 @@ class _RegisterPageState extends State<RegisterPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-          elevation: 0,
-          foregroundColor: Colors.black,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-              icon:Icon(Icons.close),
-              onPressed:() async {
-                Navigator.pop(context);
-              }
-          )
+        elevation: 0,
+        foregroundColor: Colors.black,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+            icon:Icon(Icons.close),
+            onPressed:() async {
+              Navigator.pop(context);
+            }
+        )
       ),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),

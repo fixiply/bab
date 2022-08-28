@@ -17,6 +17,7 @@
   "archives": "Archives",
   "axis.horizontal": "Horizontal",
   "axis.vertical": "Vertical",
+  "basket_empty": "Your basket is empty",
   "beer": "Bière",
   "beer(s)": "%s bière(s)",
   "beer_styles": "Beer styles",
@@ -27,6 +28,7 @@
   "bottles": "%s bottles",
   "bottom": "Bottom",
   "bottom_left": "Bottom left",
+  "buy_now": "Buy now",
   "cancel": "Cancel",
   "card_number": "Numéro de carte",
   "city": "City",
@@ -78,6 +80,7 @@
   "new_address": "New delivery address",
   "no_event": "No event",
   "no_image": "No image",
+  "no_purchase": "No purchase",
   "no_result": "No result",
   "not_found": "Not found",
   "ok": "OK",
@@ -133,5 +136,6 @@
   "user": "User",
   "validator_field_required": "This field is required",
   "validity_date": "MM/AA",
+  "your_basket": "Your basket",
   "zip_code": "Zip code"
 }

@@ -1,15 +1,16 @@
-import 'package:bb/models/rating_model.dart';
 import 'package:flutter/widgets.dart';
 
 // Internal package
+import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/models/beer_model.dart';
 import 'package:bb/models/company_model.dart';
 import 'package:bb/models/event_model.dart';
 import 'package:bb/models/model.dart';
+import 'package:bb/models/purchase_model.dart';
+import 'package:bb/models/rating_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/user_model.dart';
-import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/utils/constants.dart';
 
 // External package
@@ -22,6 +23,7 @@ class Database {
   final beers = firestore.collection("beers");
   final companies = firestore.collection("companies");
   final events = firestore.collection("events");
+  final purchases = firestore.collection("purchases");
   final ratings = firestore.collection("ratings");
   final receipts = firestore.collection("receipts");
   final styles = firestore.collection("styles");
@@ -37,6 +39,8 @@ class Database {
       return companies;
     } else if (o is EventModel) {
       return events;
+    } else if (o is PurchaseModel) {
+      return purchases;
     } else if (o is RatingModel) {
       return ratings;
     } else if (o is ReceiptModel) {
@@ -344,6 +348,24 @@ class Database {
     await query.get().then((result) {
       result.docs.forEach((doc) {
         RatingModel model = RatingModel();
+        model.uuid = doc.id;
+        model.fromMap(doc.data() as Map<String, dynamic>);
+        list.add(model);
+      });
+    });
+    return list;
+  }
+
+  Future<List<PurchaseModel>> getPurchases({String? user, bool ordered = false}) async {
+    List<PurchaseModel> list = [];
+    Query query = purchases;
+    if (user != null) {
+      query = query.where('creator', isEqualTo: user);
+    }
+    query = query.orderBy('updated_at', descending: true);
+    await query.get().then((result) {
+      result.docs.forEach((doc) {
+        PurchaseModel model = PurchaseModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);

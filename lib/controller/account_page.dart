@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/address_page.dart';
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/login_page.dart';
 import 'package:bb/controller/payments_page.dart';
 import 'package:bb/controller/purchases_page.dart';
@@ -25,8 +26,6 @@ class AccountPage extends StatefulWidget {
 class _AccountPageState extends State<AccountPage> {
   // Edition mode
   bool _editable = false;
-  bool _remove = false;
-  bool _hidden = false;
 
   @override
   void initState() {
@@ -48,6 +47,9 @@ class _AccountPageState extends State<AccountPage> {
           IconButton(
             icon: Icon(Icons.shopping_cart_outlined),
             onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return BasketPage();
+              }));
             },
           ),
         ]

@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:bb/utils/app_localizations.dart';
 
 class EmptyContainer extends StatelessWidget {
+  final Widget? image;
   final String? message;
 
   EmptyContainer({
+    this.image,
     this.message,
   });
 
@@ -16,6 +18,7 @@ class EmptyContainer extends StatelessWidget {
     EdgeInsets padding = MediaQuery.of(context).padding; // Height (without SafeArea)
     double appbar = Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight; // Height (without SafeArea)
     double netHeight = height - padding.top - kBottomNavigationBarHeight - appbar;
+
     return SingleChildScrollView(
       physics: AlwaysScrollableScrollPhysics(),
       child: Container(
@@ -24,7 +27,7 @@ class EmptyContainer extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if ((100 + 40) < netHeight) Image.asset('assets/images/logo.png', width: 100, height: 100, color: Theme.of(context).primaryColor),
+              image ?? Image.asset('assets/images/logo.png', width: 100, height: 100, color: Theme.of(context).primaryColor),
               Text(message != null ? message! : AppLocalizations.of(context)!.text('empty_list'),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.clip,

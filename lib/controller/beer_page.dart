@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_beer_page.dart';
 import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/models/beer_model.dart';
@@ -69,15 +70,8 @@ class _BeerPageState extends State<BeerPage> {
                       clipper: BezierClipper(), //set our custom wave clipper
                       child:Container(
                         color: Colors.black,
-                        height:200,
+                        height: 200,
                       ),
-                    ),
-                  ),
-                  ClipPath(
-                    clipper: CircleClipper(), //set our custom wave clipper
-                    child:Container(
-                      color: Theme.of(context).primaryColor,
-                      height:200,
                     ),
                   ),
                   Row(
@@ -87,69 +81,80 @@ class _BeerPageState extends State<BeerPage> {
                         child: ImageContainer(widget.model.image, width: null, height: null, color: Colors.transparent),
                       ),
                       Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.max,
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        child: Stack(
+                          alignment: Alignment.center,
                           children: [
-                            if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
-                            RatingBar.builder(
-                              initialRating: _rating,
-                              direction: Axis.horizontal,
-                              allowHalfRating: true,
-                              itemCount: 5,
-                              itemSize: 18,
-                              itemPadding: EdgeInsets.zero,
-                              itemBuilder: (context, _) => Icon(
-                                Icons.star,
-                                color: Colors.amber,
+                            ClipPath(
+                              clipper: CircleClipper(), //set our custom wave clipper
+                              child: Container(
+                                color: Theme.of(context).primaryColor,
                               ),
-                              tapOnlyMode: true,
-                              ignoreGestures: false,
-                              onRatingUpdate: (rating) async {
-                                RenderBox box = _keyReviews.currentContext!.findRenderObject() as RenderBox;
-                                Offset position = box.localToGlobal(Offset.zero); //this is global position
-                                _controller.animateTo(
-                                  position.dy,
-                                  duration: Duration(seconds: 1),
-                                  curve: Curves.fastOutSlowIn,
-                                );
-                                // dynamic? rating = await showDialog(
-                                //     context: context,
-                                //     builder: (BuildContext context) {
-                                //       return RatingDialog(
-                                //           RatingModel(
-                                //               creator: currentUser!.user!.uid,
-                                //               name: currentUser!.user!.displayName,
-                                //               beer: widget.model.uuid,
-                                //               rating: 0
-                                //           ),
-                                //           maxLines: 3
-                                //       );
-                                //     }
-                                // );
-                                // if (rating != null) {
-                                //   Database().update(rating).then((value) async {
-                                //     _showSnackbar(AppLocalizations.of(context)!.text('saved_review'));
-                                //     _fetch();
-                                //   }).onError((e,s) {
-                                //     _showSnackbar(e.toString());
-                                //   });
-                                // }
-                              },
                             ),
-                            Text('${_notices} ${AppLocalizations.of(context)!.text('reviews')}', style: TextStyle(color: Colors.white)),
-                            const SizedBox(height: 10),
-                            Stack(
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               children: [
-                                Image.asset('assets/images/sale.png', width: 80, color: Colors.black38),
-                                Positioned(
-                                    left: 22,
-                                    top: 9,
-                                    child: Text('${widget.model.price!.toStringAsPrecision(3)} €', style: TextStyle(fontSize: 16, color: Colors.white))
+                                if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+                                RatingBar.builder(
+                                  initialRating: _rating,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  itemCount: 5,
+                                  itemSize: 18,
+                                  itemPadding: EdgeInsets.zero,
+                                  itemBuilder: (context, _) => Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                                  tapOnlyMode: true,
+                                  ignoreGestures: false,
+                                  onRatingUpdate: (rating) async {
+                                    RenderBox box = _keyReviews.currentContext!.findRenderObject() as RenderBox;
+                                    Offset position = box.localToGlobal(Offset.zero); //this is global position
+                                    _controller.animateTo(
+                                      position.dy,
+                                      duration: Duration(seconds: 1),
+                                      curve: Curves.fastOutSlowIn,
+                                    );
+                                    // dynamic? rating = await showDialog(
+                                    //     context: context,
+                                    //     builder: (BuildContext context) {
+                                    //       return RatingDialog(
+                                    //           RatingModel(
+                                    //               creator: currentUser!.user!.uid,
+                                    //               name: currentUser!.user!.displayName,
+                                    //               beer: widget.model.uuid,
+                                    //               rating: 0
+                                    //           ),
+                                    //           maxLines: 3
+                                    //       );
+                                    //     }
+                                    // );
+                                    // if (rating != null) {
+                                    //   Database().update(rating).then((value) async {
+                                    //     _showSnackbar(AppLocalizations.of(context)!.text('saved_review'));
+                                    //     _fetch();
+                                    //   }).onError((e,s) {
+                                    //     _showSnackbar(e.toString());
+                                    //   });
+                                    // }
+                                  },
+                                ),
+                                Text('${_notices} ${AppLocalizations.of(context)!.text('reviews')}', style: TextStyle(color: Colors.white)),
+                                const SizedBox(height: 10),
+                                Stack(
+                                  children: [
+                                    Image.asset('assets/images/sale.png', width: 80, color: Colors.black38),
+                                    Positioned(
+                                        left: 22,
+                                        top: 9,
+                                        child: Text('${widget.model.price!.toStringAsPrecision(3)} €', style: TextStyle(fontSize: 16, color: Colors.white))
+                                    )
+                                  ],
                                 )
                               ],
-                            )
-                          ],
+                            ),
+                          ]
                         ),
                       )
                     ]
@@ -161,6 +166,9 @@ class _BeerPageState extends State<BeerPage> {
               IconButton(
                 icon: Icon(Icons.shopping_cart_outlined),
                 onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return BasketPage();
+                  }));
                 },
               ),
               if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
@@ -318,10 +326,10 @@ class _BeerPageState extends State<BeerPage> {
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: TextButton(
-          child: Text('Achetez dès maintenant'),
+          child: Text(AppLocalizations.of(context)!.text('buy_now')),
           style:  TextButton.styleFrom(
-            primary: Theme.of(context).primaryColor,
-            backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+            primary: Colors.white,
+            backgroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
           onPressed: () {},

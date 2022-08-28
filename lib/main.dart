@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
@@ -9,10 +8,12 @@ import 'package:bb/controller/home_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/builders/beers_carousel_builder.dart';
+import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:bb/widgets/builders/markdown_builder.dart';
 
 // External package
@@ -26,6 +27,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 final EditionNotifier editionNotifier = EditionNotifier();
+final BasketNotifier basketNotifier = BasketNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -47,7 +49,8 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => editionNotifier)
+        ChangeNotifierProvider(create: (_) => editionNotifier),
+        ChangeNotifierProvider(create: (_) => basketNotifier)
       ],
       child: MyApp()),
   );

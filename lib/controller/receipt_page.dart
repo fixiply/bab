@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
@@ -38,121 +39,124 @@ class _ReceiptPageState extends State<ReceiptPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: CustomScrollView(
-        slivers: <Widget>[
-          SliverAppBar(
-            pinned: true,
-            expandedHeight: 250.0,
-            foregroundColor: Colors.white,
-            backgroundColor: Theme.of(context).primaryColor,
-            flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.only(left: 170),
-              title: Text(widget.model.title!),
-              background: Stack(
-                children: [
-                  Opacity( //semi red clippath with more height and with 0.5 opacity
-                    opacity: 0.5,
-                    child: ClipPath(
-                      clipper: BezierClipper(), //set our custom wave clipper
-                      child:Container(
-                        color:Colors.black,
-                        height: 200,
-                      ),
-                    ),
-                  ),
-                  ClipPath(
-                    clipper: CircleClipper(
-                      radius: _style != null && _style!.title!.length > 8 ?  80 : 65,
-                      dx: MediaQuery.of(context).size.width / 1.34
-                    ), //set our custom wave clipper
-                    child: Container(
-                      color: Theme.of(context).primaryColor,
-                      height:200,
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Stack(
-                        children: [
-                          Container(
-                            padding: EdgeInsets.only(left:30),
-                            child: Image.asset('assets/images/beer3.png',
-                              color: SRM[widget.model.getSRM()]
-                              // fit: BoxFit.fill,
-                              // colorBlendMode: BlendMode.modulate
-                            ),
-                          ),
-                          Container(
-                            padding: EdgeInsets.only(left:30),
-                            child: Image.asset('assets/images/beer2.png'),
-                          ),
-                        ]
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            if (_style != null) Text(_style!.title!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
-                            if (widget.model.ibu != null) Text('IBU: ${widget.model.ibu}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                            if (widget.model.alcohol != null) Text('${widget.model.alcohol}°', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                          ],
-                        ),
-                      )
-                    ]
-                  )
-                ]
+        body: CustomScrollView(slivers: <Widget>[
+      SliverAppBar(
+        pinned: true,
+        expandedHeight: 250.0,
+        foregroundColor: Colors.white,
+        backgroundColor: Theme.of(context).primaryColor,
+        flexibleSpace: FlexibleSpaceBar(
+          titlePadding: EdgeInsets.only(left: 170),
+          title: Text(widget.model.title!),
+          background: Stack(
+            children: [
+            Opacity(
+              //semi red clippath with more height and with 0.5 opacity
+              opacity: 0.5,
+              child: ClipPath(
+                clipper: BezierClipper(), //set our custom wave clipper
+                child: Container(
+                  color: Colors.black,
+                  height: 200,
+                ),
               ),
             ),
-            actions: <Widget> [
-              IconButton(
-                icon: Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
-                },
-              ),
-              if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
-                icon: Icon(Icons.edit_note),
-                onPressed: () {
-                  _edit(widget.model);
-                },
-              ),
-            ],
-          ),
-          if (widget.model.text!.isNotEmpty) SliverToBoxAdapter(
-            child: ExpansionPanelList(
-              elevation: 1,
-              expansionCallback: (int index, bool isExpanded) {
-                setState(() {
-                  _expanded = !isExpanded;
-                });
-              },
+            Row(
               children: [
-                ExpansionPanel(
-                  isExpanded: _expanded,
-                  canTapOnHeader: true,
-                  headerBuilder: (context, isExpanded) {
-                    return ListTile(
-                      dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('features'), style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    );
-                  },
-                  body: Container(
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
-                    child: MarkdownBody(data: widget.model.text!, softLineBreak: true,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                          .copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),)
-                  ),
+                Stack(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.only(left: 30),
+                      child: Image.asset('assets/images/beer3.png', color: SRM[widget.model.getSRM()]
+                        // fit: BoxFit.fill,
+                        // colorBlendMode: BlendMode.modulate
+                        ),
+                    ),
+                    Container(
+                      padding: EdgeInsets.only(left: 30),
+                      child: Image.asset('assets/images/beer2.png'),
+                    ),
+                  ]
+                ),
+                Expanded(
+                  child: Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      ClipPath(
+                        clipper: CircleClipper(radius: _style != null && _style!.title!.length > 8 ? 80 : 65), //set our custom wave clipper
+                        child: Container(
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          if (_style != null) FittedBox(
+                              child: Text(_style!.title!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white))
+                          ),
+                          if (widget.model.ibu != null) Text('IBU: ${widget.model.ibu}', style: TextStyle(fontSize: 18, color: Colors.white)),
+                          if (widget.model.alcohol != null) Text('${widget.model.alcohol}°', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                        ],
+                      ),
+                    ]
+                  )
                 )
               ]
             )
+          ]),
+        ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.shopping_cart_outlined),
+            onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return BasketPage();
+              }));
+            },
           ),
-          SliverToBoxAdapter(
-            child: BeersCarousel(receipt: widget.model.uuid)
-          ),
-        ]
-      )
-    );
+          if (_editable && currentUser != null && currentUser!.isEditor())
+            IconButton(
+              icon: Icon(Icons.edit_note),
+              onPressed: () {
+                _edit(widget.model);
+              },
+            ),
+        ],
+      ),
+      if (widget.model.text!.isNotEmpty)
+        SliverToBoxAdapter(
+            child: ExpansionPanelList(
+                elevation: 1,
+                expansionCallback: (int index, bool isExpanded) {
+                  setState(() {
+                    _expanded = !isExpanded;
+                  });
+                },
+                children: [
+              ExpansionPanel(
+                isExpanded: _expanded,
+                canTapOnHeader: true,
+                headerBuilder: (context, isExpanded) {
+                  return ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                    title: Text(AppLocalizations.of(context)!.text('features'),
+                        style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                  );
+                },
+                body: Container(
+                  padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                  child: MarkdownBody(
+                    data: widget.model.text!,
+                    softLineBreak: true,
+                    styleSheet:
+                        MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                  )),
+              )
+            ])),
+      SliverToBoxAdapter(child: BeersCarousel(receipt: widget.model.uuid)),
+    ]));
   }
 
   _initialize() async {

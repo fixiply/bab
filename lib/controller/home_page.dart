@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/event_page.dart';
 import 'package:bb/controller/forms/form_event_page.dart';
 import 'package:bb/models/event_model.dart';
@@ -54,6 +55,9 @@ class _HomePageState extends State<HomePage> {
           IconButton(
             icon: Icon(Icons.shopping_cart_outlined),
             onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return BasketPage();
+              }));
             },
           ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
@@ -296,22 +300,22 @@ class _HomePageState extends State<HomePage> {
               )
             ),
             if(model.title != null && model.title!.length > 0) Flexible(
-                child: Container(
-                    padding: EdgeInsets.all(5),
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        model.title!,
-                        overflow: grid ? TextOverflow.ellipsis : null,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
-                        textAlign: TextAlign.left,
-                      ),
-                    )
+              child: Container(
+                padding: EdgeInsets.all(5),
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    model.title!,
+                    overflow: grid ? TextOverflow.ellipsis : null,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                    ),
+                    textAlign: TextAlign.left,
+                  ),
                 )
+              )
             ),
             if(model.subtitle != null && model.subtitle!.length > 0) Flexible(
               child: Container(

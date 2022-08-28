@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as Foundation;
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/receipt_page.dart';
 import 'package:bb/models/receipt_model.dart';
@@ -72,6 +72,9 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
           IconButton(
             icon: Icon(Icons.shopping_cart_outlined),
             onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return BasketPage();
+              }));
             },
           ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/models/event_model.dart';
 import 'package:bb/widgets/containers/image_container.dart';
 
@@ -43,6 +44,9 @@ class _EventPageState extends State<EventPage> {
           IconButton(
             icon: Icon(Icons.shopping_cart_outlined),
             onPressed: () {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return BasketPage();
+              }));
             },
           ),
         ]
@@ -116,6 +120,9 @@ class _EventPageState extends State<EventPage> {
               IconButton(
                 icon: Icon(Icons.shopping_cart_outlined),
                 onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return BasketPage();
+                  }));
                 },
               ),
             ]
