@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>955480665092-tvire7q52i740rsng3mq7cfnmscom5cc.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.955480665092-tvire7q52i740rsng3mq7cfnmscom5cc</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCiQtMKGzSYK9cBXrHcLdZNhrSX2pbkcHE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>955480665092</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.fixiply.bb</string>
+	<key>PROJECT_ID</key>
+	<string>brasseur-bordelais</string>
+	<key>STORAGE_BUCKET</key>
+	<string>brasseur-bordelais.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:955480665092:ios:9f036ad4bda4b58959d951</string>
+	<key>DATABASE_URL</key>
+	<string>https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app</string>
+</dict>
+</plist>

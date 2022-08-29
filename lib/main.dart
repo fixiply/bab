@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/account_page.dart';
 import 'package:bb/controller/home_page.dart';
 import 'package:bb/controller/receipts_page.dart';
+import 'package:bb/firebase_options.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
@@ -31,20 +32,9 @@ final BasketNotifier basketNotifier = BasketNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (Foundation.kIsWeb)
-    await Firebase.initializeApp(
-      options: FirebaseOptions(
-          apiKey: "AIzaSyAAEsXWUis1p3rQSh7K7Xi6Rh2vD9utcXA",
-          authDomain: "brasseur-bordelais.firebaseapp.com",
-          databaseURL: "https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app",
-          projectId: "brasseur-bordelais",
-          storageBucket: "brasseur-bordelais.appspot.com",
-          messagingSenderId: "955480665092",
-          appId: "1:955480665092:web:b9943e1fe865871b59d951",
-          measurementId: "G-JDKVC86LYX"
-      ),
-    );
-  else await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   runApp(
     MultiProvider(
