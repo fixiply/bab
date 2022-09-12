@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/models/beer_model.dart';
-import 'package:bb/widgets/containers/beers_carousel.dart';
+import 'package:bb/widgets/containers/carousel.dart';
 
 // External package
 import 'package:flutter_markdown/flutter_markdown.dart';

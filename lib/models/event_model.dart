@@ -14,6 +14,7 @@ class EventModel<T> extends Model {
   TextFormatModel? bottom_left;
   String? title;
   String? subtitle;
+  String? page;
   List<String>? widgets;
   List<ImageModel>? images;
 
@@ -30,6 +31,7 @@ class EventModel<T> extends Model {
     this.bottom_left,
     this.title,
     this.subtitle,
+    this.page,
     this.widgets,
     this.images,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
@@ -50,6 +52,7 @@ class EventModel<T> extends Model {
     this.bottom_left = TextFormatModel.deserialize(map['bottom_left']);
     this.title = map['title'];
     this.subtitle = map['subtitle'];
+    this.page = map['page'];
     if (map.containsKey('widgets')) this.widgets = map['widgets'].cast<String>();
     this.images = ImageModel.deserialize(map['images']);
   }
@@ -65,6 +68,7 @@ class EventModel<T> extends Model {
       'bottom_left': TextFormatModel.serialize(this.bottom_left),
       'title': this.title,
       'subtitle': this.subtitle,
+      'page': this.page,
       'widgets': this.widgets,
       'images': ImageModel.serialize(this.images),
     });
@@ -85,6 +89,7 @@ class EventModel<T> extends Model {
       bottom_left:  this.bottom_left,
       title: this.title,
       subtitle: this.subtitle,
+      page: this.page,
       widgets: this.widgets,
       images: this.images,
     );

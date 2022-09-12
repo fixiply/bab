@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/widgets/containers/image_editor_container.dart';
+import 'package:bb/controller/image_editor_page.dart';
 
 // External package
 import 'package:child_builder/child_builder.dart';
@@ -36,6 +36,6 @@ class ImageEditorBuilder extends JsonWidgetBuilder {
     required JsonWidgetData data,
     Key? key,
   }) {
-    return ImageEditorContainer(assetName);
+    return ImageEditorPage(assetName);
   }
 }

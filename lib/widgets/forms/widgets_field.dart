@@ -1,9 +1,8 @@
 import 'dart:convert';
-
-import 'package:bb/widgets/dialogs/text_input_dialog.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/admin/code_editor_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
@@ -105,49 +104,24 @@ class _ProductFieldState extends FormFieldState<List<String>> {
   }
 
   _new() async {
-    dynamic? text = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TextInputDialog(
-              initialValue: null,
-              maxLines: widget.maxLines
-          );
-        }
-    );
-    if (text != false) {
-      widget.initialValue!.add(text);
-      didChange(widget.initialValue);
-    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return CodeEditorPage();
+    })).then((value) {
+      if (value != false && value != null) {
+        widget.initialValue!.add(value);
+        didChange(widget.initialValue);
+      }
+    });
   }
 
   _edit(int index, String? data) async {
-    dynamic? text = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TextInputDialog(
-              initialValue: data,
-              maxLines: widget.maxLines
-          );
-        }
-    );
-    if (text != false) {
-      widget.initialValue![index] = text;
-      didChange(widget.initialValue);
-    }
-  }
-
-  _showDialog(String? data) async {
-    dynamic? text = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return TextInputDialog(
-              initialValue: data,
-              maxLines: widget.maxLines
-          );
-        }
-    );
-    if (text != false) {
-      didChange(text);
-    }
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return CodeEditorPage(initialValue: data);
+    })).then((value) {
+      if (value != false) {
+        widget.initialValue![index] = value;
+        didChange(widget.initialValue);
+      }
+    });
   }
 }

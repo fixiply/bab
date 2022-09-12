@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/gallery_page.dart';
-import 'package:bb/controller/image_crop_page.dart';
+import 'package:bb/controller/admin/gallery_page.dart';
+import 'package:bb/controller/admin/image_crop_page.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/widgets/containers/image_container.dart';

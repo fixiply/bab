@@ -9,7 +9,7 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
-import 'package:bb/widgets/containers/beers_carousel.dart';
+import 'package:bb/widgets/containers/carousel.dart';
 import 'package:bb/widgets/paints/bezier_clipper.dart';
 import 'package:bb/widgets/paints/circle_clipper.dart';
 import 'package:bb/widgets/paints/wave_clipper.dart';
@@ -155,7 +155,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   )),
               )
             ])),
-      SliverToBoxAdapter(child: BeersCarousel(receipt: widget.model.uuid)),
+      SliverToBoxAdapter(child: Carousel(receipt: widget.model.uuid)),
     ]));
   }
 

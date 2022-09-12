@@ -13,9 +13,10 @@ import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
-import 'package:bb/widgets/builders/beers_carousel_builder.dart';
+import 'package:bb/widgets/builders/carousel_builder.dart';
 import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:bb/widgets/builders/markdown_builder.dart';
+import 'package:bb/widgets/builders/parallax_builder.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -145,9 +146,15 @@ class _AppState extends State<MyApp> {
   _initBuilders() async {
     var registry = JsonWidgetRegistry.instance;
     registry.registerCustomBuilder(
-      BeersCarouselBuilder.type,
+      CarouselBuilder.type,
       JsonWidgetBuilderContainer(
-        builder: BeersCarouselBuilder.fromDynamic
+        builder: CarouselBuilder.fromDynamic
+      ),
+    );
+    registry.registerCustomBuilder(
+      ParallaxBuilder.type,
+      JsonWidgetBuilderContainer(
+          builder: ParallaxBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(

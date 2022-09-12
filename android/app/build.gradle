@@ -76,3 +76,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.android.support:multidex:1.0.3'
 }
+configurations.all {
+    exclude group: 'com.google.android.gms', module: 'play-services-safetynet'
+}

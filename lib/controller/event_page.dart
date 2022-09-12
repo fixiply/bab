@@ -76,7 +76,7 @@ class _EventPageState extends State<EventPage> {
               // Function callback for stretch
               return Future<void>.value();
             },
-            expandedHeight: 180.0,
+            expandedHeight: 220.0,
             flexibleSpace: FlexibleSpaceBar(
               stretchModes: const <StretchMode>[
                 StretchMode.zoomBackground,

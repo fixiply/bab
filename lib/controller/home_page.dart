@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,8 @@ import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/image_container.dart';
 import 'package:bb/widgets/containers/shimmer_container.dart';
 import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/builders/full_widget_page.dart';
+import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 // External package
 import 'package:provider/provider.dart';
@@ -206,10 +209,25 @@ class _HomePageState extends State<HomePage> {
         //shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6.0)),
         elevation: 1.0,
         child: InkWell(
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return EventPage(model);
-            }));
+          onTap: () async {
+            if (model.page != null && model.page!.isNotEmpty) {
+              var data = JsonWidgetData.fromDynamic(model.page!);
+              debugPrint('data ${data}');
+              if (data != null) {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) =>
+                        FullWidgetPage(
+                          data: data,
+                        ),
+                  ),
+                );
+              }
+            } else {
+              Navigator.push(context, MaterialPageRoute(builder: (context) {
+                return EventPage(model);
+              }));
+            }
           },
           onDoubleTap: currentUser != null && currentUser!.isEditor() ? () {
             _edit(model);
@@ -236,6 +254,7 @@ class _HomePageState extends State<HomePage> {
                 child: ImageContainer(
                   model.getImages(),
                   fit: null,
+                  color: Colors.transparent,
                   cache: currentUser != null && currentUser!.isEditor() == false,
                   emptyImage: Image.asset('assets/images/no_image.png')
                 )

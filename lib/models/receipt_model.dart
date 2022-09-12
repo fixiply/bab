@@ -3,6 +3,7 @@ import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:flutter/foundation.dart';
 
 class ReceiptModel<T> extends Model {
   Status? status;
@@ -36,9 +37,9 @@ class ReceiptModel<T> extends Model {
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
     this.style = map['style'];
-    this.alcohol = map['alcohol'].toDouble();
-    this.ibu = map['ibu'].toDouble();
-    this.ebc = map['ebc'].toDouble();
+    if (map['alcohol'] != null) this.alcohol = map['alcohol'].toDouble();
+    if (map['ibu'] != null) this.ibu = map['ibu'].toDouble();
+    if (map['ebc'] != null) this.ebc = map['ebc'].toDouble();
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {

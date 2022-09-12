@@ -13,17 +13,17 @@ import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class BeersCarousel extends StatefulWidget {
+class Carousel extends StatefulWidget {
   final String? company;
   final String? receipt;
   final String? title;
-  BeersCarousel({this.company, this.receipt, this.title});
+  Carousel({this.company, this.receipt, this.title});
 
-  _BeersCarouselState createState() => new _BeersCarouselState();
+  _CarouselState createState() => new _CarouselState();
 }
 
 
-class _BeersCarouselState extends State<BeersCarousel> {
+class _CarouselState extends State<Carousel> {
   Future<List<BeerModel>>? _beers;
   Map<String, double> _ratings = Map<String, double>();
   Map<String, int> _notices = Map<String, int>();

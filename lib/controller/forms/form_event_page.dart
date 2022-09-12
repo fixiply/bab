@@ -8,6 +8,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/carousel_field.dart';
+import 'package:bb/widgets/forms/code_editor_field.dart';
 import 'package:bb/widgets/forms/switch_field.dart';
 import 'package:bb/widgets/forms/text_format_field.dart';
 import 'package:bb/widgets/forms/widgets_field.dart';
@@ -198,6 +199,15 @@ class _FormEventPageState extends State<FormEventPage> {
                 )
               ),
               Divider(height: 10),
+              CodeEditorField(
+                context: context,
+                initialValue: widget.model.page,
+                title: AppLocalizations.of(context)!.text('page'),
+                onChanged: (text) => setState(() {
+                  widget.model.page = text;
+                }),
+              ),
+              Divider(height: 10),
               WidgetsField(
                 context: context,
                 widgets: widget.model.widgets,
@@ -205,41 +215,7 @@ class _FormEventPageState extends State<FormEventPage> {
                 onChanged: (text) => setState(() {
                   widget.model.widgets = text;
                 }),
-                // decoration: FormDecoration(
-                //   icon: const Icon(Icons.source),
-                //   labelText: AppLocalizations.of(context)!.text('widget'),
-                //   border: InputBorder.none,
-                //   fillColor: FillColor, filled: true
-                // )
               ),
-              // MarkdownTextInput(
-              //   (String value) => setState(() {
-              //     widget.model.text = value;
-              //   }),
-              //   widget.model.text ?? '',
-              //   label: AppLocalizations.of(context)!.text('text'),
-              //   maxLines: 10,
-              //   actions: MarkdownType.values,
-              //   // controller: _controller,
-              //   validators: (value) {
-              //     return null;
-              //   }
-              // ),
-              // Divider(height: 10),
-              // CustomTextField(
-              //   context: context,
-              //   initialValue: widget.model.widget,
-              //   maxLines: 20,
-              //   onChanged: (text) => setState(() {
-              //     widget.model.widget = text;
-              //   }),
-              //   decoration: FormDecoration(
-              //     icon: const Icon(Icons.source),
-              //     labelText: AppLocalizations.of(context)!.text('widget'),
-              //     border: InputBorder.none,
-              //     fillColor: FillColor, filled: true
-              //   )
-              // ),
               Divider(height: 10),
               CarouselField(
                 context: context,

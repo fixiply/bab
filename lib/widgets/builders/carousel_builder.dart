@@ -2,33 +2,31 @@ import 'package:bb/models/event_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/beer_model.dart';
-import 'package:bb/widgets/containers/beers_carousel.dart';
+import 'package:bb/widgets/containers/carousel.dart';
 
 // External package
-import 'package:json_class/json_class.dart';
 import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
-class BeersCarouselBuilder extends JsonWidgetBuilder {
-  static const type = 'beers-carousel';
+class CarouselBuilder extends JsonWidgetBuilder {
+  static const type = 'carousel';
 
   String? company;
   String? receipt;
 
-  BeersCarouselBuilder({
+  CarouselBuilder({
     this.company,
     this.receipt,
   }) : super(numSupportedChildren: 1);
 
-  static BeersCarouselBuilder fromDynamic(
+  static CarouselBuilder fromDynamic(
       dynamic map, {
         JsonWidgetRegistry? registry,
       }) {
     if (map == null) {
-      throw Exception('[BeersCarouselBuilder]: map is null');
+      throw Exception('[CarouselBuilder]: map is null');
     }
-    return BeersCarouselBuilder(
+    return CarouselBuilder(
       company: map['company'],
       receipt: map['receipt'],
     );
@@ -41,7 +39,7 @@ class BeersCarouselBuilder extends JsonWidgetBuilder {
     required JsonWidgetData data,
     Key? key,
   }) {
-    return BeersCarousel(
+    return Carousel(
       company: company,
       receipt: receipt
     );

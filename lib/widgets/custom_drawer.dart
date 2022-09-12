@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/gallery_page.dart';
+import 'package:bb/controller/admin/gallery_page.dart';
 import 'package:bb/controller/beers_page.dart';
-import 'package:bb/controller/styles_page.dart';
+import 'package:bb/controller/admin/styles_page.dart';
 import 'package:bb/controller/companies_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
