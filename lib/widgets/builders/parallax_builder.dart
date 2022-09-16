@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/widgets/containers/parallax.dart';
+import 'package:bb/widgets/containers/parallax_container.dart';
 
 // External package
-import 'package:json_class/json_class.dart';
 import 'package:child_builder/child_builder.dart';
+import 'package:json_class/json_class.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class ParallaxBuilder extends JsonWidgetBuilder {
@@ -39,7 +39,7 @@ class ParallaxBuilder extends JsonWidgetBuilder {
     required JsonWidgetData data,
     Key? key,
   }) {
-    return Parallax(
+    return ParallaxContainer(
       company: company,
       receipt: receipt
     );

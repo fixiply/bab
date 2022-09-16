@@ -1,8 +1,7 @@
-import 'package:bb/models/event_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/widgets/containers/carousel.dart';
+import 'package:bb/widgets/containers/carousel_container.dart';
 
 // External package
 import 'package:child_builder/child_builder.dart';
@@ -39,7 +38,7 @@ class CarouselBuilder extends JsonWidgetBuilder {
     required JsonWidgetData data,
     Key? key,
   }) {
-    return Carousel(
+    return CarouselContainer(
       company: company,
       receipt: receipt
     );

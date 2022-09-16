@@ -13,17 +13,17 @@ import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:parallax_animation/parallax_area.dart';
 
-class Parallax extends StatefulWidget {
+class ParallaxContainer extends StatefulWidget {
   final String? company;
   final String? receipt;
   final String? title;
-  Parallax({this.company, this.receipt, this.title});
+  ParallaxContainer({this.company, this.receipt, this.title});
 
-  _ParallaxState createState() => new _ParallaxState();
+  _ParallaxContainerState createState() => new _ParallaxContainerState();
 }
 
 
-class _ParallaxState extends State<Parallax> {
+class _ParallaxContainerState extends State<ParallaxContainer> {
   Future<List<BeerModel>>? _beers;
   Map<String, double> _ratings = Map<String, double>();
   Map<String, int> _notices = Map<String, int>();
