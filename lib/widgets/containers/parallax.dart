@@ -10,10 +10,8 @@ import 'package:bb/widgets/custom_image.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:parallax_animation/parallax_area.dart';
-import 'package:parallax_animation/parallax_widget.dart';
 
 class Parallax extends StatefulWidget {
   final String? company;
