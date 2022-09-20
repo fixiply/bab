@@ -30,7 +30,6 @@ class CompanyModel<T> extends Model {
     this.name = map['name'];
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
-    debugPrint('CompanyModel rect: ${image!.rect}');
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {

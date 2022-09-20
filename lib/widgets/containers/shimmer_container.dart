@@ -73,15 +73,19 @@ class _ShimmerContainerState extends State<ShimmerContainer> with TickerProvider
     return Container(
       padding: EdgeInsets.all(12),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: widget.crossAxisCount > 0 ? 140 : 180,
-            decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: _animation.value
-            )
+          Flexible(
+            fit: FlexFit.loose,
+            child: Container(
+              height: widget.crossAxisCount > 0 ? 140 : 180,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: _animation.value
+              )
+            ),
           ),
           if (widget.crossAxisCount == 0) const SizedBox(height: 8),
           if (widget.crossAxisCount == 0) Container(

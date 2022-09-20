@@ -1,0 +1,221 @@
+import 'package:bb/controller/admin/gallery_page.dart';
+import 'package:bb/controller/admin/styles_page.dart';
+import 'package:bb/controller/beers_page.dart';
+import 'package:bb/controller/companies_page.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as Foundation;
+
+// Internal package
+import 'package:bb/controller/account_page.dart';
+import 'package:bb/controller/events_page.dart';
+import 'package:bb/controller/receipts_page.dart';
+import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/edition_notifier.dart';
+
+// External package
+import 'package:badges/badges.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
+
+class HomePage extends StatefulWidget {
+  final String? payload;
+  HomePage({Key? key, this.payload}) : super(key: key);
+  _HomeState createState() => new _HomeState();
+}
+
+class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
+  int _selectedIndex = 0;
+  DateTime? _last_read_at;
+  bool? _editable = false;
+  PageController _page = PageController();
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+    _configureSelectNotificationSubject();
+  }
+
+  @override
+  void dispose() {
+    // selectNotificationSubject.close();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // if (ClassHelper.isIOS()) {
+    //   return CupertinoTabScaffold(
+    //     tabBar: CupertinoTabBar(
+    //       items: _generateItems(),
+    //       currentIndex: _selectedIndex,
+    //       onTap: (int index) {
+    //         setState(() {
+    //           _selectedIndex = index;
+    //         });
+    //       },
+    //     ),
+    //     tabBuilder: (BuildContext context, int index) {
+    //       return CupertinoTabView(
+    //         builder: (BuildContext context) {
+    //           return CupertinoPageScaffold(child: _showPage()!);
+    //           return _showPage()!;
+    //         }
+    //       );
+    //     }
+    //   );
+    // }
+    return Scaffold(
+      bottomNavigationBar: !Foundation.kIsWeb ? BottomNavigationBar(
+        showUnselectedLabels: true,
+        unselectedFontSize: 14,
+        type: BottomNavigationBarType.fixed,
+        items: _generateItems(),
+        currentIndex: _selectedIndex,
+        selectedItemColor: Theme.of(context).colorScheme.secondary,
+        unselectedItemColor: Colors.black54,
+        onTap: (int index) {
+          setState(() {
+            _selectedIndex = index;
+          });
+        },
+      ) : null,
+      body: !Foundation.kIsWeb ? _showPage() :
+      Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          SideMenu(
+            // Page controller to manage a PageView
+            controller: _page,
+            // Will shows on top of all items, it can be a logo or a Title text
+            title: Text(AppLocalizations.of(context)!.text('menu'), style: TextStyle(fontSize: 25, color: Colors.white)),
+            // Will show on bottom of SideMenu when displayMode was SideMenuDisplayMode.open
+            footer: Text('demo'),
+            // Notify when display mode changed
+            onDisplayModeChanged: (mode) {
+              print(mode);
+            },
+            style: SideMenuStyle(
+              backgroundColor: Theme.of(context).primaryColor,
+              selectedIconColor: Colors.white,
+              unselectedIconColor: Colors.white,
+              selectedTitleTextStyle: TextStyle(color: Colors.white),
+              unselectedTitleTextStyle: TextStyle(color: Colors.white),
+            ),
+            // List of SideMenuItem to show them on SideMenu
+            items: [
+              SideMenuItem(
+                priority: 0,
+                onTap: () => _page.jumpToPage(0),
+                icon: Icon(Icons.home_outlined),
+                title: AppLocalizations.of(context)!.text('home')
+              ),
+              SideMenuItem(
+                priority: 1,
+                onTap: () => _page.jumpToPage(1),
+                icon: Icon(Icons.search),
+                title: AppLocalizations.of(context)!.text('receipts'),
+              ),
+              SideMenuItem(
+                priority: 2,
+                onTap: () => _page.jumpToPage(2),
+                icon: Icon(Icons.person_outline),
+                title: AppLocalizations.of(context)!.text('my_account'),
+              ),
+              if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+                priority: 3,
+                onTap: () => _page.jumpToPage(3),
+                icon: Icon(Icons.photo_library_outlined),
+                title: AppLocalizations.of(context)!.text('image_gallery'),
+              ),
+              if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+                priority: 4,
+                onTap: () => _page.jumpToPage(4),
+                icon: Icon(Icons.style_outlined),
+                title: AppLocalizations.of(context)!.text('beer_styles'),
+              ),
+              if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+                priority: 5,
+                onTap: () => _page.jumpToPage(5),
+                icon: Icon(Icons.sports_bar_outlined),
+                title: AppLocalizations.of(context)!.text('beers'),
+              ),
+              if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+                priority: 6,
+                onTap: () => _page.jumpToPage(6),
+                icon: Icon(Icons.groups),
+                title: AppLocalizations.of(context)!.text('companies'),
+              ),
+            ],
+          ),
+          Expanded(
+            child: PageView(
+              controller: _page,
+              children: [
+                EventsPage(),
+                ReceiptsPage(),
+                AccountPage(),
+                GalleryPage([], close: false),
+                StylesPage(),
+                BeersPage(),
+                CompaniesPage()
+              ]
+            )
+          )
+        ]
+      )
+    );
+  }
+
+  _initialize() async {
+    final provider = Provider.of<EditionNotifier>(context, listen: false);
+    _editable = provider.editable;
+    provider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _editable = provider.editable;
+      });
+    });
+  }
+
+  List<BottomNavigationBarItem> _generateItems() {
+    return [
+      BottomNavigationBarItem(
+        icon: ImageIcon(AssetImage('assets/images/logo.png')),
+        label: AppLocalizations.of(context)!.text('home'),
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.sports_bar_outlined),
+        label: AppLocalizations.of(context)!.text('receipts'),
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.person_outline),
+        label: AppLocalizations.of(context)!.text('my_account'),
+      ),
+    ];
+  }
+
+  void _configureSelectNotificationSubject() {
+    if (widget.payload != null) {
+      setState(() {
+        _selectedIndex = 2;
+      });
+    }
+  }
+
+  Widget? _showPage() {
+    switch (_selectedIndex) {
+      case 0: return EventsPage();
+      case 1: return ReceiptsPage();
+      case 2: return AccountPage();
+      case 3: return GalleryPage([], close: false);
+      case 4: return StylesPage();
+      case 5: return BeersPage();
+      case 6: return CompaniesPage();
+    }
+  }
+}
+

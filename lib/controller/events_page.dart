@@ -23,12 +23,12 @@ import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatefulWidget {
-  HomePage({Key? key}) : super(key: key);
-  _HomePageState createState() => new _HomePageState();
+class EventsPage extends StatefulWidget {
+  EventsPage({Key? key}) : super(key: key);
+  _EventsPageState createState() => new _EventsPageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _EventsPageState extends State<EventsPage> {
   late ScrollController? _controller;
   TextEditingController _searchQueryController = TextEditingController();
   Future<List<EventModel>>? _events;

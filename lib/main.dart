@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/account_page.dart';
-import 'package:bb/controller/home_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/firebase_options.dart';
+import 'package:bb/home_page.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
@@ -96,7 +96,7 @@ class _AppState extends State<MyApp> {
         appBarTheme: theme.appBarTheme.copyWith(backgroundColor: PrimaryColor),
         // inputDecorationTheme: theme.inputDecorationTheme.copyWith(focusColor: PrimaryColor),
       ),
-      home: MyHomePage(),
+      home: HomePage(),
       builder: EasyLoading.init(),
       localizationsDelegates: [
         _newLocaleDelegate!,
@@ -169,59 +169,5 @@ class _AppState extends State<MyApp> {
           builder: ImageEditorBuilder.fromDynamic
       ),
     );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  final String? payload;
-  const MyHomePage({Key? key, this.payload}) : super(key: key);
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-  int _selectedIndex = 0;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      bottomNavigationBar: BottomNavigationBar(
-        showUnselectedLabels: true,
-        unselectedFontSize: 14,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: ImageIcon(AssetImage('assets/images/logo.png')),
-            label: AppLocalizations.of(context)!.text('home'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: AppLocalizations.of(context)!.text('receipts'),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: AppLocalizations.of(context)!.text('my_account'),
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: Theme.of(context).colorScheme.secondary,
-        unselectedItemColor: Colors.black54,
-        onTap: (int index) {
-          setState(() {
-            _selectedIndex = index;
-          });
-        },
-      ),
-      body: _showPage(),
-    );
-  }
-
-  Widget? _showPage() {
-    switch (_selectedIndex) {
-      case 0: return HomePage();
-      case 1: return ReceiptsPage();
-      case 2: return AccountPage();
-    }
   }
 }

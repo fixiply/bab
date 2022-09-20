@@ -38,7 +38,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: CustomScrollView(slivers: <Widget>[
+      body: CustomScrollView(slivers: <Widget>[
       SliverAppBar(
         pinned: true,
         expandedHeight: 250.0,

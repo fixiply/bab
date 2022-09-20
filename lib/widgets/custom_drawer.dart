@@ -38,6 +38,18 @@ class CustomDrawer<Object> extends Drawer {
           },
         ),
         ListTile(
+          title: Text(AppLocalizations.of(context)!.text('beer_styles'),
+              style: TextStyle(fontSize: 18)
+          ),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return StylesPage();
+            })).then((value) {
+              Navigator.pop(context);
+            });
+          },
+        ),
+        ListTile(
           title: Text(AppLocalizations.of(context)!.text('beers'),
             style: TextStyle(fontSize: 18)
           ),
@@ -56,18 +68,6 @@ class CustomDrawer<Object> extends Drawer {
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return CompaniesPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
-          },
-        ),
-        ListTile(
-          title: Text(AppLocalizations.of(context)!.text('beer_styles'),
-              style: TextStyle(fontSize: 18)
-          ),
-          onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return StylesPage();
             })).then((value) {
               Navigator.pop(context);
             });

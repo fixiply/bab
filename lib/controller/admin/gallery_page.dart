@@ -28,7 +28,8 @@ import 'package:url_launcher/url_launcher.dart';
 class GalleryPage extends StatefulWidget {
   final List<ImageModel> images;
   final bool only;
-  GalleryPage(this.images, {this.only = false});
+  final bool close;
+  GalleryPage(this.images, {this.only = false, this.close = true});
 
   _GalleryPageState createState() => new _GalleryPageState();
 }
@@ -71,7 +72,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         leading: _appBar != null ? _appBar!.leading : null,
         title: _appBar != null ? _appBar!.title : Text(toBeginningOfSentenceCase(_path)!),
         actions: [
-          IconButton(
+          if (widget.close == true) IconButton(
             icon:Icon(Icons.close),
             tooltip: AppLocalizations.of(context)!.text('close'),
             onPressed:() async {
@@ -86,14 +87,14 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
               setState(() {
                 _appBar = AppBarParams(
                   leading: IconButton(
-                      icon:Icon(Icons.chevron_left),
-                      onPressed:() async {
-                        setState(() {
-                          _appBar = null;
-                          _searchQueryController.clear();
-                          _fetch();
-                        });
-                      }
+                    icon:Icon(Icons.chevron_left),
+                    onPressed:() async {
+                      setState(() {
+                        _appBar = null;
+                        _searchQueryController.clear();
+                        _fetch();
+                      });
+                    }
                   ),
                   title: _buildSearchField(),
                 );
@@ -159,27 +160,12 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                 } finally {
                   EasyLoading.dismiss();
                 }
-              } else if (value == 'analyze') {
-                try {
-                  EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
-                  await Storage().migrate();
-                  _applyChange();
-                } catch (e) {
-                  _showSnackbar(e.toString());
-                } finally {
-                  EasyLoading.dismiss();
-                }
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               PopupMenuItem(
                 value: 'unused',
                 child: Text(AppLocalizations.of(context)!.text('unused_images')),
-              ),
-              PopupMenuItem(
-                enabled: false,
-                value: 'analyze',
-                child: Text(AppLocalizations.of(context)!.text('analyze')),
               ),
             ]
           )
@@ -192,37 +178,37 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
       ),
       drawer: _drawer(),
       body: Container(
-          child: RefreshIndicator(
-              onRefresh: () => _fetch(),
-              child: FutureBuilder<List<ImageModel>>(
-                  future: _images,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      if (snapshot.data!.length == 0) {
-                        return EmptyContainer(message: AppLocalizations.of(context)!.text('no_image'));
-                      }
-                      return GridView.builder(
-                          controller: _controller,
-                          padding: EdgeInsets.all(4),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: getDeviceAxisCount(),
-                              crossAxisSpacing: 4.0,
-                              mainAxisSpacing: 4.0
-                          ),
-                          itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                          itemBuilder: (context, index) {
-                            ImageModel image = snapshot.data![index];
-                            return item(image);
-                          }
-                      );
-                    }
-                    if (snapshot.hasError) {
-                      return ErrorContainer(snapshot.error.toString());
-                    }
-                    return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+        child: RefreshIndicator(
+          onRefresh: () => _fetch(),
+          child: FutureBuilder<List<ImageModel>>(
+            future: _images,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!.length == 0) {
+                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_image'));
+                }
+                return GridView.builder(
+                  controller: _controller,
+                  padding: EdgeInsets.all(4),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: getDeviceAxisCount(),
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0
+                  ),
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  itemBuilder: (context, index) {
+                    ImageModel image = snapshot.data![index];
+                    return item(image);
                   }
-              )
+                );
+              }
+              if (snapshot.hasError) {
+                return ErrorContainer(snapshot.error.toString());
+              }
+              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+            }
           )
+        )
       ),
       bottomNavigationBar: _bottomBar(),
       floatingActionButton: !Foundation.kIsWeb || _path != 'camera' ? FloatingActionButton(
@@ -385,69 +371,74 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
 
   Widget item(ImageModel image) {
     return Card(
-        child: InkWell(
-          splashColor: Colors.blue.withAlpha(30),
-          onTap: () {
-            if(_selected.isNotEmpty) {
-              _select(image);
-            }
-          },
-          onLongPress:(){
+      child: InkWell(
+        splashColor: Colors.blue.withAlpha(30),
+        onTap: () {
+          if(_selected.isNotEmpty) {
             _select(image);
-          },
-          child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                FutureBuilder<String>(
-                    future: image.getUrl(),
+          }
+        },
+        onLongPress:(){
+          _select(image);
+        },
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            FutureBuilder<String>(
+              future: image.getUrl(),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                Widget child = Container();
+                if (snapshot.hasData) {
+                  child = ExtendedImage.network(snapshot.data);
+                }
+                return Expanded(
+                  flex: 1,
+                  child: child
+                );
+              }
+            ),
+            Flexible(
+              fit: FlexFit.loose,
+              child: ListTile(
+                dense: true,
+                leading: GestureDetector(
+                  child: FutureBuilder<bool>(
+                    future: _isSelected(image),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
-                      Widget child = Container();
-                      if (snapshot.hasData) {
-                        child = ExtendedImage.network(snapshot.data);
+                      if (snapshot.hasData && snapshot.data) {
+                        return Icon(Icons.check_circle, color: PrimaryColor, size: 32);
                       }
-                      return Expanded(
-                          child: child
-                      );
+                      return Icon(Icons.image, color: Colors.red, size: 32);
                     }
+                  ),
+                  onTapDown: (TapDownDetails details) {
+                    _onPointerDown(details.globalPosition, image);
+                  }
                 ),
-                ListTile(
-                  dense: true,
-                  leading: GestureDetector(
-                      child: FutureBuilder<bool>(
-                          future: _isSelected(image),
-                          builder: (BuildContext context, AsyncSnapshot snapshot) {
-                            if (snapshot.hasData && snapshot.data) {
-                              return Icon(Icons.check_circle, color: AccentColor, size: 32);
-                            }
-                            return Icon(Icons.image, color: Colors.red, size: 32);
-                          }
-                      ),
-                      onTapDown: (TapDownDetails details) {
-                        _onPointerDown(details.globalPosition, image);
-                      }
-                  ),
-                  title: Tooltip(
-                      message: image.name!,
-                      child: Text(
-                        image.name!,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      )
-                  ),
-                  subtitle: FutureBuilder<int?>(
-                      future: image.getSize(),
-                      builder: (BuildContext context, AsyncSnapshot snapshot) {
-                        String text = '';
-                        if (snapshot.hasData) {
-                          text = ImageHelper.size(snapshot.data, 0);
-                        }
-                        return Text(text);
-                      }
-                  ),
-                )
-              ]
-          ),
-        )
+                title: Tooltip(
+                  message: image.name!,
+                  child: Text(
+                    image.name!,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  )
+                ),
+                subtitle: FutureBuilder<int?>(
+                  future: image.getSize(),
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+                    String text = '';
+                    if (snapshot.hasData) {
+                      text = ImageHelper.size(snapshot.data, 0);
+                    }
+                    return Text(text, overflow: TextOverflow.ellipsis);
+                  }
+                ),
+              )
+            )
+          ]
+        ),
+      )
     );
   }
 
