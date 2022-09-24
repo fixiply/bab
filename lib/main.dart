@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/account_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/firebase_options.dart';
-import 'package:bb/home_page.dart';
+import 'package:bb/controller/home_page.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';

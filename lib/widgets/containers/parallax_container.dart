@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/beer_page.dart';
-import 'package:bb/models/beer_model.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/controller/product_page.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/database.dart';
@@ -24,7 +25,7 @@ class ParallaxContainer extends StatefulWidget {
 
 
 class _ParallaxContainerState extends State<ParallaxContainer> {
-  Future<List<BeerModel>>? _beers;
+  Future<List<ProductModel>>? _products;
   Map<String, double> _ratings = Map<String, double>();
   Map<String, int> _notices = Map<String, int>();
 
@@ -39,8 +40,8 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
     return Container(
       height: 280,
       color: Colors.white,
-      child: FutureBuilder<List<BeerModel>>(
-        future: _beers,
+      child: FutureBuilder<List<ProductModel>>(
+        future: _products,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ParallaxArea(
@@ -51,7 +52,7 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
                 itemCount: snapshot.data!.length,
                 itemExtent: 280,
                 itemBuilder: (context, index) {
-                  BeerModel model = snapshot.data![index];
+                  ProductModel model = snapshot.data![index];
                   double rating = _ratings.containsKey(model.uuid) ? _ratings[model.uuid]! : 0;
                   int notices = _notices.containsKey(model.uuid) ? _notices[model.uuid]! : 0;
                   return Container(
@@ -61,7 +62,7 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
                         InkWell(
                           onTap: () => setState(() {
                             Navigator.push(context, MaterialPageRoute(builder: (context) {
-                              return BeerPage(model);
+                              return ProductPage(model);
                             }));
                           }),
                           child: Row(
@@ -123,19 +124,19 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
 
   _fetch() async {
     setState(() {
-      _beers = Database().getBeers(company: widget.company, receipt: widget.receipt, ordered: true);
+      _products = Database().getProducts(product: Product.beer, company: widget.company, receipt: widget.receipt, ordered: true);
     });
     _calculate();
   }
 
   _calculate() async {
-    List<BeerModel>? beers = await _beers;
+    List<ProductModel>? list = await _products;
     _notices.clear();
     _ratings.clear();
-    if (beers != null && beers.length > 0) {
-      for(BeerModel beer in beers) {
+    if (list != null && list.length > 0) {
+      for(ProductModel product in list) {
         double rating = 0;
-        List<RatingModel>? ratings = await Database().getRatings(beer: beer.uuid);
+        List<RatingModel>? ratings = await Database().getRatings(beer: product.uuid);
         if (ratings != null && ratings.length > 0) {
           for (RatingModel model in ratings) {
             rating += model.rating!;
@@ -143,8 +144,8 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
           rating = rating / ratings.length;
         }
         setState(() {
-          _notices[beer.uuid!] = ratings != null ? ratings.length : 0;
-          _ratings[beer.uuid!] = rating;
+          _notices[product.uuid!] = ratings != null ? ratings.length : 0;
+          _ratings[product.uuid!] = rating;
         });
       }
     }

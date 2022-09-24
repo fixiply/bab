@@ -149,12 +149,12 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
                 padding: EdgeInsets.all(12),
                 height: constraints.maxWidth - 30,
                 child: FlutterPainter(
-                    controller: controller,
-                    onSelectedObjectDrawableChanged: (value) {
-                      setState(() {
-                        selectedObjectDrawable = value;
-                      });
-                    }
+                  controller: controller,
+                  onSelectedObjectDrawableChanged: (value) {
+                    setState(() {
+                      selectedObjectDrawable = value;
+                    });
+                  }
                 ),
               );
             }

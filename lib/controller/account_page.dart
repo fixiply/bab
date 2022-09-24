@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/controller/address_page.dart';
 import 'package:bb/controller/basket_page.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/controller/login_page.dart';
 import 'package:bb/controller/payments_page.dart';
 import 'package:bb/controller/purchases_page.dart';
@@ -14,6 +15,7 @@ import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 
 // External package
+import 'package:badges/badges.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +26,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
+  int _baskets = 0;
   // Edition mode
   bool _editable = false;
 
@@ -44,13 +47,23 @@ class _AccountPageState extends State<AccountPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
-          IconButton(
-            icon: Icon(Icons.shopping_cart_outlined),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return BasketPage();
-              }));
-            },
+          Badge(
+            position: BadgePosition.topEnd(top: 0, end: 3),
+            animationDuration: Duration(milliseconds: 300),
+            animationType: BadgeAnimationType.slide,
+            showBadge: _baskets > 0,
+            badgeContent: _baskets > 0 ? Text(
+              _baskets.toString(),
+              style: TextStyle(color: Colors.white),
+            ) : null,
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart_outlined),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return BasketPage();
+                }));
+              },
+            ),
           ),
         ]
       ),
@@ -173,6 +186,14 @@ class _AccountPageState extends State<AccountPage> {
   _initialize() async {
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     _editable = provider.editable;
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
     // _fetch();
   }
 }

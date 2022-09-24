@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/forms/form_beer_page.dart';
-import 'package:bb/models/beer_model.dart';
+import 'package:bb/controller/forms/form_product_page.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -12,14 +12,14 @@ import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/custom_image.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
 
-class BeersPage extends StatefulWidget {
-  _BeersPageState createState() => new _BeersPageState();
+class ProductsPage extends StatefulWidget {
+  _ProductsPageState createState() => new _ProductsPageState();
 }
 
-class _BeersPageState extends State<BeersPage> {
+class _ProductsPageState extends State<ProductsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
-  Future<List<BeerModel>>? _beers;
+  Future<List<ProductModel>>? _products;
 
   @override
   void initState() {
@@ -34,7 +34,7 @@ class _BeersPageState extends State<BeersPage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('beers')),
+        title: Text(AppLocalizations.of(context)!.text('products')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white
@@ -42,8 +42,8 @@ class _BeersPageState extends State<BeersPage> {
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
-          child: FutureBuilder<List<BeerModel>>(
-            future: _beers,
+          child: FutureBuilder<List<ProductModel>>(
+            future: _products,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.length == 0) {
@@ -54,7 +54,7 @@ class _BeersPageState extends State<BeersPage> {
                     physics: const AlwaysScrollableScrollPhysics(),
                     itemCount: snapshot.hasData ? snapshot.data!.length : 0,
                     itemBuilder: (context, index) {
-                      BeerModel model = snapshot.data![index];
+                      ProductModel model = snapshot.data![index];
                       return ListTile(
                           contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
                           leading: Stack(
@@ -125,7 +125,7 @@ class _BeersPageState extends State<BeersPage> {
 
   _fetch() async {
     setState(() {
-      _beers = Database().getBeers(company: currentUser!.company, ordered: true);
+      _products = Database().getProducts(company: currentUser!.company, ordered: true);
     });
   }
 
@@ -139,17 +139,17 @@ class _BeersPageState extends State<BeersPage> {
   }
 
   _new() {
-    BeerModel newStyle = BeerModel(
+    ProductModel newModel = ProductModel(
       company: currentUser!.company
     );
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormBeerPage(newStyle);
+      return FormProductPage(newModel);
     })).then((value) { _fetch(); });
   }
 
-  _edit(BeerModel model) {
+  _edit(ProductModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormBeerPage(model);
+      return FormProductPage(model);
     })).then((value) { _fetch(); });
   }
 

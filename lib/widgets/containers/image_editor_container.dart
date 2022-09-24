@@ -157,7 +157,6 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
                 ),
                 LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    debugPrint('height: ${constraints.maxHeight} width: ${constraints.maxWidth}');
                     return Container(
                       height: constraints.maxWidth,
                       width: constraints.maxWidth,

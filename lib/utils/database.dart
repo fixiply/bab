@@ -2,8 +2,9 @@ import 'package:flutter/widgets.dart';
 
 // Internal package
 import 'package:bb/helpers/class_helper.dart';
-import 'package:bb/models/beer_model.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/models/company_model.dart';
+import 'package:bb/models/basket_model.dart';
 import 'package:bb/models/event_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/purchase_model.dart';
@@ -20,9 +21,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 class Database {
   static final firestore = FirebaseFirestore.instance;
 
-  final beers = firestore.collection("beers");
+  final baskets = firestore.collection("baskets");
   final companies = firestore.collection("companies");
   final events = firestore.collection("events");
+  final products = firestore.collection("products");
   final purchases = firestore.collection("purchases");
   final ratings = firestore.collection("ratings");
   final receipts = firestore.collection("receipts");
@@ -33,12 +35,14 @@ class Database {
   final _auth = FirebaseAuth.instance;
 
   CollectionReference<Map<String, dynamic>>? getTableName(dynamic o) {
-    if (o is BeerModel) {
-      return beers;
+    if (o is BasketModel) {
+      return baskets;
     } else if (o is CompanyModel) {
       return companies;
     } else if (o is EventModel) {
       return events;
+    } else if (o is ProductModel) {
+      return products;
     } else if (o is PurchaseModel) {
       return purchases;
     } else if (o is RatingModel) {
@@ -51,6 +55,14 @@ class Database {
       return users;
     }
     return null;
+  }
+
+  Future<void> copy(String from, String to) async {
+    await firestore.collection(from).get().then((result) async {
+      result.docs.forEach((doc) async {
+        await firestore.collection(to).add(doc.data());
+      });
+    });
   }
 
   Future<String> add(dynamic d) async {
@@ -314,9 +326,23 @@ class Database {
     return list;
   }
 
-  Future<List<BeerModel>> getBeers({String? company, String? receipt, bool ordered = false}) async {
-    List<BeerModel> list = [];
-    Query query = beers;
+  Future<ProductModel?> getProduct(String uuid) async {
+    DocumentSnapshot snapshot = await products.doc(uuid).get();
+    if (snapshot.exists) {
+      ProductModel model = ProductModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
+  Future<List<ProductModel>> getProducts({Product? product, String? company, String? receipt, bool ordered = false}) async {
+    List<ProductModel> list = [];
+    Query query = products;
+    if (product != null) {
+      query = query.where('product', isEqualTo: product.index);
+    }
     if (company != null) {
       query = query.where('company', isEqualTo: company);
     }
@@ -326,7 +352,7 @@ class Database {
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
-        BeerModel model = BeerModel();
+        ProductModel model = ProductModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);

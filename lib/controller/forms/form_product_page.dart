@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/models/beer_model.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/models/company_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -16,13 +16,13 @@ import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 
-class FormBeerPage extends StatefulWidget {
-  final BeerModel model;
-  FormBeerPage(this.model);
-  _FormBeerPageState createState() => new _FormBeerPageState();
+class FormProductPage extends StatefulWidget {
+  final ProductModel model;
+  FormProductPage(this.model);
+  _FormProductPageState createState() => new _FormProductPageState();
 }
 
-class _FormBeerPageState extends State<FormBeerPage> {
+class _FormProductPageState extends State<FormProductPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -41,7 +41,7 @@ class _FormBeerPageState extends State<FormBeerPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('beer')),
+        title: Text(AppLocalizations.of(context)!.text('product')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -78,11 +78,11 @@ class _FormBeerPageState extends State<FormBeerPage> {
               if (value == 'information') {
                 await ModalBottomSheet.showInformation(context, widget.model);
               } else if (value == 'duplicate') {
-                BeerModel model = widget.model.copy();
+                ProductModel model = widget.model.copy();
                 model.uuid = null;
                 model.status = Status.pending;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FormBeerPage(model);
+                  return FormProductPage(model);
                 })).then((value) {
                   Navigator.pop(context);
                 });
@@ -107,6 +107,59 @@ class _FormBeerPageState extends State<FormBeerPage> {
           key: _formKey,
           child: Column(
             children: <Widget>[
+              DropdownButtonFormField<Product>(
+                value: widget.model.product,
+                decoration: FormDecoration(
+                    icon: const Icon(Icons.article_outlined),
+                    labelText: AppLocalizations.of(context)!.text('product')
+                ),
+                items: Product.values.map((Product display) {
+                  return DropdownMenuItem<Product>(
+                    value: display,
+                    child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                }).toList(),
+                onChanged: (value) => setState(() {
+                  widget.model.product = value;
+                }),
+                validator: (value) {
+                  if (value == null) {
+                    return AppLocalizations.of(context)!.text('required_field');
+                  }
+                  return null;
+                }
+              ),
+              Divider(height: 10),
+              if (widget.model.product == Product.beer) FutureBuilder<List<ReceiptModel>>(
+                  future: _receipts,
+                  builder: (context, snapshot) {
+                    if (snapshot.data != null) {
+                      return DropdownButtonFormField<String>(
+                          value: widget.model.receipt,
+                          decoration: FormDecoration(
+                            icon: Icon(Icons.receipt_outlined),
+                            labelText: AppLocalizations.of(context)!.text('receipt'),
+                          ),
+                          items: snapshot.data!.map((ReceiptModel model) {
+                            return DropdownMenuItem<String>(
+                                value: model.uuid,
+                                child: Text(model.title!));
+                          }).toList(),
+                          onChanged: (value) =>
+                              setState(() {
+                                widget.model.receipt = value;
+                              }),
+                          validator: (value) {
+                            if (value == null) {
+                              return AppLocalizations.of(context)!.text('required_field');
+                            }
+                            return null;
+                          }
+                      );
+                    }
+                    return Container();
+                  }
+              ),
+              if (widget.model.product == Product.beer) Divider(height: 10),
               FutureBuilder<List<CompanyModel>>(
                 future: _companies,
                 builder: (context, snapshot) {
@@ -114,7 +167,7 @@ class _FormBeerPageState extends State<FormBeerPage> {
                     return DropdownButtonFormField<String>(
                       value: widget.model.company,
                       decoration: FormDecoration(
-                        icon: Icon(Icons.store),
+                        icon: Icon(Icons.store_outlined),
                         labelText: AppLocalizations.of(context)!.text('company'),
                       ),
                       items: snapshot.data!.map((CompanyModel model) {
@@ -167,7 +220,7 @@ class _FormBeerPageState extends State<FormBeerPage> {
                   widget.model.subtitle = text;
                 }),
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.subtitles),
+                    icon: const Icon(Icons.subtitles_outlined),
                     labelText: AppLocalizations.of(context)!.text('subtitle'),
                     border: InputBorder.none,
                     fillColor: FillColor, filled: true
@@ -194,35 +247,18 @@ class _FormBeerPageState extends State<FormBeerPage> {
                 }
               ),
               Divider(height: 10),
-              FutureBuilder<List<ReceiptModel>>(
-                future: _receipts,
-                builder: (context, snapshot) {
-                  if (snapshot.data != null) {
-                    return DropdownButtonFormField<String>(
-                      value: widget.model.receipt,
-                      decoration: FormDecoration(
-                        icon: Icon(Icons.receipt),
-                        labelText: AppLocalizations.of(context)!.text('receipt'),
-                      ),
-                      items: snapshot.data!.map((ReceiptModel model) {
-                        return DropdownMenuItem<String>(
-                            value: model.uuid,
-                            child: Text(model.title!));
-                      }).toList(),
-                      onChanged: (value) =>
-                          setState(() {
-                            widget.model.receipt = value;
-                          }),
-                      validator: (value) {
-                        if (value == null) {
-                          return AppLocalizations.of(context)!.text('required_field');
-                        }
-                        return null;
-                      }
-                    );
-                  }
-                  return Container();
-                }
+              TextFormField(
+                initialValue: widget.model.pack != null ? widget.model.pack.toString() : null,
+                keyboardType: TextInputType.number,
+                onChanged: (value) => setState(() {
+                  widget.model.pack = int.tryParse(value);
+                }),
+                decoration: FormDecoration(
+                  icon: const Icon(Icons.production_quantity_limits_outlined),
+                  labelText: AppLocalizations.of(context)!.text('pack'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
+                ),
               ),
               Divider(height: 10),
               MarkdownTextInput(

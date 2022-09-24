@@ -27,7 +27,9 @@ UserModel? currentUser;
 enum Status { pending, publied, disabled}
 enum Roles { admin, editor, customer}
 enum Fermentation { hight, low, spontaneous}
+enum Product { beer, other}
 enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size}
+enum Payments { credit_card, paypal, apple_pay, google_pay}
 
 //Colors
 const Color PrimaryColor = const Color(0xFF008351);

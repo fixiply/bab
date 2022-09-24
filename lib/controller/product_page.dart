@@ -2,36 +2,38 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
-import 'package:bb/controller/forms/form_beer_page.dart';
+import 'package:bb/utils/basket_notifier.dart';
+import 'package:bb/controller/forms/form_product_page.dart';
 import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/models/beer_model.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/image_container.dart';
-import 'package:bb/widgets/dialogs/rating_dialog.dart';
+import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:bb/widgets/paints/bezier_clipper.dart';
 import 'package:bb/widgets/paints/circle_clipper.dart';
-import 'package:bb/widgets/paints/wave_clipper.dart';
 import 'package:flutter/rendering.dart';
 
 // External package
+import 'package:badges/badges.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:sprintf/sprintf.dart';
 
-class BeerPage extends StatefulWidget {
-  final BeerModel model;
-  BeerPage(this.model);
-  _BeerPageState createState() => new _BeerPageState();
+class ProductPage extends StatefulWidget {
+  final ProductModel model;
+  ProductPage(this.model);
+  _ProductPageState createState() => new _ProductPageState();
 }
 
-class _BeerPageState extends State<BeerPage> {
+class _ProductPageState extends State<ProductPage> {
   GlobalKey _keyReviews = GlobalKey();
   final ScrollController _controller = ScrollController();
+  int _baskets = 0;
 
   // Edition mode
   bool _editable = false;
@@ -163,13 +165,23 @@ class _BeerPageState extends State<BeerPage> {
               ),
             ),
             actions: <Widget> [
-              IconButton(
-                icon: Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return BasketPage();
-                  }));
-                },
+              Badge(
+                position: BadgePosition.topEnd(top: 0, end: 3),
+                animationDuration: Duration(milliseconds: 300),
+                animationType: BadgeAnimationType.slide,
+                showBadge: _baskets > 0,
+                badgeContent: _baskets > 0 ? Text(
+                  _baskets.toString(),
+                  style: TextStyle(color: Colors.white),
+                ) : null,
+                child: IconButton(
+                  icon: Icon(Icons.shopping_cart_outlined),
+                  onPressed: () {
+                    Navigator.push(context, MaterialPageRoute(builder: (context) {
+                      return BasketPage();
+                    }));
+                  },
+                ),
               ),
               if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
                 icon: Icon(Icons.edit_note),
@@ -332,16 +344,25 @@ class _BeerPageState extends State<BeerPage> {
             backgroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
-          onPressed: () {},
-
+          onPressed: () {
+            ModalBottomSheet.showAddToCart(context, widget.model);
+          },
         ),
       ),
     );
   }
 
   _initialize() async {
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
+    final editionProvider = Provider.of<EditionNotifier>(context, listen: false);
+    _editable = editionProvider.editable;
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
     _fetch();
   }
 
@@ -367,9 +388,9 @@ class _BeerPageState extends State<BeerPage> {
     });
   }
 
-  _edit(BeerModel model) {
+  _edit(ProductModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormBeerPage(model);
+      return FormProductPage(model);
     }));
   }
 

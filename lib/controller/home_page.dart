@@ -1,13 +1,13 @@
-import 'package:bb/controller/admin/gallery_page.dart';
-import 'package:bb/controller/admin/styles_page.dart';
-import 'package:bb/controller/beers_page.dart';
-import 'package:bb/controller/companies_page.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bb/controller/account_page.dart';
+import 'package:bb/controller/admin/gallery_page.dart';
+import 'package:bb/controller/admin/styles_page.dart';
+import 'package:bb/controller/products_page.dart';
+import 'package:bb/controller/companies_page.dart';
 import 'package:bb/controller/events_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -140,8 +140,8 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 5,
                 onTap: () => _page.jumpToPage(5),
-                icon: Icon(Icons.sports_bar_outlined),
-                title: AppLocalizations.of(context)!.text('beers'),
+                icon: Icon(Icons.article_outlined),
+                title: AppLocalizations.of(context)!.text('products'),
               ),
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 6,
@@ -160,7 +160,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 AccountPage(),
                 GalleryPage([], close: false),
                 StylesPage(),
-                BeersPage(),
+                ProductsPage(),
                 CompaniesPage()
               ]
             )
@@ -188,7 +188,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
         label: AppLocalizations.of(context)!.text('home'),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.sports_bar_outlined),
+        icon: Icon(Icons.search),
         label: AppLocalizations.of(context)!.text('receipts'),
       ),
       BottomNavigationBarItem(
@@ -213,7 +213,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       case 2: return AccountPage();
       case 3: return GalleryPage([], close: false);
       case 4: return StylesPage();
-      case 5: return BeersPage();
+      case 5: return ProductsPage();
       case 6: return CompaniesPage();
     }
   }

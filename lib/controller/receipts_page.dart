@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/receipt_page.dart';
 import 'package:bb/models/receipt_model.dart';
@@ -19,6 +20,7 @@ import 'package:bb/widgets/image_animate_rotate.dart';
 import 'package:expandable_text/expandable_text.dart';
 
 // External package
+import 'package:badges/badges.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
@@ -34,6 +36,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   TextEditingController _searchQueryController = TextEditingController();
   Future<List<ReceiptModel>>? _receipts;
   List<StyleModel>? _styles;
+  int _baskets = 0;
 
   // Edition mode
   bool _editable = false;
@@ -69,13 +72,23 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          IconButton(
-            icon: Icon(Icons.shopping_cart_outlined),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return BasketPage();
-              }));
-            },
+          Badge(
+            position: BadgePosition.topEnd(top: 0, end: 3),
+            animationDuration: Duration(milliseconds: 300),
+            animationType: BadgeAnimationType.slide,
+            showBadge: _baskets > 0,
+            badgeContent: _baskets > 0 ? Text(
+              _baskets.toString(),
+              style: TextStyle(color: Colors.white),
+            ) : null,
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart_outlined),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return BasketPage();
+                }));
+              },
+            ),
           ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
             icon: Icon(Icons.more_vert),
@@ -423,8 +436,16 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   }
 
   _initialize() async {
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
+    final editionProvider = Provider.of<EditionNotifier>(context, listen: false);
+    _editable = editionProvider.editable;
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
     _fetch();
   }
 

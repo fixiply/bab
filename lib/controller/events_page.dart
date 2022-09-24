@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/controller/event_page.dart';
 import 'package:bb/controller/forms/form_event_page.dart';
 import 'package:bb/models/event_model.dart';
@@ -20,6 +21,7 @@ import 'package:bb/widgets/builders/full_widget_page.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 // External package
+import 'package:badges/badges.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -32,7 +34,8 @@ class _EventsPageState extends State<EventsPage> {
   late ScrollController? _controller;
   TextEditingController _searchQueryController = TextEditingController();
   Future<List<EventModel>>? _events;
-  
+  int _baskets = 0;
+
   // Edition mode
   bool _editable = false;
   bool _remove = false;
@@ -55,13 +58,23 @@ class _EventsPageState extends State<EventsPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          IconButton(
-            icon: Icon(Icons.shopping_cart_outlined),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return BasketPage();
-              }));
-            },
+          Badge(
+            position: BadgePosition.topEnd(top: 0, end: 3),
+            animationDuration: Duration(milliseconds: 300),
+            animationType: BadgeAnimationType.slide,
+            showBadge: _baskets > 0,
+            badgeContent: _baskets > 0 ? Text(
+              _baskets.toString(),
+              style: TextStyle(color: Colors.white),
+            ) : null,
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart_outlined),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return BasketPage();
+                }));
+              },
+            ),
           ),
           if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
               icon: Icon(Icons.more_vert),
@@ -212,7 +225,6 @@ class _EventsPageState extends State<EventsPage> {
           onTap: () async {
             if (model.page != null && model.page!.isNotEmpty) {
               var data = JsonWidgetData.fromDynamic(model.page!);
-              debugPrint('data ${data}');
               if (data != null) {
                 await Navigator.of(context).push(
                   MaterialPageRoute(
@@ -399,6 +411,14 @@ class _EventsPageState extends State<EventsPage> {
   _initialize() async {
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     _editable = provider.editable;
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
     _fetch();
   }
 
