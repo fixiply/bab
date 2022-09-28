@@ -2,13 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/about_page.dart';
 import 'package:bb/controller/address_page.dart';
 import 'package:bb/controller/basket_page.dart';
-import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/controller/login_page.dart';
 import 'package:bb/controller/payments_page.dart';
 import 'package:bb/controller/purchases_page.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/custom_drawer.dart';
@@ -151,6 +152,11 @@ class _AccountPageState extends State<AccountPage> {
                     contentPadding: EdgeInsets.zero,
                     leading: Icon(Icons.info_outline),
                     title: Text(AppLocalizations.of(context)!.text('about')),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return AboutPage();
+                      }));
+                    },
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,

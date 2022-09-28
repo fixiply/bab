@@ -1,5 +1,6 @@
 {
   "about": "A propos de Brasseur Bordelais",
+  "about_this_app": "A propos de cette application",
   "account": "Compte",
   "add": "Ajouter",
   "add_address": "Ajouter une adresse de livraison",
@@ -177,6 +178,7 @@
   "user": "Utilisateur",
   "validator_field_required": "Ce champ est requis",
   "validity_date": "AA/MM",
+  "version": "Version",
   "view": "Afficher",
   "view_image": "Voir l'image",
   "your_basket": "Votre panier",
