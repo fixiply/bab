@@ -175,6 +175,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                     _fetch();
                   },
                   onFermentationChanged: (value) {
+                    debugPrint('onFermentationChanged');
                     setState(() {
                       if (_selectedFermentations.contains(value)) {
                         _selectedFermentations.remove(value);
@@ -322,7 +323,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
               alignment: Alignment.centerLeft,
               child: Text(
                 model.title!,
-                style: TextStyle(  fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -336,35 +337,20 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                     style: DefaultTextStyle.of(context).style,
                     children: <TextSpan>[
                       TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(text: ' - '),
                       TextSpan(
                           style: DefaultTextStyle.of(context).style,
                           children: <TextSpan>[
-                            TextSpan(text: ' IBU: '),
-                            TextSpan(text: model.ibu.toString()),
-                            TextSpan(text: '    ' +model.abv.toString() + '°'),
+                            if (model.style != null && (model.ibu != null || model.abv != null)) TextSpan(text: ' - '),
+                            if (model.ibu != null) TextSpan(text: ' IBU: '),
+                            if (model.ibu != null)TextSpan(text: model.ibu.toString()),
+                            if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
+                            if (model.abv != null) TextSpan(text: ' ABV: ' +model.abv.toString() + '°'),
                           ]
                       )
                     ],
                   ),
                 ),
-                Foundation.kIsWeb ?
-                  MarkdownBody(
-                    data: model.text!,
-                    fitContent: true,
-                    shrinkWrap: true,
-                    softLineBreak: true,
-                    styleSheet: MarkdownStyleSheet(
-                        textAlign: WrapAlignment.start
-                    )
-                  ) :
-                  ExpandableText(
-                    model.text!,
-                    linkColor: Theme.of(context).primaryColor,
-                    expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
-                    collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
-                    maxLines: 3,
-                  )
+                if (model.text != null ) _text(model.text!)
               ],
             ),
             // subtitle: model.text != null ? Text(model.text!, style: TextStyle(fontSize: 14)) : null,
@@ -397,6 +383,25 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
           )
         ]
       )
+    );
+  }
+
+  Widget _text(String text) {
+    return Foundation.kIsWeb ? MarkdownBody(
+        data: text,
+        fitContent: true,
+        shrinkWrap: true,
+        softLineBreak: true,
+        styleSheet: MarkdownStyleSheet(
+            textAlign: WrapAlignment.start
+        )
+    ) :
+    ExpandableText(
+      text,
+      linkColor: Theme.of(context).primaryColor,
+      expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
+      collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
+      maxLines: 3,
     );
   }
 
@@ -460,7 +465,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
       if (model.abv != null && _abv.start != null && _abv.start! > model.abv!) continue;
       if (model.abv != null && _abv.end != null && _abv.end! < model.abv!) continue;
       if (_selectedFermentations.isNotEmpty) {
-        if (!_selectedFermentations.contains(model.style)) {
+        if (!_styles!.contains(model.style)) {
           continue;
         }
       };

@@ -113,7 +113,7 @@ class _StylePageState extends State<StylePage> {
                       SizedBox(width: 25, child: Text((widget.model.max_ibu ?? MAX_IBU).round().toString(), style: TextStyle(fontSize: 12))),
                     ]
                   ),
-                  Text(AppLocalizations.of(context)!.text('alcohol'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
+                  Text(AppLocalizations.of(context)!.text('abv'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
                       SizedBox(width: 25, child: Text('${ widget.model.min_abv != null ?  widget.model.min_abv!.toStringAsPrecision(2) : 0}°', softWrap: false, style: TextStyle(fontSize: 12))),

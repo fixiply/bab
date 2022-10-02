@@ -272,23 +272,32 @@ class _StylesPageState extends State<StylesPage> {
             contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
             // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
             title: Text(model.title!),
-            subtitle: model.text != null ?  Foundation.kIsWeb ?
-              MarkdownBody(
-                data: model.text!,
-                fitContent: true,
-                shrinkWrap: true,
-                softLineBreak: true,
-                styleSheet: MarkdownStyleSheet(
-                    textAlign: WrapAlignment.start
-                )
-              ) :
-              ExpandableText(
-                model.text!,
-                linkColor: Theme.of(context).primaryColor,
-                expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
-                collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
-                maxLines: 3,
-              ) : null,
+            subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                RichText(
+                  textAlign: TextAlign.left,
+                  text: TextSpan(
+                    style: DefaultTextStyle.of(context).style,
+                    children: <TextSpan>[
+                      if (model.category != null) TextSpan(text: model.category, style: TextStyle(fontWeight: FontWeight.bold)),
+                      TextSpan(
+                        style: DefaultTextStyle.of(context).style,
+                        children: <TextSpan>[
+                          if (model.category != null && (model.min_ibu != null || model.min_abv != null)) TextSpan(text: ' - '),
+                          if (model.min_ibu != null) TextSpan(text: 'IBU: '),
+                          if (model.min_ibu != null) TextSpan(text: model.min_ibu.toString()),
+                          if (model.min_ibu != null && model.min_abv != null) TextSpan(text: '   '),
+                          if (model.min_abv != null) TextSpan(text: 'ABV: ' +model.min_abv.toString() + '°'),
+                        ]
+                      )
+                    ],
+                  ),
+                ),
+                if (model.text != null) _text(model.text!)
+              ]
+            ),
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (context) {
                 return StylePage(model);
@@ -298,6 +307,25 @@ class _StylesPageState extends State<StylesPage> {
         ]
       )
     );
+  }
+
+  Widget _text(String text) {
+      return Foundation.kIsWeb ? MarkdownBody(
+        data: text,
+        fitContent: true,
+        shrinkWrap: true,
+        softLineBreak: true,
+        styleSheet: MarkdownStyleSheet(
+            textAlign: WrapAlignment.start
+        )
+      ) :
+      ExpandableText(
+        text,
+        linkColor: Theme.of(context).primaryColor,
+        expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
+        collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
+        maxLines: 3,
+      );
   }
 
   _clear() async {

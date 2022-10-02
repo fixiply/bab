@@ -29,6 +29,7 @@
   "billing_address": "Billing address",
   "bitterness": "Bitterness",
   "ibu": "IBU - Bitterness",
+  "abv": "ABV - Alcohol",
   "bottle": "Bottle",
   "bottles": "%s bottles",
   "bottom": "Bottom",

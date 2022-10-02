@@ -29,6 +29,7 @@
   "billing_address": "Adresse de facturation",
   "bitterness": "Amertume",
   "ibu": "IBU - Amertume",
+  "abv": "ABV - Alcool",
   "bottle": "Bouteille",
   "bottles": "%s bouteilles",
   "bottom": "En bas",

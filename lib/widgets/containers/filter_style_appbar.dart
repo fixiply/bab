@@ -11,15 +11,12 @@ import 'package:bb/widgets/gradient_rect_range_slider_track_shape.dart';
 import 'package:bb/widgets/paints/custom_thumb_shape.dart';
 
 // External package
-import 'package:syncfusion_flutter_sliders/sliders.dart';
 
 class FilterStyleAppBar extends StatefulWidget {
   SRM srm;
   IBU ibu;
   ABV abv;
   RangeValues? srm_values;
-  SfRangeValues? ibu_values;
-  SfRangeValues? abv_values;
   List<Fermentation>? selectedFermentations = [];
   final Function(double start, double end)? onColorChanged;
   final Function(double start, double end)? onIBUChanged;
@@ -32,8 +29,6 @@ class FilterStyleAppBar extends StatefulWidget {
     required this.srm,
     required this.ibu,
     required this.abv,
-    this.ibu_values,
-    this.abv_values,
     this.selectedFermentations,
     this.onColorChanged,
     this.onIBUChanged,
@@ -44,8 +39,6 @@ class FilterStyleAppBar extends StatefulWidget {
   }) : super(key: key) {
     if (selectedFermentations == null) selectedFermentations = [];
     if (srm_values == null) srm_values = RangeValues(srm.start ?? 0, srm.end ?? SRM_COLORS.length.toDouble());
-    if (ibu_values == null) ibu_values = SfRangeValues(ibu.start ?? ibu.min, ibu.end ?? ibu.max);
-    if (abv_values == null) abv_values = SfRangeValues(abv.start ?? abv.min, abv.end ?? abv.max);
   }
 
   _FilterStyleAppBarState createState() => new _FilterStyleAppBarState();
@@ -53,6 +46,7 @@ class FilterStyleAppBar extends StatefulWidget {
 
 class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  bool changed = false;
 
   @override
   void initState() {
@@ -106,9 +100,12 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
                   textStyle: const TextStyle(fontSize: 12),
                 ),
-                onPressed: () {
+                onPressed: changed ? () {
+                  setState(() {
+                    changed = false;
+                  });
                   widget.onReset?.call();
-                }
+                } : null
               )
             ],
           )
@@ -145,6 +142,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                     labels: RangeLabels(IBU.label(widget.ibu.start ?? widget.ibu.min), IBU.label(widget.ibu.end ?? widget.ibu.max)),
                     onChanged: (values) {
                       setState(() {
+                        changed = true;
                         widget.ibu.start = values.start;
                         widget.ibu.end = values.end;
                       });
@@ -156,7 +154,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
               SizedBox(width: 25, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: TextStyle(fontSize: 12))),
             ]
           ),
-          Text(AppLocalizations.of(context)!.text('alcohol'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
+          Text(AppLocalizations.of(context)!.text('abv'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
               SizedBox(width: 25, child: Text('${(widget.abv.start ?? widget.abv.min).toStringAsPrecision(2)}°', softWrap: false, style: TextStyle(fontSize: 12))),
@@ -178,6 +176,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                     // labels: RangeLabels((_startAlcohol ?? _minAlcohol).toStringAsPrecision(2), (_endAlcohol ?? _maxAlcohol).toStringAsPrecision(2)),
                     onChanged: (values) {
                       setState(() {
+                        changed = true;
                         widget.abv.start = values.start;
                         widget.abv.end = values.end;
                       });
@@ -216,6 +215,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   child: RangeSlider(
                       onChanged: (values) {
                         setState(() {
+                          changed = true;
                           widget.srm.start = values.start;
                           widget.srm.end = values.end;
                         });
@@ -235,33 +235,6 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
       )
     );
   }
-
-  // Widget _color() {
-  //   return Container(
-  //       height: 70,
-  //       padding: EdgeInsets.only(left: 12, right: 12, top: 55),
-  //       child: SizedBox(
-  //           width:70, height:70,
-  //           child: SfRadialGauge(
-  //             axes: <RadialAxis>[
-  //               RadialAxis(
-  //                   ranges: <GaugeRange>[
-  //                     GaugeRange(
-  //                         startValue: widget.startSRM ?? 0,
-  //                         endValue: widget.endSRM ?? SRM.length.toDouble(),
-  //                         gradient: const SweepGradient(
-  //                             colors: <Color>[Color(0xFFBC4E9C), Color(0xFFF80759)],
-  //                             stops: <double>[0.25, 0.75]),
-  //                         startWidth: 5,
-  //                         endWidth: 20
-  //                     )
-  //                   ]
-  //               )
-  //             ],
-  //           )
-  //       )
-  //   );
-  // }
 
   Widget _fermentation() {
     return Container(
@@ -284,6 +257,9 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
             backgroundColor: FillColor,
             shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
             onSelected: (value) {
+              setState(() {
+                changed = true;
+              });
               widget.onFermentationChanged?.call(e);
             }
           );

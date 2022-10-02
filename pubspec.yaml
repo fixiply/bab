@@ -69,8 +69,6 @@ dependencies:
   shimmer: ^2.0.0
   sprintf: ^6.0.2
   stack_board: ^0.1.2
-  syncfusion_flutter_gauges: ^20.2.50
-  syncfusion_flutter_sliders: ^20.2.50
   url_launcher: ^6.1.6
   uuid: ^3.0.6
 
