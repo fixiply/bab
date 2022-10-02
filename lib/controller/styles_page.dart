@@ -285,11 +285,10 @@ class _StylesPageState extends State<StylesPage> {
                       TextSpan(
                         style: DefaultTextStyle.of(context).style,
                         children: <TextSpan>[
-                          if (model.category != null && (model.min_ibu != null || model.min_abv != null)) TextSpan(text: ' - '),
-                          if (model.min_ibu != null) TextSpan(text: 'IBU: '),
-                          if (model.min_ibu != null) TextSpan(text: model.min_ibu.toString()),
-                          if (model.min_ibu != null && model.min_abv != null) TextSpan(text: '   '),
-                          if (model.min_abv != null) TextSpan(text: 'ABV: ' +model.min_abv.toString() + '°'),
+                          if (model.category != null && (model.min_ibu != null || model.max_ibu!= null || model.min_abv != null || model.max_abv != null)) TextSpan(text: ' - '),
+                          _between('IBU', model.min_ibu, model.max_ibu),
+                          if ((model.min_ibu != null || model.max_abv != null) && (model.min_abv != null || model.max_abv != null)) TextSpan(text: '   '),
+                          _between('ABV', model.min_abv, model.max_abv, trailing: '%'),
                         ]
                       )
                     ],
@@ -309,23 +308,38 @@ class _StylesPageState extends State<StylesPage> {
     );
   }
 
-  Widget _text(String text) {
-      return Foundation.kIsWeb ? MarkdownBody(
-        data: text,
-        fitContent: true,
-        shrinkWrap: true,
-        softLineBreak: true,
-        styleSheet: MarkdownStyleSheet(
-            textAlign: WrapAlignment.start
-        )
-      ) :
-      ExpandableText(
-        text,
-        linkColor: Theme.of(context).primaryColor,
-        expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
-        collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
-        maxLines: 3,
+  TextSpan _between(String leading, double? min, double? max, {String? trailing = ''}) {
+    if (min != null || max != null) {
+      return TextSpan(
+        style: DefaultTextStyle.of(context).style,
+        children: [
+          TextSpan(text: '$leading: '),
+          if (min != null) TextSpan(text: '${min.toString()}$trailing'),
+          if (min != null && max != null) TextSpan(text: ' ${AppLocalizations.of(context)!.text('to').toLowerCase()} '),
+          if (max != null) TextSpan(text: '${max.toString()}$trailing')
+        ]
       );
+    }
+    return TextSpan();
+  }
+
+  Widget _text(String text) {
+    return Foundation.kIsWeb ? MarkdownBody(
+      data: text,
+      fitContent: true,
+      shrinkWrap: true,
+      softLineBreak: true,
+      styleSheet: MarkdownStyleSheet(
+          textAlign: WrapAlignment.start
+      )
+    ) :
+    ExpandableText(
+      text,
+      linkColor: Theme.of(context).primaryColor,
+      expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
+      collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
+      maxLines: 3,
+    );
   }
 
   _clear() async {

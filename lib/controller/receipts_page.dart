@@ -344,7 +344,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                             if (model.ibu != null) TextSpan(text: ' IBU: '),
                             if (model.ibu != null)TextSpan(text: model.ibu.toString()),
                             if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
-                            if (model.abv != null) TextSpan(text: ' ABV: ' +model.abv.toString() + '°'),
+                            if (model.abv != null) TextSpan(text: ' ABV: ${model.abv}%'),
                           ]
                       )
                     ],

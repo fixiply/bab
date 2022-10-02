@@ -1,3 +1,4 @@
+import 'package:bb/utils/srm.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -155,9 +156,8 @@ class _StylePageState extends State<StylePage> {
                             rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                           ),
                           child: RangeSlider(
-                            onChanged: (values) {
-                            },
-                            values: RangeValues(widget.model.min_ebc ?? 0, widget.model.max_ebc ?? SRM_COLORS.length.toDouble()),
+                            onChanged: (values) {  },
+                            values: RangeValues(SRM.parse(widget.model.min_ebc).toDouble(), widget.model.max_ebc != null ? SRM.parse(widget.model.max_ebc).toDouble() : SRM_COLORS.length.toDouble()),
                             min: 0,
                             max: SRM_COLORS.length.toDouble(),
                             divisions: SRM_COLORS.length

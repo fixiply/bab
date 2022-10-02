@@ -8,8 +8,8 @@ class SRM {
     this.start = 0;
   }
 
-  static int parse(double ebc) {
-    return (ebc * 0.508).toInt();
+  static int parse(double? ebc) {
+    return ebc != null ? (ebc * 0.508).toInt() : 0;
   }
 
   static double toEBC(double srm) {

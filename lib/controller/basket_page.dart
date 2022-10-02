@@ -276,7 +276,7 @@ class _BasketPageState extends State<BasketPage> {
                               children: <TextSpan>[
                                 TextSpan(text: ' IBU: '),
                                 TextSpan(text: snapshot2.data.ibu.toString()),
-                                TextSpan(text: '    ' + snapshot2.data.abv.toString() + '°'),
+                                TextSpan(text: '    ' + snapshot2.data.abv.toString() + '%'),
                               ]
                             )
                           ],
