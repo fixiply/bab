@@ -17,6 +17,7 @@ class FormDecoration extends InputDecoration {
     Widget? prefixIcon,
     Widget? prefix,
     BoxConstraints? prefixIconConstraints,
+    BoxConstraints? constraints,
     String? suffixText,
     Widget? suffixIcon,
     Widget? suffix,
@@ -44,6 +45,7 @@ class FormDecoration extends InputDecoration {
       suffixIcon: suffixIcon,
       suffix: suffix,
       hintText: hintText,
-      contentPadding: contentPadding
+      contentPadding: contentPadding,
+      constraints: constraints
   );
 }

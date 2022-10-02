@@ -6,14 +6,17 @@ import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/utils/srm.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
 import 'package:bb/widgets/paints/bezier_clipper.dart';
 import 'package:bb/widgets/paints/circle_clipper.dart';
 
 // External package
+import 'package:badges/badges.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 
@@ -28,6 +31,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   bool _editable = false;
   bool _expanded = true;
   StyleModel? _style;
+  int _baskets = 0;
 
   @override
   void initState() {
@@ -66,7 +70,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   children: [
                     Container(
                       padding: EdgeInsets.only(left: 30),
-                      child: Image.asset('assets/images/beer3.png', color: SRM[widget.model.getSRM()]
+                      child: Image.asset('assets/images/beer3.png', color: SRM_COLORS[SRM.parse(widget.model.ebc!)]
                         // fit: BoxFit.fill,
                         // colorBlendMode: BlendMode.modulate
                         ),
@@ -95,7 +99,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                               child: Text(_style!.title!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white))
                           ),
                           if (widget.model.ibu != null) Text('IBU: ${widget.model.ibu}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                          if (widget.model.alcohol != null) Text('${widget.model.alcohol}°', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                          if (widget.model.abv != null) Text('${widget.model.abv}°', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                         ],
                       ),
                     ]
@@ -106,13 +110,23 @@ class _ReceiptPageState extends State<ReceiptPage> {
           ]),
         ),
         actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.shopping_cart_outlined),
-            onPressed: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return BasketPage();
-              }));
-            },
+          Badge(
+            position: BadgePosition.topEnd(top: 0, end: 3),
+            animationDuration: Duration(milliseconds: 300),
+            animationType: BadgeAnimationType.slide,
+            showBadge: _baskets > 0,
+            badgeContent: _baskets > 0 ? Text(
+              _baskets.toString(),
+              style: TextStyle(color: Colors.white),
+            ) : null,
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart_outlined),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return BasketPage();
+                }));
+              },
+            ),
           ),
           if (_editable && currentUser != null && currentUser!.isEditor())
             IconButton(
@@ -125,14 +139,14 @@ class _ReceiptPageState extends State<ReceiptPage> {
       ),
       if (widget.model.text!.isNotEmpty)
         SliverToBoxAdapter(
-            child: ExpansionPanelList(
-                elevation: 1,
-                expansionCallback: (int index, bool isExpanded) {
-                  setState(() {
-                    _expanded = !isExpanded;
-                  });
-                },
-                children: [
+          child: ExpansionPanelList(
+            elevation: 1,
+            expansionCallback: (int index, bool isExpanded) {
+              setState(() {
+                _expanded = !isExpanded;
+              });
+            },
+            children: [
               ExpansionPanel(
                 isExpanded: _expanded,
                 canTapOnHeader: true,
@@ -151,14 +165,24 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     softLineBreak: true,
                     styleSheet:
                         MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
-                  )),
+                  )
+                ),
               )
-            ])),
+          ])
+        ),
       SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
     ]));
   }
 
   _initialize() async {
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     _editable = provider.editable;
     _fetch();

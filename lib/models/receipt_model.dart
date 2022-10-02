@@ -1,9 +1,7 @@
 // Internal package
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:flutter/foundation.dart';
 
 class ReceiptModel<T> extends Model {
   Status? status;
@@ -11,7 +9,7 @@ class ReceiptModel<T> extends Model {
   String? text;
   ImageModel? image;
   String? style;
-  double? alcohol;
+  double? abv;
   double? ibu;
   double? ebc;
 
@@ -25,7 +23,7 @@ class ReceiptModel<T> extends Model {
     this.text,
     this.image,
     this.style,
-    this.alcohol,
+    this.abv,
     this.ibu,
     this.ebc
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
@@ -37,7 +35,7 @@ class ReceiptModel<T> extends Model {
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
     this.style = map['style'];
-    if (map['alcohol'] != null) this.alcohol = map['alcohol'].toDouble();
+    if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['ibu'] != null) this.ibu = map['ibu'].toDouble();
     if (map['ebc'] != null) this.ebc = map['ebc'].toDouble();
   }
@@ -50,7 +48,7 @@ class ReceiptModel<T> extends Model {
       'text': this.text,
       'image': ImageModel.serialize(this.image),
       'style': this.style,
-      'alcohol': this.alcohol,
+      'abv': this.abv,
       'ibu': this.ibu,
       'ebc': this.ebc
     });
@@ -68,7 +66,7 @@ class ReceiptModel<T> extends Model {
       text: this.text,
       image: this.image,
       style: this.style,
-      alcohol: this.alcohol,
+      abv: this.abv,
       ibu: this.ibu,
       ebc: this.ebc
     );
@@ -82,9 +80,5 @@ class ReceiptModel<T> extends Model {
   @override
   String toString() {
     return 'Receipt: $title, UUID: $uuid';
-  }
-
-  int getSRM() {
-    return (ebc! * 0.508).toInt();
   }
 }

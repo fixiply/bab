@@ -6,9 +6,10 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/utils/srm.dart';
 import 'package:bb/widgets/form_decoration.dart';
-import 'package:bb/widgets/forms/image_field.dart';
 import 'package:bb/widgets/forms/beer_style_field.dart';
+import 'package:bb/widgets/forms/image_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
@@ -24,6 +25,13 @@ class FormReceiptPage extends StatefulWidget {
 class _FormReceiptPageState extends State<FormReceiptPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late TextEditingController _textSRMController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textSRMController = TextEditingController(text: widget.model.ebc != null ?  widget.model.ebc.toString() :  null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,30 +125,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 }
               ),
               Divider(height: 10),
-              ImageField(
-                context: context,
-                image: widget.model.image,
-                height: null,
-                crop: true,
-                onChanged: (images) => setState(() {
-                  widget.model.image = images;
-                })
-              ),
-              Divider(height: 10),
-              MarkdownTextInput(
-                (String value) => setState(() {
-                  widget.model.text = value;
-                }),
-                widget.model.text ?? '',
-                label: AppLocalizations.of(context)!.text('text'),
-                maxLines: 10,
-                actions: MarkdownType.values,
-                // controller: _controller,
-                validators: (value) {
-                  return null;
-                }
-              ),
-              Divider(height: 10),
               BeerStyleField(
                 context: context,
                 dataset: widget.model.style,
@@ -157,13 +141,13 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               ),
               Divider(height: 10),
               TextFormField(
-                initialValue: widget.model.alcohol != null ?  widget.model.alcohol.toString() :  '',
+                initialValue: widget.model.abv != null ?  widget.model.abv.toString() :  '',
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) => setState(() {
-                  widget.model.alcohol = double.parse(value);
+                  widget.model.abv = double.parse(value);
                 }),
                 decoration: FormDecoration(
-                  icon: const Icon(Icons.percent),
+                  icon: const Text('ABV'),
                   labelText: AppLocalizations.of(context)!.text('alcohol'),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true
@@ -196,22 +180,65 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 }
               ),
               Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.ebc != null ?  widget.model.ebc.toString() :  '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) => setState(() {
-                  widget.model.ebc = double.parse(value);
+              FormField(
+                builder: (FormFieldState<int> state) {
+                  return Row(
+                    children: [
+                      Expanded(
+                        child: TextFormField(
+                          controller: _textSRMController,
+                          keyboardType: TextInputType.numberWithOptions(decimal: true),
+                          onChanged: (value) => setState(() {
+                            widget.model.ebc = double.parse(value);
+                          }),
+                          decoration: FormDecoration(
+                            icon: const Text('EBC'),
+                            labelText: AppLocalizations.of(context)!.text('color'),
+                            border: InputBorder.none,
+                            fillColor: FillColor, filled: true
+                          ),
+                          validator: (value) {
+                            if (value!.isEmpty) {
+                              return AppLocalizations.of(context)!.text('validator_field_required');
+                            }
+                            return null;
+                          }
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.calculate_outlined),
+                        tooltip: 'SRM calculator',
+                        onPressed: widget.model.ebc != null ? () {
+                          setState(() {
+                            _textSRMController.text = SRM.toEBC(widget.model.ebc!).toString();
+                            widget.model.ebc = double.parse(_textSRMController.text);
+                          });
+                        } : null,
+                      ),
+                    ],
+                  );
+                }
+              ),
+              Divider(height: 10),
+              ImageField(
+                  context: context,
+                  image: widget.model.image,
+                  height: null,
+                  crop: true,
+                  onChanged: (images) => setState(() {
+                    widget.model.image = images;
+                  })
+              ),
+              Divider(height: 10),
+              MarkdownTextInput((String value) => setState(() {
+                  widget.model.text = value;
                 }),
-                decoration: FormDecoration(
-                    icon: const Text('EBC'),
-                    labelText: AppLocalizations.of(context)!.text('color'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                ),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
+                widget.model.text ?? '',
+                label: AppLocalizations.of(context)!.text('text'),
+                maxLines: 10,
+                actions: MarkdownType.values,
+                // controller: _controller,
+                validators: (value) {
                   return null;
                 }
               ),

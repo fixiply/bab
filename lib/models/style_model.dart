@@ -7,6 +7,13 @@ class StyleModel<T> extends Model {
   Fermentation? fermentation;
   String? title;
   String? text;
+  String? category;
+  double? min_abv;
+  double? max_abv;
+  double? min_ibu;
+  double? max_ibu;
+  double? min_ebc;
+  double? max_ebc;
 
   StyleModel({
     String? uuid,
@@ -17,6 +24,13 @@ class StyleModel<T> extends Model {
     this.fermentation = Fermentation.hight,
     this.title,
     this.text,
+    this.category,
+    this.min_abv,
+    this.max_abv,
+    this.min_ibu,
+    this.max_ibu,
+    this.min_ebc,
+    this.max_ebc
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
   void fromMap(Map<String, dynamic> map) {
@@ -25,6 +39,13 @@ class StyleModel<T> extends Model {
     this.fermentation = Fermentation.values.elementAt(map['fermentation']);
     this.title = map['title'];
     this.text = map['text'];
+    this.category = map['category'];
+    if (map['min_abv'] != null) this.min_abv = map['min_abv'].toDouble();
+    if (map['max_abv'] != null) this.max_abv = map['max_abv'].toDouble();
+    if (map['min_ibu'] != null) this.min_ibu = map['min_ibu'].toDouble();
+    if (map['max_ibu'] != null) this.max_ibu = map['max_ibu'].toDouble();
+    if (map['min_ebc'] != null) this.min_ebc = map['min_ebc'].toDouble();
+    if (map['max_ebc'] != null) this.max_ebc = map['max_ebc'].toDouble();
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -34,6 +55,13 @@ class StyleModel<T> extends Model {
       'fermentation': this.fermentation!.index,
       'title': this.title,
       'text': this.text,
+      'category': this.category,
+      'min_abv': this.min_abv,
+      'max_abv': this.max_abv,
+      'min_ibu': this.min_ibu,
+      'max_ibu': this.max_ibu,
+      'min_ebc': this.min_ebc,
+      'max_ebc': this.max_ebc
     });
     return map;
   }
@@ -48,6 +76,13 @@ class StyleModel<T> extends Model {
       fermentation: this.fermentation,
       title: this.title,
       text: this.text,
+      category: this.category,
+      min_abv: this.min_abv,
+      max_abv: this.max_abv,
+      min_ibu: this.min_ibu,
+      max_ibu: this.max_ibu,
+      min_ebc: this.min_ebc,
+      max_ebc: this.max_ebc
     );
   }
 

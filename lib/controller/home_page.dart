@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart' as Foundation;
 // Internal package
 import 'package:bb/controller/account_page.dart';
 import 'package:bb/controller/admin/gallery_page.dart';
-import 'package:bb/controller/admin/styles_page.dart';
+import 'package:bb/controller/styles_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/companies_page.dart';
 import 'package:bb/controller/events_page.dart';
@@ -15,9 +15,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
 
 // External package
-import 'package:badges/badges.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
 
 class HomePage extends StatefulWidget {
@@ -28,7 +26,6 @@ class HomePage extends StatefulWidget {
 
 class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
-  DateTime? _last_read_at;
   bool? _editable = false;
   PageController _page = PageController();
 
@@ -116,26 +113,26 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
               SideMenuItem(
                 priority: 1,
                 onTap: () => _page.jumpToPage(1),
-                icon: Icon(Icons.search),
+                icon: Icon(Icons.sports_bar_outlined),
                 title: AppLocalizations.of(context)!.text('receipts'),
               ),
               SideMenuItem(
                 priority: 2,
                 onTap: () => _page.jumpToPage(2),
+                icon: Icon(Icons.style_outlined),
+                title: AppLocalizations.of(context)!.text('beer_styles'),
+              ),
+              SideMenuItem(
+                priority: 3,
+                onTap: () => _page.jumpToPage(3),
                 icon: Icon(Icons.person_outline),
                 title: AppLocalizations.of(context)!.text('my_account'),
               ),
               if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 3,
-                onTap: () => _page.jumpToPage(3),
-                icon: Icon(Icons.photo_library_outlined),
-                title: AppLocalizations.of(context)!.text('image_gallery'),
-              ),
-              if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 4,
                 onTap: () => _page.jumpToPage(4),
-                icon: Icon(Icons.style_outlined),
-                title: AppLocalizations.of(context)!.text('beer_styles'),
+                icon: Icon(Icons.photo_library_outlined),
+                title: AppLocalizations.of(context)!.text('image_gallery'),
               ),
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 5,
@@ -157,9 +154,9 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
               children: [
                 EventsPage(),
                 ReceiptsPage(),
+                StylesPage(),
                 AccountPage(),
                 GalleryPage([], close: false),
-                StylesPage(),
                 ProductsPage(),
                 CompaniesPage()
               ]
@@ -188,8 +185,12 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
         label: AppLocalizations.of(context)!.text('home'),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.search),
+        icon: Icon(Icons.sports_bar_outlined),
         label: AppLocalizations.of(context)!.text('receipts'),
+      ),
+      BottomNavigationBarItem(
+        icon: Icon(Icons.style_outlined),
+        label: AppLocalizations.of(context)!.text('styles'),
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.person_outline),
@@ -201,7 +202,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   void _configureSelectNotificationSubject() {
     if (widget.payload != null) {
       setState(() {
-        _selectedIndex = 2;
+        _selectedIndex = 0;
       });
     }
   }
@@ -210,9 +211,9 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
     switch (_selectedIndex) {
       case 0: return EventsPage();
       case 1: return ReceiptsPage();
-      case 2: return AccountPage();
-      case 3: return GalleryPage([], close: false);
-      case 4: return StylesPage();
+      case 2: return StylesPage();
+      case 3: return AccountPage();
+      case 4: return GalleryPage([], close: false);
       case 5: return ProductsPage();
       case 6: return CompaniesPage();
     }

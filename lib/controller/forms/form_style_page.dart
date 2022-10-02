@@ -6,6 +6,7 @@ import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/utils/srm.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
@@ -22,6 +23,15 @@ class FormStylePage extends StatefulWidget {
 class _FormStylePageState extends State<FormStylePage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late TextEditingController _textMinSRMController;
+  late TextEditingController _textMaxSRMController;
+
+  @override
+  void initState() {
+    super.initState();
+    _textMinSRMController = TextEditingController(text: widget.model.min_ebc != null ?  widget.model.min_ebc.toString() :  null);
+    _textMaxSRMController = TextEditingController(text: widget.model.max_ebc != null ?  widget.model.max_ebc.toString() :  null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,6 +138,210 @@ class _FormStylePageState extends State<FormStylePage> {
                     return AppLocalizations.of(context)!.text('validator_field_required');
                   }
                   return null;
+                }
+              ),
+              Divider(height: 10),
+              TextFormField(
+                initialValue: widget.model.category,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (text) => setState(() {
+                  widget.model.category = text;
+                }),
+                decoration: FormDecoration(
+                  icon: const Icon(Icons.category),
+                  labelText: AppLocalizations.of(context)!.text('category'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
+                )
+              ),
+              Divider(height: 10),
+              FormField(
+                  builder: (FormFieldState<int> state) {
+                    return Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextFormField(
+                            initialValue: widget.model.min_ibu != null ?  widget.model.min_ibu.toString() :  '',
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onChanged: (value) => setState(() {
+                              widget.model.min_ibu = double.parse(value);
+                            }),
+                            decoration: FormDecoration(
+                                icon: const Text('IBU'),
+                                labelText: 'min',
+                                border: InputBorder.none,
+                                fillColor: FillColor, filled: true,
+                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return AppLocalizations.of(context)!.text('validator_field_required');
+                              }
+                              return null;
+                            }
+                        ),
+                        const SizedBox(width: 8),
+                        TextFormField(
+                            initialValue: widget.model.max_ibu != null ?  widget.model.max_ibu.toString() :  '',
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onChanged: (value) => setState(() {
+                              widget.model.max_ibu = double.parse(value);
+                            }),
+                            decoration: FormDecoration(
+                                labelText: 'max',
+                                border: InputBorder.none,
+                                fillColor: FillColor, filled: true,
+                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return AppLocalizations.of(context)!.text('validator_field_required');
+                              }
+                              return null;
+                            }
+                        ),
+                      ],
+                    );
+                  }
+              ),
+              Divider(height: 10),
+              FormField(
+                builder: (FormFieldState<int> state) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      TextFormField(
+                        initialValue: widget.model.min_abv != null ?  widget.model.min_abv.toString() :  '',
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (value) => setState(() {
+                          widget.model.min_abv = double.parse(value);
+                        }),
+                        decoration: FormDecoration(
+                          icon: const Text('ABV'),
+                          labelText: 'min',
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true,
+                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return AppLocalizations.of(context)!.text('validator_field_required');
+                          }
+                          return null;
+                        }
+                      ),
+                      const SizedBox(width: 8),
+                      TextFormField(
+                        initialValue: widget.model.max_abv != null ?  widget.model.max_abv.toString() :  '',
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (value) => setState(() {
+                          widget.model.max_abv = double.parse(value);
+                        }),
+                        decoration: FormDecoration(
+                          labelText: 'max',
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true,
+                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                        ),
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return AppLocalizations.of(context)!.text('validator_field_required');
+                          }
+                          return null;
+                          }
+                      ),
+                    ],
+                  );
+                }
+              ),
+              Divider(height: 10),
+              FormField(
+                builder: (FormFieldState<int> state) {
+                  return Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Container(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: Row(
+                         mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _textMinSRMController,
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
+                                onChanged: (value) => setState(() {
+                                  widget.model.min_ebc = double.parse(value);
+                                }),
+                                decoration: FormDecoration(
+                                    icon: const Text('EBC'),
+                                    labelText: 'min',
+                                    border: InputBorder.none,
+                                    fillColor: FillColor, filled: true,
+                                ),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return AppLocalizations.of(context)!.text('validator_field_required');
+                                  }
+                                  return null;
+                                }
+                             ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.calculate_outlined),
+                              tooltip: 'SRM calculator',
+                              onPressed: widget.model.min_ebc != null ? () {
+                                setState(() {
+                                  _textMinSRMController.text = SRM.toEBC(widget.model.min_ebc!).toString();
+                                  widget.model.min_ebc = double.parse(_textMinSRMController.text);
+                                });
+                              } : null,
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        width: MediaQuery.of(context).size.width / 2.5,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: _textMaxSRMController,
+                                keyboardType: TextInputType.numberWithOptions(decimal: false),
+                                onChanged: (value) => setState(() {
+                                  widget.model.max_ebc = double.parse(value);
+                                }),
+                                decoration: FormDecoration(
+                                    labelText: 'max',
+                                    border: InputBorder.none,
+                                    fillColor: FillColor, filled: true,
+                                ),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return AppLocalizations.of(context)!.text('validator_field_required');
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.calculate_outlined),
+                              tooltip: 'SRM calculator',
+                              onPressed: widget.model.max_ebc != null ? () {
+                               setState(() {
+                                 _textMaxSRMController.text = SRM.toEBC(widget.model.max_ebc!).toString();
+                                 widget.model.max_ebc = double.parse(_textMaxSRMController.text);
+                               });
+                              } : null,
+                            ),
+                          ]
+                        )
+                      )
+                    ],
+                  );
                 }
               ),
               Divider(height: 10),

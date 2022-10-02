@@ -77,8 +77,7 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
       appBar: AppBar(
         titleSpacing: 0.0,
         title: Text(AppLocalizations.of(context)!.text('personalization')),
-        iconTheme: new IconThemeData(color: Theme.of(context).primaryColor),
-        titleTextStyle: Theme.of(context).textTheme.headline6,
+        foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.transparent,
         bottomOpacity: 0.0,
         elevation: 0.0,

@@ -4,25 +4,27 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
-import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/receipt_page.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
+import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/utils/ibu.dart';
+import 'package:bb/utils/srm.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/filter_receipt_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
-import 'package:expandable_text/expandable_text.dart';
 
 // External package
 import 'package:badges/badges.dart';
+import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sprintf/sprintf.dart';
@@ -43,16 +45,9 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   bool _remove = false;
   bool _hidden = false;
 
-  double? _startSRM;
-  double? _endSRM;
-  double? _startIBU;
-  double? _endIBU;
-  double? _startAlcohol;
-  double? _endAlcohol;
-  double _minIBU = 0.0;
-  double _maxIBU = 0.0;
-  double _minAlcohol = 0.0;
-  double _maxAlcohol = 0.0;
+  SRM _srm = SRM();
+  IBU _ibu = IBU();
+  ABV _abv = ABV();
   List<Fermentation> _selectedFermentations = [];
   List<StyleModel> _selectedStyles = [];
 
@@ -152,37 +147,30 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
             return CustomScrollView(
               slivers: [
                 FilterReceiptAppBar(
-                  startSRM: _startSRM,
-                  endSRM: _endSRM,
-                  minIBU: _minIBU,
-                  maxIBU: _maxIBU,
-                  minAlcohol: _minAlcohol,
-                  maxAlcohol: _maxAlcohol,
-                  startIBU: _startIBU,
-                  endIBU: _endIBU,
-                  startAlcohol: _startAlcohol,
-                  endAlcohol: _endAlcohol,
+                  srm: _srm,
+                  ibu: _ibu,
+                  abv: _abv,
                   selectedFermentations: _selectedFermentations,
                   styles: _styles,
                   selectedStyles: _selectedStyles,
                   onColorChanged: (start, end) {
                     setState(() {
-                      _startSRM = start;
-                      _endSRM = end;
+                      _srm.start = start;
+                      _srm.end = end;
                     });
                     _fetch();
                   },
                   onIBUChanged: (start, end) {
                     setState(() {
-                      _startIBU = start;
-                      _endIBU = end;
+                      _ibu.start = start;
+                      _ibu.end = end;
                     });
                     _fetch();
                   },
                   onAlcoholChanged: (start, end) {
                     setState(() {
-                      _startAlcohol = start;
-                      _endAlcohol = end;
+                      _abv.start = start;
+                      _abv.end = end;
                     });
                     _fetch();
                   },
@@ -302,7 +290,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                 Container(
                   // color: SRM[model.getSRM()],
                   child: Image.asset('assets/images/beer3.png',
-                    color: SRM[model.getSRM()],
+                    color: SRM_COLORS[SRM.parse(model.ebc!)],
                     // colorBlendMode: BlendMode.modulate
                   ),
                   width: 30,
@@ -354,7 +342,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                           children: <TextSpan>[
                             TextSpan(text: ' IBU: '),
                             TextSpan(text: model.ibu.toString()),
-                            TextSpan(text: '    ' +model.alcohol.toString() + '°'),
+                            TextSpan(text: '    ' +model.abv.toString() + '°'),
                           ]
                       )
                     ],
@@ -414,12 +402,10 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
 
   _clear() async {
     setState(() {
-      _startSRM = 0;
-      _endSRM = SRM.length.toDouble();
-      _startIBU = _minIBU;
-      _endIBU = _maxIBU;
-      _startAlcohol = _minAlcohol;
-      _endAlcohol = _maxAlcohol;
+      _srm.clear();
+      _srm.end = SRM_COLORS.length.toDouble();
+      _ibu.clear();
+      _abv.clear();
       _selectedFermentations.clear();
       _selectedStyles.clear();
     });
@@ -451,30 +437,30 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
 
   _fetch() async {
     _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
-    List<ReceiptModel> receipts  = await Database().getReceipts(ordered: true);
+    List<ReceiptModel> list  = await Database().getReceipts(ordered: true);
     setState(() {
-      _receipts = _filter(receipts);
+      _receipts = _filter(list);
     });
   }
 
-  Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> receipts) async {
+  Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> list) async {
     List<ReceiptModel>? values = [];
     String? search =  _searchQueryController.text;
-    for (ReceiptModel model in receipts) {
+    for (ReceiptModel model in list) {
       _setFilter(model);
       if (search != null && search.length > 0) {
         if (!(model.title!.toLowerCase().contains(search.toLowerCase()))) {
           continue;
         }
       }
-      if (_startSRM != null && _startSRM! > model.getSRM()) continue;
-      if (_endSRM != null && _endSRM! < model.getSRM()) continue;
-      if (_startIBU != null && _startIBU! > model.ibu!) continue;
-      if (_endIBU != null && _endIBU! < model.ibu!) continue;
-      if (_startAlcohol != null && _startAlcohol! > model.alcohol!) continue;
-      if (_endAlcohol != null && _endAlcohol! < model.alcohol!) continue;
+      if (model.ebc != null && _srm.start != null && _srm.start! > SRM.parse(model.ebc!)) continue;
+      if (model.ebc != null && _srm.end != null && _srm.end! < SRM.parse(model.ebc!)) continue;
+      if (model.ibu != null && _ibu.start != null && _ibu.start! > model.ibu!) continue;
+      if (model.ibu != null && _ibu.end != null && _ibu.end! < model.ibu!) continue;
+      if (model.abv != null && _abv.start != null && _abv.start! > model.abv!) continue;
+      if (model.abv != null && _abv.end != null && _abv.end! < model.abv!) continue;
       if (_selectedFermentations.isNotEmpty) {
-        if (!_styles!.contains(model.style)) {
+        if (!_selectedFermentations.contains(model.style)) {
           continue;
         }
       };
@@ -489,10 +475,10 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   }
 
   _setFilter(ReceiptModel model) {
-    if (_minIBU == 0.0 || model.ibu! < _minIBU)  _minIBU = model.ibu!;
-    if (_maxIBU == 0.0 || model.ibu! > _maxIBU) _maxIBU = model.ibu!;
-    if (_minAlcohol == 0.0 || model.alcohol! < _minAlcohol) _minAlcohol = model.alcohol!;
-    if (_maxAlcohol == 0.0 || model.alcohol! > _maxAlcohol)  _maxAlcohol = model.alcohol!;
+    if (model.ibu != null && (_ibu.min == 0.0 || model.ibu! < _ibu.min))  _ibu.min = model.ibu!;
+    if (model.ibu != null && (_ibu.max == 0.0 || model.ibu! > _ibu.max)) _ibu.max = model.ibu!;
+    if (model.abv != null && (_abv.min == 0.0 || model.abv! < _abv.min)) _abv.min = model.abv!;
+    if (model.abv != null && (_abv.max == 0.0 || model.abv! > _abv.max))  _abv.max = model.abv!;
   }
 
   _new() async {
@@ -502,12 +488,6 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
     })).then((value) {
       _fetch();
     });
-  }
-
-  _edit(ReceiptModel model) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormReceiptPage(model);
-    })).then((value) { _fetch(); });
   }
 }
 

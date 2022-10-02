@@ -13,7 +13,7 @@ import 'package:bb/widgets/paints/custom_thumb_shape.dart';
 // External package
 import 'package:syncfusion_flutter_sliders/sliders.dart';
 
-class FilterReceiptAppBar extends StatefulWidget {
+class FilterStyleAppBar extends StatefulWidget {
   SRM srm;
   IBU ibu;
   ABV abv;
@@ -21,8 +21,6 @@ class FilterReceiptAppBar extends StatefulWidget {
   SfRangeValues? ibu_values;
   SfRangeValues? abv_values;
   List<Fermentation>? selectedFermentations = [];
-  List<StyleModel>? styles;
-  List<StyleModel>? selectedStyles = [];
   final Function(double start, double end)? onColorChanged;
   final Function(double start, double end)? onIBUChanged;
   final Function(double start, double end)? onAlcoholChanged;
@@ -30,15 +28,13 @@ class FilterReceiptAppBar extends StatefulWidget {
   final Function(StyleModel value)? onStyleChanged;
   final Function()? onReset;
 
-  FilterReceiptAppBar({Key? key,
+  FilterStyleAppBar({Key? key,
     required this.srm,
     required this.ibu,
     required this.abv,
     this.ibu_values,
     this.abv_values,
     this.selectedFermentations,
-    this.styles,
-    this.selectedStyles,
     this.onColorChanged,
     this.onIBUChanged,
     this.onAlcoholChanged,
@@ -47,24 +43,22 @@ class FilterReceiptAppBar extends StatefulWidget {
     this.onReset,
   }) : super(key: key) {
     if (selectedFermentations == null) selectedFermentations = [];
-    if (styles == null) styles = [];
-    if (selectedStyles == null) selectedStyles = [];
     if (srm_values == null) srm_values = RangeValues(srm.start ?? 0, srm.end ?? SRM_COLORS.length.toDouble());
     if (ibu_values == null) ibu_values = SfRangeValues(ibu.start ?? ibu.min, ibu.end ?? ibu.max);
     if (abv_values == null) abv_values = SfRangeValues(abv.start ?? abv.min, abv.end ?? abv.max);
   }
 
-  _FilterReceiptAppBarState createState() => new _FilterReceiptAppBarState();
+  _FilterStyleAppBarState createState() => new _FilterStyleAppBarState();
 }
 
-class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTickerProviderStateMixin {
+class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     _tabController = new TabController(
-      length: 4,
+      length: 3,
       vsync: this,
     );
   }
@@ -85,7 +79,6 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
             Tab(icon: Icon(Icons.tune, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Saveur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
             Tab(icon: Icon(Icons.palette_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Couleur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
             Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Type', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.style_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Style', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
           ],
         ),
         flexibleSpace: FlexibleSpaceBar(
@@ -96,7 +89,6 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
               _flavor(),
               _color(),
               _fermentation(),
-              _styles()
             ],
           ),
         ),
@@ -136,7 +128,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
               SizedBox(width: 25, child: Text((widget.ibu.start ?? widget.ibu.min).round().toString(), style: TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
-                    data: SliderThemeData(
+                  data: SliderThemeData(
                       trackHeight: 2,
                       thumbColor: Theme.of(context).primaryColor,
                       activeTrackColor: Theme.of(context).primaryColor,
@@ -145,21 +137,21 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                       rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                       showValueIndicator: ShowValueIndicator.always,
                       valueIndicatorTextStyle: TextStyle(fontSize: 12)
-                    ),
-                    child: RangeSlider(
-                      min: widget.ibu.min,
-                      max: widget.ibu.max,
-                      values: RangeValues(widget.ibu.start ?? widget.ibu.min, widget.ibu.end ?? widget.ibu.max),
-                      labels: RangeLabels(IBU.label(widget.ibu.start ?? widget.ibu.min), IBU.label(widget.ibu.end ?? widget.ibu.max)),
-                      onChanged: (values) {
-                        setState(() {
-                          widget.ibu.start = values.start;
-                          widget.ibu.end = values.end;
-                        });
-                        widget.onIBUChanged?.call(values.start, values.end);
-                      },
-                    )
+                  ),
+                  child: RangeSlider(
+                    min: widget.ibu.min,
+                    max: widget.ibu.max,
+                    values: RangeValues(widget.ibu.start ?? widget.ibu.min, widget.ibu.end ?? widget.ibu.max),
+                    labels: RangeLabels(IBU.label(widget.ibu.start ?? widget.ibu.min), IBU.label(widget.ibu.end ?? widget.ibu.max)),
+                    onChanged: (values) {
+                      setState(() {
+                        widget.ibu.start = values.start;
+                        widget.ibu.end = values.end;
+                      });
+                      widget.onIBUChanged?.call(values.start, values.end);
+                    },
                   )
+                )
               ),
               SizedBox(width: 25, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: TextStyle(fontSize: 12))),
             ]
@@ -191,7 +183,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                       });
                       widget.onAlcoholChanged?.call(values.start, values.end);
                     },
-                    )
+                  )
                 )
               ),
               SizedBox(width: 25, child: Text('${(widget.abv.end ?? widget.abv.max).toStringAsPrecision(2)}°', softWrap: false, style: TextStyle(fontSize: 12))),
@@ -293,36 +285,6 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
             shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
             onSelected: (value) {
               widget.onFermentationChanged?.call(e);
-            }
-          );
-        }).toList()
-      )
-    );
-  }
-
-  Widget _styles() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
-      child: Wrap(
-        spacing: 2.0,
-        runSpacing: 4.0,
-        direction: Axis.vertical,
-        children: widget.styles!.map((e) {
-          return FilterChip(
-            selected: widget.selectedStyles!.contains(e),
-            padding: EdgeInsets.zero,
-            label: Text(
-              e.title ?? '',
-              style: TextStyle(
-                fontSize: 12.0,
-              ),
-            ),
-            selectedColor: BlendColor,
-            backgroundColor: FillColor,
-            shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
-            onSelected: (value) {
-              widget.onStyleChanged?.call(e);
             }
           );
         }).toList()

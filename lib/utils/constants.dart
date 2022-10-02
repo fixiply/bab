@@ -82,7 +82,7 @@ TextStyle regular16pt = TextStyle(
   fontWeight: FontWeight.w400,
 );
 
-final List<Color> EBC = [
+final List<Color> EBC_COLORS = [
   Color.fromARGB(255, 250, 250, 210),
   Color.fromARGB(255, 250, 250, 160),
   Color.fromARGB(255, 250, 250, 133),
@@ -145,7 +145,7 @@ final List<Color> EBC = [
   Color.fromARGB(255, 6, 2, 1),
 ];
 
-final List<Color> SRM = [
+final List<Color> SRM_COLORS = [
   const Color(0xFFFFE699),
   const Color(0xFFFFD878),
   const Color(0xFFFFCA5A),

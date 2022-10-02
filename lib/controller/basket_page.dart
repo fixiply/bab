@@ -221,7 +221,7 @@ class _BasketPageState extends State<BasketPage> {
         child: TextButton(
           child: Text(sprintf(AppLocalizations.of(context)!.text('continue_with'), [AppLocalizations.of(context)!.text(_payment.toString().toLowerCase())])),
           style:  TextButton.styleFrom(
-            primary: Colors.white,
+            foregroundColor: Colors.white,
             backgroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
@@ -276,7 +276,7 @@ class _BasketPageState extends State<BasketPage> {
                               children: <TextSpan>[
                                 TextSpan(text: ' IBU: '),
                                 TextSpan(text: snapshot2.data.ibu.toString()),
-                                TextSpan(text: '    ' + snapshot2.data.alcohol.toString() + '°'),
+                                TextSpan(text: '    ' + snapshot2.data.abv.toString() + '°'),
                               ]
                             )
                           ],
