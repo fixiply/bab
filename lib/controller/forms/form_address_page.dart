@@ -3,11 +3,8 @@ import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/models/adress_model.dart';
-import 'package:bb/models/company_model.dart';
-import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 class FormAddressPage extends StatefulWidget {
@@ -19,16 +16,6 @@ class FormAddressPage extends StatefulWidget {
 class _FormAddressPageState extends State<FormAddressPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-
-  Future<List<CompanyModel>>? _companies;
-  Future<List<ReceiptModel>>? _receipts;
-
-  @override
-  void initState() {
-    super.initState();
-    _companies = Database().getCompanies(ordered: true);
-    _receipts = Database().getReceipts(ordered: true);
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -191,6 +191,7 @@
   "version": "Version",
   "view": "Afficher",
   "view_image": "Voir l'image",
+  "without_saving": "Des modifications sont en cours, voulez-vous vraiment quitter cette page sans enregistrer ?",
   "your_basket": "Votre panier",
   "zip_code": "Code postal"
 }

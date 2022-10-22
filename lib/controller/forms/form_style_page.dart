@@ -6,6 +6,7 @@ import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/utils/srm.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
@@ -25,6 +26,7 @@ class _FormStylePageState extends State<FormStylePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late TextEditingController _textMinSRMController;
   late TextEditingController _textMaxSRMController;
+  bool _modified = false;
 
   @override
   void initState() {
@@ -42,12 +44,28 @@ class _FormStylePageState extends State<FormStylePage> {
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: const BackButtonIcon(),
+          onPressed:() async {
+            bool confirm = _modified ? await showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return ConfirmDialog(
+                  content: Text(AppLocalizations.of(context)!.text('without_saving')),
+                );
+              }
+            ) : true;
+            if (confirm) {
+              Navigator.pop(context);
+            }
+          }
+        ),
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text('save'),
             icon: const Icon(Icons.save),
-            onPressed: () {
+            onPressed: _modified == true ? () {
               if (_formKey.currentState!.validate()) {
                 Database().update(widget.model).then((value) async {
                   Navigator.pop(context, widget.model);
@@ -55,7 +73,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   _showSnackbar(e.toString());
                 });
               }
-            }
+            } : null
           ),
           if (widget.model.uuid != null) IconButton(
             padding: EdgeInsets.zero,
@@ -102,6 +120,11 @@ class _FormStylePageState extends State<FormStylePage> {
         padding: EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
+          onChanged: () {
+            setState(() {
+              _modified = true;
+            });
+          },
           child: Column(
             children: <Widget>[
               DropdownButtonFormField<Fermentation>(

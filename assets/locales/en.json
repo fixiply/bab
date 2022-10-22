@@ -191,6 +191,7 @@
   "version": "Version",
   "view": "Display",
   "view_image": "View image",
+  "without_saving": "Changes are in progress, do you really want to leave this page without saving?",
   "your_basket": "Your basket",
   "zip_code": "Zip code"
 }
