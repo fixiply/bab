@@ -136,7 +136,7 @@ class _StylesPageState extends State<StylesPage> {
             ),
           ]
         ),
-        drawer: _editable && currentUser != null && currentUser!.isEditor() ? CustomDrawer(context) : null,
+        drawer: CustomDrawer(context),
         body: FutureBuilder<List<StyleModel>>(
           future: _styles,
           builder: (context, snapshot) {

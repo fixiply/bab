@@ -8,11 +8,11 @@ import 'package:bb/utils/constants.dart';
 // External package
 import 'package:package_info_plus/package_info_plus.dart';
 
-class AboutPage extends StatefulWidget {
-  _AboutPageState createState() => new _AboutPageState();
+class ToolsPage extends StatefulWidget {
+  _ToolsPageState createState() => new _ToolsPageState();
 }
 
-class _AboutPageState extends State<AboutPage> {
+class _ToolsPageState extends State<ToolsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
   String? _version;
@@ -30,7 +30,7 @@ class _AboutPageState extends State<AboutPage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('about')),
+        title: Text(AppLocalizations.of(context)!.text('tools')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white

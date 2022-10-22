@@ -25,6 +25,18 @@ class CustomDrawer<Object> extends Drawer {
           )
         ),
         ListTile(
+          title: Text(AppLocalizations.of(context)!.text('tools'),
+              style: TextStyle(fontSize: 18)
+          ),
+          onTap: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return GalleryPage([]);
+            })).then((value) {
+              Navigator.pop(context);
+            });
+          },
+        ),
+        if (currentUser != null && currentUser!.isEditor()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('image_gallery'),
               style: TextStyle(fontSize: 18)
           ),
@@ -36,7 +48,7 @@ class CustomDrawer<Object> extends Drawer {
             });
           },
         ),
-        ListTile(
+        if (currentUser != null && currentUser!.isEditor()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('products'),
             style: TextStyle(fontSize: 18)
           ),

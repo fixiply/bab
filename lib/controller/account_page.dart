@@ -68,7 +68,7 @@ class _AccountPageState extends State<AccountPage> {
           ),
         ]
       ),
-      drawer: _editable && currentUser != null && currentUser!.isEditor() ? CustomDrawer(context) : null,
+      drawer: CustomDrawer(context),
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
         child: Column(
@@ -77,9 +77,7 @@ class _AccountPageState extends State<AccountPage> {
           children: <Widget>[
             if (currentUser == null) const SizedBox(height: 30),
             if (currentUser == null) Align(
-              child: const Text(
-                'Connectez-vous pour accéder à votre compte',
-              ),
+              child: Text(AppLocalizations.of(context)!.text('login')),
             ),
             const SizedBox(height: 8),
             if (currentUser == null) Align(
@@ -168,7 +166,7 @@ class _AccountPageState extends State<AccountPage> {
                         context: context,
                         builder: (BuildContext context) {
                         return ConfirmDialog(
-                          content: Text('Voulez-vous vraiment vous déconnecter ?'),
+                          content: Text(AppLocalizations.of(context)!.text('disconnect')),
                           );
                         }
                       );

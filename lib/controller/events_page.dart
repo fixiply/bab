@@ -130,7 +130,7 @@ class _EventsPageState extends State<EventsPage> {
           ),
         ]
       ),
-      drawer: _editable && currentUser != null && currentUser!.isEditor() ? CustomDrawer(context) : null,
+      drawer: CustomDrawer(context),
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),

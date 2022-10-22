@@ -5,11 +5,12 @@ import 'package:flutter/foundation.dart' as Foundation;
 // Internal package
 import 'package:bb/controller/account_page.dart';
 import 'package:bb/controller/admin/gallery_page.dart';
-import 'package:bb/controller/styles_page.dart';
-import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/companies_page.dart';
 import 'package:bb/controller/events_page.dart';
+import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/receipts_page.dart';
+import 'package:bb/controller/styles_page.dart';
+import 'package:bb/controller/tools_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
@@ -125,23 +126,29 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
               SideMenuItem(
                 priority: 3,
                 onTap: () => _page.jumpToPage(3),
+                icon: Icon(Icons.build_outlined),
+                title: AppLocalizations.of(context)!.text('tools'),
+              ),
+              SideMenuItem(
+                priority: 4,
+                onTap: () => _page.jumpToPage(3),
                 icon: Icon(Icons.person_outline),
                 title: AppLocalizations.of(context)!.text('my_account'),
               ),
               if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 4,
+                priority: 5,
                 onTap: () => _page.jumpToPage(4),
                 icon: Icon(Icons.photo_library_outlined),
                 title: AppLocalizations.of(context)!.text('image_gallery'),
               ),
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 5,
+                priority: 6,
                 onTap: () => _page.jumpToPage(5),
                 icon: Icon(Icons.article_outlined),
                 title: AppLocalizations.of(context)!.text('products'),
               ),
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 6,
+                priority: 7,
                 onTap: () => _page.jumpToPage(6),
                 icon: Icon(Icons.groups),
                 title: AppLocalizations.of(context)!.text('companies'),
@@ -155,6 +162,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 EventsPage(),
                 ReceiptsPage(),
                 StylesPage(),
+                ToolsPage(),
                 AccountPage(),
                 GalleryPage([], close: false),
                 ProductsPage(),

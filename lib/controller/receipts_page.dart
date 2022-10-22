@@ -139,7 +139,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
           ),
         ]
       ),
-      drawer: _editable && currentUser != null && currentUser!.isEditor() ? CustomDrawer(context) : null,
+      drawer: CustomDrawer(context),
       body: FutureBuilder<List<ReceiptModel>>(
         future: _receipts,
         builder: (context, snapshot) {
