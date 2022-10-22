@@ -1,47 +1,35 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/constants.dart';
 import 'package:bb/controller/product_page.dart';
 import 'package:bb/models/product_model.dart';
-import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/database.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/widgets/containers/abstract_container.dart';
 import 'package:bb/widgets/custom_image.dart';
-import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:parallax_animation/parallax_area.dart';
 
-class ParallaxContainer extends StatefulWidget {
-  final String? company;
-  final String? receipt;
-  final String? title;
-  ParallaxContainer({this.company, this.receipt, this.title});
+class ParallaxContainer extends AbstractContainer {
+  ParallaxContainer({String? company, String? receipt, int? product}) : super(
+      company: company,
+      receipt: receipt,
+      product: product
+  );
 
   _ParallaxContainerState createState() => new _ParallaxContainerState();
 }
 
-
-class _ParallaxContainerState extends State<ParallaxContainer> {
-  Future<List<ProductModel>>? _products;
-  Map<String, double> _ratings = Map<String, double>();
-  Map<String, int> _notices = Map<String, int>();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetch();
-  }
-
+class _ParallaxContainerState extends AbstractContainerState {
   @override
   Widget build(BuildContext context) {
     return Container(
       height: 280,
       color: Colors.white,
       child: FutureBuilder<List<ProductModel>>(
-        future: _products,
+        future: products,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return ParallaxArea(
@@ -53,18 +41,18 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
                 itemExtent: 280,
                 itemBuilder: (context, index) {
                   ProductModel model = snapshot.data![index];
-                  double rating = _ratings.containsKey(model.uuid) ? _ratings[model.uuid]! : 0;
-                  int notices = _notices.containsKey(model.uuid) ? _notices[model.uuid]! : 0;
+                  double rating = ratings.containsKey(model.uuid) ? ratings[model.uuid]! : 0;
+                  int notice = notices.containsKey(model.uuid) ? notices[model.uuid]! : 0;
                   return Container(
                     color: Colors.white,
                     child: Column(
                       children: [
                         InkWell(
-                          onTap: () => setState(() {
+                          onTap: widget.product != Product.workshop.index ? () => setState(() {
                             Navigator.push(context, MaterialPageRoute(builder: (context) {
                               return ProductPage(model);
                             }));
-                          }),
+                          }) : null,
                           child: Row(
                             children: [
                               CustomImage.network(model.image!.url, width: 100, height: 160, fit: BoxFit.scaleDown),
@@ -86,7 +74,7 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
                                       ignoreGestures: true,
                                       onRatingUpdate: (rating) async {},
                                     ),
-                                    Text('${notices} ${AppLocalizations.of(context)!.text('reviews')}')
+                                    Text('${notice} ${AppLocalizations.of(context)!.text('reviews')}')
                                   ],
                                 )
                               )
@@ -97,19 +85,7 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
                         Text(model.title!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                         if (model.subtitle != null) Text(model.subtitle!, style: TextStyle(fontSize: 14)),
                         const SizedBox(height: 4),
-                        SizedBox(
-                          width: 100,
-                          child: TextButton(
-                            child: Text('${model.price!.toStringAsPrecision(3)} €', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                            style: TextButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(color: Theme.of(context).primaryColor),
-                            )),
-                            onPressed: () {
-                              ModalBottomSheet.showAddToCart(context, model);
-                            },
-                          )
-                        ),
+                        button(model)
                       ],
                     )
                   );
@@ -120,34 +96,5 @@ class _ParallaxContainerState extends State<ParallaxContainer> {
         }
       )
     );
-  }
-
-  _fetch() async {
-    setState(() {
-      _products = Database().getProducts(product: Product.beer, company: widget.company, receipt: widget.receipt, ordered: true);
-    });
-    _calculate();
-  }
-
-  _calculate() async {
-    List<ProductModel>? list = await _products;
-    _notices.clear();
-    _ratings.clear();
-    if (list != null && list.length > 0) {
-      for(ProductModel product in list) {
-        double rating = 0;
-        List<RatingModel>? ratings = await Database().getRatings(beer: product.uuid);
-        if (ratings != null && ratings.length > 0) {
-          for (RatingModel model in ratings) {
-            rating += model.rating!;
-          }
-          rating = rating / ratings.length;
-        }
-        setState(() {
-          _notices[product.uuid!] = ratings != null ? ratings.length : 0;
-          _ratings[product.uuid!] = rating;
-        });
-      }
-    }
   }
 }

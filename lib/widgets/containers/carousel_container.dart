@@ -1,12 +1,11 @@
+import 'package:bb/widgets/containers/abstract_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/utils/constants.dart';
 import 'package:bb/controller/product_page.dart';
 import 'package:bb/models/product_model.dart';
-import 'package:bb/models/rating_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/custom_image.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
@@ -14,34 +13,25 @@ import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class CarouselContainer extends StatefulWidget {
-  final String? company;
-  final String? receipt;
-  final String? title;
-  CarouselContainer({this.company, this.receipt, this.title});
+class CarouselContainer extends AbstractContainer {
+  CarouselContainer({String? company, String? receipt, int? product}) : super(
+      company: company,
+      receipt: receipt,
+      product: product
+  );
 
   _CarouselContainerState createState() => new _CarouselContainerState();
 }
 
 
-class _CarouselContainerState extends State<CarouselContainer> {
-  Future<List<ProductModel>>? _products;
-  Map<String, double> _ratings = Map<String, double>();
-  Map<String, int> _notices = Map<String, int>();
-
-  @override
-  void initState() {
-    super.initState();
-    _fetch();
-  }
-
+class _CarouselContainerState extends AbstractContainerState {
   @override
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       color: Colors.white,
       child: FutureBuilder<List<ProductModel>>(
-        future: _products,
+        future: products,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return CarouselSlider(
@@ -52,18 +42,18 @@ class _CarouselContainerState extends State<CarouselContainer> {
                 enableInfiniteScroll: false
               ),
               items: snapshot.data!.map((model) {
-                double rating = _ratings.containsKey(model.uuid) ? _ratings[model.uuid]! : 0;
-                int notices = _notices.containsKey(model.uuid) ? _notices[model.uuid]! : 0;
+                double rating = ratings.containsKey(model.uuid) ? ratings[model.uuid]! : 0;
+                int notice = notices.containsKey(model.uuid) ? notices[model.uuid]! : 0;
                 return Container(
                   color: Colors.white,
                   child: Column(
                     children: [
                       InkWell(
-                        onTap: () => setState(() {
+                        onTap: widget.product != Product.workshop.index ? () => setState(() {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return ProductPage(model);
                           }));
-                        }),
+                        }) : null,
                         child: Row(
                           children: [
                             CustomImage.network(model.image!.url, width: 100, height: 160, fit: BoxFit.scaleDown),
@@ -85,7 +75,7 @@ class _CarouselContainerState extends State<CarouselContainer> {
                                     ignoreGestures: true,
                                     onRatingUpdate: (rating) async {},
                                   ),
-                                  Text('${notices} ${AppLocalizations.of(context)!.text('reviews')}')
+                                  Text('${notice} ${AppLocalizations.of(context)!.text('reviews')}')
                                 ],
                               )
                             )
@@ -119,34 +109,5 @@ class _CarouselContainerState extends State<CarouselContainer> {
         }
       )
     );
-  }
-
-  _fetch() async {
-    setState(() {
-      _products = Database().getProducts(product: Product.beer, company: widget.company, receipt: widget.receipt, ordered: true);
-    });
-    _calculate();
-  }
-
-  _calculate() async {
-    List<ProductModel>? list = await _products;
-    _notices.clear();
-    _ratings.clear();
-    if (list != null && list.length > 0) {
-      for(ProductModel product in list) {
-        double rating = 0;
-        List<RatingModel>? ratings = await Database().getRatings(beer: product.uuid);
-        if (ratings != null && ratings.length > 0) {
-          for (RatingModel model in ratings) {
-            rating += model.rating!;
-          }
-          rating = rating / ratings.length;
-        }
-        setState(() {
-          _notices[product.uuid!] = ratings != null ? ratings.length : 0;
-          _ratings[product.uuid!] = rating;
-        });
-      }
-    }
   }
 }

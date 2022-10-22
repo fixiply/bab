@@ -3,10 +3,8 @@ import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/account_page.dart';
-import 'package:bb/controller/receipts_page.dart';
-import 'package:bb/firebase_options.dart';
 import 'package:bb/controller/home_page.dart';
+import 'package:bb/firebase_options.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
@@ -15,6 +13,7 @@ import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/builders/carousel_builder.dart';
 import 'package:bb/widgets/builders/image_editor_builder.dart';
+import 'package:bb/widgets/builders/list_builder.dart';
 import 'package:bb/widgets/builders/markdown_builder.dart';
 import 'package:bb/widgets/builders/parallax_builder.dart';
 
@@ -155,6 +154,12 @@ class _AppState extends State<MyApp> {
       ParallaxBuilder.type,
       JsonWidgetBuilderContainer(
           builder: ParallaxBuilder.fromDynamic
+      ),
+    );
+    registry.registerCustomBuilder(
+      ListBuilder.type,
+      JsonWidgetBuilderContainer(
+          builder: ListBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(

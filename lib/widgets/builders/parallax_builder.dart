@@ -13,10 +13,12 @@ class ParallaxBuilder extends JsonWidgetBuilder {
 
   String? company;
   String? receipt;
+  int? product;
 
   ParallaxBuilder({
     this.company,
     this.receipt,
+    this.product,
   }) : super(numSupportedChildren: 1);
 
   static ParallaxBuilder fromDynamic(
@@ -29,6 +31,7 @@ class ParallaxBuilder extends JsonWidgetBuilder {
     return ParallaxBuilder(
       company: map['company'],
       receipt: map['receipt'],
+      product: map['product'],
     );
   }
 
@@ -41,7 +44,8 @@ class ParallaxBuilder extends JsonWidgetBuilder {
   }) {
     return ParallaxContainer(
       company: company,
-      receipt: receipt
+      receipt: receipt,
+      product: product
     );
   }
 }

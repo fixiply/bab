@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/utils/app_localizations.dart';
@@ -9,11 +9,11 @@ import 'package:bb/utils/app_localizations.dart';
 class ConfirmDialog extends StatefulWidget {
   final String? title;
   final Widget content;
-
   final void Function()? onOk;
   final void Function()? onCancel;
-
-  ConfirmDialog({this.title, required this.content, this.onOk, this.onCancel});
+  final String? ok;
+  final String? cancel;
+  ConfirmDialog({this.title, required this.content, this.onOk, this.onCancel, this.ok, this.cancel});
 
   @override
   State<StatefulWidget> createState() {
@@ -29,7 +29,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
         content: widget.content,
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
-            child: Text(AppLocalizations.of(context)!.text('cancel')),
+            child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
             onPressed: () {
               if (widget.onCancel != null) {
                 widget.onCancel?.call();
@@ -39,7 +39,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
             },
           ),
           CupertinoDialogAction(
-              child: Text(AppLocalizations.of(context)!.text('ok')),
+              child: Text(widget.ok ?? AppLocalizations.of(context)!.text('ok')),
               isDestructiveAction: true,
               onPressed: () {
                 if (widget.onOk != null) {
@@ -57,9 +57,9 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       content: widget.content,
       actions: <Widget>[
         TextButton(
-          child: Text(AppLocalizations.of(context)!.text('cancel')),
+          child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
           style: TextButton.styleFrom(
-            primary: Theme.of(context).primaryColor,
+            foregroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {
@@ -71,10 +71,9 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
           }
         ),
         TextButton(
-          // textColor: Theme.of(context).colorScheme.secondary,
-          child: Text(AppLocalizations.of(context)!.text('ok')),
+          child: Text(widget.ok ?? AppLocalizations.of(context)!.text('ok')),
           style: TextButton.styleFrom(
-            primary: Theme.of(context).primaryColor,
+            foregroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {

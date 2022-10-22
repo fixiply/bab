@@ -114,6 +114,7 @@ class _FormEventPageState extends State<FormEventPage> {
               ),
               Divider(height: 10),
               SwitchField(
+                context: context,
                 value: widget.model.sliver!,
                 icon: Icon(Icons.expand),
                 hintText: AppLocalizations.of(context)!.text('show_sliver'),
