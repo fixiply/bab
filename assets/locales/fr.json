@@ -1,4 +1,5 @@
 {
+  "% min": "Minimum",
   "about": "A propos de Brasseur Bordelais",
   "about_this_app": "A propos de cette application",
   "abv": "ABV - Alcool",
@@ -55,6 +56,7 @@
   "deselect": "Déselectionner",
   "direction": "Direction",
   "drawing": "Dessin",
+  "duplicate": "Dupliquer",
   "edit": "Éditer",
   "edit_cart": "Modifier le panier",
   "email": "Email",
@@ -88,6 +90,7 @@
   "image_processing": "Traitement des images...",
   "images": "Images",
   "included": "Incluse",
+  "information": "Informations",
   "invalid": "Non valide",
   "logout": "Déconnexion",
   "menu": "Menu",
