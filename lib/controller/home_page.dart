@@ -154,7 +154,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 icon: Icon(Icons.build_outlined),
                 title: AppLocalizations.of(context)!.text('tools'),
               ),
-              if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+              if (Foundation.kIsWeb && currentUser != null && currentUser!.hasRole()) SideMenuItem(
                 priority: 7,
                 onTap: () => _page.jumpToPage(7),
                 icon: Icon(Icons.calendar_month),
