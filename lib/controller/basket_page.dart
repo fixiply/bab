@@ -221,8 +221,6 @@ class _BasketPageState extends State<BasketPage> {
         child: TextButton(
           child: Text(sprintf(AppLocalizations.of(context)!.text('continue_with'), [AppLocalizations.of(context)!.text(_payment.toString().toLowerCase())])),
           style:  TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
           onPressed: () {
@@ -240,7 +238,7 @@ class _BasketPageState extends State<BasketPage> {
         if (snapshot1.hasData) {
           if (snapshot1.data.image != null && snapshot1.data.image.url != null) {
             image = CustomImage.network(snapshot1.data.image.url!, height: 60, width: 50, fit: BoxFit.cover,
-              cache: currentUser != null && currentUser!.isEditor() == false
+              cache: currentUser != null && currentUser!.isAdmin() == false
             );
           }
           return ListTile(

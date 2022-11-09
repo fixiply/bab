@@ -76,57 +76,57 @@ class _EventsPageState extends State<EventsPage> {
               },
             ),
           ),
-          if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
-              icon: Icon(Icons.more_vert),
-              tooltip: AppLocalizations.of(context)!.text('display'),
-              onSelected: (value) async {
-                if (value == 1) {
-                  await Database().publishAll();
-                } else if (value == 3) {
-                  bool checked = !_remove;
-                  if (checked) {
-                    _hidden = false;
-                  }
-                  setState(() { _remove = checked; });
-                  _fetch();
+          if (currentUser != null && currentUser!.isAdmin()) PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.text('display'),
+            onSelected: (value) async {
+              if (value == 1) {
+                await Database().publishAll();
+              } else if (value == 3) {
+                bool checked = !_remove;
+                if (checked) {
+                  _hidden = false;
                 }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-                PopupMenuItem(
-                  value: 1,
-                  child: Text(AppLocalizations.of(context)!.text('publish_everything')),
-                ),
-                PopupMenuItem(
-                  value: 2,
-                  child: SwitchListTile(
-                    value: _editable,
-                    title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
-                    onChanged: (value) async {
-                      bool checked = !_editable;
-                      Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
-                      SharedPreferences prefs = await SharedPreferences.getInstance();
-                      await prefs.setBool(EDIT_KEY, checked);
-                      setState(() { _editable = checked; });
-                      Navigator.pop(context);
-                    },
-                  )
-                ),
-                PopupMenuItem(
-                  enabled: false,
-                  value: null,
-                  child: Text(AppLocalizations.of(context)!.text('filtered')),
-                ),
-                CheckedPopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.text('archives')),
-                  value: 3,
-                  checked: _remove,
-                ),
-                CheckedPopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.text('hidden')),
-                  value: 4,
-                  checked: _hidden,
+                setState(() { _remove = checked; });
+                _fetch();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+              PopupMenuItem(
+                value: 1,
+                child: Text(AppLocalizations.of(context)!.text('publish_everything')),
+              ),
+              PopupMenuItem(
+                value: 2,
+                child: SwitchListTile(
+                  value: _editable,
+                  title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
+                  onChanged: (value) async {
+                    bool checked = !_editable;
+                    Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
+                    SharedPreferences prefs = await SharedPreferences.getInstance();
+                    await prefs.setBool(EDIT_KEY, checked);
+                    setState(() { _editable = checked; });
+                    Navigator.pop(context);
+                  },
                 )
-              ]
+              ),
+              PopupMenuItem(
+                enabled: false,
+                value: null,
+                child: Text(AppLocalizations.of(context)!.text('filtered')),
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('archives')),
+                value: 3,
+                checked: _remove,
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('hidden')),
+                value: 4,
+                checked: _hidden,
+              )
+            ]
           ),
         ]
       ),
@@ -163,12 +163,12 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
       floatingActionButton: Visibility(
-        visible: _editable && currentUser != null && currentUser!.isEditor(),
+        visible: _editable && currentUser != null && currentUser!.isAdmin(),
         child: FloatingActionButton(
-            onPressed: _new,
-            backgroundColor: Theme.of(context).primaryColor,
-            tooltip: AppLocalizations.of(context)!.text('new'),
-            child: const Icon(Icons.add)
+          onPressed: _new,
+          backgroundColor: Theme.of(context).primaryColor,
+          tooltip: AppLocalizations.of(context)!.text('new'),
+          child: const Icon(Icons.add)
         )
       )
     );
@@ -241,10 +241,10 @@ class _EventsPageState extends State<EventsPage> {
               }));
             }
           },
-          onDoubleTap: currentUser != null && currentUser!.isEditor() ? () {
+          onDoubleTap: currentUser != null && currentUser!.isAdmin() ? () {
             _edit(model);
           } : null,
-          onLongPress: currentUser != null && currentUser!.isEditor() ? () {
+          onLongPress: currentUser != null && currentUser!.isAdmin() ? () {
             _edit(model);
           } : null,
           child: _event(model, grid),
@@ -267,7 +267,7 @@ class _EventsPageState extends State<EventsPage> {
                   model.getImages(),
                   fit: null,
                   color: Colors.transparent,
-                  cache: currentUser != null && currentUser!.isEditor() == false,
+                  cache: currentUser != null && currentUser!.isAdmin() == false,
                   emptyImage: Image.asset('assets/images/no_image.png')
                 )
               ),
@@ -308,7 +308,7 @@ class _EventsPageState extends State<EventsPage> {
               )
             ],
           ),
-          if (currentUser != null && currentUser!.isEditor()) Positioned(
+          if (currentUser != null && currentUser!.isAdmin()) Positioned(
             top: 4.0,
             right: 4.0,
             child: _indicator(model),
@@ -326,7 +326,7 @@ class _EventsPageState extends State<EventsPage> {
               width: double.infinity,
               child: ImageContainer(
                   model.getImages(),
-                  cache: currentUser != null && currentUser!.isEditor() == false,
+                  cache: currentUser != null && currentUser!.isAdmin() == false,
                   emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.scaleDown)
               )
             ),
@@ -368,7 +368,7 @@ class _EventsPageState extends State<EventsPage> {
             )
           ],
         ),
-        if (currentUser != null && currentUser!.isEditor()) Positioned(
+        if (currentUser != null && currentUser!.isAdmin()) Positioned(
           top: 4.0,
           right: 4.0,
           child: _indicator(model),

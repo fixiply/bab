@@ -49,7 +49,7 @@ class _ListContainerState extends AbstractContainerState {
                       Text(model.title!, textAlign: TextAlign.left, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       if (model.subtitle != null) Text(model.subtitle!, style: TextStyle(fontSize: 14)),
                       InkWell(
-                        onTap: widget.product != Product.workshop.index ? () => setState(() {
+                        onTap: widget.product != Product.booking.index ? () => setState(() {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return ProductPage(model);
                           }));

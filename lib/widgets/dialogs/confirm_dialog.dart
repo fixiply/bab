@@ -59,7 +59,6 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
         TextButton(
           child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
           style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {
@@ -73,7 +72,6 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
         TextButton(
           child: Text(widget.ok ?? AppLocalizations.of(context)!.text('ok')),
           style: TextButton.styleFrom(
-            foregroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {

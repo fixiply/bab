@@ -183,7 +183,7 @@ class _ProductPageState extends State<ProductPage> {
                   },
                 ),
               ),
-              if (_editable && currentUser != null && currentUser!.isEditor()) IconButton(
+              if (_editable && currentUser != null && currentUser!.isAdmin()) IconButton(
                 icon: Icon(Icons.edit_note),
                 onPressed: () {
                   _edit(widget.model);
@@ -340,7 +340,7 @@ class _ProductPageState extends State<ProductPage> {
         child: TextButton(
           child: Text(AppLocalizations.of(context)!.text('buy_now')),
           style:  TextButton.styleFrom(
-            primary: Colors.white,
+            foregroundColor: Colors.white,
             backgroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),

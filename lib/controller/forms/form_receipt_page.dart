@@ -244,13 +244,13 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               ),
               Divider(height: 10),
               ImageField(
-                  context: context,
-                  image: widget.model.image,
-                  height: null,
-                  crop: true,
-                  onChanged: (images) => setState(() {
-                    widget.model.image = images;
-                  })
+                context: context,
+                image: widget.model.image,
+                height: null,
+                crop: true,
+                onChanged: (images) => setState(() {
+                  widget.model.image = images;
+                })
               ),
               Divider(height: 10),
               MarkdownTextInput((String value) => setState(() {

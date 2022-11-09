@@ -8,11 +8,11 @@ import 'package:bb/utils/constants.dart';
 // External package
 import 'package:package_info_plus/package_info_plus.dart';
 
-class ToolsPage extends StatefulWidget {
-  _ToolsPageState createState() => new _ToolsPageState();
+class TanksPage extends StatefulWidget {
+  _TanksPageState createState() => new _TanksPageState();
 }
 
-class _ToolsPageState extends State<ToolsPage> {
+class _TanksPageState extends State<TanksPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -21,7 +21,7 @@ class _ToolsPageState extends State<ToolsPage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('tools')),
+        title: Text(AppLocalizations.of(context)!.text('my_tanks')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white

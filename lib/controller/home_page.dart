@@ -5,19 +5,25 @@ import 'package:flutter/foundation.dart' as Foundation;
 // Internal package
 import 'package:bb/controller/account_page.dart';
 import 'package:bb/controller/admin/gallery_page.dart';
+import 'package:bb/controller/brews_page.dart';
+import 'package:bb/controller/calendar_page.dart';
 import 'package:bb/controller/companies_page.dart';
 import 'package:bb/controller/events_page.dart';
+import 'package:bb/controller/ingredients_page.dart';
+import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/controller/styles_page.dart';
+import 'package:bb/controller/tanks_page.dart';
 import 'package:bb/controller/tools_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
 
 // External package
-import 'package:provider/provider.dart';
 import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   final String? payload;
@@ -27,8 +33,9 @@ class HomePage extends StatefulWidget {
 
 class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
-  bool? _editable = false;
   PageController _page = PageController();
+  bool? _editable = false;
+  String? _version;
 
   @override
   void initState() {
@@ -89,9 +96,9 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
             // Page controller to manage a PageView
             controller: _page,
             // Will shows on top of all items, it can be a logo or a Title text
-            title: Text(AppLocalizations.of(context)!.text('menu'), style: TextStyle(fontSize: 25, color: Colors.white)),
+            title: Text(AppLocalizations.of(context)!.text('menu'), style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold, color: Colors.white)),
             // Will show on bottom of SideMenu when displayMode was SideMenuDisplayMode.open
-            footer: Text('demo'),
+            footer: Text(_version!, style: TextStyle(color: Colors.white)),
             // Notify when display mode changed
             onDisplayModeChanged: (mode) {
               print(mode);
@@ -105,7 +112,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
             ),
             // List of SideMenuItem to show them on SideMenu
             items: [
-              SideMenuItem(
+              if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 0,
                 onTap: () => _page.jumpToPage(0),
                 icon: Icon(Icons.home_outlined),
@@ -123,35 +130,65 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 icon: Icon(Icons.style_outlined),
                 title: AppLocalizations.of(context)!.text('beer_styles'),
               ),
-              SideMenuItem(
+              if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
                 priority: 3,
                 onTap: () => _page.jumpToPage(3),
+                icon: Icon(Icons.propane_tank_outlined),
+                title: AppLocalizations.of(context)!.text('my_tanks'),
+              ),
+              if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
+                priority: 4,
+                onTap: () => _page.jumpToPage(4),
+                icon: Icon(Icons.outdoor_grill_outlined),
+                title: AppLocalizations.of(context)!.text('my_brews'),
+              ),
+              if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
+                priority: 5,
+                onTap: () => _page.jumpToPage(5),
+                icon: Icon(Icons.science_outlined),
+                title: AppLocalizations.of(context)!.text('my_ingredients'),
+              ),
+              if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
+                priority: 6,
+                onTap: () => _page.jumpToPage(6),
                 icon: Icon(Icons.build_outlined),
                 title: AppLocalizations.of(context)!.text('tools'),
               ),
-              SideMenuItem(
-                priority: 4,
-                onTap: () => _page.jumpToPage(3),
-                icon: Icon(Icons.person_outline),
-                title: AppLocalizations.of(context)!.text('my_account'),
+              if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+                priority: 7,
+                onTap: () => _page.jumpToPage(7),
+                icon: Icon(Icons.calendar_month),
+                title: AppLocalizations.of(context)!.text('calendar'),
+              ),
+              if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+                priority: 8,
+                onTap: () => _page.jumpToPage(8),
+                icon: Icon(Icons.local_offer_outlined),
+                title: AppLocalizations.of(context)!.text('orders'),
               ),
               if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 5,
-                onTap: () => _page.jumpToPage(4),
+                priority: 9,
+                onTap: () => _page.jumpToPage(9),
                 icon: Icon(Icons.photo_library_outlined),
                 title: AppLocalizations.of(context)!.text('image_gallery'),
               ),
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 6,
-                onTap: () => _page.jumpToPage(5),
+                priority: 10,
+                onTap: () => _page.jumpToPage(10),
                 icon: Icon(Icons.article_outlined),
                 title: AppLocalizations.of(context)!.text('products'),
               ),
               if (Foundation.kIsWeb && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                priority: 7,
-                onTap: () => _page.jumpToPage(6),
+                priority: 11,
+                onTap: () => _page.jumpToPage(11),
                 icon: Icon(Icons.groups),
                 title: AppLocalizations.of(context)!.text('companies'),
+              ),
+              SideMenuItem(
+                priority: 12,
+                onTap: () => _page.jumpToPage(12),
+                icon: Icon(Icons.person_outline),
+                title: AppLocalizations.of(context)!.text('my_account'),
               ),
             ],
           ),
@@ -162,11 +199,16 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 EventsPage(),
                 ReceiptsPage(),
                 StylesPage(),
+                TanksPage(),
+                BrewsPage(),
+                IngredientsPage(),
                 ToolsPage(),
-                AccountPage(),
+                CalendarPage(),
+                OrdersPage(),
                 GalleryPage([], close: false),
                 ProductsPage(),
-                CompaniesPage()
+                CompaniesPage(),
+                AccountPage(),
               ]
             )
           )
@@ -176,6 +218,10 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   }
 
   _initialize() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+    setState(() {
+      _version = 'V${packageInfo.version} (${packageInfo.buildNumber})';
+    });
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     _editable = provider.editable;
     provider.addListener(() {

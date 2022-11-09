@@ -11,6 +11,8 @@ import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/image_field.dart';
+import 'package:bb/widgets/forms/period_field.dart';
+import 'package:bb/widgets/forms/weekdays_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
@@ -152,7 +154,7 @@ class _FormProductPageState extends State<FormProductPage> {
                 }
               ),
               Divider(height: 10),
-              if (widget.model.product == Product.beer) FutureBuilder<List<ReceiptModel>>(
+              if (widget.model.product == Product.article) FutureBuilder<List<ReceiptModel>>(
                   future: _receipts,
                   builder: (context, snapshot) {
                     if (snapshot.data != null) {
@@ -182,7 +184,7 @@ class _FormProductPageState extends State<FormProductPage> {
                     return Container();
                   }
               ),
-              if (widget.model.product == Product.beer) Divider(height: 10),
+              if (widget.model.product == Product.article) Divider(height: 10),
               FutureBuilder<List<CompanyModel>>(
                 future: _companies,
                 builder: (context, snapshot) {
@@ -283,7 +285,60 @@ class _FormProductPageState extends State<FormProductPage> {
                   fillColor: FillColor, filled: true
                 ),
               ),
-              Divider(height: 10),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 2.5,
+                    child: TextFormField(
+                      initialValue: widget.model.min != null ? widget.model.min.toString() : null,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) => setState(() {
+                        widget.model.min = int.tryParse(value);
+                      }),
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.first_page),
+                        labelText: AppLocalizations.of(context)!.text('min'),
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: MediaQuery.of(context).size.width / 2.5,
+                    child: TextFormField(
+                      initialValue: widget.model.max != null ? widget.model.max.toString() : null,
+                      keyboardType: TextInputType.number,
+                      onChanged: (value) => setState(() {
+                        widget.model.max = int.tryParse(value);
+                      }),
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.last_page),
+                        labelText: AppLocalizations.of(context)!.text('max'),
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              if (widget.model.product == Product.booking) Divider(height: 10),
+              if (widget.model.product == Product.booking) WeekdaysField(
+                context: context,
+                value: widget.model.weekdays!,
+                onChanged: (values) => setState(() {
+                  widget.model.weekdays = values;
+                }),
+              ),
+              if (widget.model.product == Product.booking) PeriodField(
+                context: context,
+                value: widget.model.period!,
+                onChanged: (value) => setState(() {
+                  widget.model.period = value;
+                }),
+              ),
+              if (widget.model.product == Product.booking) Divider(height: 10),
               MarkdownTextInput(
                 (String value) => setState(() {
                   widget.model.text = value;

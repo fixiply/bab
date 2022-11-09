@@ -41,18 +41,19 @@ class AbstractContainerState extends State<AbstractContainer> {
   }
 
   Widget button(ProductModel model) {
-    if (widget.product == Product.workshop.index) {
+    if (widget.product == Product.booking.index) {
       return Container(
         width: double.infinity,
         padding: EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: TextButton(
-          child: Text(AppLocalizations.of(context)!.text('booking_now')),
+          child: Text(AppLocalizations.of(context)!.text('select_dates')),
           style:  TextButton.styleFrom(
-            primary: Colors.white,
+            foregroundColor: Colors.white,
             backgroundColor: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontWeight: FontWeight.bold),
           ),
           onPressed: () {
+            ModalBottomSheet.showCalendar(context, model);
           },
         ),
       );
@@ -61,7 +62,9 @@ class AbstractContainerState extends State<AbstractContainer> {
       width: 100,
       child: TextButton(
         child: Text('${model.price!.toStringAsPrecision(3)} €', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-        style: TextButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(
+        style: TextButton.styleFrom(
+          backgroundColor: Theme.of(context).primaryColor,
+          shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18.0),
           side: BorderSide(color: Theme.of(context).primaryColor),
         )),
@@ -73,7 +76,7 @@ class AbstractContainerState extends State<AbstractContainer> {
   }
 
   fetch() async {
-    Product product = widget.product != null ? Product.values.elementAt(widget.product!) : Product.beer;
+    Product product = widget.product != null ? Product.values.elementAt(widget.product!) : Product.article;
     setState(() {
       products = Database().getProducts(product: product, company: widget.company, receipt: widget.receipt, ordered: true);
     });

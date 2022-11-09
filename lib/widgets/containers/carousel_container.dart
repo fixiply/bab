@@ -49,7 +49,7 @@ class _CarouselContainerState extends AbstractContainerState {
                   child: Column(
                     children: [
                       InkWell(
-                        onTap: widget.product != Product.workshop.index ? () => setState(() {
+                        onTap: widget.product != Product.booking.index ? () => setState(() {
                           Navigator.push(context, MaterialPageRoute(builder: (context) {
                             return ProductPage(model);
                           }));
@@ -90,7 +90,9 @@ class _CarouselContainerState extends AbstractContainerState {
                         width: 100,
                         child: TextButton(
                           child: Text('${model.price!.toStringAsPrecision(3)} €', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          style: TextButton.styleFrom(backgroundColor: Theme.of(context).primaryColor, shape: RoundedRectangleBorder(
+                          style: TextButton.styleFrom(
+                            backgroundColor: Theme.of(context).primaryColor,
+                            shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(18.0),
                             side: BorderSide(color: Theme.of(context).primaryColor),
                           )),

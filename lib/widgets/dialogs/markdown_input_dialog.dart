@@ -69,7 +69,6 @@ class _MarkdownInputDialogState extends State<MarkdownInputDialog> {
           // textColor: Theme.of(context).colorScheme.secondary,
           child: Text(AppLocalizations.of(context)!.text('cancel')),
           style: TextButton.styleFrom(
-            primary: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {
@@ -80,7 +79,6 @@ class _MarkdownInputDialogState extends State<MarkdownInputDialog> {
           // textColor: Theme.of(context).colorScheme.secondary,
           child: Text(AppLocalizations.of(context)!.text('ok')),
           style: TextButton.styleFrom(
-            primary: Theme.of(context).primaryColor,
             textStyle: const TextStyle(fontSize: 16),
           ),
           onPressed: () {

@@ -41,6 +41,10 @@ class UserModel<T> {
   }
 
   bool isEditor() {
+    return role != null && role == Roles.editor;
+  }
+
+  bool hasRole() {
     return role != null && (role == Roles.editor || role == Roles.admin);
   }
 

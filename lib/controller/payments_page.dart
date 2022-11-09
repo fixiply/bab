@@ -86,8 +86,6 @@ class _PaymentsPageState extends State<PaymentsPage> {
             icon: Icon(Icons.add),
             label: Text(AppLocalizations.of(context)!.text('add_card').toUpperCase(), textAlign: TextAlign.left),
             style: TextButton.styleFrom(
-              primary: Theme.of(context).primaryColor,
-              backgroundColor: Colors.white,
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
             ),
               onPressed: _new

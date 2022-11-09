@@ -82,7 +82,7 @@ class _StylesPageState extends State<StylesPage> {
               },
             ),
           ),
-          if (currentUser != null && currentUser!.isEditor()) PopupMenuButton(
+          if (currentUser != null && currentUser!.isAdmin()) PopupMenuButton(
               icon: Icon(Icons.more_vert),
               tooltip: AppLocalizations.of(context)!.text('display'),
               onSelected: (value) async {
@@ -211,7 +211,7 @@ class _StylesPageState extends State<StylesPage> {
           }
         ),
         floatingActionButton: Visibility(
-          visible: _editable && currentUser != null && currentUser!.isEditor(),
+          visible: _editable && currentUser != null && currentUser!.isAdmin(),
           child: FloatingActionButton(
               onPressed: _new,
               backgroundColor: Theme.of(context).primaryColor,

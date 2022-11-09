@@ -103,7 +103,6 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                 icon: Icon(Icons.clear, size: 12),
                 label: Text(AppLocalizations.of(context)!.text('erase_all')),
                 style: TextButton.styleFrom(
-                  foregroundColor: Theme.of(context).primaryColor,
                   backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
                   textStyle: const TextStyle(fontSize: 12),

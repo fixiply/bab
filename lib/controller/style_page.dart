@@ -67,7 +67,7 @@ class _StylePageState extends State<StylePage> {
               },
             ),
           ),
-          if (_editable && currentUser != null && currentUser!.isEditor())
+          if (_editable && currentUser != null && currentUser!.isAdmin())
             IconButton(
               icon: Icon(Icons.edit_note),
               onPressed: () {

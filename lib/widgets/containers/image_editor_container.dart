@@ -85,7 +85,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
                   icon: Icon(Icons.text_fields_outlined),
                   label: Text(AppLocalizations.of(context)!.text('text')),
                   style: TextButton.styleFrom(
-                    primary: Colors.black,
+                    foregroundColor: Colors.black,
                     backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
                   ),
                   onPressed: () async {
@@ -105,7 +105,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
                   icon: Icon(Icons.image),
                   label: Text(AppLocalizations.of(context)!.text('image')),
                   style: TextButton.styleFrom(
-                    primary: Colors.black,
+                    foregroundColor: Colors.black,
                     backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
                   ),
                   onPressed: () async {
@@ -128,7 +128,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
                   icon: Icon(Icons.palette),
                   label: Text(AppLocalizations.of(context)!.text('drawing')),
                   style: TextButton.styleFrom(
-                    primary: Colors.black,
+                    foregroundColor: Colors.black,
                     backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
                   ),
                   onPressed: () async {

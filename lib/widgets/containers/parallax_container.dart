@@ -48,7 +48,7 @@ class _ParallaxContainerState extends AbstractContainerState {
                     child: Column(
                       children: [
                         InkWell(
-                          onTap: widget.product != Product.workshop.index ? () => setState(() {
+                          onTap: widget.product != Product.booking.index ? () => setState(() {
                             Navigator.push(context, MaterialPageRoute(builder: (context) {
                               return ProductPage(model);
                             }));

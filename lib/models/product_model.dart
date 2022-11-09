@@ -1,7 +1,7 @@
 // Internal package
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/models/rating_model.dart';
+import 'package:bb/models/period_model.dart';
 import 'package:bb/utils/constants.dart';
 
 class ProductModel<T> extends Model {
@@ -13,6 +13,10 @@ class ProductModel<T> extends Model {
   String? subtitle;
   double? price;
   int? pack;
+  int? max;
+  int? min;
+  List<dynamic>? weekdays;
+  PeriodModel? period;
   String? text;
   ImageModel? image;
 
@@ -22,16 +26,23 @@ class ProductModel<T> extends Model {
     DateTime? updated_at,
     String? creator,
     this.status = Status.pending,
-    this.product = Product.beer,
+    this.product = Product.article,
     this.company,
     this.receipt,
     this.title,
     this.subtitle,
     this.price,
     this.pack,
+    this.max,
+    this.min,
+    this.weekdays,
+    this.period,
     this.text,
     this.image
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
+  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
+    if(weekdays == null) { weekdays = []; }
+    if(period == null) { period = PeriodModel(); }
+  }
 
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
@@ -43,6 +54,10 @@ class ProductModel<T> extends Model {
     this.subtitle = map['subtitle'];
     if (map['price'] != null) this.price = map['price'].toDouble();
     if (map['pack'] != null) this.pack = map['pack'];
+    if (map['max'] != null) this.max = map['max'];
+    if (map['min'] != null) this.min = map['min'];
+    if (map['weekdays'] != null) this.weekdays = map['weekdays'];
+    if (map['period'] != null) this.period = PeriodModel.deserialize(map['period']);
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
   }
@@ -58,6 +73,10 @@ class ProductModel<T> extends Model {
       'subtitle': this.subtitle,
       'price': this.price,
       'pack': this.pack,
+      'max': this.max,
+      'min': this.min,
+      'weekdays': this.weekdays,
+      'period': PeriodModel.serialize(this.period),
       'text': this.text,
       'image': ImageModel.serialize(this.image)
     });
@@ -78,6 +97,10 @@ class ProductModel<T> extends Model {
       subtitle: this.subtitle,
       price: this.price,
       pack: this.pack,
+      max: this.max,
+      min: this.min,
+      weekdays: this.weekdays,
+      period: this.period,
       text: this.text,
       image: this.image
     );

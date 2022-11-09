@@ -91,7 +91,11 @@ class _AppState extends State<MyApp> {
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
       debugShowCheckedModeBanner: false,
       theme: theme.copyWith(
-        colorScheme: theme.colorScheme.copyWith(secondary: PrimaryColor),
+        colorScheme: theme.colorScheme.copyWith(
+          primary: PrimaryColor,
+          secondary: PrimaryColor,
+          onPrimary: Colors.white,
+        ),
         appBarTheme: theme.appBarTheme.copyWith(backgroundColor: PrimaryColor),
         // inputDecorationTheme: theme.inputDecorationTheme.copyWith(focusColor: PrimaryColor),
       ),

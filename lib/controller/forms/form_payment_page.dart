@@ -189,7 +189,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   icon: Icon(Icons.delete_outline),
                   label: Text(AppLocalizations.of(context)!.text('remove_card')),
                   style: TextButton.styleFrom(
-                    primary: Colors.red,
+                    foregroundColor: Colors.red,
                     backgroundColor: Colors.white,
                     textStyle: const TextStyle(fontWeight: FontWeight.bold),
                   ),
@@ -204,7 +204,6 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                     icon: Icon(Icons.save),
                     label: Text(AppLocalizations.of(context)!.text('save').toUpperCase()),
                     style: TextButton.styleFrom(
-                      primary: Theme.of(context).primaryColor,
                       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
                       textStyle: const TextStyle(fontWeight: FontWeight.bold),
                     ),

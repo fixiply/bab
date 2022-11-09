@@ -87,8 +87,6 @@ class _AddressPageState extends State<AddressPage> {
             icon: Icon(Icons.add),
             label: Text(AppLocalizations.of(context)!.text('add_address').toUpperCase()),
             style: TextButton.styleFrom(
-              primary: Theme.of(context).primaryColor,
-              backgroundColor: Colors.white,
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
             ),
             onPressed: _new

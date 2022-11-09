@@ -128,7 +128,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               },
             ),
           ),
-          if (_editable && currentUser != null && currentUser!.isEditor())
+          if (_editable && currentUser != null && currentUser!.isAdmin())
             IconButton(
               icon: Icon(Icons.edit_note),
               onPressed: () {
