@@ -24,13 +24,15 @@ const String PRIVACY_POLICY = 'terms/privacy_policy.md';
 UserModel? currentUser;
 
 //Enums
-enum Fermentation { hight, low, spontaneous}
-enum Payments { credit_card, paypal, apple_pay, google_pay}
+enum Fermentation { hight, low, spontaneous }
+enum Ingredient { grain, hops, yeast, misc }
+enum Payments { credit_card, paypal, apple_pay, google_pay }
 enum Period { day, week, month, year }
-enum Product { article, booking, other}
-enum Roles { admin, editor, customer}
-enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size}
-enum Status { pending, publied, disabled}
+enum Product { article, booking, other }
+enum Role { admin, editor, customer }
+enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size }
+enum Status { pending, publied, disabled }
+enum Unit { mass, pressure, time, temperature, volume }
 
 //Colors
 const Color PrimaryColor = const Color(0xFF008351);

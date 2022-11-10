@@ -1,5 +1,6 @@
 // Internal package
 import 'package:bb/models/image_model.dart';
+import 'package:bb/models/ingredient_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
 
@@ -12,6 +13,8 @@ class ReceiptModel<T> extends Model {
   double? abv;
   double? ibu;
   double? ebc;
+  List<IngredientModel>? ingredients;
+  String? notes;
 
   ReceiptModel({
     String? uuid,
@@ -25,8 +28,12 @@ class ReceiptModel<T> extends Model {
     this.style,
     this.abv,
     this.ibu,
-    this.ebc
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
+    this.ebc,
+    this.ingredients,
+    this.notes
+  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
+    if(ingredients == null) { ingredients = []; }
+  }
 
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
@@ -38,6 +45,8 @@ class ReceiptModel<T> extends Model {
     if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['ibu'] != null) this.ibu = map['ibu'].toDouble();
     if (map['ebc'] != null) this.ebc = map['ebc'].toDouble();
+    this.ingredients = IngredientModel.deserialize(map['ingredients']);
+    this.notes = map['notes'];
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -50,7 +59,9 @@ class ReceiptModel<T> extends Model {
       'style': this.style,
       'abv': this.abv,
       'ibu': this.ibu,
-      'ebc': this.ebc
+      'ebc': this.ebc,
+      'ingredients': IngredientModel.serialize(this.ingredients),
+      'notes': this.notes,
     });
     return map;
   }
@@ -68,7 +79,8 @@ class ReceiptModel<T> extends Model {
       style: this.style,
       abv: this.abv,
       ibu: this.ibu,
-      ebc: this.ebc
+      ebc: this.ebc,
+      ingredients: this.ingredients
     );
   }
 

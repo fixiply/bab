@@ -14,7 +14,7 @@ class UserModel<T> {
   String? full_name;
   String? email;
   User? user;
-  Roles? role;
+  Role? role;
   String? company;
   List<AdressModel>? addresses;
   List<PaymentModel>? payments;
@@ -26,7 +26,7 @@ class UserModel<T> {
     this.full_name,
     this.email,
     this.user,
-    this.role = Roles.customer,
+    this.role = Role.customer,
     this.company,
     this.addresses,
     this.payments
@@ -37,15 +37,15 @@ class UserModel<T> {
   }
 
   bool isAdmin() {
-    return role != null && role == Roles.admin;
+    return role != null && role == Role.admin;
   }
 
   bool isEditor() {
-    return role != null && role == Roles.editor;
+    return role != null && role == Role.editor;
   }
 
   bool hasRole() {
-    return role != null && (role == Roles.editor || role == Roles.admin);
+    return role != null && (role == Role.editor || role == Role.admin);
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -54,7 +54,7 @@ class UserModel<T> {
     this.updated_at = DateHelper.parse(map['updated_at']);
     this.full_name = map['full_name'];
     this.email = map['email'];
-    this.role = Roles.values.elementAt(map['role']);
+    this.role = Role.values.elementAt(map['role']);
     this.company = map['company'];
     this.addresses = AdressModel.deserialize(map['addresses']);
     this.payments = PaymentModel.deserialize(map['payments']);
