@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/text_format_model.dart';
+import 'package:bb/utils/text_format.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 
 // External package
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
-class TextFormatField extends FormField<TextFormatModel> {
-  final TextFormatModel? initialValue;
+class TextFormatField extends FormField<TextFormat> {
+  final TextFormat? initialValue;
   InputDecoration? decoration;
-  final void Function(TextFormatModel? value)? onChanged;
-  final FormFieldValidator<TextFormatModel>? validator;
+  final void Function(TextFormat? value)? onChanged;
+  final FormFieldValidator<TextFormat>? validator;
 
   TextFormatField({Key? key, required BuildContext context, this.initialValue, this.decoration, this.onChanged, this.validator}) : super(
     key: key,
-    initialValue: initialValue ?? TextFormatModel(),
-    builder: (FormFieldState<TextFormatModel> field) {
+    initialValue: initialValue ?? TextFormat(),
+    builder: (FormFieldState<TextFormat> field) {
       return field.build(field.context);
     }
   );
@@ -26,14 +26,14 @@ class TextFormatField extends FormField<TextFormatModel> {
   _TextFormatFieldState createState() => _TextFormatFieldState();
 }
 
-class _TextFormatFieldState extends FormFieldState<TextFormatModel> {
+class _TextFormatFieldState extends FormFieldState<TextFormat> {
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
 
   @override
   TextFormatField get widget => super.widget as TextFormatField;
 
   @override
-  void didChange(TextFormatModel? value) {
+  void didChange(TextFormat? value) {
     widget.onChanged?.call(value);
     super.didChange(value);
   }
@@ -60,8 +60,8 @@ class _TextFormatFieldState extends FormFieldState<TextFormatModel> {
     );
   }
 
-  _showDialog(TextFormatModel? text) async {
-    text ??= TextFormatModel();
+  _showDialog(TextFormat? text) async {
+    text ??= TextFormat();
     List<bool> selected = [text.bold ?? false, text.italic ?? false, text.underline ?? false];
     bool confirm = await showDialog(
       context: context,
@@ -115,7 +115,7 @@ class _TextFormatFieldState extends FormFieldState<TextFormatModel> {
                         Text('${AppLocalizations.of(context)!.text('color')} :'),
                         SizedBox(width: 10),
                         ElevatedButton(
-                          style: ElevatedButton.styleFrom(padding: EdgeInsets.zero, primary: Color(text.color!)),
+                          style: ElevatedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: Color(text.color!)),
                           onPressed: () async {
                             int? pickerColor = text!.color;
                             bool confirm = await showDialog(

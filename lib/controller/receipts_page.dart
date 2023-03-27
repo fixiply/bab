@@ -1,32 +1,34 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/receipt_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
+import 'package:bb/utils/category.dart';
+import 'package:bb/utils/color_units.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/srm.dart';
+import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/filter_receipt_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sprintf/sprintf.dart';
 
 class ReceiptsPage extends StatefulWidget {
@@ -34,10 +36,11 @@ class ReceiptsPage extends StatefulWidget {
   _ReceiptsPageState createState() => new _ReceiptsPageState();
 }
 
-class _ReceiptsPageState extends State<ReceiptsPage>  {
+class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClientMixin<ReceiptsPage> {
   TextEditingController _searchQueryController = TextEditingController();
   Future<List<ReceiptModel>>? _receipts;
-  List<StyleModel>? _styles;
+  List<StyleModel> _styles = [];
+  List<Category> _categories = [];
   int _baskets = 0;
 
   // Edition mode
@@ -45,11 +48,14 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   bool _remove = false;
   bool _hidden = false;
 
-  SRM _srm = SRM();
+  ColorUnits _cu = ColorUnits();
   IBU _ibu = IBU();
   ABV _abv = ABV();
   List<Fermentation> _selectedFermentations = [];
-  List<StyleModel> _selectedStyles = [];
+  List<Category> _selectedCategories = [];
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -67,10 +73,10 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          Badge(
-            position: BadgePosition.topEnd(top: 0, end: 3),
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
             animationDuration: Duration(milliseconds: 300),
-            animationType: BadgeAnimationType.slide,
+            animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
@@ -85,61 +91,35 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
               },
             ),
           ),
-          if (currentUser != null && currentUser!.isAdmin()) PopupMenuButton(
+          PopupMenuButton(
             icon: Icon(Icons.more_vert),
             tooltip: AppLocalizations.of(context)!.text('display'),
             onSelected: (value) async {
-              if (value == 1) {
-                await Database().publishAll();
-              } else if (value == 3) {
-                bool checked = !_remove;
-                if (checked) {
-                  _hidden = false;
-                }
-                setState(() { _remove = checked; });
-                _fetch();
+              if (value is Locale) {
+                Provider.of<LocaleNotifier>(context, listen: false).set(value);
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-              PopupMenuItem(
-                value: 1,
-                child: Text(AppLocalizations.of(context)!.text('publish_everything')),
-              ),
-              PopupMenuItem(
-                value: 2,
-                child: SwitchListTile(
-                  value: _editable,
-                  title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
-                  onChanged: (value) async {
-                    bool checked = !_editable;
-                    Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setBool(EDIT_KEY, checked);
-                    setState(() { _editable = checked; });
-                    Navigator.pop(context);
-                  },
-                )
-              ),
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
                 enabled: false,
                 value: null,
-                child: Text(AppLocalizations.of(context)!.text('filtered')),
+                child: Text(AppLocalizations.of(context)!.text('language')),
               ),
               CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('archives')),
-                value: 3,
-                checked: _remove,
+                child: Text(AppLocalizations.of(context)!.text('english')),
+                value: const Locale('en', 'US'),
+                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
               ),
               CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('hidden')),
-                value: 4,
-                checked: _hidden,
-              )
+                child: Text(AppLocalizations.of(context)!.text('french')),
+                value: const Locale('fr', 'FR'),
+                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
+              ),
             ]
           ),
         ]
       ),
-      drawer: CustomDrawer(context),
+      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
       body: FutureBuilder<List<ReceiptModel>>(
         future: _receipts,
         builder: (context, snapshot) {
@@ -147,16 +127,16 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
             return CustomScrollView(
               slivers: [
                 FilterReceiptAppBar(
-                  srm: _srm,
+                  cu: _cu,
                   ibu: _ibu,
                   abv: _abv,
                   selectedFermentations: _selectedFermentations,
-                  styles: _styles,
-                  selectedStyles: _selectedStyles,
+                  categories: _categories,
+                  selectedCategories: _selectedCategories,
                   onColorChanged: (start, end) {
                     setState(() {
-                      _srm.start = start;
-                      _srm.end = end;
+                      _cu.start = start;
+                      _cu.end = end;
                     });
                     _fetch();
                   },
@@ -175,23 +155,22 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                     _fetch();
                   },
                   onFermentationChanged: (value) {
-                    debugPrint('onFermentationChanged');
                     setState(() {
                       if (_selectedFermentations.contains(value)) {
                         _selectedFermentations.remove(value);
-                        _selectedStyles.clear();
+                        _selectedCategories.clear();
                       } else {
                         _selectedFermentations.add(value);
                       }
                     });
                     _fetch();
                   },
-                  onStyleChanged: (value) {
+                  onCategoryChanged: (value) {
                     setState(() {
-                      if (_selectedStyles.contains(value)) {
-                        _selectedStyles.remove(value);
+                      if (_selectedCategories.contains(value)) {
+                        _selectedCategories.remove(value);
                       } else {
-                        _selectedStyles.add(value);
+                        _selectedCategories.add(value);
                       }
                     });
                     _fetch();
@@ -203,19 +182,18 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
                     color: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 6.0),
                     child: Center(
-                      child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : sprintf(AppLocalizations.of(context)!.text('beer(s)'), [snapshot.data!.length]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                      child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : sprintf(AppLocalizations.of(context)!.text('receipt(s)'), [snapshot.data!.length]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
                     )
                   )
                 ),
                 SliverList(
-                  delegate: SliverChildBuilderDelegate((
-                      BuildContext context, int index) {
+                  delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
                     ReceiptModel model = snapshot.data![index];
                     return _item(model);
                   }, childCount: snapshot.data!.length)
                 )
               ]
-          );
+            );
           }
           if (snapshot.hasError) {
             return ErrorContainer(snapshot.error.toString());
@@ -228,7 +206,7 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
         }
       ),
       floatingActionButton: Visibility(
-        visible: _editable && currentUser != null && currentUser!.isAdmin(),
+        visible: currentUser != null && currentUser!.hasRole(),
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,
@@ -283,118 +261,120 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
   Widget _item(ReceiptModel model) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Column(
-        children: [
-          ListTile(
-            leading: Stack(
-              children: [
-                Container(
-                  // color: SRM[model.getSRM()],
-                  child: Image.asset('assets/images/beer3.png',
-                    color: SRM_COLORS[SRM.parse(model.ebc!)],
-                    // colorBlendMode: BlendMode.modulate
-                  ),
-                  width: 30,
-                  height: 50,
-                ),
-                Container(
-                  // color: SRM[model.getSRM()],
-                  child: Image.asset('assets/images/beer2.png'),
-                  width: 30,
-                  height: 50,
-                ),
-                if (model.status == Status.pending) Positioned(
-                  top: 4.0,
-                  right: 4.0,
-                  child: Container(
-                    padding: EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(100),
-                      color: Theme.of(context).primaryColor
-                    ),
-                    child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
-                  )
-                ),
-              ]
-            ),
-            // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
-            title: FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
-                model.title!,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                textAlign: TextAlign.left,
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        leading: Stack(
+          children: [
+            Container(
+              // color: SRM[model.getSRM()],
+              child: Image.asset('assets/images/beer3.png',
+                color: ColorUnits.color(model.srm),
+                // colorBlendMode: BlendMode.modulate
               ),
+              width: 30,
+              height: 50,
             ),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  textAlign: TextAlign.left,
-                  text: TextSpan(
+            Container(
+              // color: SRM[model.getSRM()],
+              child: Image.asset('assets/images/beer2.png'),
+              width: 30,
+              height: 50,
+            ),
+            if (model.status == Status.pending) Positioned(
+              top: 4.0,
+              right: 4.0,
+              child: Container(
+                padding: EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(100),
+                  color: Theme.of(context).primaryColor
+                ),
+                child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
+              )
+            ),
+          ]
+        ),
+        title: FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(
+            model.localizedTitle(AppLocalizations.of(context)!.locale) ?? '',
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            textAlign: TextAlign.left,
+          ),
+        ),
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
+                  TextSpan(
                     style: DefaultTextStyle.of(context).style,
                     children: <TextSpan>[
-                      TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
-                          style: DefaultTextStyle.of(context).style,
-                          children: <TextSpan>[
-                            if (model.style != null && (model.ibu != null || model.abv != null)) TextSpan(text: ' - '),
-                            if (model.ibu != null) TextSpan(text: ' IBU: '),
-                            if (model.ibu != null)TextSpan(text: model.ibu.toString()),
-                            if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
-                            if (model.abv != null) TextSpan(text: ' ABV: ${model.abv}%'),
-                          ]
-                      )
-                    ],
-                  ),
-                ),
-                if (model.text != null ) _text(model.text!)
-              ],
+                      if (model.ibu != null || model.abv != null) TextSpan(text: '  -  '),
+                      if (model.ibu != null) TextSpan(text: 'IBU: ${model.localizedIBU(AppLocalizations.of(context)!.locale)}'),
+                      if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
+                      if (model.abv != null) TextSpan(text: ' ABV: ${model.localizedABV(AppLocalizations.of(context)!.locale)}'),
+                    ]
+                  )
+                ],
+              ),
             ),
-            // subtitle: model.text != null ? Text(model.text!, style: TextStyle(fontSize: 14)) : null,
-            // trailing: _editable && currentUser != null && currentUser!.isAdmin() ? PopupMenuButton<String>(
-            //     icon: Icon(Icons.more_vert),
-            //     tooltip: AppLocalizations.of(context)!.text('options'),
-            //     onSelected: (value) {
-            //       if (value == 'edit') {
-            //         _edit(model);
-            //       } else if (value == 'remove') {
-            //         DeleteDialog.model(context, model, forced: true);
-            //       }
-            //     },
-            //     itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            //       PopupMenuItem(
-            //         value: 'edit',
-            //         child: Text(AppLocalizations.of(context)!.text('edit')),
-            //       ),
-            //       PopupMenuItem(
-            //         value: 'remove',
-            //         child: Text(AppLocalizations.of(context)!.text('remove')),
-            //       ),
-            //     ]
-            // ) : null,
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return ReceiptPage(model);
-              }));
-            },
-          )
-        ]
+            if (model.text != null ) _text(model.localizedText(AppLocalizations.of(context)!.locale)!)
+          ],
+        ),
+        trailing: model.isEditable() ? PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert),
+          tooltip: AppLocalizations.of(context)!.text('options'),
+          onSelected: (value) async {
+            if (value == 'edit') {
+              _edit(model);
+            } else if (value == 'remove') {
+              if (await DeleteDialog.model(context, model, forced: true)) {
+              _fetch();
+              }
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            PopupMenuItem(
+              value: 'edit',
+              child: Text(AppLocalizations.of(context)!.text('edit')),
+            ),
+            PopupMenuItem(
+              value: 'remove',
+              child: Text(AppLocalizations.of(context)!.text('remove')),
+            ),
+          ]
+        ) : null,
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return ReceiptPage(model);
+          }));
+        },
+        onLongPress: () {
+          if (currentUser != null && (currentUser!.isAdmin() || model.creator == currentUser!.uuid)) {
+            _edit(model);
+          }
+        },
       )
     );
   }
 
   Widget _text(String text) {
-    return Foundation.kIsWeb ? MarkdownBody(
-        data: text,
-        fitContent: true,
-        shrinkWrap: true,
-        softLineBreak: true,
-        styleSheet: MarkdownStyleSheet(
-            textAlign: WrapAlignment.start
-        )
+    return DeviceHelper.isDesktop ? MarkdownBody(
+      data: text,
+      fitContent: true,
+      shrinkWrap: true,
+      softLineBreak: true,
+      styleSheet: MarkdownStyleSheet(
+          textAlign: WrapAlignment.start
+      )
     ) :
     ExpandableText(
       text,
@@ -407,20 +387,20 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
 
   _clear() async {
     setState(() {
-      _srm.clear();
-      _srm.end = SRM_COLORS.length.toDouble();
+      _cu.clear();
+      _cu.end = SRM_COLORS.length.toDouble();
       _ibu.clear();
       _abv.clear();
       _selectedFermentations.clear();
-      _selectedStyles.clear();
+      _selectedCategories.clear();
     });
     _fetch();
   }
 
   String _style(String? uuid) {
-    for (StyleModel model in _styles!) {
+    for (StyleModel model in _styles) {
       if (model.uuid == uuid) {
-        return model.title!;
+        return model.localizedName(AppLocalizations.of(context)!.locale) ?? '';
       }
     }
     return '';
@@ -442,7 +422,8 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
 
   _fetch() async {
     _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
-    List<ReceiptModel> list  = await Database().getReceipts(ordered: true);
+    Category.populate(_categories, _styles, AppLocalizations.of(context)!.locale);
+    List<ReceiptModel> list = await Database().getReceipts(ordered: true);
     setState(() {
       _receipts = _filter(list);
     });
@@ -454,23 +435,24 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
     for (ReceiptModel model in list) {
       _setFilter(model);
       if (search != null && search.length > 0) {
-        if (!(model.title!.toLowerCase().contains(search.toLowerCase()))) {
+        if (!(model.localizedTitle(AppLocalizations.of(context)!.locale)!.toLowerCase().contains(search.toLowerCase()))) {
           continue;
         }
       }
-      if (model.ebc != null && _srm.start != null && _srm.start! > SRM.parse(model.ebc!)) continue;
-      if (model.ebc != null && _srm.end != null && _srm.end! < SRM.parse(model.ebc!)) continue;
+      if (model.srm != null && _cu.start != null && _cu.start! > model.srm!) continue;
+      if (model.srm != null && _cu.end != null && _cu.end! < model.srm!) continue;
       if (model.ibu != null && _ibu.start != null && _ibu.start! > model.ibu!) continue;
       if (model.ibu != null && _ibu.end != null && _ibu.end! < model.ibu!) continue;
       if (model.abv != null && _abv.start != null && _abv.start! > model.abv!) continue;
       if (model.abv != null && _abv.end != null && _abv.end! < model.abv!) continue;
       if (_selectedFermentations.isNotEmpty) {
-        if (!_styles!.contains(model.style)) {
+        if (!_styles.contains(model.style)) {
           continue;
         }
       };
-      if (_selectedStyles.isNotEmpty) {
-        if (!_selectedStyles.contains(model.style)) {
+      if (_selectedCategories.isNotEmpty) {
+        var result = _selectedCategories.where((element) => element.styles!.contains(model.style));
+        if (result.isEmpty) {
           continue;
         }
       };
@@ -490,6 +472,14 @@ class _ReceiptsPageState extends State<ReceiptsPage>  {
     ReceiptModel newArticle = ReceiptModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormReceiptPage(newArticle);
+    })).then((value) {
+      _fetch();
+    });
+  }
+
+  _edit(ReceiptModel model) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormReceiptPage(model.copy());
     })).then((value) {
       _fetch();
     });

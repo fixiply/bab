@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/utils/database.dart';
 import 'package:bb/controller/forms/form_address_page.dart';
-import 'package:bb/models/adress_model.dart';
+import 'package:bb/utils/adress.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 
@@ -27,7 +27,7 @@ class _AddressPageState extends State<AddressPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<AdressModel>? addresses = currentUser != null ? currentUser!.addresses : [];
+    List<Adress>? addresses = currentUser != null ? currentUser!.addresses : [];
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,
@@ -54,7 +54,7 @@ class _AddressPageState extends State<AddressPage> {
             padding: EdgeInsets.all(12),
             child: Text(AppLocalizations.of(context)!.text('registered_addresses'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
           ),
-          for(AdressModel address in addresses) ListTileTheme(
+          for(Adress address in addresses) ListTileTheme(
             tileColor: Colors.white,
             child: ListTile(
               contentPadding: EdgeInsets.zero,
@@ -97,7 +97,7 @@ class _AddressPageState extends State<AddressPage> {
   }
 
   _new() async {
-    AdressModel newModel = AdressModel();
+    Adress newModel = Adress();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormAddressPage(newModel);
     })).then((value) {
@@ -115,7 +115,7 @@ class _AddressPageState extends State<AddressPage> {
     });
   }
 
-  _edit(AdressModel model) {
+  _edit(Adress model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormAddressPage(model);
     })).then((value) {

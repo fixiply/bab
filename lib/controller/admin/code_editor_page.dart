@@ -8,7 +8,6 @@ import 'package:bb/utils/constants.dart';
 import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:code_text_field/code_text_field.dart';
-import 'package:flutter_highlight/themes/default.dart';
 
 class CodeEditorPage extends StatefulWidget {
   String? initialValue;
@@ -29,8 +28,7 @@ class _CodeEditorPageState extends State<CodeEditorPage> {
     super.initState();
     _textFieldController = CodeController(
       text: widget.initialValue ?? '',
-      language: dart,
-      theme: defaultTheme,
+      language: dart
     );
   }
 
@@ -62,7 +60,7 @@ class _CodeEditorPageState extends State<CodeEditorPage> {
               tooltip: AppLocalizations.of(context)!.text('save'),
               icon: const Icon(Icons.save),
               onPressed: () async {
-                final value = await _textFieldController.rawText;
+                final value = await _textFieldController.value.text;
                 Navigator.pop(context, value);
               }
             ),

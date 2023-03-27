@@ -14,10 +14,13 @@ class CompaniesPage extends StatefulWidget {
   _CompaniesPageState createState() => new _CompaniesPageState();
 }
 
-class _CompaniesPageState extends State<CompaniesPage> {
+class _CompaniesPageState extends State<CompaniesPage> with AutomaticKeepAliveClientMixin<CompaniesPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
   Future<List<CompanyModel>>? _companies;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {

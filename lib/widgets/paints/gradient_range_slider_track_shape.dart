@@ -2,10 +2,10 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/color_units.dart';
 
-class GradientRectRangeSliderTrackShape extends RangeSliderTrackShape {
-  GradientRectRangeSliderTrackShape({
+class GradientRangeSliderTrackShape extends RangeSliderTrackShape {
+  GradientRangeSliderTrackShape({
     this.gradient,
     this.darkenInactive = true,
   }) {

@@ -8,7 +8,6 @@ import 'package:bb/models/product_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/days.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
@@ -138,7 +137,7 @@ class ModalBottomSheet {
                           style: ElevatedButton.styleFrom(
                             shape: CircleBorder(),
                             padding: EdgeInsets.all(12),
-                            primary: Colors.white, // <-- Button color
+                            backgroundColor: Colors.white, // <-- Button color
                           ),
                         ),
                         const SizedBox(width: 10),
@@ -155,7 +154,7 @@ class ModalBottomSheet {
                           style: ElevatedButton.styleFrom(
                             shape: CircleBorder(),
                             padding: EdgeInsets.all(12),
-                            primary: Colors.white, // <-- Button color
+                            backgroundColor: Colors.white, // <-- Button color
                           ),
                         )
                       ]
@@ -242,7 +241,7 @@ class ModalBottomSheet {
                         calendarBuilders: CalendarBuilders(
                           defaultBuilder: (context, day, _) {
                             if (product.weekdays != null) {
-                              DateTime? last = product.period != null ?  product.period!.getLast() : null;
+                              DateTime? last = product.term != null ?  product.term!.getLast() : null;
                               for(dynamic weekday in product.weekdays!) {
                                 if (day.weekday == weekday && (last == null || day.isBefore(last))) {
 
@@ -259,12 +258,6 @@ class ModalBottomSheet {
                           }
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                    Column(
-                      children: [
-
-                      ],
                     ),
                     const SizedBox(height: 10),
                     Row(

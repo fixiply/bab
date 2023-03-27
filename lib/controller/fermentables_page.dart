@@ -1,0 +1,422 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+
+// Internal package
+import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/models/fermentable_model.dart';
+import 'package:bb/models/receipt_model.dart';
+import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/color_units.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
+import 'package:bb/utils/localized_text.dart';
+import 'package:bb/utils/quantity.dart';
+import 'package:bb/widgets/containers/empty_container.dart';
+import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
+
+// External package
+import 'package:file_picker/file_picker.dart';
+import 'package:expandable_text/expandable_text.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:xml/xml.dart';
+
+class FermentablesPage extends StatefulWidget {
+  bool? showCheckboxColumn;
+  bool? showQuantity;
+  ReceiptModel? receipt;
+  FermentablesPage({Key? key, this.showCheckboxColumn = false, this.showQuantity = false, this.receipt}) : super(key: key);
+
+  _FermentablesPageState createState() => new _FermentablesPageState();
+}
+
+class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAliveClientMixin<FermentablesPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+  late FermentableDataSource _dataSource;
+  final DataGridController _dataGridController = DataGridController();
+  final TextEditingController _searchQueryController = TextEditingController();
+  ScrollController? _controller;
+  Future<List<FermentableModel>>? _data;
+  List<FermentableModel> _selected = [];
+  bool _showList = false;
+
+  List<FermentableModel> get selected => _selected;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = ScrollController();
+    _dataSource = FermentableDataSource(context,
+      showQuantity: widget.showQuantity,
+      showCheckboxColumn: widget.showCheckboxColumn!,
+      onChanged: (FermentableModel value) {
+        Database().update(value).then((value) async {
+          _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
+        }).onError((e, s) {
+          _showSnackbar(e.toString());
+        });
+      }
+    );
+    _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
+    _fetch();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: _buildSearchField(),
+        foregroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        automaticallyImplyLeading: widget.showCheckboxColumn == true,
+        leading: widget.showCheckboxColumn == true ? IconButton(
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          onPressed:() async {
+            Navigator.pop(context, selected);
+          }
+        ) : null,
+        actions: [
+          if (currentUser != null && currentUser!.isAdmin()) IconButton(
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.download_outlined),
+            tooltip: AppLocalizations.of(context)!.text('import'),
+            onPressed: _import,
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
+            tooltip: AppLocalizations.of(context)!.text(_showList ? 'grid_view' : 'view_list'),
+            onPressed: () {
+              setState(() { _showList = !_showList; });
+            },
+          ),
+        ],
+      ),
+      body: Container(
+        child: RefreshIndicator(
+          onRefresh: () => _fetch(),
+          child: FutureBuilder<List<FermentableModel>>(
+            future: _data,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!.length == 0) {
+                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+                }
+                if (_showList || widget.showCheckboxColumn == true) {
+                  _dataSource.buildDataGridRows(snapshot.data!);
+                  return EditSfDataGrid(
+                    context,
+                    allowEditing: currentUser != null && currentUser!.isAdmin(),
+                    showCheckboxColumn: widget.showCheckboxColumn!,
+                    selectionMode: SelectionMode.multiple,
+                    source: _dataSource,
+                    controller: _dataGridController,
+                    onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+                      for(var row in addedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.add(snapshot.data![index]);
+                      }
+                      for(var row in removedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.remove(snapshot.data![index]);
+                      }
+                    },
+                    columns: FermentableModel.columns(context: context, showQuantity: false),
+                  );
+                }
+                return ListView.builder(
+                  controller: _controller,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  itemBuilder: (context, index) {
+                    FermentableModel model = snapshot.data![index];
+                    return _item(model);
+                  }
+                );
+              }
+              if (snapshot.hasError) {
+                return ErrorContainer(snapshot.error.toString());
+              }
+              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+            }
+          )
+        ),
+      ),
+      floatingActionButton: Visibility(
+        visible: currentUser != null && currentUser!.hasRole(),
+        child: FloatingActionButton(
+          onPressed: _new,
+          backgroundColor: Theme.of(context).primaryColor,
+          tooltip: AppLocalizations.of(context)!.text('new'),
+          child: const Icon(Icons.add)
+        )
+      )
+    );
+  }
+
+  Widget _buildSearchField() {
+    return Container(
+        margin: EdgeInsets.zero,
+        padding: EdgeInsets.zero,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: FillColor
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Flexible(
+              child: TextField(
+                controller: _searchQueryController,
+                decoration: InputDecoration(
+                  isDense: true,
+                  contentPadding: EdgeInsets.all(14),
+                  icon: Padding(
+                      padding: EdgeInsets.only(left: 4.0),
+                      child: Icon(Icons.search, color: Theme.of(context).primaryColor)
+                  ),
+                  hintText: AppLocalizations.of(context)!.text('search_hint'),
+                  hintStyle: TextStyle(color: Theme.of(context).primaryColor),
+                  border: InputBorder.none
+                ),
+                style: TextStyle(fontSize: 14.0),
+                onChanged: (query) {
+                  return _fetch();
+                },
+              )
+            ),
+            if (_searchQueryController.text.length > 0) IconButton(
+                icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
+                onPressed: () {
+                  _searchQueryController.clear();
+                  _fetch();
+                }
+            )
+          ],
+        )
+    );
+  }
+
+  Widget _item(FermentableModel model) {
+    Locale locale = AppLocalizations.of(context)!.locale;
+    return Card(
+      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        leading: model.srm != null && model.srm! >= 1 ? Stack(
+          children: [
+            Container(
+              // color: SRM[model.getSRM()],
+              child: Image.asset('assets/images/beer3.png',
+                color: ColorUnits.color(model.srm),
+                // colorBlendMode: BlendMode.modulate
+              ),
+              width: 30,
+              height: 50,
+            ),
+            Container(
+              // color: SRM[model.getSRM()],
+              child: Image.asset('assets/images/beer2.png'),
+              width: 30,
+              height: 50,
+            ),
+            if (model.status == Status.pending) Positioned(
+                top: 4.0,
+                right: 4.0,
+                child: Container(
+                  padding: EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(100),
+                      color: Theme.of(context).primaryColor
+                  ),
+                  child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
+                )
+            ),
+          ]
+        ) : Container(
+          width: 30,
+          height: 50,
+        ),
+        title: RichText(
+          text: TextSpan(
+            style: DefaultTextStyle.of(context).style,
+            children: <TextSpan>[
+              TextSpan(text: model.localizedName(locale) ?? '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              if (model.origin != null) TextSpan(text: '  ${LocalizedText.emoji(model.origin!)}',
+                  style: TextStyle(fontSize: 16, fontFamily: 'Emoji' )
+              ),
+            ],
+          ),
+        ),
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(text: AppLocalizations.of(context)!.text(model.type.toString().toLowerCase()), style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.srm != null || model.efficiency != null) TextSpan(text: '  -  '),
+                  if (model.srm != null) TextSpan(text: 'SRM: ${model.localizedColor(locale)}'),
+                  if (model.srm != null && model.efficiency != null) TextSpan(text: '   '),
+                  if (model.efficiency != null) TextSpan(text: '${AppLocalizations.of(context)!.text('yield')}: ${AppLocalizations.of(context)!.percent(model.efficiency)}'),
+                ],
+              ),
+            ),
+            if (model.notes != null ) ExpandableText(
+              model.localizedNotes(locale) ?? '',
+              linkColor: Theme.of(context).primaryColor,
+              expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
+              collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
+              maxLines: 3,
+            )
+          ],
+        ),
+        trailing: model.isEditable() ? PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert),
+          tooltip: AppLocalizations.of(context)!.text('options'),
+          onSelected: (value) {
+            if (value == 'edit') {
+              _edit(model);
+            } else if (value == 'remove') {
+              DeleteDialog.model(context, model, forced: true);
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            PopupMenuItem(
+              value: 'edit',
+              child: Text(AppLocalizations.of(context)!.text('edit')),
+            ),
+            PopupMenuItem(
+              value: 'remove',
+              child: Text(AppLocalizations.of(context)!.text('remove')),
+            ),
+          ]
+        ) : null
+      )
+    );
+  }
+
+  _fetch() async {
+    setState(() {
+      _data = Database().getFermentables(searchText: _searchQueryController.value.text, ordered: true);
+    });
+  }
+
+  _new() {
+    FermentableModel newModel = FermentableModel();
+    // Navigator.push(context, MaterialPageRoute(builder: (context) {
+    //   return FormProductPage(newModel);
+    // })).then((value) { _fetch(); });
+  }
+
+  _edit(FermentableModel model) {
+    // Navigator.push(context, MaterialPageRoute(builder: (context) {
+    //   return FormProductPage(model);
+    // })).then((value) { _fetch(); });
+  }
+
+  _import() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xml'],
+      );
+      if (result != null) {
+        try {
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+
+          final XmlDocument document;
+          if(DeviceHelper.isDesktop) {
+            document = XmlDocument.parse(utf8.decode(result.files.single.bytes!));
+          } else {
+            File file = File(result.files.single.path!);
+            document = XmlDocument.parse(file.readAsStringSync());
+          }
+          if (document != null) {
+            final fermentables = document.findAllElements('Grain');
+            for (XmlElement element in fermentables) {
+              final model = FermentableModel(
+                  name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.text}),
+                  origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.text),
+                  srm: double.tryParse(element.getElement('F_G_COLOR')!.text),
+                  efficiency: double.tryParse(element.getElement('F_G_YIELD')!.text)
+              );
+              final desc = element.getElement('F_G_NOTES');
+              if (desc != null && desc.text.isNotEmpty) {
+                String text = desc.text.replaceAll(RegExp(r'\n'), '');
+                text = desc.text.replaceAll(RegExp(r'\r'), '');
+                text = desc.text.replaceAll('  ', '');
+                model.notes = LocalizedText(map: { 'en': text.trim()});
+              }
+              int type = int.parse(element.getElement('F_G_TYPE')!.text);
+              switch (type) {
+                case 0:
+                  model.type = Type.grain;
+                  break;
+                case 1:
+                  model.type = Type.extract;
+                  break;
+                case 2:
+                  model.type = Type.sugar;
+                  break;
+                case 3:
+                  model.type = Type.adjunct;
+                  break;
+                case 4:
+                  model.type = Type.dry_extract;
+                  break;
+                case 5:
+                  model.type = Type.fruit;
+                  break;
+                case 6:
+                  model.type = Type.juice;
+                  break;
+                case 7:
+                  model.type = Type.honey;
+                  break;
+              }
+              List<FermentableModel> list = await Database().getFermentables(
+                  name: model.name.toString());
+              if (list.isEmpty) {
+                Database().add(model, ignoreAuth: true);
+              }
+            }
+            _fetch();
+          }
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+    } on PlatformException catch (e) {
+      _showSnackbar("Unsupported operation" + e.toString());
+    } catch (ex) {
+      debugPrint(ex.toString());
+      _showSnackbar(ex.toString());
+    }
+  }
+
+  _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(message),
+            duration: Duration(seconds: 10)
+        )
+    );
+  }
+}
+

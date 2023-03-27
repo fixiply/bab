@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bb/utils/app_localizations.dart';
@@ -61,18 +60,6 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
 
   @override
   Widget build(BuildContext context) {
-    double? widthFactor = _widthFactor();
-    if (widthFactor != null) {
-      return FractionallySizedBox(
-        widthFactor: widthFactor,
-        alignment: Alignment.topCenter,
-        child: _body()
-      );
-    }
-    return _body();
-  }
-
-  Widget _body() {
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 0.0,
@@ -453,22 +440,12 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
     });
   }
 
-  double? _widthFactor() {
-    if (Foundation.kIsWeb) {
-      return 0.6;
-    }
-    if (!DeviceHelper.mobileLayout(context) && DeviceHelper.landscapeOrientation(context)) {
-      return 0.6;
-    }
-    return null;
-  }
-
   void onFocus() {
     setState(() {});
   }
 
   bool landscapeOrientation() {
-    if (Foundation.kIsWeb) {
+    if (DeviceHelper.isDesktop) {
       return true;
     }
     return DeviceHelper.landscapeOrientation(context);

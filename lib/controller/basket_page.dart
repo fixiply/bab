@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/controller/forms/form_address_page.dart';
 import 'package:bb/controller/payments_page.dart';
-import 'package:bb/models/adress_model.dart';
+import 'package:bb/utils/adress.dart';
 import 'package:bb/models/basket_model.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/models/receipt_model.dart';
@@ -58,7 +58,7 @@ class _BasketPageState extends State<BasketPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<AdressModel>? addresses = currentUser != null ? currentUser!.addresses : [];
+    List<Adress>? addresses = currentUser != null ? currentUser!.addresses : [];
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,
@@ -95,9 +95,9 @@ class _BasketPageState extends State<BasketPage> {
                   padding: EdgeInsets.all(12),
                   child: Text(AppLocalizations.of(context)!.text('delivery_addresses'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
                 ),
-                for(AdressModel address in addresses!) ListTileTheme(
+                for(Adress address in addresses!) ListTileTheme(
                   tileColor: Colors.white,
-                  child: RadioListTile<AdressModel>(
+                  child: RadioListTile<Adress>(
                     contentPadding: EdgeInsets.zero,
                     value: address,
                     groupValue: address,
@@ -129,7 +129,7 @@ class _BasketPageState extends State<BasketPage> {
                         )
                       ]
                     ),
-                    onChanged: (AdressModel? value) {
+                    onChanged: (Adress? value) {
                     },
                   ),
                 ),
@@ -249,7 +249,7 @@ class _BasketPageState extends State<BasketPage> {
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
-                snapshot1.data.title,
+                snapshot1.data.name,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left,
               ),
@@ -273,8 +273,8 @@ class _BasketPageState extends State<BasketPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: ' IBU: '),
-                                TextSpan(text: snapshot2.data.ibu.toString()),
-                                TextSpan(text: '    ' + snapshot2.data.abv.toString() + '%'),
+                                TextSpan(text: snapshot2.data.localizedIBU(AppLocalizations.of(context)!.locale) ),
+                                TextSpan(text: '    ' + snapshot2.data.localizedABV(AppLocalizations.of(context)!.locale) + '%'),
                               ]
                             )
                           ],
@@ -349,13 +349,13 @@ class _BasketPageState extends State<BasketPage> {
   String _style(String? uuid) {
     for (StyleModel model in _styles!) {
       if (model.uuid == uuid) {
-        return model.title!;
+        return model.localizedName(AppLocalizations.of(context)!.locale) ?? '';
       }
     }
     return '';
   }
 
-  _modifyAdress(AdressModel model) {
+  _modifyAdress(Adress model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormAddressPage(model);
     })).then((value) {

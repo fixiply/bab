@@ -1,40 +1,53 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_style_page.dart';
 import 'package:bb/controller/style_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
+import 'package:bb/utils/category.dart';
+import 'package:bb/utils/color_units.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/srm.dart';
+import 'package:bb/utils/locale_notifier.dart';
+import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/filter_style_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sprintf/sprintf.dart';
+import 'package:xml/xml.dart';
 
 class StylesPage extends StatefulWidget {
+  StylesPage({Key? key}) : super(key: key);
   _StylesPageState createState() => new _StylesPageState();
 }
 
-class _StylesPageState extends State<StylesPage> {
+class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMixin<StylesPage> {
   TextEditingController _searchQueryController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   Future<List<StyleModel>>? _styles;
+  List<Category> _categories = [];
   int _baskets = 0;
 
   // Edition mode
@@ -42,10 +55,14 @@ class _StylesPageState extends State<StylesPage> {
   bool _remove = false;
   bool _hidden = false;
 
-  SRM _srm = SRM();
+  ColorUnits _cu = ColorUnits();
   IBU _ibu = IBU();
   ABV _abv = ABV();
   List<Fermentation> _selectedFermentations = [];
+  List<Category> _selectedCategories = [];
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -64,10 +81,10 @@ class _StylesPageState extends State<StylesPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          Badge(
-            position: BadgePosition.topEnd(top: 0, end: 3),
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
             animationDuration: Duration(milliseconds: 300),
-            animationType: BadgeAnimationType.slide,
+            animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
@@ -82,61 +99,41 @@ class _StylesPageState extends State<StylesPage> {
               },
             ),
           ),
-          if (currentUser != null && currentUser!.isAdmin()) PopupMenuButton(
-              icon: Icon(Icons.more_vert),
-              tooltip: AppLocalizations.of(context)!.text('display'),
-              onSelected: (value) async {
-                if (value == 1) {
-                  await Database().publishAll();
-                } else if (value == 3) {
-                  bool checked = !_remove;
-                  if (checked) {
-                    _hidden = false;
-                  }
-                  setState(() { _remove = checked; });
-                  _fetch();
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
-                PopupMenuItem(
-                  value: 1,
-                  child: Text(AppLocalizations.of(context)!.text('publish_everything')),
-                ),
-                PopupMenuItem(
-                    value: 2,
-                    child: SwitchListTile(
-                      value: _editable,
-                      title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
-                      onChanged: (value) async {
-                        bool checked = !_editable;
-                        Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
-                        SharedPreferences prefs = await SharedPreferences.getInstance();
-                        await prefs.setBool(EDIT_KEY, checked);
-                        setState(() { _editable = checked; });
-                        Navigator.pop(context);
-                      },
-                    )
-                ),
-                PopupMenuItem(
-                  enabled: false,
-                  value: null,
-                  child: Text(AppLocalizations.of(context)!.text('filtered')),
-                ),
-                CheckedPopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.text('archives')),
-                  value: 3,
-                  checked: _remove,
-                ),
-                CheckedPopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.text('hidden')),
-                  value: 4,
-                  checked: _hidden,
-                )
-              ]
-            ),
+          PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.text('display'),
+            onSelected: (value) async {
+              if (value is Locale) {
+                Provider.of<LocaleNotifier>(context, listen: false).set(value);
+              } else if (value == 1) {
+                _import();
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              PopupMenuItem(
+                enabled: false,
+                value: null,
+                child: Text(AppLocalizations.of(context)!.text('language')),
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('english')),
+                value: const Locale('en', 'US'),
+                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('french')),
+                value: const Locale('fr', 'FR'),
+                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
+              ),
+              if (currentUser != null && currentUser!.isAdmin()) PopupMenuItem(
+                value: 1,
+                child: Text('${AppLocalizations.of(context)!.text('import')} BJCP'),
+              ),
+            ]
+          ),
           ]
         ),
-        drawer: CustomDrawer(context),
+        drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
         body: FutureBuilder<List<StyleModel>>(
           future: _styles,
           builder: (context, snapshot) {
@@ -144,14 +141,16 @@ class _StylesPageState extends State<StylesPage> {
               return CustomScrollView(
                 slivers: [
                   FilterStyleAppBar(
-                    srm: _srm,
+                    cu: _cu,
                     ibu: _ibu,
                     abv: _abv,
                     selectedFermentations: _selectedFermentations,
+                    categories: _categories,
+                    selectedCategories: _selectedCategories,
                     onColorChanged: (start, end) {
                       setState(() {
-                        _srm.start = start;
-                        _srm.end = end;
+                        _cu.start = start;
+                        _cu.end = end;
                       });
                       _fetch();
                     },
@@ -179,20 +178,29 @@ class _StylesPageState extends State<StylesPage> {
                       });
                       _fetch();
                     },
+                    onCategoryChanged: (value) {
+                      setState(() {
+                        if (_selectedCategories.contains(value)) {
+                          _selectedCategories.remove(value);
+                        } else {
+                          _selectedCategories.add(value);
+                        }
+                      });
+                      _fetch();
+                    },
                     onReset: () => _clear()
                   ),
                   SliverToBoxAdapter(
                     child: Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 6.0),
-                        child: Center(
-                            child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : sprintf(AppLocalizations.of(context)!.text('style(s)'), [snapshot.data!.length]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                        )
+                      color: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 6.0),
+                      child: Center(
+                          child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : sprintf(AppLocalizations.of(context)!.text('style(s)'), [snapshot.data!.length]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                      )
                     )
                   ),
                   SliverList(
-                    delegate: SliverChildBuilderDelegate((
-                        BuildContext context, int index) {
+                    delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
                       StyleModel model = snapshot.data![index];
                       return _item(model);
                     }, childCount: snapshot.data!.length)
@@ -266,57 +274,87 @@ class _StylesPageState extends State<StylesPage> {
   Widget _item(StyleModel model) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Column(
-        children: [
-          ListTile(
-            contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-            // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
-            title: Text(model.title!),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                RichText(
-                  textAlign: TextAlign.left,
-                  text: TextSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    children: <TextSpan>[
-                      if (model.category != null) TextSpan(text: model.category, style: TextStyle(fontWeight: FontWeight.bold)),
-                      TextSpan(
-                        style: DefaultTextStyle.of(context).style,
-                        children: <TextSpan>[
-                          if (model.category != null && (model.min_ibu != null || model.max_ibu!= null || model.min_abv != null || model.max_abv != null)) TextSpan(text: ' - '),
-                          _between('IBU', model.min_ibu, model.max_ibu),
-                          if ((model.min_ibu != null || model.max_abv != null) && (model.min_abv != null || model.max_abv != null)) TextSpan(text: '   '),
-                          _between('ABV', model.min_abv, model.max_abv, trailing: '%'),
-                        ]
-                      )
-                    ],
-                  ),
-                ),
-                if (model.text != null) _text(model.text!)
-              ]
+      child: ListTile(
+        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        title: RichText(
+          textAlign: TextAlign.left,
+          overflow: TextOverflow.ellipsis,
+          text: TextSpan(
+            style: DefaultTextStyle.of(context).style,
+            children: <TextSpan>[
+              TextSpan(text: model.localizedName(AppLocalizations.of(context)!.locale) ?? '', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              TextSpan(text: '  ${model.uuid}' ?? ''),
+            ],
+          ),
+        ),
+        // title: Text('${model.localizedName(AppLocalizations.of(context)!.locale) ${model.uuid}}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  if (model.category != null) TextSpan(text: model.localizedCategory(AppLocalizations.of(context)!.locale) ?? '', style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.min_ibu != null || model.max_ibu != null || model.min_abv != null || model.max_abv != null) TextSpan(text: '  -  '),
+                  _between('IBU', model.min_ibu, model.max_ibu),
+                  if (model.min_ibu != null || model.max_ibu != null || model.min_abv != null || model.max_abv != null) TextSpan(text: '   '),
+                  _between('ABV', model.min_abv, model.max_abv, trailing: '%'),
+                ],
+              ),
             ),
-            onTap: () {
-              Navigator.push(context, MaterialPageRoute(builder: (context) {
-                return StylePage(model);
-              }));
-            },
-          )
-        ]
+            if (model.text != null) _text(model.localizedText(AppLocalizations.of(context)!.locale)!)
+          ]
+        ),
+        trailing: model.isEditable() ? PopupMenuButton<String>(
+          icon: Icon(Icons.more_vert),
+          tooltip: AppLocalizations.of(context)!.text('options'),
+          onSelected: (value) async {
+            if (value == 'edit') {
+              _edit(model);
+            } else if (value == 'remove') {
+              if (await DeleteDialog.model(context, model, forced: true)) {
+                _fetch();
+              }
+            }
+          },
+          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            PopupMenuItem(
+              value: 'edit',
+              child: Text(AppLocalizations.of(context)!.text('edit')),
+            ),
+            PopupMenuItem(
+              value: 'remove',
+              child: Text(AppLocalizations.of(context)!.text('remove')),
+            ),
+          ]
+        ) : null,
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) {
+            return StylePage(model);
+          }));
+        },
+        onLongPress: () {
+          if (currentUser != null && (currentUser!.isAdmin() || model.creator == currentUser!.uuid)) {
+            _edit(model);
+          }
+        },
       )
     );
   }
 
-  TextSpan _between(String leading, double? min, double? max, {String? trailing = ''}) {
+  TextSpan _between(String label, double? min, double? max, {String? trailing = ''}) {
     if (min != null || max != null) {
       return TextSpan(
         style: DefaultTextStyle.of(context).style,
         children: [
-          TextSpan(text: '$leading: '),
-          if (min != null) TextSpan(text: '${min.toString()}$trailing'),
+          TextSpan(text: '$label: '),
+          if (min != null) TextSpan(text: '${NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(min)}$trailing'),
           if (min != null && max != null) TextSpan(text: ' ${AppLocalizations.of(context)!.text('to').toLowerCase()} '),
-          if (max != null) TextSpan(text: '${max.toString()}$trailing')
+          if (max != null) TextSpan(text: '${NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(max)}$trailing')
         ]
       );
     }
@@ -324,7 +362,7 @@ class _StylesPageState extends State<StylesPage> {
   }
 
   Widget _text(String text) {
-    return Foundation.kIsWeb ? MarkdownBody(
+    return DeviceHelper.isDesktop ? MarkdownBody(
       data: text,
       fitContent: true,
       shrinkWrap: true,
@@ -344,8 +382,8 @@ class _StylesPageState extends State<StylesPage> {
 
   _clear() async {
     setState(() {
-      _srm.clear();
-      _srm.end = SRM_COLORS.length.toDouble();
+      _cu.clear();
+      _cu.end = SRM_COLORS.length.toDouble();
       _ibu.clear();
       _abv.clear();
       _selectedFermentations.clear();
@@ -368,7 +406,8 @@ class _StylesPageState extends State<StylesPage> {
   }
 
   _fetch() async {
-    List<StyleModel> list  = await Database().getStyles(ordered: true);
+    List<StyleModel> list = await Database().getStyles(ordered: true);
+    Category.populate(_categories, list, AppLocalizations.of(context)!.locale);
     setState(() {
       _styles = _filter(list);
     });
@@ -380,18 +419,24 @@ class _StylesPageState extends State<StylesPage> {
     for (StyleModel model in list) {
       _setFilter(model);
       if (search != null && search.length > 0) {
-        if (!(model.title!.toLowerCase().contains(search.toLowerCase()))) {
+        if (!(model.localizedName(AppLocalizations.of(context)!.locale)!.toLowerCase().contains(search.toLowerCase()))) {
           continue;
         }
       }
-      if (model.min_ebc != null && _srm.start != null && _srm.start! > SRM.parse(model.min_ebc!)) continue;
-      if (model.max_ebc != null && _srm.end != null && _srm.end! < SRM.parse(model.max_ebc!)) continue;
+      if (model.min_srm != null && _cu.start != null && _cu.start! > model.min_srm!) continue;
+      if (model.max_srm != null && _cu.end != null && _cu.end! < model.max_srm!) continue;
       if (model.min_ibu != null && _ibu.start != null && _ibu.start! > model.min_ibu!) continue;
       if (model.max_ibu != null && _ibu.end != null && _ibu.end! < model.max_ibu!) continue;
       if (model.min_abv != null && _abv.start != null && _abv.start! > model.min_abv!) continue;
       if (model.max_abv != null && _abv.end != null && _abv.end! < model.max_abv!) continue;
       if (_selectedFermentations.isNotEmpty) {
         if (!_selectedFermentations.contains(model.fermentation)) {
+          continue;
+        }
+      };
+      if (_selectedCategories.isNotEmpty) {
+        var result = _selectedCategories.where((element) => element.styles!.contains(model));
+        if (result.isEmpty) {
           continue;
         }
       };
@@ -412,6 +457,82 @@ class _StylesPageState extends State<StylesPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormStylePage(newStyle);
     })).then((value) { _fetch(); });
+  }
+
+  _edit(StyleModel model) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormStylePage(model.copy());
+    })).then((value) {
+      _fetch();
+    });
+  }
+
+  _import() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xml'],
+      );
+      if (result != null) {
+        try {
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+
+          final XmlDocument document;
+          if(DeviceHelper.isDesktop) {
+            document = XmlDocument.parse(utf8.decode(result.files.single.bytes!));
+          } else {
+            File file = File(result.files.single.path!);
+            document = XmlDocument.parse(file.readAsStringSync());
+          }
+          final categories = document.findAllElements('category');
+          for(XmlElement category in categories) {
+            final subcategories = category.findAllElements('subcategory');
+            for(XmlElement subcategory in subcategories) {
+              final model = StyleModel(
+                uuid: subcategory.getAttribute('id'),
+                name: LocalizedText( map: { 'en': subcategory.getElement('name')!.text}),
+                category: LocalizedText( map: { 'en': category.getElement('name')!.text}),
+              );
+              final impression = subcategory.getElement('impression');
+              if (impression != null) {
+                model.text = LocalizedText( map: { 'en': impression.text});
+              }
+              final stats = subcategory.getElement('stats');
+              if (stats != null) {
+                final ibu = stats.getElement('ibu');
+                if (ibu != null) {
+                  final low = ibu.getElement('low');
+                  final high = ibu.getElement('high');
+                  if (low != null) model.min_ibu = double.tryParse(low.text);
+                  if (high != null) model.max_ibu = double.tryParse(high.text);
+                }
+                final srm = stats.getElement('srm');
+                if (srm != null) {
+                  final low = srm.getElement('low');
+                  final high = srm.getElement('high');
+                  if (low != null) model.min_srm = double.tryParse(low.text);
+                  if (high != null) model.max_srm = double.tryParse(high.text);
+                }
+                final abv = stats.getElement('abv');
+                if (abv != null) {
+                  final low = abv.getElement('low');
+                  final high = abv.getElement('high');
+                  if (low != null) model.min_abv = double.tryParse(low.text);
+                  if (high != null) model.max_abv = double.tryParse(high.text);
+                }
+              }
+              Database().set(model.uuid!, model, ignoreAuth: true);
+            }
+          }
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+    } on PlatformException catch (e) {
+      _showSnackbar("Unsupported operation" + e.toString());
+    } catch (ex) {
+      _showSnackbar(ex.toString());
+    }
   }
 
   _showSnackbar(String message) {

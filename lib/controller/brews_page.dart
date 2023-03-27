@@ -12,8 +12,11 @@ class BrewsPage extends StatefulWidget {
   _BrewsPageState createState() => new _BrewsPageState();
 }
 
-class _BrewsPageState extends State<BrewsPage> {
+class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixin<BrewsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,7 @@ class _BrewsPageState extends State<BrewsPage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('my_brews')),
+        title: Text(AppLocalizations.of(context)!.text('brews')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white

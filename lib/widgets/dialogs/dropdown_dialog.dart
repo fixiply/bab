@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
 
 class DropdownDialog extends StatefulWidget {
@@ -23,7 +22,7 @@ class _DropdownDialogState extends State<DropdownDialog> {
   dynamic? _value;
 
   Widget build(BuildContext context) {
-    if (!Foundation.kIsWeb && Platform.isIOS) {
+    if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(
         title: Text(widget.title),
         content:  DropdownButtonFormField<dynamic>(

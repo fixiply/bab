@@ -2,20 +2,20 @@
 import 'package:flutter/material.dart';
 
 // Internal package+
-import 'package:bb/models/period_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/term.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
-class PeriodField extends FormField<PeriodModel> {
-  final void Function(PeriodModel)? onChanged;
+class PeriodField extends FormField<Term> {
+  final void Function(Term)? onChanged;
   String? hintText;
   Widget? icon;
 
-  PeriodField({Key? key, required BuildContext context, required PeriodModel value, this.onChanged, this.hintText, this.icon}) : super(
+  PeriodField({Key? key, required BuildContext context, required Term value, this.onChanged, this.hintText, this.icon}) : super(
       key: key,
       initialValue: value,
-      builder: (FormFieldState<PeriodModel> field) {
+      builder: (FormFieldState<Term> field) {
         return field.build(field.context);
       }
   );
@@ -24,10 +24,10 @@ class PeriodField extends FormField<PeriodModel> {
   _PeriodFieldState createState() => _PeriodFieldState();
 }
 
-class _PeriodFieldState extends FormFieldState<PeriodModel> {
+class _PeriodFieldState extends FormFieldState<Term> {
   
   @override
-  void didChange(PeriodModel? value) {
+  void didChange(Term? value) {
     // widget.onChanged?.call(value!);
     super.didChange(value);
   }

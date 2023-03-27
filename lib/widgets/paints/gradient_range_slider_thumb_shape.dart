@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
-class CustomThumbShape implements RangeSliderThumbShape {
+class CustomRangeSliderThumbShape implements RangeSliderThumbShape {
 
-  const CustomThumbShape({
+  const CustomRangeSliderThumbShape({
     this.radius = 12.0,
     this.ringColor = Colors.black,
     this.fillColor = Colors.transparent,

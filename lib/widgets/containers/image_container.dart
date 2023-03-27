@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/custom_image.dart';
-import 'package:bb/models/text_format_model.dart';
+import 'package:bb/utils/text_format.dart';
 
 // External package
 import 'package:carousel_slider/carousel_slider.dart';
@@ -88,7 +88,7 @@ class _ImageContainerState extends State<ImageContainer> {
     if (image == null) {
       return null;
     }
-    if (TextFormatModel.hasText(value.left)) {
+    if (TextFormat.hasText(value.left)) {
       stacks.add(Positioned(
         top: 8.0,
         left: 6.0,
@@ -104,7 +104,7 @@ class _ImageContainerState extends State<ImageContainer> {
         ),
       ));
     }
-    if (TextFormatModel.hasText(value.right)) {
+    if (TextFormat.hasText(value.right)) {
       stacks.add(Positioned(
         top: 8.0,
         right: 6.0,
@@ -126,7 +126,7 @@ class _ImageContainerState extends State<ImageContainer> {
         ),
       ));
     }
-    if (TextFormatModel.hasText(value.bottom)) {
+    if (TextFormat.hasText(value.bottom)) {
       stacks.add(Positioned(
         bottom: 8.0,
         left: 6.0,

@@ -1,16 +1,19 @@
 import 'dart:async';
+
 import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/home_page.dart';
 import 'package:bb/firebase_options.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/widgets/builders/carousel_builder.dart';
 import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:bb/widgets/builders/list_builder.dart';
@@ -29,6 +32,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 final EditionNotifier editionNotifier = EditionNotifier();
 final BasketNotifier basketNotifier = BasketNotifier();
+final LocaleNotifier localeNotifier = LocaleNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -40,7 +44,8 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => editionNotifier),
-        ChangeNotifierProvider(create: (_) => basketNotifier)
+        ChangeNotifierProvider(create: (_) => basketNotifier),
+        ChangeNotifierProvider(create: (_) => localeNotifier),
       ],
       child: MyApp()),
   );
@@ -66,6 +71,11 @@ class _AppState extends State<MyApp> {
     _authStateChanges();
     _subscribe();
     _initBuilders();
+    final localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
+    localeNotifier.addListener(() {
+      if (!mounted) return;
+      onLocaleChange(localeNotifier.getlocale!);
+    });
   }
 
   void onLocaleChange(Locale locale) {
@@ -96,7 +106,9 @@ class _AppState extends State<MyApp> {
           secondary: PrimaryColor,
           onPrimary: Colors.white,
         ),
-        appBarTheme: theme.appBarTheme.copyWith(backgroundColor: PrimaryColor),
+        appBarTheme: theme.appBarTheme.copyWith(
+            backgroundColor: PrimaryColor,
+        ),
         // inputDecorationTheme: theme.inputDecorationTheme.copyWith(focusColor: PrimaryColor),
       ),
       home: HomePage(),
@@ -108,8 +120,8 @@ class _AppState extends State<MyApp> {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
-        const Locale('en'), // English
-        const Locale('fr'), // French
+        const Locale('en', 'US'), // English
+        const Locale('fr', 'FR') // French
       ]
     );
   }
@@ -138,7 +150,7 @@ class _AppState extends State<MyApp> {
   }
 
   Future<void> _subscribe() async {
-    if (!Foundation.kIsWeb) {
+    if (!DeviceHelper.isDesktop) {
       await FirebaseMessaging.instance.subscribeToTopic(Foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC);
       print('[$APP_NAME] Firebase messaging subscribe from "${Foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {

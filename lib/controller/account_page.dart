@@ -8,15 +8,17 @@ import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/login_page.dart';
 import 'package:bb/controller/payments_page.dart';
 import 'package:bb/controller/purchases_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:provider/provider.dart';
@@ -48,10 +50,10 @@ class _AccountPageState extends State<AccountPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
-          Badge(
-            position: BadgePosition.topEnd(top: 0, end: 3),
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
             animationDuration: Duration(milliseconds: 300),
-            animationType: BadgeAnimationType.slide,
+            animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
@@ -66,9 +68,35 @@ class _AccountPageState extends State<AccountPage> {
               },
             ),
           ),
+          PopupMenuButton(
+            icon: Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.text('display'),
+            onSelected: (value) async {
+              if (value is Locale) {
+                Provider.of<LocaleNotifier>(context, listen: false).set(value);
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
+              PopupMenuItem(
+                enabled: false,
+                value: null,
+                child: Text(AppLocalizations.of(context)!.text('language')),
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('english')),
+                value: const Locale('en', 'US'),
+                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('french')),
+                value: const Locale('fr', 'FR'),
+                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
+              ),
+            ]
+          ),
         ]
       ),
-      drawer: CustomDrawer(context),
+      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
         child: Column(
@@ -77,11 +105,12 @@ class _AccountPageState extends State<AccountPage> {
           children: <Widget>[
             if (currentUser == null) const SizedBox(height: 30),
             if (currentUser == null) Align(
-              child: Text(AppLocalizations.of(context)!.text('login')),
+              child: Text(AppLocalizations.of(context)!.text('login_account')),
             ),
             const SizedBox(height: 8),
             if (currentUser == null) Align(
               child: TextButton(
+                child: Text(AppLocalizations.of(context)!.text('login'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return LoginPage();
@@ -91,7 +120,6 @@ class _AccountPageState extends State<AccountPage> {
                   borderRadius: BorderRadius.circular(4.0),
                   side: BorderSide(color: Theme.of(context).primaryColor),
                 )),
-                child: Text('Connectez-vous', style: TextStyle(color: Theme.of(context).primaryColor)),
               ),
             ),
             if (currentUser == null) const SizedBox(height: 40),

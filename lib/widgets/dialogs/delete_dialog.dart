@@ -23,7 +23,7 @@ class DeleteDialog extends StatefulWidget {
 
   static Future<bool> model(BuildContext context, dynamic model, {bool forced = false}) async {
     bool archive = ClassHelper.hasStatus(model) && model.status != Status.disabled;
-    String title = archive ? AppLocalizations.of(context)!.text('archive_title') : AppLocalizations.of(context)!.text('delete_item_title');
+    String title = archive && !forced ? AppLocalizations.of(context)!.text('archive_title') : AppLocalizations.of(context)!.text('delete_item_title');
     bool confirm = await showDialog(
       context: context,
       builder: (BuildContext context) {

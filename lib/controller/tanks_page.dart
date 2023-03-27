@@ -12,8 +12,11 @@ class TanksPage extends StatefulWidget {
   _TanksPageState createState() => new _TanksPageState();
 }
 
-class _TanksPageState extends State<TanksPage> {
+class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin<TanksPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +24,7 @@ class _TanksPageState extends State<TanksPage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('my_tanks')),
+        title: Text(AppLocalizations.of(context)!.text('equipments')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white

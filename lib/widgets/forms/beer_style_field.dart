@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/styles_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
@@ -48,17 +50,19 @@ class _BeerStyleFieldState extends FormFieldState<String> {
   Widget build(BuildContext context) {
     return InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
+        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
         icon: Icon(Icons.how_to_reg),
-        suffix: Padding(
+        fillColor: FillColor,
+        filled: true,
+        suffix: DeviceHelper.isDesktop ? Padding(
           padding: EdgeInsets.only(left: 20.0, right: 15.0),
-          child: InkWell(
-              onTap: () {
-                _showPage();
-              },
-              child: Icon(Icons.chevron_right, color: Colors.black45)
-          ),
-        ),
+          child: IconButton(
+            icon: Icon(Icons.chevron_right),
+            onPressed: () {
+              _showPage();
+            },
+          )
+        ) : null,
       ),
       child: FutureBuilder<List<StyleModel>>(
         future: _style,
@@ -105,10 +109,10 @@ class _BeerStyleFieldState extends FormFieldState<String> {
           child: Icon(Icons.clear)
       )
     ];
-    for (StyleModel dataset in values) {
+    for (StyleModel value in values) {
       items.add(DropdownMenuItem(
-          value: dataset.uuid,
-          child: Text(dataset.title!, overflow: TextOverflow.ellipsis)
+          value: value.uuid,
+          child: Text(value.localizedName(AppLocalizations.of(context)!.locale) ?? '', overflow: TextOverflow.ellipsis)
       ));
     };
     return items;

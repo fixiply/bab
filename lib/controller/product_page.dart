@@ -18,7 +18,7 @@ import 'package:bb/widgets/paints/circle_clipper.dart';
 import 'package:flutter/rendering.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
@@ -165,10 +165,10 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ),
             actions: <Widget> [
-              Badge(
-                position: BadgePosition.topEnd(top: 0, end: 3),
+              badge.Badge(
+                position: badge.BadgePosition.topEnd(top: 0, end: 3),
                 animationDuration: Duration(milliseconds: 300),
-                animationType: BadgeAnimationType.slide,
+                animationType: badge.BadgeAnimationType.slide,
                 showBadge: _baskets > 0,
                 badgeContent: _baskets > 0 ? Text(
                   _baskets.toString(),

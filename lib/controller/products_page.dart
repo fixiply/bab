@@ -1,3 +1,4 @@
+import 'package:bb/controller/product_page.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -16,10 +17,13 @@ class ProductsPage extends StatefulWidget {
   _ProductsPageState createState() => new _ProductsPageState();
 }
 
-class _ProductsPageState extends State<ProductsPage> {
+class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClientMixin<ProductsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
-  Future<List<ProductModel>>? _products;
+  Future<List<ProductModel>>? _data;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -43,63 +47,63 @@ class _ProductsPageState extends State<ProductsPage> {
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
           child: FutureBuilder<List<ProductModel>>(
-            future: _products,
+            future: _data,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.length == 0) {
                   return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
                 }
                 return ListView.builder(
-                    controller: _controller,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                    itemBuilder: (context, index) {
-                      ProductModel model = snapshot.data![index];
-                      return ListTile(
-                          contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                          leading: Stack(
-                            children: [
-                              _image(model.image),
-                              if (model.status == Status.pending) Positioned(
-                                top: 4.0,
-                                right: 4.0,
-                                child: Container(
-                                  padding: EdgeInsets.all(4),
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(100),
-                                    color: Theme.of(context).primaryColor
-                                  ),
-                                  child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
-                                )
-                              )
-                            ]
-                          ),
-                          // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
-                          title: Text(model.title!),
-                          subtitle: model.subtitle != null ? Text(model.subtitle!) : null,
-                          trailing: PopupMenuButton<String>(
-                              icon: Icon(Icons.more_vert),
-                              tooltip: AppLocalizations.of(context)!.text('options'),
-                              onSelected: (value) {
-                                if (value == 'edit') {
-                                  _edit(model);
-                                } else if (value == 'remove') {
-                                  DeleteDialog.model(context, model, forced: true);
-                                }
-                              },
-                              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                                PopupMenuItem(
-                                  value: 'edit',
-                                  child: Text(AppLocalizations.of(context)!.text('edit')),
-                                ),
-                                PopupMenuItem(
-                                  value: 'remove',
-                                  child: Text(AppLocalizations.of(context)!.text('remove')),
-                                ),
-                              ]
+                  controller: _controller,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  itemBuilder: (context, index) {
+                    ProductModel model = snapshot.data![index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      leading: Stack(
+                        children: [
+                          _image(model.image),
+                          if (model.status == Status.pending) Positioned(
+                            top: 4.0,
+                            right: 4.0,
+                            child: Container(
+                              padding: EdgeInsets.all(4),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(100),
+                                color: Theme.of(context).primaryColor
+                              ),
+                              child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
+                            )
                           )
-                      );
-                    }
+                        ]
+                      ),
+                      // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
+                      title: Text(model.title!),
+                      subtitle: model.subtitle != null ? Text(model.subtitle!) : null,
+                      trailing: PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert),
+                        tooltip: AppLocalizations.of(context)!.text('options'),
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            _edit(model);
+                          } else if (value == 'remove') {
+                            DeleteDialog.model(context, model, forced: true);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text(AppLocalizations.of(context)!.text('edit')),
+                          ),
+                          PopupMenuItem(
+                            value: 'remove',
+                            child: Text(AppLocalizations.of(context)!.text('remove')),
+                          ),
+                        ]
+                      )
+                    );
+                  }
                 );
               }
               if (snapshot.hasError) {
@@ -125,7 +129,7 @@ class _ProductsPageState extends State<ProductsPage> {
 
   _fetch() async {
     setState(() {
-      _products = Database().getProducts(company: currentUser!.company, ordered: true);
+      _data = Database().getProducts(company: currentUser!.company, ordered: true);
     });
   }
 

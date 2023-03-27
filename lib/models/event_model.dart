@@ -1,17 +1,17 @@
 // Internal package
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/models/text_format_model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/text_format.dart';
 import 'package:flutter/material.dart';
 
 class EventModel<T> extends Model {
   Status? status;
   Axis? axis;
   bool? sliver;
-  TextFormatModel? top_left;
-  TextFormatModel? top_right;
-  TextFormatModel? bottom_left;
+  TextFormat? top_left;
+  TextFormat? top_right;
+  TextFormat? bottom_left;
   String? title;
   String? subtitle;
   String? page;
@@ -35,9 +35,9 @@ class EventModel<T> extends Model {
     this.widgets,
     this.images,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (top_left == null) top_left = TextFormatModel();
-    if (top_right == null) top_right = TextFormatModel();
-    if (bottom_left == null) bottom_left = TextFormatModel();
+    if (top_left == null) top_left = TextFormat();
+    if (top_right == null) top_right = TextFormat();
+    if (bottom_left == null) bottom_left = TextFormat();
     if (widgets == null) { widgets = []; }
     if (images == null) { images = []; }
   }
@@ -47,9 +47,9 @@ class EventModel<T> extends Model {
     this.status = Status.values.elementAt(map['status']);
     if (map.containsKey('axis')) this.axis = Axis.values.elementAt(map['axis']);
     if (map.containsKey('sliver')) this.sliver = map['sliver'];
-    this.top_left = TextFormatModel.deserialize(map['top_left']);
-    this.top_right = TextFormatModel.deserialize(map['top_right']);
-    this.bottom_left = TextFormatModel.deserialize(map['bottom_left']);
+    this.top_left = TextFormat.deserialize(map['top_left']);
+    this.top_right = TextFormat.deserialize(map['top_right']);
+    this.bottom_left = TextFormat.deserialize(map['bottom_left']);
     this.title = map['title'];
     this.subtitle = map['subtitle'];
     this.page = map['page'];
@@ -63,9 +63,9 @@ class EventModel<T> extends Model {
       'status': this.status!.index,
       'axis': this.axis!.index,
       'sliver': this.sliver,
-      'top_left': TextFormatModel.serialize(this.top_left),
-      'top_right': TextFormatModel.serialize(this.top_right),
-      'bottom_left': TextFormatModel.serialize(this.bottom_left),
+      'top_left': TextFormat.serialize(this.top_left),
+      'top_right': TextFormat.serialize(this.top_right),
+      'bottom_left': TextFormat.serialize(this.bottom_left),
       'title': this.title,
       'subtitle': this.subtitle,
       'page': this.page,

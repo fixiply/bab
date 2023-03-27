@@ -3,11 +3,11 @@ import 'dart:convert';
 // Internal package
 import 'package:bb/utils/constants.dart';
 
-class PeriodModel<T> {
+class Term<T> {
   Period? period;
   int? each;
 
-  PeriodModel({
+  Term({
     this.period = Period.month,
     this.each = 3,
   });
@@ -25,8 +25,8 @@ class PeriodModel<T> {
     return map;
   }
 
-  PeriodModel copy() {
-    return PeriodModel(
+  Term copy() {
+    return Term(
       period: this.period,
       each: this.each,
     );
@@ -51,16 +51,16 @@ class PeriodModel<T> {
 
   static dynamic serialize(dynamic data) {
     if (data != null) {
-      if (data is PeriodModel) {
+      if (data is Term) {
         return data.toMap();
       }
     }
     return null;
   }
 
-  static PeriodModel? deserialize(dynamic data) {
+  static Term? deserialize(dynamic data) {
     if (data != null) {
-      PeriodModel model = new PeriodModel();
+      Term model = new Term();
       if (data is Map<String, dynamic>) {
         model.fromMap(data);
       }

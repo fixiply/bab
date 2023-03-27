@@ -1,19 +1,22 @@
 // Internal package
 import 'package:bb/helpers/date_helper.dart';
+import 'package:bb/utils/constants.dart';
 
 class Model<T> {
   String? uuid;
   DateTime? inserted_at;
   DateTime? updated_at;
   String? creator;
-
-  bool isEditMode = false;
+  bool? isEdited;
+  bool? isSelected;
 
   Model({
     this.uuid,
     this.inserted_at,
     this.updated_at,
-    this.creator
+    this.creator,
+    this.isEdited = false,
+    this.isSelected = false
   }) {
     if(inserted_at == null) { inserted_at = DateTime.now(); }
   }
@@ -35,5 +38,14 @@ class Model<T> {
       map.addAll({'uuid': this.uuid});
     }
     return map;
+  }
+
+  bool isEditable() {
+    if (currentUser != null) {
+      if (currentUser!.uuid == creator || currentUser!.isAdmin()) {
+        return true;
+      }
+    }
+    return false;
   }
 }

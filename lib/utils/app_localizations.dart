@@ -34,9 +34,71 @@ class AppLocalizations {
     return _localisedValues![key] ?? "$key not found";
   }
 
-  String currency(double value) {
-    final formatter = NumberFormat.simpleCurrency(locale: locale.languageCode);
-    return formatter.format(value);
+  String get colon {
+    if (currentLanguage == 'fr') {
+      return ' :';
+    }
+    return ':';
+  }
+
+  String? number(double? number, {String? symbol}) {
+    if (number == null) {
+      return null;
+    }
+    return NumberFormat("#0.#", currentLanguage).format(number) + symbol!;
+  }
+
+  String? currency(double? number) {
+    if (number == null) {
+      return null;
+    }
+    return NumberFormat.simpleCurrency(locale: currentLanguage).format(number);
+  }
+
+  String? temperature(double? number) {
+    if (number == null) {
+      return null;
+    }
+    return NumberFormat("#0.#°C", currentLanguage).format(number);
+  }
+
+  /// Returns the localized duration, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in minutes.
+  String? duration(int? number) {
+    if (number == null) {
+      return null;
+    }
+    return '$number min';
+  }
+
+  String? percent(double? number) {
+    if (number == null) {
+      return null;
+    }
+    return this.number(number, symbol: '%');
+  }
+
+  /// Returns the localized weight, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in grams.
+  String? weight(double? number) {
+    if (number == null) {
+      return null;
+    }
+    var suffix = ' g';
+    if (number >= 100) {
+      number = number / 100;
+      suffix = ' kg';
+    }
+    return this.number(number, symbol: suffix);
+  }
+
+  String? volume(double? number) {
+    if (number == null) {
+      return null;
+    }
+    return this.number(number, symbol: ' L');
   }
 }
 

@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 class SwitchField extends FormField<bool> {
@@ -41,12 +40,12 @@ class _SwitchFieldState extends FormFieldState<bool> {
           child: TextField(
             readOnly: true,
             decoration: FormDecoration(
-                icon: widget.icon,
-                hintText: widget.hintText
+              icon: widget.icon,
+              hintText: widget.hintText
             )
           ),
         ),
-        !Foundation.kIsWeb && Platform.isIOS ? CupertinoSwitch(
+        DeviceHelper.isIOS ? CupertinoSwitch(
             value: widget.initialValue!,
             onChanged: (value) => didChange(value)
         ) : Switch(

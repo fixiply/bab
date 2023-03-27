@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/company_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -36,7 +37,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const BackButtonIcon(),
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -86,7 +87,6 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
               } else if (value == 'duplicate') {
                 CompanyModel model = widget.model.copy();
                 model.uuid = null;
-                model.status = Status.pending;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormCompanyPage(model);
                 })).then((value) {

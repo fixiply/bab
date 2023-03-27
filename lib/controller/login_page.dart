@@ -10,6 +10,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/dialogs/markdown_dialog.dart';
 import 'package:bb/widgets/primary_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/services.dart';
 
 // External package
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +24,7 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _email = Foundation.kDebugMode ? RECIPIENT : null;
   late TextEditingController _emailController;
+  final FocusNode _textNode = FocusNode();
   final TextEditingController _passwordController = TextEditingController();
 
   bool passwordVisible = false;
@@ -116,31 +118,40 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(AppLocalizations.of(context)!.text('password'), style: TextStyle(fontWeight: FontWeight.bold)),
               ),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: !passwordVisible,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+              RawKeyboardListener(
+                autofocus: true,
+                focusNode: _textNode,
+                onKey: (RawKeyEvent event) {
+                  if (event.runtimeType.toString() == 'RawKeyDownEvent' ||  // debug mode
+                      event.runtimeType.toString() == 'minified:kW')        // compiled mode
+                      {  }
+                },
+                child: TextFormField(
+                  controller: _passwordController,
+                  obscureText: !passwordVisible,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                    ),
+                    isDense: true,
+                    contentPadding: EdgeInsets.all(12),
+                    suffixIcon: IconButton(
+                      color: TextGrey,
+                      icon: Icon(passwordVisible
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
+                      onPressed: togglePassword,
+                    ),
                   ),
-                  isDense: true,
-                  contentPadding: EdgeInsets.all(12),
-                  suffixIcon: IconButton(
-                    color: TextGrey,
-                    icon: Icon(passwordVisible
-                        ? Icons.visibility_off_outlined
-                        : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
-                    onPressed: togglePassword,
-                  ),
-                ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('password_required');
+                  autovalidateMode: AutovalidateMode.onUserInteraction,
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return AppLocalizations.of(context)!.text('password_required');
+                    }
+                    return null;
                   }
-                  return null;
-                }
+                ),
               ),
               SizedBox(height: 6),
               Align(

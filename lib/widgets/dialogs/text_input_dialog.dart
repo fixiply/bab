@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
 
 class TextInputDialog extends StatefulWidget {
@@ -29,7 +28,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
   }
 
   Widget build(BuildContext context) {
-    if (!Foundation.kIsWeb && Platform.isIOS) {
+    if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(
         title: widget.title != null ? Text(widget.title!) : null,
         content: TextField(

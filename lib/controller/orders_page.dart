@@ -12,8 +12,11 @@ class OrdersPage extends StatefulWidget {
   _OrdersPageState createState() => new _OrdersPageState();
 }
 
-class _OrdersPageState extends State<OrdersPage> {
+class _OrdersPageState extends State<OrdersPage> with AutomaticKeepAliveClientMixin<OrdersPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,7 @@
-import 'package:flutter/foundation.dart'
-    show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -19,7 +19,7 @@ class Payment {
   static Payment google_pay = Payment(Payments.google_pay, platform: [TargetPlatform.iOS]);
 
   static List<Payment> get currentPlatform {
-    if (kIsWeb) {
+    if (DeviceHelper.isDesktop) {
       return [credit_card, paypal, apple_pay, google_pay];
     }
     switch (defaultTargetPlatform) {

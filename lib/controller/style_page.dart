@@ -1,21 +1,22 @@
-import 'package:bb/utils/srm.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/abv.dart';
-import 'package:bb/utils/ibu.dart';
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_style_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/style_model.dart';
+import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
+import 'package:bb/utils/color_units.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
-import 'package:bb/widgets/gradient_rect_range_slider_track_shape.dart';
-import 'package:bb/widgets/paints/custom_thumb_shape.dart';
+import 'package:bb/utils/ibu.dart';
+import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
+import 'package:bb/widgets/paints/gradient_range_slider_track_shape.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 
@@ -44,15 +45,21 @@ class _StylePageState extends State<StylePage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(widget.model.title!),
+        title: Text(widget.model.localizedName(AppLocalizations.of(context)!.locale) ?? ''),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          onPressed:() async {
+            Navigator.pop(context);
+          }
+        ),
         actions: <Widget>[
-          Badge(
-            position: BadgePosition.topEnd(top: 0, end: 3),
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
             animationDuration: Duration(milliseconds: 300),
-            animationType: BadgeAnimationType.slide,
+            animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
@@ -67,7 +74,7 @@ class _StylePageState extends State<StylePage> {
               },
             ),
           ),
-          if (_editable && currentUser != null && currentUser!.isAdmin())
+          if (currentUser != null && (currentUser!.isAdmin() || widget.model.creator == currentUser!.uuid))
             IconButton(
               icon: Icon(Icons.edit_note),
               onPressed: () {
@@ -97,7 +104,7 @@ class _StylePageState extends State<StylePage> {
                             activeTrackColor: Theme.of(context).primaryColor,
                             inactiveTrackColor: Theme.of(context).primaryColor.withOpacity(.4),
                             overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                            rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                            rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                             showValueIndicator: ShowValueIndicator.always,
                             valueIndicatorTextStyle: TextStyle(fontSize: 12)
                           ),
@@ -126,7 +133,7 @@ class _StylePageState extends State<StylePage> {
                             activeTrackColor: Theme.of(context).primaryColor,
                             inactiveTrackColor: Theme.of(context).primaryColor.withOpacity(.4),
                             overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                            rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                            rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                             // showValueIndicator: ShowValueIndicator.always
                           ),
                           child: RangeSlider(
@@ -145,26 +152,26 @@ class _StylePageState extends State<StylePage> {
                   Text(AppLocalizations.of(context)!.text('srm'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 20, child: Text('${widget.model.min_ebc != null ?  widget.model.min_ebc!.round() : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 20, child: Text('${widget.model.min_srm != null ?  widget.model.min_srm : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
                             trackHeight: 5,
-                            rangeTrackShape: GradientRectRangeSliderTrackShape(),
+                            rangeTrackShape: GradientRangeSliderTrackShape(),
                             thumbColor: Theme.of(context).primaryColor,
                             overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                            rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                            rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                           ),
                           child: RangeSlider(
                             onChanged: (values) {  },
-                            values: RangeValues(SRM.parse(widget.model.min_ebc).toDouble(), widget.model.max_ebc != null ? SRM.parse(widget.model.max_ebc).toDouble() : SRM_COLORS.length.toDouble()),
+                            values: RangeValues(widget.model.min_srm ?? 0, widget.model.max_srm != null ? widget.model.max_srm! : SRM_COLORS.length.toDouble()),
                             min: 0,
                             max: SRM_COLORS.length.toDouble(),
                             divisions: SRM_COLORS.length
                           )
                         )
                       ),
-                      SizedBox(width: 20, child: Text('${widget.model.max_ebc != null ? widget.model.max_ebc!.round() : SRM_COLORS.length}', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 20, child: Text('${widget.model.max_srm != null ? widget.model.max_srm : SRM_COLORS.length}', softWrap: false, style: TextStyle(fontSize: 12))),
                     ]
                   )
                 ]
@@ -172,6 +179,7 @@ class _StylePageState extends State<StylePage> {
             ),
             ExpansionPanelList(
               elevation: 1,
+              expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
                   _expanded = !isExpanded;
@@ -186,17 +194,18 @@ class _StylePageState extends State<StylePage> {
                       dense: true,
                       contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('features'),
-                          style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
-                      padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
-                      child: MarkdownBody(
-                        data: widget.model.text!,
-                        softLineBreak: true,
-                        styleSheet:
-                        MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
-                      )
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    child: MarkdownBody(
+                      data: widget.model.localizedText(AppLocalizations.of(context)!.locale) ?? '',
+                      softLineBreak: true,
+                      styleSheet:
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                    )
                   ),
                 )
               ]

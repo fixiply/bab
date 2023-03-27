@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
@@ -10,7 +9,7 @@ import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/widgets/containers/image_container.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:palette_generator/palette_generator.dart';
 import 'package:provider/provider.dart';
@@ -34,18 +33,6 @@ class _EventPageState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
-    double? widthFactor = _widthFactor();
-    if (widthFactor != null) {
-      return FractionallySizedBox(
-        widthFactor: _widthFactor(),
-        alignment: Alignment.topCenter,
-        child: _body()
-      );
-    }
-    return _body();
-  }
-
-  Widget _body() {
     var registry = JsonWidgetRegistry.instance;
     return Scaffold(
       appBar: widget.model.sliver == false ? AppBar(
@@ -54,15 +41,19 @@ class _EventPageState extends State<EventPage> {
         backgroundColor: Colors.white,
         title: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(
-              widget.model.title!
-          ),
+          child: Text(widget.model.title!),
+        ),
+        leading: IconButton(
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          onPressed:() async {
+            Navigator.pop(context);
+          }
         ),
         actions: <Widget> [
-          Badge(
-            position: BadgePosition.topEnd(top: 0, end: 3),
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
             animationDuration: Duration(milliseconds: 300),
-            animationType: BadgeAnimationType.slide,
+            animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
@@ -100,6 +91,12 @@ class _EventPageState extends State<EventPage> {
             stretch: true,
             foregroundColor: _dominantColor,
             backgroundColor: Theme.of(context).primaryColor,
+            leading: IconButton(
+              icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+              onPressed:() async {
+                Navigator.pop(context);
+              }
+            ),
             onStretchTrigger: () {
               // Function callback for stretch
               return Future<void>.value();
@@ -145,10 +142,10 @@ class _EventPageState extends State<EventPage> {
               ),
             ),
             actions: <Widget> [
-              Badge(
-                position: BadgePosition.topEnd(top: 0, end: 3),
+              badge.Badge(
+                position: badge.BadgePosition.topEnd(top: 0, end: 3),
                 animationDuration: Duration(milliseconds: 300),
-                animationType: BadgeAnimationType.slide,
+                animationType: badge.BadgeAnimationType.slide,
                 showBadge: _baskets > 0,
                 badgeContent: _baskets > 0 ? Text(
                   _baskets.toString(),
@@ -199,15 +196,5 @@ class _EventPageState extends State<EventPage> {
       //   }
       // });
     }
-  }
-
-  double? _widthFactor() {
-    if (Foundation.kIsWeb) {
-      return 0.6;
-    }
-    if (!DeviceHelper.mobileLayout(context) && DeviceHelper.landscapeOrientation(context)) {
-      return 0.6;
-    }
-    return null;
   }
 }

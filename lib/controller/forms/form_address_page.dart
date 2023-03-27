@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/models/adress_model.dart';
+import 'package:bb/utils/adress.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 class FormAddressPage extends StatefulWidget {
-  final AdressModel model;
+  final Adress model;
   FormAddressPage(this.model);
   _FormAddressPageState createState() => new _FormAddressPageState();
 }

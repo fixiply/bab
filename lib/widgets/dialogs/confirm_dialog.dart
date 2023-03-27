@@ -1,9 +1,8 @@
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
 
 class ConfirmDialog extends StatefulWidget {
@@ -23,7 +22,7 @@ class ConfirmDialog extends StatefulWidget {
 
 class _ConfirmDialogState extends State<ConfirmDialog> {
   Widget build(BuildContext context) {
-    if (!Foundation.kIsWeb && Platform.isIOS) {
+    if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(
         title: widget.title != null ? Text(widget.title!) : null,
         content: widget.content,

@@ -29,7 +29,7 @@ class ImageField extends FormField<ImageModel> {
         children: <Widget>[
           InputDecorator(
             decoration: FormDecoration(
-              contentPadding: EdgeInsets.all(0.0),
+              contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
               icon: Icon(Icons.image)
             ),
             child: ListTile(

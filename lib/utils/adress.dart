@@ -3,7 +3,7 @@ import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 
-class AdressModel<T> {
+class Adress<T> {
   String? uuid;
   DateTime? inserted_at;
   DateTime? updated_at;
@@ -14,7 +14,7 @@ class AdressModel<T> {
   String? information;
   String? phone;
 
-  AdressModel({
+  Adress({
     this.uuid,
     this.inserted_at,
     this.updated_at,
@@ -57,8 +57,8 @@ class AdressModel<T> {
     return map;
   }
 
-  AdressModel copy() {
-    return AdressModel(
+  Adress copy() {
+    return Adress(
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
@@ -73,7 +73,7 @@ class AdressModel<T> {
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is AdressModel && other.uuid == uuid);
+    return (other is Adress && other.uuid == uuid);
   }
 
   @override
@@ -83,7 +83,7 @@ class AdressModel<T> {
 
   static dynamic serialize(dynamic data) {
     if (data != null) {
-      if (data is AdressModel) {
+      if (data is Adress) {
         return data.toMap(persist: true);
       }
       if (data is List) {
@@ -97,15 +97,15 @@ class AdressModel<T> {
     return null;
   }
 
-  static List<AdressModel> deserialize(dynamic data) {
-    List<AdressModel> values = [];
+  static List<Adress> deserialize(dynamic data) {
+    List<Adress> values = [];
     if (data != null) {
       if (data is List) {
         for(final value in data) {
           values.addAll(deserialize(value));
         }
       } else {
-        AdressModel model = new AdressModel();
+        Adress model = new Adress();
         model.fromMap(data);
         values.add(model);
       }

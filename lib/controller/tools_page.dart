@@ -12,8 +12,11 @@ class ToolsPage extends StatefulWidget {
   _ToolsPageState createState() => new _ToolsPageState();
 }
 
-class _ToolsPageState extends State<ToolsPage> {
+class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixin<ToolsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {

@@ -11,7 +11,7 @@ class PurchaseModel<T> extends Model {
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
-    this.status = Status.pending,
+    this.status = Status.publied,
     this.name,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 

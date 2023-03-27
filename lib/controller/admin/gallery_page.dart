@@ -44,7 +44,7 @@ class AppBarParams {
   });
 }
 
-class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStateMixin {
+class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin<GalleryPage> {
   String _path = 'pictures';
   AppBarParams? _appBar;
   List<ImageModel> _selected = [];
@@ -54,6 +54,9 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
   ScrollController? _controller;
   Future<List<ImageModel>>? _images;
   Sort _sort = Sort.asc_name;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -211,7 +214,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         )
       ),
       bottomNavigationBar: _bottomBar(),
-      floatingActionButton: !Foundation.kIsWeb || _path != 'camera' ? FloatingActionButton(
+      floatingActionButton: !DeviceHelper.isDesktop || _path != 'camera' ? FloatingActionButton(
         onPressed: _add,
         tooltip: AppLocalizations.of(context)!.text('add_image'),
         child: Icon(_path == 'camera' ? Icons.camera : Icons.add_photo_alternate_rounded)
@@ -363,10 +366,10 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
   }
 
   int getDeviceAxisCount() {
-    if (Foundation.kIsWeb) {
+    if (DeviceHelper.isDesktop) {
       return 8;
     }
-    return !DeviceHelper.mobileLayout(context) || DeviceHelper.landscapeOrientation(context) ? 4 : 2;
+    return !DeviceHelper.isMobile(context) || DeviceHelper.landscapeOrientation(context) ? 4 : 2;
   }
 
   Widget item(ImageModel image) {
@@ -451,7 +454,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           children: [
             TextButton.icon(
                 icon: Icon(Icons.check_circle_outline_outlined, color: Theme.of(context).primaryColor),
-                label: Text(Foundation.kIsWeb ? AppLocalizations.of(context)!.text('select_all') : '', style: TextStyle(color: Theme.of(context).primaryColor)
+                label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('select_all') : '', style: TextStyle(color: Theme.of(context).primaryColor)
                 ),
                 onPressed: () async {
                   List<ImageModel>? list = await _images;
@@ -472,7 +475,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           children: [
             TextButton.icon(
               icon: Icon(Icons.highlight_off_outlined, color: Theme.of(context).primaryColor),
-              label: Text(Foundation.kIsWeb ? AppLocalizations.of(context)!.text('deselect') : '', style: TextStyle(color: Theme.of(context).primaryColor)
+              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('deselect') : '', style: TextStyle(color: Theme.of(context).primaryColor)
               ),
               onPressed: () {
                 setState(() {
@@ -483,7 +486,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
             ),
             TextButton.icon(
               icon: Icon(Icons.drive_file_move, color: Theme.of(context).primaryColor),
-              label: Text(Foundation.kIsWeb ? AppLocalizations.of(context)!.text('move') : '', style: TextStyle(color: Theme.of(context).primaryColor)
+              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('move') : '', style: TextStyle(color: Theme.of(context).primaryColor)
               ),
               onPressed: () {
                 _move();
@@ -491,7 +494,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
             ),
             TextButton.icon(
               icon: Icon(Icons.delete, color: Theme.of(context).primaryColor),
-              label: Text(Foundation.kIsWeb ? AppLocalizations.of(context)!.text('remove') : '', style: TextStyle(color: Theme.of(context).primaryColor)
+              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('remove') : '', style: TextStyle(color: Theme.of(context).primaryColor)
               ),
               onPressed: () {
                 _delete();
@@ -773,7 +776,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
     final menuItem = await showMenu<int>(
         context: context,
         items: [
-          PopupMenuItem(child: Text(AppLocalizations.of(context)!.text('use')), value: 1),
+          PopupMenuItem(child: Text(AppLocalizations.of(context)!.text('use(s)')), value: 1),
           PopupMenuItem(child: Text(AppLocalizations.of(context)!.text('view_image')), value: 2),
           // PopupMenuItem(child: Text(AppLocalizations.of(context)!.text('analyze')), value: 3),
         ],
@@ -792,7 +795,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
-                title: Text(AppLocalizations.of(context)!.text('use')),
+                title: Text(AppLocalizations.of(context)!.text('use(s)')),
                 content: Container(
                   // height: 300.0, // Change as per your requirement
                   // width: 300.0, // Change as per your requirement

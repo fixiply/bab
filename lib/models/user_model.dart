@@ -1,5 +1,5 @@
 // Internal package
-import 'package:bb/models/adress_model.dart';
+import 'package:bb/utils/adress.dart';
 import 'package:bb/models/payment_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/helpers/date_helper.dart';
@@ -16,7 +16,7 @@ class UserModel<T> {
   User? user;
   Role? role;
   String? company;
-  List<AdressModel>? addresses;
+  List<Adress>? addresses;
   List<PaymentModel>? payments;
 
   UserModel({
@@ -56,7 +56,7 @@ class UserModel<T> {
     this.email = map['email'];
     this.role = Role.values.elementAt(map['role']);
     this.company = map['company'];
-    this.addresses = AdressModel.deserialize(map['addresses']);
+    this.addresses = Adress.deserialize(map['addresses']);
     this.payments = PaymentModel.deserialize(map['payments']);
   }
 
@@ -68,7 +68,7 @@ class UserModel<T> {
       'email': this.email,
       'role': this.role!.index,
       'company': company,
-      'addresses': AdressModel.serialize(this.addresses),
+      'addresses': Adress.serialize(this.addresses),
       'payments': PaymentModel.serialize(this.payments),
     };
     if (persist == true) {

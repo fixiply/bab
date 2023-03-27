@@ -34,6 +34,9 @@ class _CarouselContainerState extends AbstractContainerState {
         future: products,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
+            if (snapshot.data!.length == 0) {
+              return Container();
+            }
             return CarouselSlider(
               options: CarouselOptions(
                 height: 280,

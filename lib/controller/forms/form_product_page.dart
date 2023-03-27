@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/company_model.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/models/receipt_model.dart';
@@ -50,7 +51,7 @@ class _FormProductPageState extends State<FormProductPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const BackButtonIcon(),
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -100,7 +101,6 @@ class _FormProductPageState extends State<FormProductPage> {
               } else if (value == 'duplicate') {
                 ProductModel model = widget.model.copy();
                 model.uuid = null;
-                model.status = Status.pending;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormProductPage(model);
                 })).then((value) {
@@ -167,7 +167,7 @@ class _FormProductPageState extends State<FormProductPage> {
                           items: snapshot.data!.map((ReceiptModel model) {
                             return DropdownMenuItem<String>(
                                 value: model.uuid,
-                                child: Text(model.title!));
+                                child: Text(model.localizedTitle(AppLocalizations.of(context)!.locale) ?? ''));
                           }).toList(),
                           onChanged: (value) =>
                               setState(() {
@@ -333,9 +333,9 @@ class _FormProductPageState extends State<FormProductPage> {
               ),
               if (widget.model.product == Product.booking) PeriodField(
                 context: context,
-                value: widget.model.period!,
+                value: widget.model.term!,
                 onChanged: (value) => setState(() {
-                  widget.model.period = value;
+                  widget.model.term = value;
                 }),
               ),
               if (widget.model.product == Product.booking) Divider(height: 10),

@@ -5,7 +5,7 @@ import 'package:bb/controller/admin/gallery_page.dart';
 import 'package:bb/controller/brews_page.dart';
 import 'package:bb/controller/calendar_page.dart';
 import 'package:bb/controller/companies_page.dart';
-import 'package:bb/controller/ingredients_page.dart';
+import 'package:bb/controller/inventory_page.dart';
 import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/tanks_page.dart';
@@ -31,7 +31,7 @@ class CustomDrawer<Object> extends Drawer {
           )
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
-          title: Text(AppLocalizations.of(context)!.text('my_tanks'),
+          title: Text(AppLocalizations.of(context)!.text('equipments'),
               style: TextStyle(fontSize: 18)
           ),
           onTap: () {
@@ -43,7 +43,7 @@ class CustomDrawer<Object> extends Drawer {
           },
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
-          title: Text(AppLocalizations.of(context)!.text('my_brews'),
+          title: Text(AppLocalizations.of(context)!.text('brews'),
               style: TextStyle(fontSize: 18)
           ),
           onTap: () {
@@ -55,12 +55,12 @@ class CustomDrawer<Object> extends Drawer {
           },
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
-          title: Text(AppLocalizations.of(context)!.text('my_ingredients'),
+          title: Text(AppLocalizations.of(context)!.text('inventory'),
               style: TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return IngredientsPage();
+              return InventoryPage();
             })).then((value) {
               Navigator.pop(context);
             });

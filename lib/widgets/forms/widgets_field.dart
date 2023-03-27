@@ -7,10 +7,9 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 class WidgetsField extends FormField<List<String>> {
-  final int? maxLines;
   final void Function(List<String> value)? onChanged;
 
-  WidgetsField({Key? key, required BuildContext context, List<String>? widgets, this.onChanged, this.maxLines}) : super(
+  WidgetsField({Key? key, required BuildContext context, List<String>? widgets, this.onChanged}) : super(
       key: key,
       initialValue: widgets,
       builder: (FormFieldState<List<dynamic>> field) {
@@ -19,10 +18,10 @@ class WidgetsField extends FormField<List<String>> {
   );
 
   @override
-  _ProductFieldState createState() => _ProductFieldState();
+  _WidgetsFieldState createState() => _WidgetsFieldState();
 }
 
-class _ProductFieldState extends FormFieldState<List<String>> {
+class _WidgetsFieldState extends FormFieldState<List<String>> {
   @override
   WidgetsField get widget => super.widget as WidgetsField;
 

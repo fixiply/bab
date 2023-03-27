@@ -16,7 +16,7 @@ class CompanyModel<T> extends Model {
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
-    this.status = Status.pending,
+    this.status = Status.publied,
     this.name,
     this.text,
     this.image,

@@ -1,29 +1,29 @@
-import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
-import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/controller/event_page.dart';
 import 'package:bb/controller/forms/form_event_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/event_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
+import 'package:bb/utils/locale_notifier.dart';
+import 'package:bb/widgets/builders/full_widget_page.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/image_container.dart';
 import 'package:bb/widgets/containers/shimmer_container.dart';
 import 'package:bb/widgets/custom_drawer.dart';
-import 'package:bb/widgets/builders/full_widget_page.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 // External package
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badge;
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class EventsPage extends StatefulWidget {
   EventsPage({Key? key}) : super(key: key);
@@ -58,10 +58,10 @@ class _EventsPageState extends State<EventsPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          Badge(
-            position: BadgePosition.topEnd(top: 0, end: 3),
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
             animationDuration: Duration(milliseconds: 300),
-            animationType: BadgeAnimationType.slide,
+            animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
@@ -76,11 +76,13 @@ class _EventsPageState extends State<EventsPage> {
               },
             ),
           ),
-          if (currentUser != null && currentUser!.isAdmin()) PopupMenuButton(
+          PopupMenuButton(
             icon: Icon(Icons.more_vert),
             tooltip: AppLocalizations.of(context)!.text('display'),
             onSelected: (value) async {
-              if (value == 1) {
+              if (value is Locale) {
+                Provider.of<LocaleNotifier>(context, listen: false).set(value);
+              } else if (value == 1) {
                 await Database().publishAll();
               } else if (value == 3) {
                 bool checked = !_remove;
@@ -91,46 +93,46 @@ class _EventsPageState extends State<EventsPage> {
                 _fetch();
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<int>>[
+            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
               PopupMenuItem(
+                enabled: false,
+                value: null,
+                child: Text(AppLocalizations.of(context)!.text('language')),
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('english')),
+                value: const Locale('en', 'US'),
+                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
+              ),
+              CheckedPopupMenuItem(
+                child: Text(AppLocalizations.of(context)!.text('french')),
+                value: const Locale('fr', 'FR'),
+                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
+              ),
+              if (currentUser != null && currentUser!.isAdmin()) PopupMenuItem(
                 value: 1,
                 child: Text(AppLocalizations.of(context)!.text('publish_everything')),
               ),
-              PopupMenuItem(
-                value: 2,
-                child: SwitchListTile(
-                  value: _editable,
-                  title: Text(AppLocalizations.of(context)!.text('edit'), softWrap: false),
-                  onChanged: (value) async {
-                    bool checked = !_editable;
-                    Provider.of<EditionNotifier>(context, listen: false).setEditable(checked);
-                    SharedPreferences prefs = await SharedPreferences.getInstance();
-                    await prefs.setBool(EDIT_KEY, checked);
-                    setState(() { _editable = checked; });
-                    Navigator.pop(context);
-                  },
-                )
-              ),
-              PopupMenuItem(
+              if (currentUser != null && currentUser!.isAdmin()) PopupMenuItem(
                 enabled: false,
                 value: null,
                 child: Text(AppLocalizations.of(context)!.text('filtered')),
               ),
-              CheckedPopupMenuItem(
+              if (currentUser != null && currentUser!.isAdmin()) CheckedPopupMenuItem(
                 child: Text(AppLocalizations.of(context)!.text('archives')),
-                value: 3,
+                value: 2,
                 checked: _remove,
               ),
-              CheckedPopupMenuItem(
+              if (currentUser != null && currentUser!.isAdmin()) CheckedPopupMenuItem(
                 child: Text(AppLocalizations.of(context)!.text('hidden')),
-                value: 4,
+                value: 3,
                 checked: _hidden,
               )
             ]
           ),
         ]
       ),
-      drawer: CustomDrawer(context),
+      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
@@ -143,6 +145,24 @@ class _EventsPageState extends State<EventsPage> {
                     return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
                   }
                   return EmptyContainer(message: AppLocalizations.of(context)!.text('no_event'));
+                }
+                if (DeviceHelper.isDesktop || DeviceHelper.landscapeOrientation(context)) {
+                  return GridView.builder(
+                    controller: _controller,
+                    padding: EdgeInsets.all(4),
+                    gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                      maxCrossAxisExtent: MediaQuery.of(context).size.width / 2,
+                      childAspectRatio: 3 / 2,
+                      crossAxisSpacing: 4.0,
+                      mainAxisSpacing: 4.0
+                    ),
+                    // physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      EventModel event = snapshot.data![index];
+                      return _item(event, true);
+                    }
+                  );
                 }
                 return ListView.builder(
                   controller: _controller,
@@ -227,11 +247,8 @@ class _EventsPageState extends State<EventsPage> {
               var data = JsonWidgetData.fromDynamic(model.page!);
               if (data != null) {
                 await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (BuildContext context) =>
-                        FullWidgetPage(
-                          data: data,
-                        ),
+                  MaterialPageRoute(builder: (BuildContext context) =>
+                    FullWidgetPage(data: data),
                   ),
                 );
               }
@@ -316,54 +333,53 @@ class _EventsPageState extends State<EventsPage> {
         ],
       );
     }
+
     return Stack(
       children: <Widget>[
         Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
-              height: grid ? 140 : 180,
-              width: double.infinity,
-              child: ImageContainer(
+            Flexible(
+              fit: DeviceHelper.isDesktop ? FlexFit.tight: FlexFit.loose,
+              child: Container(
+                width: double.infinity,
+                child: ImageContainer(
                   model.getImages(),
                   cache: currentUser != null && currentUser!.isAdmin() == false,
                   emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.scaleDown)
+                )
+              ),
+            ),
+            if(model.title != null && model.title!.length > 0) Container(
+              padding: EdgeInsets.all(5),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  model.title!,
+                  overflow: grid ? TextOverflow.ellipsis : null,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  textAlign: TextAlign.left,
+                ),
               )
             ),
-            if(model.title != null && model.title!.length > 0) Flexible(
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    model.title!,
-                    overflow: grid ? TextOverflow.ellipsis : null,
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                    ),
-                    textAlign: TextAlign.left,
+            if(model.subtitle != null && model.subtitle!.length > 0) Container(
+              padding: EdgeInsets.all(5),
+              child: FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  model.subtitle ?? '',
+                  overflow: grid ? TextOverflow.ellipsis : null,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
                   ),
-                )
-              )
-            ),
-            if(model.subtitle != null && model.subtitle!.length > 0) Flexible(
-              child: Container(
-                padding: EdgeInsets.all(5),
-                child: FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    model.subtitle ?? '',
-                    overflow: grid ? TextOverflow.ellipsis : null,
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    textAlign: TextAlign.left,
-                  ),
-                )
+                  textAlign: TextAlign.left,
+                ),
               )
             )
           ],

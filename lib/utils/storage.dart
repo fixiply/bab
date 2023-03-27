@@ -1,12 +1,13 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart' as Foundation;
+
 import 'package:flutter/widgets.dart';
 
 // Internal package
+import 'package:bb/helpers/class_helper.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/model_helper.dart';
 import 'package:bb/models/image_model.dart';
-import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 
@@ -93,7 +94,7 @@ class Storage {
           contentType: file.mimeType,
           customMetadata: {'picked-file-path': file.path}
       );
-      if (Foundation.kIsWeb) {
+      if (DeviceHelper.isDesktop) {
         ImageLib.Image? image = ImageLib.decodeImage(await file.readAsBytes());
         if (image!.width > 640) {
           image = ImageLib.copyResize(image, width: 640);

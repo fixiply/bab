@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class TextFormatModel<T> {
+class TextFormat<T> {
   String? text;
   double? size;
   bool? bold;
@@ -8,7 +8,7 @@ class TextFormatModel<T> {
   bool? underline;
   int? color;
 
-  TextFormatModel({
+  TextFormat({
     this.text,
     this.size = 14.0,
     this.bold = false,
@@ -40,8 +40,8 @@ class TextFormatModel<T> {
     return map;
   }
 
-  TextFormatModel copy() {
-    return TextFormatModel(
+  TextFormat copy() {
+    return TextFormat(
       text: this.text,
       size: this.size,
       bold: this.bold,
@@ -53,7 +53,7 @@ class TextFormatModel<T> {
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is TextFormatModel && other.text == text);
+    return (other is TextFormat && other.text == text);
   }
 
   @override
@@ -89,38 +89,38 @@ class TextFormatModel<T> {
     return model != null && model.isNotEmpty ? true: false;
   }
 
-  static double? getFontSize(TextFormatModel? model) {
+  static double? getFontSize(TextFormat? model) {
     return model != null && model.size != null ? model.size : null;
   }
 
-  static Color? getColor(TextFormatModel? model) {
+  static Color? getColor(TextFormat? model) {
     return model != null && model.color != null ? Color(model.color!) : null;
   }
 
-  static bool hasFontBold(TextFormatModel? model) {
+  static bool hasFontBold(TextFormat? model) {
     return model != null && model.isBold;
   }
 
-  static bool hasFontItalic(TextFormatModel? model) {
+  static bool hasFontItalic(TextFormat? model) {
     return model != null && model.isItalic;
   }
 
-  static bool hasFontUnderline(TextFormatModel? model) {
+  static bool hasFontUnderline(TextFormat? model) {
     return model != null && model.isUnderline;
   }
 
   static dynamic serialize(dynamic data) {
     if (data != null) {
-      if (data is TextFormatModel) {
+      if (data is TextFormat) {
         return data.toMap();
       }
     }
     return null;
   }
 
-  static TextFormatModel? deserialize(dynamic data) {
+  static TextFormat? deserialize(dynamic data) {
     if (data != null) {
-      TextFormatModel model = new TextFormatModel();
+      TextFormat model = new TextFormat();
       if (data is Map<String, dynamic>) {
         model.fromMap(data);
       } else {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/text_format_model.dart';
+import 'package:bb/utils/text_format.dart';
 
 // External package
 import 'package:firebase_storage/firebase_storage.dart';
@@ -10,9 +10,9 @@ class ImageModel<T> {
   String? url;
   String? name;
   DateTime? updated_at;
-  TextFormatModel? left;
-  TextFormatModel? right;
-  TextFormatModel? bottom;
+  TextFormat? left;
+  TextFormat? right;
+  TextFormat? bottom;
   int? size;
   Rect? rect;
   Reference? reference;
@@ -28,9 +28,9 @@ class ImageModel<T> {
     this.rect,
     this.reference,
   }) {
-    if (left == null) left = TextFormatModel();
-    if (right == null) right = TextFormatModel();
-    if (bottom == null) bottom = TextFormatModel();
+    if (left == null) left = TextFormat();
+    if (right == null) right = TextFormat();
+    if (bottom == null) bottom = TextFormat();
   }
 
   void fromMap(Map<String, dynamic> map) {

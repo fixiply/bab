@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
-import 'package:bb/utils/srm.dart';
 import 'package:bb/widgets/form_decoration.dart';
+import 'package:bb/widgets/forms/color_field.dart';
+import 'package:bb/widgets/forms/localized_text_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 
 // External package
@@ -31,8 +33,8 @@ class _FormStylePageState extends State<FormStylePage> {
   @override
   void initState() {
     super.initState();
-    _textMinSRMController = TextEditingController(text: widget.model.min_ebc != null ?  widget.model.min_ebc.toString() :  null);
-    _textMaxSRMController = TextEditingController(text: widget.model.max_ebc != null ?  widget.model.max_ebc.toString() :  null);
+    _textMinSRMController = TextEditingController(text: widget.model.min_srm != null ?  widget.model.min_srm.toString() :  null);
+    _textMaxSRMController = TextEditingController(text: widget.model.max_srm != null ?  widget.model.max_srm.toString() :  null);
   }
 
   @override
@@ -45,7 +47,7 @@ class _FormStylePageState extends State<FormStylePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const BackButtonIcon(),
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -95,7 +97,6 @@ class _FormStylePageState extends State<FormStylePage> {
               } else if (value == 'duplicate') {
                 StyleModel model = widget.model.copy();
                 model.uuid = null;
-                model.status = Status.pending;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormStylePage(model);
                 })).then((value) {
@@ -128,32 +129,35 @@ class _FormStylePageState extends State<FormStylePage> {
           child: Column(
             children: <Widget>[
               DropdownButtonFormField<Fermentation>(
-                  value: widget.model.fermentation,
-                  decoration: FormDecoration(
-                      icon: const Icon(Icons.aspect_ratio),
-                      labelText: AppLocalizations.of(context)!.text('fermentation')
-                  ),
-                  items: Fermentation.values.map((Fermentation display) {
-                    return DropdownMenuItem<Fermentation>(
-                        value: display,
-                        child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
-                  }).toList(),
-                  onChanged: (value) => setState(() {
-                    widget.model.fermentation = value;
-                  })
+                value: widget.model.fermentation,
+                decoration: FormDecoration(
+                  icon: const Icon(Icons.aspect_ratio),
+                  labelText: AppLocalizations.of(context)!.text('fermentation'),
+                  fillColor: FillColor,
+                  filled: true,
+                ),
+                items: Fermentation.values.map((Fermentation display) {
+                  return DropdownMenuItem<Fermentation>(
+                      value: display,
+                      child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                }).toList(),
+                onChanged: (value) => setState(() {
+                  widget.model.fermentation = value;
+                })
               ),
               Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.title,
+              LocalizedTextField(
+                context: context,
+                initialValue: widget.model.name,
                 textCapitalization: TextCapitalization.sentences,
                 onChanged: (text) => setState(() {
-                  widget.model.title = text;
+                  widget.model.name = text;
                 }),
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.title),
-                    labelText: AppLocalizations.of(context)!.text('title'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
+                  icon: const Icon(Icons.title),
+                  labelText: AppLocalizations.of(context)!.text('title'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
@@ -165,7 +169,7 @@ class _FormStylePageState extends State<FormStylePage> {
               ),
               Divider(height: 10),
               TextFormField(
-                initialValue: widget.model.category,
+                initialValue: widget.model.localizedCategory(AppLocalizations.of(context)!.locale),
                 textCapitalization: TextCapitalization.sentences,
                 onChanged: (text) => setState(() {
                   widget.model.category = text;
@@ -179,23 +183,28 @@ class _FormStylePageState extends State<FormStylePage> {
               ),
               Divider(height: 10),
               FormField(
-                  builder: (FormFieldState<int> state) {
-                    return Row(
-                      mainAxisSize: MainAxisSize.max,
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                builder: (FormFieldState<int> state) {
+                  return InputDecorator(
+                    decoration: FormDecoration(
+                      icon: const Text('IBU'),
+                    ),
+                    child: Row(
                       children: [
-                        TextFormField(
+                        Expanded(
+                          child: TextFormField(
                             initialValue: widget.model.min_ibu != null ?  widget.model.min_ibu.toString() :  '',
                             keyboardType: TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => setState(() {
                               widget.model.min_ibu = double.parse(value);
                             }),
                             decoration: FormDecoration(
-                                icon: const Text('IBU'),
-                                labelText: 'min',
-                                border: InputBorder.none,
-                                fillColor: FillColor, filled: true,
-                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                              labelText: 'min',
+                              border: InputBorder.none,
+                              suffixIcon: Tooltip(
+                                message: 'Amertume minimum',
+                                child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                              ),
+                              fillColor: FillColor, filled: true,
                             ),
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -203,177 +212,109 @@ class _FormStylePageState extends State<FormStylePage> {
                               }
                               return null;
                             }
+                          )
                         ),
-                        const SizedBox(width: 8),
-                        TextFormField(
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
                             initialValue: widget.model.max_ibu != null ?  widget.model.max_ibu.toString() :  '',
                             keyboardType: TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => setState(() {
                               widget.model.max_ibu = double.parse(value);
                             }),
                             decoration: FormDecoration(
-                                labelText: 'max',
-                                border: InputBorder.none,
-                                fillColor: FillColor, filled: true,
-                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                              labelText: 'max',
+                              border: InputBorder.none,
+                              suffixIcon: Tooltip(
+                                message:  'Amertume maximale',
+                                child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                              ),
+                              fillColor: FillColor, filled: true,
                             ),
-                            validator: (value) {
-                              if (value!.isEmpty) {
-                                return AppLocalizations.of(context)!.text('validator_field_required');
-                              }
-                              return null;
-                            }
+                          )
                         ),
                       ],
-                    );
-                  }
-              ),
-              Divider(height: 10),
-              FormField(
-                builder: (FormFieldState<int> state) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextFormField(
-                        initialValue: widget.model.min_abv != null ?  widget.model.min_abv.toString() :  '',
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        onChanged: (value) => setState(() {
-                          widget.model.min_abv = double.parse(value);
-                        }),
-                        decoration: FormDecoration(
-                          icon: const Text('ABV'),
-                          labelText: 'min',
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true,
-                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
-                        ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return AppLocalizations.of(context)!.text('validator_field_required');
-                          }
-                          return null;
-                        }
-                      ),
-                      const SizedBox(width: 8),
-                      TextFormField(
-                        initialValue: widget.model.max_abv != null ?  widget.model.max_abv.toString() :  '',
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        onChanged: (value) => setState(() {
-                          widget.model.max_abv = double.parse(value);
-                        }),
-                        decoration: FormDecoration(
-                          labelText: 'max',
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true,
-                          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
-                        ),
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return AppLocalizations.of(context)!.text('validator_field_required');
-                          }
-                          return null;
-                          }
-                      ),
-                    ],
+                    )
                   );
                 }
               ),
               Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
-                  return Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Container(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        child: Row(
-                         mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _textMinSRMController,
-                                keyboardType: TextInputType.numberWithOptions(decimal: false),
-                                onChanged: (value) => setState(() {
-                                  widget.model.min_ebc = double.parse(value);
-                                }),
-                                decoration: FormDecoration(
-                                    icon: const Text('EBC'),
-                                    labelText: 'min',
-                                    border: InputBorder.none,
-                                    fillColor: FillColor, filled: true,
-                                ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return AppLocalizations.of(context)!.text('validator_field_required');
-                                  }
-                                  return null;
-                                }
-                             ),
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.calculate_outlined),
-                              tooltip: 'SRM calculator',
-                              onPressed: widget.model.min_ebc != null ? () {
-                                setState(() {
-                                  _textMinSRMController.text = SRM.toEBC(widget.model.min_ebc!).toString();
-                                  widget.model.min_ebc = double.parse(_textMinSRMController.text);
-                                });
-                              } : null,
-                            ),
-                          ],
-                        ),
-                      ),
-                      Container(
-                        width: MediaQuery.of(context).size.width / 2.5,
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: _textMaxSRMController,
-                                keyboardType: TextInputType.numberWithOptions(decimal: false),
-                                onChanged: (value) => setState(() {
-                                  widget.model.max_ebc = double.parse(value);
-                                }),
-                                decoration: FormDecoration(
-                                    labelText: 'max',
-                                    border: InputBorder.none,
-                                    fillColor: FillColor, filled: true,
-                                ),
-                                validator: (value) {
-                                  if (value!.isEmpty) {
-                                    return AppLocalizations.of(context)!.text('validator_field_required');
-                                  }
-                                  return null;
-                                },
+                  return InputDecorator(
+                    decoration: FormDecoration(
+                      icon: const Text('ABV'),
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: widget.model.min_abv != null ?  widget.model.min_abv.toString() :  '',
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onChanged: (value) => setState(() {
+                              widget.model.min_abv = double.parse(value);
+                            }),
+                            decoration: FormDecoration(
+                              labelText: 'min',
+                              border: InputBorder.none,
+                              suffixIcon: Tooltip(
+                                message:  'Alcool minimum',
+                                child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                               ),
+                              fillColor: FillColor, filled: true,
+                              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.2)
                             ),
-                            IconButton(
-                              icon: const Icon(Icons.calculate_outlined),
-                              tooltip: 'SRM calculator',
-                              onPressed: widget.model.max_ebc != null ? () {
-                               setState(() {
-                                 _textMaxSRMController.text = SRM.toEBC(widget.model.max_ebc!).toString();
-                                 widget.model.max_ebc = double.parse(_textMaxSRMController.text);
-                               });
-                              } : null,
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: widget.model.max_abv != null ?  widget.model.max_abv.toString() :  '',
+                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            onChanged: (value) => setState(() {
+                              widget.model.max_abv = double.parse(value);
+                            }),
+                            decoration: FormDecoration(
+                              labelText: 'max',
+                              border: InputBorder.none,
+                              suffixIcon: Tooltip(
+                                message:  'Alcool maximum',
+                                child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                              ),
+                              fillColor: FillColor, filled: true,
+                              constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
                             ),
-                          ]
-                        )
-                      )
-                    ],
+                          )
+                        ),
+                      ],
+                    )
                   );
                 }
+              ),
+              Divider(height: 10),
+              ColorField(
+                context: context,
+                value: widget.model.min_srm,
+                icon: Icon(Icons.color_lens_outlined),
+                onChanged: (value) => setState(() {
+                  widget.model.min_srm = value;
+                }),
+              ),
+              ColorField(
+                context: context,
+                value: widget.model.max_srm,
+                icon: Icon(Icons.color_lens),
+                onChanged: (value) => setState(() {
+                  widget.model.max_srm = value;
+                }),
               ),
               Divider(height: 10),
               MarkdownTextInput(
                 (String value) => setState(() {
                   widget.model.text = value;
                 }),
-                widget.model.text ?? '',
-                label: AppLocalizations.of(context)!.text('text'),
+                widget.model.localizedText(AppLocalizations.of(context)!.locale) ?? '',
+                label: AppLocalizations.of(context)!.text('notes'),
                 maxLines: 10,
                 actions: MarkdownType.values,
                 // controller: _controller,

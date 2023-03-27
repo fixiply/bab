@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/event_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -38,7 +39,7 @@ class _FormEventPageState extends State<FormEventPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: const BackButtonIcon(),
+          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -235,9 +236,8 @@ class _FormEventPageState extends State<FormEventPage> {
               WidgetsField(
                 context: context,
                 widgets: widget.model.widgets,
-                maxLines: 20,
-                onChanged: (text) => setState(() {
-                  widget.model.widgets = text;
+                onChanged: (values) => setState(() {
+                  widget.model.widgets = values;
                 }),
               ),
               Divider(height: 10),

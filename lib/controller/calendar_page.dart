@@ -22,12 +22,15 @@ class Event {
 }
 
 
-class _CalendarPageState extends State<CalendarPage> {
-  List<ProductModel>? _products;
+class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
+  Future<List<ProductModel>>? _products;
   late final ValueNotifier<List<Event>> _selectedEvents;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   DateTime? _selectedDay;
   DateTime _focusedDay = DateTime.now();
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -107,7 +110,7 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 
   _fetch() async {
-    _products = await Database().getProducts(product: Product.booking);
+    _products = Database().getProducts(product: Product.booking);
     _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
   }
 

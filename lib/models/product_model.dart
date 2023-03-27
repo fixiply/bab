@@ -1,8 +1,8 @@
 // Internal package
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/models/period_model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/term.dart';
 
 class ProductModel<T> extends Model {
   Status? status;
@@ -16,7 +16,7 @@ class ProductModel<T> extends Model {
   int? max;
   int? min;
   List<dynamic>? weekdays;
-  PeriodModel? period;
+  Term? term;
   String? text;
   ImageModel? image;
 
@@ -25,7 +25,7 @@ class ProductModel<T> extends Model {
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
-    this.status = Status.pending,
+    this.status = Status.publied,
     this.product = Product.article,
     this.company,
     this.receipt,
@@ -36,12 +36,12 @@ class ProductModel<T> extends Model {
     this.max,
     this.min,
     this.weekdays,
-    this.period,
+    this.term,
     this.text,
     this.image
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     if(weekdays == null) { weekdays = []; }
-    if(period == null) { period = PeriodModel(); }
+    if(term == null) { term = Term(); }
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -57,7 +57,7 @@ class ProductModel<T> extends Model {
     if (map['max'] != null) this.max = map['max'];
     if (map['min'] != null) this.min = map['min'];
     if (map['weekdays'] != null) this.weekdays = map['weekdays'];
-    if (map['period'] != null) this.period = PeriodModel.deserialize(map['period']);
+    if (map['term'] != null) this.term = Term.deserialize(map['term']);
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
   }
@@ -76,7 +76,7 @@ class ProductModel<T> extends Model {
       'max': this.max,
       'min': this.min,
       'weekdays': this.weekdays,
-      'period': PeriodModel.serialize(this.period),
+      'term': Term.serialize(this.term),
       'text': this.text,
       'image': ImageModel.serialize(this.image)
     });
@@ -100,7 +100,7 @@ class ProductModel<T> extends Model {
       max: this.max,
       min: this.min,
       weekdays: this.weekdays,
-      period: this.period,
+      term: this.term,
       text: this.text,
       image: this.image
     );

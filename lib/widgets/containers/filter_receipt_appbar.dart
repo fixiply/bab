@@ -1,50 +1,50 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/style_model.dart';
+import 'package:bb/utils/category.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/srm.dart';
-import 'package:bb/widgets/gradient_rect_range_slider_track_shape.dart';
-import 'package:bb/widgets/paints/custom_thumb_shape.dart';
+import 'package:bb/utils/color_units.dart';
+import 'package:bb/widgets/paints/gradient_range_slider_track_shape.dart';
+import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
 
 // External package
 
 class FilterReceiptAppBar extends StatefulWidget {
-  SRM srm;
+  ColorUnits cu;
   IBU ibu;
   ABV abv;
   RangeValues? srm_values;
   List<Fermentation>? selectedFermentations = [];
-  List<StyleModel>? styles;
-  List<StyleModel>? selectedStyles = [];
+  List<Category>? categories;
+  List<Category>? selectedCategories = [];
   final Function(double start, double end)? onColorChanged;
   final Function(double start, double end)? onIBUChanged;
   final Function(double start, double end)? onAlcoholChanged;
   final Function(Fermentation value)? onFermentationChanged;
-  final Function(StyleModel value)? onStyleChanged;
+  final Function(Category value)? onCategoryChanged;
   final Function()? onReset;
 
   FilterReceiptAppBar({Key? key,
-    required this.srm,
+    required this.cu,
     required this.ibu,
     required this.abv,
     this.selectedFermentations,
-    this.styles,
-    this.selectedStyles,
+    this.categories,
+    this.selectedCategories,
     this.onColorChanged,
     this.onIBUChanged,
     this.onAlcoholChanged,
     this.onFermentationChanged,
-    this.onStyleChanged,
+    this.onCategoryChanged,
     this.onReset,
   }) : super(key: key) {
     if (selectedFermentations == null) selectedFermentations = [];
-    if (styles == null) styles = [];
-    if (selectedStyles == null) selectedStyles = [];
-    if (srm_values == null) srm_values = RangeValues(srm.start ?? 0, srm.end ?? SRM_COLORS.length.toDouble());
+    if (categories == null) categories = [];
+    if (selectedCategories == null) selectedCategories = [];
+    if (srm_values == null) srm_values = RangeValues(cu.start ?? 0, cu.end ?? SRM_COLORS.length.toDouble());
   }
 
   _FilterReceiptAppBarState createState() => new _FilterReceiptAppBarState();
@@ -66,57 +66,56 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
   @override
   Widget build(BuildContext context) {
     return SliverAppBar(
-        automaticallyImplyLeading: false,
-        expandedHeight: MediaQuery.of(context).size.height / 2.7,
-        backgroundColor: FillColor,
-        title: TabBar(
+      automaticallyImplyLeading: false,
+      expandedHeight: MediaQuery.of(context).size.height / 2.7,
+      backgroundColor: FillColor,
+      title: TabBar(
+        controller: _tabController,
+        indicator: ShapeDecoration(
+          color: Theme.of(context).primaryColor.withOpacity(0.2),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        ),
+        tabs: [
+          Tab(icon: Icon(Icons.tune, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Saveur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+          Tab(icon: Icon(Icons.palette_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Couleur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+          Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Type', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+          Tab(icon: Icon(Icons.style_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Style', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+        ],
+      ),
+      flexibleSpace: FlexibleSpaceBar(
+        background: TabBarView(
           controller: _tabController,
-          indicator: ShapeDecoration(
-            color: Theme.of(context).primaryColor.withOpacity(0.2),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
-          ),
-          tabs: [
-            Tab(icon: Icon(Icons.tune, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Saveur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.palette_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Couleur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Type', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.style_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Style', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+          physics: NeverScrollableScrollPhysics(),
+          children: [
+            _flavor(),
+            _color(),
+            _fermentation(),
+            _styles()
           ],
         ),
-        flexibleSpace: FlexibleSpaceBar(
-          background: TabBarView(
-            controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-              _flavor(),
-              _color(),
-              _fermentation(),
-              _styles()
-            ],
-          ),
-        ),
-        bottom: PreferredSize(
-          preferredSize: const Size(double.infinity, kToolbarHeight),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton.icon(
-                icon: Icon(Icons.clear, size: 12),
-                label: Text(AppLocalizations.of(context)!.text('erase_all')),
-                style: TextButton.styleFrom(
-                  backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
-                  textStyle: const TextStyle(fontSize: 12),
-                ),
-                onPressed: changed ? () {
-                  setState(() {
-                    changed = false;
-                  });
-                  widget.onReset?.call();
-                } : null
-              )
-            ],
+      ),
+      bottom: PreferredSize(
+        preferredSize: const Size(double.infinity, kToolbarHeight),
+        child: Container(
+          padding: EdgeInsets.all(8.0),
+          alignment: Alignment.centerRight,
+          child: TextButton.icon(
+            icon: Icon(Icons.clear, size: 12),
+            label: Text(AppLocalizations.of(context)!.text('erase_all')),
+            style: TextButton.styleFrom(
+              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
+              textStyle: const TextStyle(fontSize: 12),
+            ),
+            onPressed: changed ? () {
+              setState(() {
+                changed = false;
+              });
+              widget.onReset?.call();
+            } : null
           )
         )
+      )
     );
   }
 
@@ -138,7 +137,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                       activeTrackColor: Theme.of(context).primaryColor,
                       inactiveTrackColor: Theme.of(context).primaryColor.withOpacity(.4),
                       overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                      rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                      rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                       showValueIndicator: ShowValueIndicator.always,
                       valueIndicatorTextStyle: TextStyle(fontSize: 12)
                     ),
@@ -173,7 +172,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
                     activeTrackColor: Theme.of(context).primaryColor,
                     inactiveTrackColor: Theme.of(context).primaryColor.withOpacity(.4),
                     overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                    rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                    rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                     // showValueIndicator: ShowValueIndicator.always
                   ),
                   child: RangeSlider(
@@ -209,33 +208,33 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
           Text(AppLocalizations.of(context)!.text('srm'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 20, child: Text('${widget.srm.start != null ?  widget.srm.start!.round() : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 20, child: Text('${widget.cu.start != null ?  widget.cu.start!.round() : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
                     trackHeight: 5,
-                    rangeTrackShape: GradientRectRangeSliderTrackShape(),
+                    rangeTrackShape: GradientRangeSliderTrackShape(),
                     thumbColor: Theme.of(context).primaryColor,
                     overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                    rangeThumbShape: CustomThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                    rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                   ),
                   child: RangeSlider(
                     onChanged: (values) {
                       setState(() {
                         changed = true;
-                        widget.srm.start = values.start;
-                        widget.srm.end = values.end;
+                        widget.cu.start = values.start;
+                        widget.cu.end = values.end;
                       });
                       widget.onColorChanged?.call(values.start, values.end);
                     },
-                    values: RangeValues(widget.srm.start ?? 0, widget.srm.end ?? SRM_COLORS.length.toDouble()),
+                    values: RangeValues(widget.cu.start ?? 0, widget.cu.end ?? SRM_COLORS.length.toDouble()),
                     min: 0,
                     max: SRM_COLORS.length.toDouble(),
                     divisions: SRM_COLORS.length
                   )
                 )
               ),
-              SizedBox(width: 20, child: Text('${widget.srm.end != null ? widget.srm.end!.round() : SRM_COLORS.length}', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 20, child: Text('${widget.cu.end != null ? widget.cu.end!.round() : SRM_COLORS.length}', softWrap: false, style: TextStyle(fontSize: 12))),
             ]
           )
         ]
@@ -283,12 +282,12 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
         spacing: 2.0,
         runSpacing: 4.0,
         direction: Axis.vertical,
-        children: widget.styles!.map((e) {
+        children: widget.categories!.map((e) {
           return FilterChip(
-            selected: widget.selectedStyles!.contains(e),
+            selected: widget.selectedCategories!.contains(e),
             padding: EdgeInsets.zero,
             label: Text(
-              e.title ?? '',
+              e.localizedName(AppLocalizations.of(context)!.locale) ?? '',
               style: TextStyle(
                 fontSize: 12.0,
               ),
@@ -300,7 +299,7 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
               setState(() {
                 changed = true;
               });
-              widget.onStyleChanged?.call(e);
+              widget.onCategoryChanged?.call(e);
             }
           );
         }).toList()
