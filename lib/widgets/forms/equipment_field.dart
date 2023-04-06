@@ -111,7 +111,7 @@ class _BeerStyleFieldState extends FormFieldState<String> {
     for (EquipmentModel value in values) {
       items.add(DropdownMenuItem(
           value: value.uuid,
-          child: Text(value.localizedName(AppLocalizations.of(context)!.locale) ?? '', overflow: TextOverflow.ellipsis)
+          child: Text(AppLocalizations.of(context)!.localizedText(value.name), overflow: TextOverflow.ellipsis)
       ));
     };
     return items;

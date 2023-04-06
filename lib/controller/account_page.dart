@@ -13,8 +13,8 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
-import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 
 // External package
@@ -30,8 +30,6 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   int _baskets = 0;
-  // Edition mode
-  bool _editable = false;
 
   @override
   void initState() {
@@ -68,32 +66,12 @@ class _AccountPageState extends State<AccountPage> {
               },
             ),
           ),
-          PopupMenuButton(
-            icon: Icon(Icons.more_vert),
-            tooltip: AppLocalizations.of(context)!.text('display'),
-            onSelected: (value) async {
-              if (value is Locale) {
-                Provider.of<LocaleNotifier>(context, listen: false).set(value);
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              PopupMenuItem(
-                enabled: false,
-                value: null,
-                child: Text(AppLocalizations.of(context)!.text('language')),
-              ),
-              CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('english')),
-                value: const Locale('en', 'US'),
-                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
-              ),
-              CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('french')),
-                value: const Locale('fr', 'FR'),
-                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
-              ),
-            ]
-          ),
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+          )
         ]
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
@@ -216,8 +194,6 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   _initialize() async {
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
     final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
     _baskets = basketProvider.size;
     basketProvider.addListener(() {

@@ -166,8 +166,8 @@ class _FormProductPageState extends State<FormProductPage> {
                           ),
                           items: snapshot.data!.map((ReceiptModel model) {
                             return DropdownMenuItem<String>(
-                                value: model.uuid,
-                                child: Text(model.localizedTitle(AppLocalizations.of(context)!.locale) ?? ''));
+                              value: model.uuid,
+                              child: Text(AppLocalizations.of(context)!.localizedText(model.title)));
                           }).toList(),
                           onChanged: (value) =>
                               setState(() {

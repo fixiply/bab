@@ -23,7 +23,7 @@ class ReceiptModel<T> extends Model {
   double? fg;
   double? abv;
   double? ibu;
-  double? srm;
+  int? ebc;
   List<Quantity>? fermentables;
   List<Quantity>? hops;
   List<Quantity>? miscellaneous;
@@ -49,7 +49,7 @@ class ReceiptModel<T> extends Model {
     this.fg,
     this.abv,
     this.ibu,
-    this.srm,
+    this.ebc,
     this.fermentables,
     this.hops,
     this.miscellaneous,
@@ -79,7 +79,7 @@ class ReceiptModel<T> extends Model {
     if (map['fg'] != null) this.fg = map['fg'].toDouble();
     if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['ibu'] != null) this.ibu = map['ibu'].toDouble();
-    if (map['srm'] != null) this.srm = map['srm'].toDouble();
+    this.ebc = map['ebc'];
     this.fermentables = Quantity.deserialize(map['fermentables']);
     this.hops = Quantity.deserialize(map['hops']);
     this.miscellaneous = Quantity.deserialize(map['miscellaneous']);
@@ -104,7 +104,7 @@ class ReceiptModel<T> extends Model {
       'fg': this.fg,
       'abv': this.abv,
       'ibu': this.ibu,
-      'srm': this.srm,
+      'ebc': this.ebc,
       'fermentables': Quantity.serialize(this.fermentables),
       'hops': Quantity.serialize(this.hops),
       'miscellaneous': Quantity.serialize(this.miscellaneous),
@@ -134,7 +134,7 @@ class ReceiptModel<T> extends Model {
       fg: this.fg,
       abv: this.abv,
       ibu: this.ibu,
-      srm: this.srm,
+      ebc: this.ebc,
       fermentables: this.fermentables,
       hops: this.hops,
       miscellaneous: this.miscellaneous,
@@ -153,21 +153,6 @@ class ReceiptModel<T> extends Model {
   String toString() {
     return 'Receipt: $title, UUID: $uuid';
   }
-
-  String? localizedTitle(Locale? locale) {
-    if (this.title is LocalizedText) {
-      return this.title.get(locale);
-    }
-    return this.title;
-  }
-
-  String? localizedText(Locale? locale) {
-    if (this.text is LocalizedText) {
-      return this.text.get(locale);
-    }
-    return this.text;
-  }
-
 
   String? localizedOG(Locale? locale) {
     if (this.og != null) {
@@ -195,12 +180,5 @@ class ReceiptModel<T> extends Model {
       return NumberFormat("#0.#", locale.toString()).format(ibu);
     }
     return '';
-  }
-
-  String? localizedNotes(Locale? locale) {
-    if (this.notes is LocalizedText) {
-      return this.notes.get(locale);
-    }
-    return this.notes;
   }
 }

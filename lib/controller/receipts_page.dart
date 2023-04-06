@@ -15,21 +15,20 @@ import 'package:bb/utils/category.dart';
 import 'package:bb/utils/color_units.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
-import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/filter_receipt_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
+import 'package:bb/widgets/search_text.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
-import 'package:sprintf/sprintf.dart';
 
 class ReceiptsPage extends StatefulWidget {
   ReceiptsPage({Key? key}) : super(key: key);
@@ -43,14 +42,9 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   List<Category> _categories = [];
   int _baskets = 0;
 
-  // Edition mode
-  bool _editable = false;
-  bool _remove = false;
-  bool _hidden = false;
-
-  ColorUnits _cu = ColorUnits();
   IBU _ibu = IBU();
   ABV _abv = ABV();
+  ColorUnits _cu = ColorUnits();
   List<Fermentation> _selectedFermentations = [];
   List<Category> _selectedCategories = [];
 
@@ -68,7 +62,10 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: _buildSearchField(),
+        title: SearchText(
+          _searchQueryController,
+          () {  _fetch(); }
+        ),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -91,32 +88,21 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
               },
             ),
           ),
-          PopupMenuButton(
-            icon: Icon(Icons.more_vert),
-            tooltip: AppLocalizations.of(context)!.text('display'),
-            onSelected: (value) async {
-              if (value is Locale) {
-                Provider.of<LocaleNotifier>(context, listen: false).set(value);
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+            units: true,
+            onSelected: (value) {
+              if (value is Unit) {
+                _clear();
+                setState(() {
+                  AppLocalizations.of(context)!.unit = value;
+                });
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              PopupMenuItem(
-                enabled: false,
-                value: null,
-                child: Text(AppLocalizations.of(context)!.text('language')),
-              ),
-              CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('english')),
-                value: const Locale('en', 'US'),
-                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
-              ),
-              CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('french')),
-                value: const Locale('fr', 'FR'),
-                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
-              ),
-            ]
-          ),
+          )
         ]
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
@@ -182,7 +168,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
                     color: Colors.white,
                     padding: EdgeInsets.symmetric(vertical: 6.0),
                     child: Center(
-                      child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : sprintf(AppLocalizations.of(context)!.text('receipt(s)'), [snapshot.data!.length]), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                      child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'receipts': 'receipt')}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
                     )
                   )
                 ),
@@ -217,88 +203,37 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     );
   }
 
-  Widget _buildSearchField() {
-    return  Container(
-      margin: EdgeInsets.zero,
-      padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(100),
-          color: FillColor
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Flexible(
-              child: TextField(
-                controller: _searchQueryController,
-                decoration: InputDecoration(
-                  icon: Padding(
-                      padding: EdgeInsets.only(left: 4.0),
-                      child: Icon(Icons.search, color: Theme.of(context).primaryColor)
-                  ),
-                  hintText: AppLocalizations.of(context)!.text('search_hint'),
-                  hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                  border: InputBorder.none
-                ),
-                style: TextStyle(fontSize: 16.0),
-                onChanged: (query) {
-                  return _fetch();
-                },
-              )
-          ),
-          if (_searchQueryController.text.length > 0) IconButton(
-            icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-            onPressed: () {
-              _searchQueryController.clear();
-              _fetch();
-            }
-          )
-        ],
-      )
-    );
-  }
-
   Widget _item(ReceiptModel model) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        leading: Stack(
+        leading: model.ebc != null && model.ebc! >= 0 ? Stack(
           children: [
             Container(
-              // color: SRM[model.getSRM()],
-              child: Image.asset('assets/images/beer3.png',
-                color: ColorUnits.color(model.srm),
-                // colorBlendMode: BlendMode.modulate
+              child: Image.asset('assets/images/beer_1.png',
+                color: ColorUnits.color(model.ebc) ?? SRM_COLORS[0],
+                colorBlendMode: BlendMode.modulate
               ),
               width: 30,
               height: 50,
             ),
             Container(
               // color: SRM[model.getSRM()],
-              child: Image.asset('assets/images/beer2.png'),
+              child: Image.asset('assets/images/beer_2.png'),
               width: 30,
               height: 50,
             ),
-            if (model.status == Status.pending) Positioned(
-              top: 4.0,
-              right: 4.0,
-              child: Container(
-                padding: EdgeInsets.all(4),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(100),
-                  color: Theme.of(context).primaryColor
-                ),
-                child: Icon(Icons.hourglass_empty, size: 14, color: Colors.white),
-              )
-            ),
           ]
+        ) : Container(
+          width: 30,
+          height: 50,
         ),
         title: FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
           child: Text(
-            model.localizedTitle(AppLocalizations.of(context)!.locale) ?? '',
+            AppLocalizations.of(context)!.localizedText(model.title),
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             textAlign: TextAlign.left,
           ),
@@ -313,20 +248,15 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
-                  TextSpan(
-                    style: DefaultTextStyle.of(context).style,
-                    children: <TextSpan>[
-                      if (model.ibu != null || model.abv != null) TextSpan(text: '  -  '),
-                      if (model.ibu != null) TextSpan(text: 'IBU: ${model.localizedIBU(AppLocalizations.of(context)!.locale)}'),
-                      if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
-                      if (model.abv != null) TextSpan(text: ' ABV: ${model.localizedABV(AppLocalizations.of(context)!.locale)}'),
-                    ]
-                  )
+                  if (model.style != null) TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.style != null && (model.ibu != null || model.abv != null)) TextSpan(text: '  -  '),
+                  if (model.ibu != null) TextSpan(text: 'IBU: ${model.localizedIBU(AppLocalizations.of(context)!.locale)}'),
+                  if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
+                  if (model.abv != null) TextSpan(text: ' ABV: ${model.localizedABV(AppLocalizations.of(context)!.locale)}'),
                 ],
               ),
             ),
-            if (model.text != null ) _text(model.localizedText(AppLocalizations.of(context)!.locale)!)
+            if (model.text != null ) _text(AppLocalizations.of(context)!.localizedText(model.text))
           ],
         ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
@@ -388,7 +318,6 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   _clear() async {
     setState(() {
       _cu.clear();
-      _cu.end = SRM_COLORS.length.toDouble();
       _ibu.clear();
       _abv.clear();
       _selectedFermentations.clear();
@@ -400,15 +329,13 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   String _style(String? uuid) {
     for (StyleModel model in _styles) {
       if (model.uuid == uuid) {
-        return model.localizedName(AppLocalizations.of(context)!.locale) ?? '';
+        return AppLocalizations.of(context)!.localizedText(model.name);
       }
     }
     return '';
   }
 
   _initialize() async {
-    final editionProvider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = editionProvider.editable;
     final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
     _baskets = basketProvider.size;
     basketProvider.addListener(() {
@@ -435,12 +362,12 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     for (ReceiptModel model in list) {
       _setFilter(model);
       if (search != null && search.length > 0) {
-        if (!(model.localizedTitle(AppLocalizations.of(context)!.locale)!.toLowerCase().contains(search.toLowerCase()))) {
+        if (!(AppLocalizations.of(context)!.localizedText(model.title).toLowerCase().contains(search.toLowerCase()))) {
           continue;
         }
       }
-      if (model.srm != null && _cu.start != null && _cu.start! > model.srm!) continue;
-      if (model.srm != null && _cu.end != null && _cu.end! < model.srm!) continue;
+      if (model.ebc != null && _cu.start != null && AppLocalizations.of(context)!.fromSRM(_cu.start)! > model.ebc!) continue;
+      if (model.ebc != null && _cu.end != null && AppLocalizations.of(context)!.fromSRM(_cu.end)! < model.ebc!) continue;
       if (model.ibu != null && _ibu.start != null && _ibu.start! > model.ibu!) continue;
       if (model.ibu != null && _ibu.end != null && _ibu.end! < model.ibu!) continue;
       if (model.abv != null && _abv.start != null && _abv.start! > model.abv!) continue;

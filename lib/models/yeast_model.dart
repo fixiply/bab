@@ -17,6 +17,10 @@ enum Yeast with Enums { liquid, dry, slant, culture;
   List<Enum> get enums => [ liquid, dry, slant, culture ];
 }
 
+extension Ex on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
+}
+
 class YeastModel<T> extends Model {
   Status? status;
   dynamic? name;
@@ -124,31 +128,6 @@ class YeastModel<T> extends Model {
     return 'YeastModel: $name, UUID: $uuid';
   }
 
-  String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
-    }
-    return this.name;
-  }
-
-  String? localizedNotes(Locale? locale) {
-    if (this.notes is LocalizedText) {
-      return this.notes.get(locale);
-    }
-    return this.notes;
-  }
-
-  void merge(List<Quantity>? quantities) {
-    if (quantities != null) {
-      for (Quantity item in quantities) {
-        if (item.uuid == uuid) {
-          this.amount = item.amount;
-          break;
-        }
-      }
-    }
-  }
-
   double? get attenuation {
     if (this.min_attenuation != null && this.max_attenuation != null) {
       return (this.min_attenuation! + this.max_attenuation!) / 2;
@@ -179,6 +158,23 @@ class YeastModel<T> extends Model {
   /// The `og` argument is relative to the original gravity 1.xxx.
   double density(double? og) {
     return FormulaHelper.fg(og, attenuation);
+  }
+
+  static List<YeastModel> merge(List<Quantity>? quantities, List<YeastModel> yeasts) {
+    List<YeastModel> list = [];
+    if (quantities != null && yeasts != null) {
+      for (Quantity quantity in quantities) {
+        for (YeastModel yeast in yeasts) {
+          if (quantity.uuid == yeast.uuid) {
+            YeastModel model = yeast.copy();
+            model.amount = quantity.amount;
+            list.add(model);
+            break;
+          }
+        }
+      }
+    }
+    return list;
   }
 
   static dynamic serialize(dynamic data) {
@@ -290,7 +286,7 @@ class YeastModel<T> extends Model {
 
 class YeastDataSource extends EditDataSource {
   List<YeastModel> data = [];
-  final void Function(YeastModel value)? onChanged;
+  final void Function(YeastModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
@@ -310,6 +306,15 @@ class YeastDataSource extends EditDataSource {
     ])).toList();
   }
 
+  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+    var value = super.getValue(dataGridRow, rowColumnIndex, column);
+    if (value != null && column.columnName == 'amount') {
+      double? weight = AppLocalizations.of(context)!.weight(value);
+      return weight!.toPrecision(2);
+    }
+    return value;
+  }
+
   @override
   bool isNumericType(GridColumn column) {
     return column.columnName == 'amount' || column.columnName == 'attenuation';
@@ -326,16 +331,24 @@ class YeastDataSource extends EditDataSource {
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
             if (e.columnName == 'amount') {
-              value = AppLocalizations.of(context)!.weight(e.value);
+              value = AppLocalizations.of(context)!.weightFormat(e.value);
             } else if (e.columnName == 'attenuation') {
-              value = AppLocalizations.of(context)!.percent(e.value);
+              value = AppLocalizations.of(context)!.percentFormat(e.value);
             } else if (e.columnName == 'duration') {
-              value = AppLocalizations.of(context)!.duration(e.value);
+              value = AppLocalizations.of(context)!.durationFormat(e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {
             alignment = Alignment.center;
             value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+          } else {
+            if (e.columnName == 'amount') {
+              return Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.all(4),
+                child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
+              );
+            }
           }
           return Container(
             alignment: alignment,
@@ -352,7 +365,7 @@ class YeastDataSource extends EditDataSource {
         .firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
     final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (newCellValue == null || oldValue == newCellValue) {
+    if (dataRowIndex == -1 || oldValue == newCellValue) {
       return;
     }
     int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
@@ -360,7 +373,7 @@ class YeastDataSource extends EditDataSource {
       case 'amount':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = newCellValue as double;
+        data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
         break;
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -383,15 +396,15 @@ class YeastDataSource extends EditDataSource {
       case 'type':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Fermentation>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue as Fermentation;
+        data[dataRowIndex].type = newCellValue;
         break;
       case 'form':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Yeast>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].form = newCellValue as Yeast;
+        data[dataRowIndex].form = newCellValue;
         break;
     }
-    onChanged?.call(data[dataRowIndex]);
+    onChanged?.call(data[dataRowIndex], dataRowIndex);
     updateDataSource();
   }
 

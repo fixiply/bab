@@ -15,6 +15,7 @@ import 'package:bb/utils/color_units.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/beer_style_field.dart';
@@ -23,7 +24,6 @@ import 'package:bb/widgets/forms/ingredients_field.dart';
 import 'package:bb/widgets/forms/localized_text_field.dart';
 import 'package:bb/widgets/forms/mash_field.dart';
 import 'package:bb/widgets/forms/switch_field.dart';
-import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:bb/widgets/paints/gradient_slider_thumb_shape.dart';
 import 'package:bb/widgets/paints/gradient_slider_track_shape.dart';
 import 'package:bb/widgets/paints/rect_slider_thumb_shape.dart';
@@ -45,6 +45,16 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
+
+  TextEditingController _volumeController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _initialize();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -96,33 +106,20 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               // }
             }
           ),
-          if (widget.model.uuid != null) PopupMenuButton<String>(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('tools'),
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) async {
-              if (value == 'information') {
-                await ModalBottomSheet.showInformation(context, widget.model);
-              } else if (value == 'duplicate') {
-                ReceiptModel model = widget.model.copy();
-                model.uuid = null;
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FormReceiptPage(model);
-                })).then((value) {
-                  Navigator.pop(context);
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+            units: true,
+            onSelected: (value) {
+              if (value is Unit) {
+                setState(() {
+                  AppLocalizations.of(context)!.unit = value;
                 });
+                _initialize();
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem(
-                value: 'information',
-                child: Text(AppLocalizations.of(context)!.text('information')),
-              ),
-              PopupMenuItem(
-                value: 'duplicate',
-                child: Text(AppLocalizations.of(context)!.text('duplicate')),
-              )
-            ]
           )
         ]
       ),
@@ -141,17 +138,17 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 initiallyExpanded: true,
                 backgroundColor: FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
-                title: Text('Profile', style: TextStyle(color: Theme.of(context).primaryColor)),
+                title: Text(AppLocalizations.of(context)!.text('profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
                   Row(
                     children: [
                       Expanded(
-                        child: _slider('Densité initial', widget.model.og ?? 1, 1, 1.2, 0.01,
+                        child: _slider(AppLocalizations.of(context)!.text('oiginal_gravity'), widget.model.og ?? 1, 1, 1.2, 0.01,
                           format: NumberFormat("0.000", AppLocalizations.of(context)!.locale.toString())
                         )
                       ),
                       Expanded(
-                        child: _slider('Densité final', widget.model.fg ?? 1, 1, 1.2, 0.01,
+                        child: _slider(AppLocalizations.of(context)!.text('final_gravity'), widget.model.fg ?? 1, 1, 1.2, 0.01,
                           format: NumberFormat("0.000", AppLocalizations.of(context)!.locale.toString())
                         )
                       ),
@@ -165,11 +162,33 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   Row(
                     children: [
                       Expanded(
-                        child: _color(widget.model.srm ?? 0)
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('${AppLocalizations.of(context)!.colorUnit} - ${AppLocalizations.of(context)!.text('color')}', style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
+                            SliderTheme(
+                              data: SliderThemeData(
+                                trackHeight: 5,
+                                trackShape: GradientRectSliderTrackShape(darkenInactive: false),
+                                thumbColor: Theme.of(context).primaryColor,
+                                overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
+                                thumbShape: GradientSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor, selectedValue: 10),
+                              ),
+                              child: Slider(
+                                value: AppLocalizations.of(context)!.color(widget.model.ebc)?.toDouble() ?? 0,
+                                min: 0,
+                                max: AppLocalizations.of(context)!.maxColor.toDouble(),
+                                divisions: AppLocalizations.of(context)!.maxColor,
+                                onChanged: (values) {
+                                },
+                              )
+                            )
+                          ]
+                        )
                       ),
                       Expanded(
                         child: _slider(AppLocalizations.of(context)!.text('ibu'), widget.model.ibu ?? 0, 0, MAX_IBU, 0.1,
-                            format: NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString())
+                          format: NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString())
                         )
                       ),
                     ]
@@ -183,9 +202,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       context: context,
                       initialValue: widget.model.title,
                       textCapitalization: TextCapitalization.sentences,
-                      onChanged: (text) => setState(() {
-                        widget.model.title = text;
-                      }),
+                      onChanged: (value) => widget.model.title = value,
                       decoration: FormDecoration(
                         icon: const Icon(Icons.title),
                         labelText: AppLocalizations.of(context)!.text('title'),
@@ -208,10 +225,8 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       context: context,
                       value: widget.model.shared!,
                       icon: null,
-                      hintText: AppLocalizations.of(context)!.text('share'),
-                      onChanged: (value) => setState(() {
-                        widget.model.shared = value;
-                      })
+                      hintText: AppLocalizations.of(context)!.text('public'),
+                      onChanged: (value) => widget.model.shared = value,
                     )
                   )
                 ]
@@ -222,33 +237,26 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   Expanded(
                     child: BeerStyleField(
                       context: context,
-                      dataset: widget.model.style,
+                      initialValue: widget.model.style,
                       title: AppLocalizations.of(context)!.text('style'),
-                      onChanged: (value) => setState(() {
-                        widget.model.style = value;
-                      }),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return AppLocalizations.of(context)!.text('validator_field_required');
-                        }
-                        return null;
-                      }
+                      onChanged: (value) => widget.model.style = value
                     ),
                   ),
                   SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
-                      initialValue:  AppLocalizations.of(context)!.percent(widget.model.efficiency) ?? '',
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
-                      onChanged: (value) => setState(() {
-                        widget.model.efficiency = double.parse(value);
+                      onChanged: (value) {
+                        widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
-                      }),
+                      },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.propane_tank_outlined),
-                          labelText: AppLocalizations.of(context)!.text('pasting_efficiency'),
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true
+                        icon: const Icon(Icons.propane_tank_outlined),
+                        labelText: AppLocalizations.of(context)!.text('pasting_efficiency'),
+                        suffixText: '%',
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -266,15 +274,18 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 children: [
                   Expanded(
                     child: TextFormField(
-                      initialValue:  AppLocalizations.of(context)!.volume(widget.model.volume) ?? '',
+                      // key: UniqueKey(),
+                      // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
+                      controller:  _volumeController,
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
-                      onChanged: (value) => setState(() {
-                        widget.model.volume = double.parse(value);
+                      onChanged: (value) {
+                        widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
-                      }),
+                      },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.waves_outlined),
                         labelText: AppLocalizations.of(context)!.text('volume'),
+                        suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
                         suffixIcon: Tooltip(
                           message: 'Volume final après transfert',
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
@@ -294,17 +305,18 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
-                      initialValue: AppLocalizations.of(context)!.duration(widget.model.boil) ?? '',
+                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.boil) ?? '',
                       keyboardType: TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (value) => setState(() {
+                      onChanged: (value) {
                         widget.model.boil = int.parse(value);
                         _calculate();
-                      }),
+                      },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.thermostat_outlined),
-                          labelText: AppLocalizations.of(context)!.text('boiling_time'),
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true
+                        icon: const Icon(Icons.timer_outlined),
+                        labelText: AppLocalizations.of(context)!.text('boiling_time'),
+                        suffixText: 'minutes',
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -323,10 +335,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 ingredient: Ingredient.fermentable,
                 data: widget.model.fermentables,
                 receipt: widget.model,
-                onChanged: (values) => setState(() {
+                onChanged: (values) {
                   widget.model.fermentables = values;
                   _calculate();
-                }),
+                },
               ),
               Divider(height: 10),
               IngredientsField(
@@ -334,10 +346,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 ingredient: Ingredient.hops,
                 data: widget.model.hops,
                 receipt: widget.model,
-                onChanged: (values) => setState(() {
+                onChanged: (values) {
                   widget.model.hops = values;
                   _calculate();
-                }),
+                },
               ),
               Divider(height: 10),
               IngredientsField(
@@ -345,9 +357,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 ingredient: Ingredient.yeast,
                 data: widget.model.yeasts,
                 receipt: widget.model,
-                onChanged: (values) => setState(() {
-                  widget.model.yeasts = values;
-                }),
+                onChanged: (values) => widget.model.yeasts = values,
               ),
               Divider(height: 10),
               IngredientsField(
@@ -355,24 +365,18 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 ingredient: Ingredient.misc,
                 data: widget.model.miscellaneous,
                 receipt: widget.model,
-                onChanged: (values) => setState(() {
-                  widget.model.miscellaneous = values;
-                }),
+                onChanged: (values) => widget.model.miscellaneous = values,
               ),
               Divider(height: 10),
               MashField(
                 context: context,
                 data: widget.model.mash,
                 receipt: widget.model,
-                onChanged: (values) => setState(() {
-                  widget.model.mash = values;
-                }),
+                onChanged: (values) => widget.model.mash = values,
               ),
               Divider(height: 10),
-              MarkdownTextInput((String value) => setState(() {
-                  widget.model.text = value;
-                }),
-                widget.model.localizedText(AppLocalizations.of(context)!.locale) ?? '',
+              MarkdownTextInput((String value) => widget.model.text = value,
+                AppLocalizations.of(context)!.localizedText(widget.model.text),
                 label: AppLocalizations.of(context)!.text('notes'),
                 maxLines: 10,
                 actions: MarkdownType.values,
@@ -387,15 +391,19 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 image: widget.model.image,
                 height: null,
                 crop: true,
-                onChanged: (images) => setState(() {
-                  widget.model.image = images;
-                })
+                onChanged: (images) => widget.model.image = images
               ),
             ]
           ),
         )
       )
     );
+  }
+
+  _initialize() async {
+    bool modified = _modified;
+    _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '';
+    _modified = modified ? true : false;
   }
 
   Widget _slider(String label, double value, double min, double max, double interval, {NumberFormat? format}) {
@@ -439,37 +447,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     );
   }
 
-  Widget _color(double value) {
-    if (value < 0) {
-      value = 0;
-    } else if (value > SRM_COLORS.length) {
-      value = SRM_COLORS.length.toDouble();
-    }
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(AppLocalizations.of(context)!.text('color'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
-        SliderTheme(
-          data: SliderThemeData(
-            trackHeight: 5,
-            trackShape: GradientRectSliderTrackShape(darkenInactive: false),
-            thumbColor: Theme.of(context).primaryColor,
-            overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-            thumbShape: GradientSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor, selectedValue: value),
-          ),
-          child: Slider(
-            value: value,
-            min: 0,
-            max: SRM_COLORS.length.toDouble(),
-            divisions: SRM_COLORS.length,
-            onChanged: (values) {
-            },
-          )
-        )
-      ]
-    );
-  }
-
   _calculate() async {
     double og = 0;
     double fg = 0;
@@ -481,7 +458,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       if (item.method == Method.mashed) {
         double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
         extract += item.extract(widget.model.efficiency);
-        mcu += ColorUnits.mcu(item.srm, item.amount, widget.model.volume);
+        mcu += ColorUnits.mcu(item.ebc, item.amount, widget.model.volume);
       }
     }
     if (extract != 0) {
@@ -504,7 +481,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       if (og != 0) widget.model.og = og;
       if (fg != 0) widget.model.fg = fg;
       if (og != 0 && fg != 0) widget.model.abv = FormulaHelper.abv(og, fg);
-      if (mcu != 0) widget.model.srm = ColorUnits.ratingEBC(mcu);
+      if (mcu != 0) widget.model.ebc = ColorUnits.ratingEBC(mcu).toInt();
       if (ibu != 0) widget.model.ibu = ibu;
     });
   }

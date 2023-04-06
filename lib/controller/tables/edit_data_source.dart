@@ -30,20 +30,27 @@ abstract class EditDataSource extends DataGridSource {
     return false;
   }
 
+  String? suffixText(GridColumn column) {
+    return null;
+  }
+
   Enums? isEnums(GridColumn column) {
     return null;
+  }
+
+  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+    return dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == column.columnName).value;
   }
 
   @override
   Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
     // Text going to display on editable widget
-    var value = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
-      dataGridCell.columnName == column.columnName).value;
-    newCellValue = null;
+    var value = getValue(dataGridRow, rowColumnIndex, column);
+    newCellValue = value;
     if (value is Enums) {
       return buildDropDownWidget(value, submitCell);
     }
-    return buildTextFieldWidget(value?.toString() ??  '', column, submitCell);
+    return buildTextFieldWidget(value?.toString() ?? '', column, submitCell);
   }
 
   Widget buildTextFieldWidget(String displayText, GridColumn column, CellSubmit submitCell) {
@@ -57,6 +64,7 @@ abstract class EditDataSource extends DataGridSource {
         textAlign: isNumericType(column) ? TextAlign.right : TextAlign.left,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 16.0),
+          suffixText: suffixText(column)
         ),
         keyboardType: isNumericType(column) ? TextInputType.number : TextInputType.text,
         inputFormatters: <TextInputFormatter>[
@@ -65,7 +73,11 @@ abstract class EditDataSource extends DataGridSource {
         onChanged: (String value) {
           if (value.isNotEmpty) {
             if (isNumericType(column)) {
-              newCellValue = NumberFormat.decimalPattern(AppLocalizations.of(context)!.locale.toString()).parse(value);
+              try {
+                newCellValue = NumberFormat.decimalPattern(AppLocalizations.of(context)!.locale.toString()).parse(value);
+              } catch(e) {
+                newCellValue = double.tryParse(value);
+              }
             } else {
               newCellValue = value;
             }

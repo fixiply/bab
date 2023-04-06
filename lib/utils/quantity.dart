@@ -7,7 +7,7 @@ class Quantity<T> {
   String? uuid;
   double? amount;
   int? duration;
-  Enum? use;
+  int? use;
 
   Quantity({
     this.uuid,
@@ -20,18 +20,16 @@ class Quantity<T> {
     this.uuid = map['uuid'];
     if (map['amount'] != null) this.amount = map['amount'].toDouble();
     this.duration = map['duration'];
-    // this.use = map['use'];
+    this.use = map['use'];
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'uuid': this.uuid,
       'amount': this.amount,
-      'duration': this.duration
+      'duration': this.duration,
+      'use': this.use
     };
-    if (this.use != null) {
-      map['use'] = this.use!.index;
-    }
     return map;
   }
 

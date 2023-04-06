@@ -74,7 +74,7 @@ class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
       case Ingredient.fermentable:
         return FermentablesDataTable(key: _datatableKey,
           data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+          title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           color: FillColor,
           allowEditing: true,
           allowAdding: true,
@@ -87,7 +87,7 @@ class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
       case Ingredient.misc:
         return MiscellaneousDataTable(key: _datatableKey,
           data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+          title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           color: FillColor,
           allowEditing: true,
           allowAdding: true,
@@ -100,7 +100,7 @@ class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
       case Ingredient.yeast:
         return YeastsDataTable(key: _datatableKey,
           data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+          title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           color: FillColor,
           allowEditing: true,
           allowAdding: true,
@@ -113,7 +113,7 @@ class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
       case Ingredient.hops:
         return HopsDataTable(key: _datatableKey,
           data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+          title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           color: FillColor,
           allowEditing: true,
           allowAdding: true,

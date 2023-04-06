@@ -8,7 +8,7 @@ import 'package:bb/controller/miscellaneous_page.dart';
 import 'package:bb/controller/yeasts_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/locale_notifier.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
@@ -70,32 +70,20 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
                 },
               ),
             ),
-            PopupMenuButton(
-              icon: Icon(Icons.more_vert),
-              tooltip: AppLocalizations.of(context)!.text('display'),
-              onSelected: (value) async {
-                if (value is Locale) {
-                  Provider.of<LocaleNotifier>(context, listen: false).set(value);
+            CustomMenuButton(
+              context: context,
+              publish: false,
+              filtered: false,
+              archived: false,
+              units: true,
+              onSelected: (value) {
+                if (value is Unit) {
+                  setState(() {
+                    AppLocalizations.of(context)!.unit = value;
+                  });
                 }
               },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-                PopupMenuItem(
-                  enabled: false,
-                  value: null,
-                  child: Text(AppLocalizations.of(context)!.text('language')),
-                ),
-                CheckedPopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.text('english')),
-                  value: const Locale('en', 'US'),
-                  checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
-                ),
-                CheckedPopupMenuItem(
-                  child: Text(AppLocalizations.of(context)!.text('french')),
-                  value: const Locale('fr', 'FR'),
-                  checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
-                ),
-              ]
-            ),
+            )
           ],
           bottom: PreferredSize(
             preferredSize: _tabBar.preferredSize,

@@ -76,20 +76,6 @@ class EquipmentModel<T> extends Model {
     return 'Equipment: $name, UUID: $uuid';
   }
 
-  String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
-    }
-    return this.name;
-  }
-
-  String? localizedDesc(Locale? locale) {
-    if (this.desc is LocalizedText) {
-      return this.desc.get(locale);
-    }
-    return this.desc;
-  }
-
   /// Returns the pre-boil volume, based on the given conditions.
   ///
   /// The `volume` argument is relative to the final volume.

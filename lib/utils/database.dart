@@ -322,9 +322,12 @@ class Database {
     return null;
   }
 
-  Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, String? name, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
+    if (name != null) {
+      query = query.where('name', isEqualTo: name);
+    }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
@@ -456,11 +459,13 @@ class Database {
           FermentableModel model = FermentableModel();
           model.uuid = doc.id;
           model.fromMap(doc.data() as Map<String, dynamic>);
-          model.merge(quantities);
           list.add(model);
         }
       });
     });
+    if (quantities != null) {
+      return FermentableModel.merge(quantities, list);
+    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }
@@ -502,11 +507,13 @@ class Database {
           HopModel model = HopModel();
           model.uuid = doc.id;
           model.fromMap(doc.data() as Map<String, dynamic>);
-          model.merge(quantities);
           list.add(model);
         }
       });
     });
+    if (quantities != null) {
+      return HopModel.merge(quantities, list);
+    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }
@@ -548,11 +555,13 @@ class Database {
           MiscellaneousModel model = MiscellaneousModel();
           model.uuid = doc.id;
           model.fromMap(doc.data() as Map<String, dynamic>);
-          model.merge(quantities);
           list.add(model);
         }
       });
     });
+    if (quantities != null) {
+      return MiscellaneousModel.merge(quantities, list);
+    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }
@@ -594,11 +603,13 @@ class Database {
           YeastModel model = YeastModel();
           model.uuid = doc.id;
           model.fromMap(doc.data() as Map<String, dynamic>);
-          model.merge(quantities);
           list.add(model);
         }
       });
     });
+    if (quantities != null) {
+      return YeastModel.merge(quantities, list);
+    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }

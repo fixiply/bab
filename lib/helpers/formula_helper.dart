@@ -103,8 +103,68 @@ class FormulaHelper {
     if (og == null || volume == null || cells == null) {
       return 0;
     }
-    debugPrint('yeast  og:$og  volume:$volume  cells:$cells');
     return rate * (volume * 1000) * plato(og) / (cells * 1000);
+  }
+
+  /// Returns the gallon to liter conversion
+  ///
+  /// The `volume` argument is relative to the volume in gallon.
+  static double convertGallonToLiter(double? volume) {
+    if (volume == null) {
+      return 0;
+    }
+    return volume * 3.785;
+  }
+
+  /// Returns the liter to gallon conversion
+  ///
+  /// The `volume` argument is relative to the volume in liters.
+  static double convertLiterToGallon(double? volume) {
+    if (volume == null) {
+      return 0;
+    }
+    return volume / 3.785;
+  }
+
+  /// Returns the gram to ounce conversion
+  ///
+  /// The `weight` argument is relative to the weight in grams.
+  static double convertGramToOunce(double? weight) {
+    if (weight == null) {
+      return 0;
+    }
+    return weight / 28.35;
+  }
+
+  /// Returns the ounce to gram conversion
+  ///
+  /// The `weight` argument is relative to the weight in ounce.
+  static double convertOunceToGram(double? weight) {
+    if (weight == null) {
+      return 0;
+    }
+    return weight * 28.35;
+  }
+
+
+  /// Returns the ounce to livre conversion
+  ///
+  /// The `weight` argument is relative to the weight in ounce.
+  static double convertOunceToLivre(double? weight) {
+    if (weight == null) {
+      return 0;
+    }
+    return weight / 16;
+  }
+
+  /// Returns the livre to ounce conversion
+  ///
+  /// The `weight` argument is relative to the weight in livre.
+  static double convertLivreToOunce(double? weight) {
+    if (weight == null) {
+      return 0;
+    }
+    return weight * 16;
   }
 }
 

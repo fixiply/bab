@@ -1,6 +1,10 @@
 import 'dart:math';
 
+import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter/material.dart';
+
+// External package
+import 'package:bb/utils/constants.dart';
 
 const List<Color> SRM_COLORS = [
   const Color(0xFFFFE699),
@@ -49,18 +53,17 @@ class ColorUnits {
   double? start;
   double? end;
 
-  ColorUnits({this.start, this.end});
-
   clear() {
-    this.start = 0;
+    start = null;
+    end = null;
   }
 
-  static int toSRM(double? ebc) {
+  static int toSRM(int? ebc) {
     return ebc != null ? (ebc * 0.508).toInt() : 0;
   }
 
-  static double toEBC(double srm) {
-    return (srm * 1.97).round().toDouble();
+  static int toEBC(int? srm) {
+    return srm != null ? (srm * 1.97).round() : 0;
   }
 
   /// Returns the malt color unit, based on the given conditions.
@@ -70,7 +73,7 @@ class ColorUnits {
   /// The `weight` argument is relative to the weight grain.
   ///
   /// The `volume` argument is relative to the final volume.
-  static double mcu(double? ebc, double? weight, double? volume) {
+  static double mcu(int? ebc, double? weight, double? volume) {
     if (ebc == null || weight == null || volume == null) {
       return 0;
     }
@@ -89,7 +92,7 @@ class ColorUnits {
 
   /// Returns the SRM color rating, based on the given conditions.
   /// 
-  /// The `mcu` argument is relative to the total mcu.
+  /// The `mcu` argument is relative to the total mcu.{
   static double ratingSRM(double? mcu) {
     if (mcu == null || mcu == 0) {
       return 0;
@@ -97,12 +100,12 @@ class ColorUnits {
     return 1.4922 * pow(mcu, 0.659);
   }
 
-  static Color? color(double? srm) {
-    if (srm != null) {
-      int index = srm.toInt();
-      if (index <= 0) return Colors.white;
-      if (index < SRM_COLORS.length) return SRM_COLORS[index];
-      if (index >= SRM_COLORS.length) return SRM_COLORS[SRM_COLORS.length-1];
+  static Color? color(int? ebc) {
+    if (ebc != null) {
+      int srm = ColorUnits.toSRM(ebc);
+      if (srm < 0) return SRM_COLORS[0];
+      if (srm < SRM_COLORS.length) return SRM_COLORS[srm];
+      if (srm >= SRM_COLORS.length) return SRM_COLORS[SRM_COLORS.length-1];
     }
     return null;
   }

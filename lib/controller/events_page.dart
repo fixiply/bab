@@ -12,14 +12,15 @@ import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
-import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/widgets/builders/full_widget_page.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/image_container.dart';
 import 'package:bb/widgets/containers/shimmer_container.dart';
 import 'package:bb/widgets/custom_drawer.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
+import 'package:bb/widgets/search_text.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
@@ -40,6 +41,7 @@ class _EventsPageState extends State<EventsPage> {
   bool _editable = false;
   bool _remove = false;
   bool _hidden = false;
+  bool _archived = false;
 
   @override
   void initState() {
@@ -53,7 +55,10 @@ class _EventsPageState extends State<EventsPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: _buildSearchField(),
+        title: SearchText(
+          _searchQueryController,
+          () {  _fetch(); }
+        ),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -76,15 +81,15 @@ class _EventsPageState extends State<EventsPage> {
               },
             ),
           ),
-          PopupMenuButton(
-            icon: Icon(Icons.more_vert),
-            tooltip: AppLocalizations.of(context)!.text('display'),
+          CustomMenuButton(
+            context: context,
+            publish: currentUser != null && currentUser!.isAdmin(),
+            filtered: currentUser != null && currentUser!.isAdmin(),
+            archived: _archived,
             onSelected: (value) async {
-              if (value is Locale) {
-                Provider.of<LocaleNotifier>(context, listen: false).set(value);
-              } else if (value == 1) {
+              if (value == 1) {
                 await Database().publishAll();
-              } else if (value == 3) {
+              } else if (value == Menu.hidden) {
                 bool checked = !_remove;
                 if (checked) {
                   _hidden = false;
@@ -93,43 +98,7 @@ class _EventsPageState extends State<EventsPage> {
                 _fetch();
               }
             },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry>[
-              PopupMenuItem(
-                enabled: false,
-                value: null,
-                child: Text(AppLocalizations.of(context)!.text('language')),
-              ),
-              CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('english')),
-                value: const Locale('en', 'US'),
-                checked: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
-              ),
-              CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('french')),
-                value: const Locale('fr', 'FR'),
-                checked: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
-              ),
-              if (currentUser != null && currentUser!.isAdmin()) PopupMenuItem(
-                value: 1,
-                child: Text(AppLocalizations.of(context)!.text('publish_everything')),
-              ),
-              if (currentUser != null && currentUser!.isAdmin()) PopupMenuItem(
-                enabled: false,
-                value: null,
-                child: Text(AppLocalizations.of(context)!.text('filtered')),
-              ),
-              if (currentUser != null && currentUser!.isAdmin()) CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('archives')),
-                value: 2,
-                checked: _remove,
-              ),
-              if (currentUser != null && currentUser!.isAdmin()) CheckedPopupMenuItem(
-                child: Text(AppLocalizations.of(context)!.text('hidden')),
-                value: 3,
-                checked: _hidden,
-              )
-            ]
-          ),
+          )
         ]
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
@@ -190,47 +159,6 @@ class _EventsPageState extends State<EventsPage> {
           tooltip: AppLocalizations.of(context)!.text('new'),
           child: const Icon(Icons.add)
         )
-      )
-    );
-  }
-
-  Widget _buildSearchField() {
-    return Container(
-      margin: EdgeInsets.zero,
-      padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(100),
-        color: FillColor
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Flexible(
-            child: TextField(
-              controller: _searchQueryController,
-              decoration: InputDecoration(
-                icon: Padding(
-                    padding: EdgeInsets.only(left: 4.0),
-                    child: Icon(Icons.search, color: Theme.of(context).primaryColor)
-                ),
-                hintText: AppLocalizations.of(context)!.text('search_hint'),
-                hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                border: InputBorder.none
-              ),
-              style: TextStyle(fontSize: 16.0),
-              onChanged: (query) {
-                return _fetch();
-              },
-            )
-          ),
-          if (_searchQueryController.text.length > 0) IconButton(
-            icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-            onPressed: () {
-              _searchQueryController.clear();
-              _fetch();
-            }
-          )
-        ],
       )
     );
   }

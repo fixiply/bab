@@ -14,9 +14,9 @@ class BeerStyleField extends FormField<String> {
   final void Function(String? value)? onChanged;
   final FormFieldValidator<String>? validator;
 
-  BeerStyleField({Key? key, required BuildContext context, String? dataset, this.title, this.onChanged, this.validator}) : super(
+  BeerStyleField({Key? key, required BuildContext context, String? initialValue, this.title, this.onChanged, this.validator}) : super(
       key: key,
-      initialValue: dataset,
+      initialValue: initialValue,
       builder: (FormFieldState<String> field) {
         return field.build(field.context);
       }
@@ -54,15 +54,6 @@ class _BeerStyleFieldState extends FormFieldState<String> {
         icon: Icon(Icons.how_to_reg),
         fillColor: FillColor,
         filled: true,
-        suffix: DeviceHelper.isDesktop ? Padding(
-          padding: EdgeInsets.only(left: 20.0, right: 15.0),
-          child: IconButton(
-            icon: Icon(Icons.chevron_right),
-            onPressed: () {
-              _showPage();
-            },
-          )
-        ) : null,
       ),
       child: FutureBuilder<List<StyleModel>>(
         future: _style,
@@ -70,7 +61,7 @@ class _BeerStyleFieldState extends FormFieldState<String> {
           if (snapshot.data != null) {
             return DropdownButtonFormField<String>(
               key: _key,
-              value: widget.initialValue,
+              value: snapshot.data!.contains(widget.initialValue) ? widget.initialValue : null,
               iconEnabledColor: Colors.black45,
               isExpanded: true,
               decoration: FormDecoration(
@@ -98,7 +89,7 @@ class _BeerStyleFieldState extends FormFieldState<String> {
 
   _fetch() async {
     setState(() {
-      _style = Database().getStyles();
+      _style = Database().getStyles(ordered: true);
     });
   }
 
@@ -112,17 +103,9 @@ class _BeerStyleFieldState extends FormFieldState<String> {
     for (StyleModel value in values) {
       items.add(DropdownMenuItem(
           value: value.uuid,
-          child: Text(value.localizedName(AppLocalizations.of(context)!.locale) ?? '', overflow: TextOverflow.ellipsis)
+          child: Text(AppLocalizations.of(context)!.localizedText(value.name), overflow: TextOverflow.ellipsis)
       ));
     };
     return items;
-  }
-
-  _showPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return StylesPage();
-    })).then((articles) {
-      _fetch();
-    });
   }
 }

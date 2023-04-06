@@ -20,6 +20,10 @@ enum Use with Enums { boil, mash, primary, secondary, bottling, sparge;
   List<Enum> get enums => [ boil, mash, primary, secondary, bottling, sparge ];
 }
 
+extension Ex on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
+}
+
 class MiscellaneousModel<T> extends Model {
   Status? status;
   dynamic? name;
@@ -95,33 +99,25 @@ class MiscellaneousModel<T> extends Model {
     return 'MiscellaneousModel: $name, UUID: $uuid';
   }
 
-  String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
-    }
-    return this.name;
-  }
-
-  String? localizedNotes(Locale? locale) {
-    if (this.notes is LocalizedText) {
-      return this.notes.get(locale);
-    }
-    return this.notes;
-  }
-
-  void merge(List<Quantity>? quantities) {
-    if (quantities != null) {
-      for (Quantity item in quantities) {
-        if (item.uuid == uuid) {
-          this.amount = item.amount;
-          this.time = item.duration;
-          this.use = item.use != null
-              ? Use.values.elementAt(item.use!.index)
-              : null;
-          break;
+  static List<MiscellaneousModel> merge(List<Quantity>? quantities, List<MiscellaneousModel> miscellaneous) {
+    List<MiscellaneousModel> list = [];
+    if (quantities != null && miscellaneous != null) {
+      for (Quantity quantity in quantities) {
+        for (MiscellaneousModel misc in miscellaneous) {
+          if (quantity.uuid == misc.uuid) {
+            MiscellaneousModel model = misc.copy();
+            model.amount = quantity.amount;
+            model.time = quantity.duration;
+            model.use = quantity.use != null
+                ? Use.values.elementAt(quantity.use!)
+                : Use.boil;
+            list.add(model);
+            break;
+          }
         }
       }
     }
+    return list;
   }
 
   static dynamic serialize(dynamic data) {
@@ -212,7 +208,7 @@ class MiscellaneousModel<T> extends Model {
 
 class MiscellaneousDataSource extends EditDataSource {
   List<MiscellaneousModel> data = [];
-  final void Function(MiscellaneousModel value)? onChanged;
+  final void Function(MiscellaneousModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   MiscellaneousDataSource(BuildContext context, {List<MiscellaneousModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
@@ -228,6 +224,23 @@ class MiscellaneousDataSource extends EditDataSource {
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
       if (showQuantity == true)  DataGridCell<int>(columnName: 'time', value: e.time),
     ])).toList();
+  }
+
+  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+    var value = super.getValue(dataGridRow, rowColumnIndex, column);
+    if (value != null && column.columnName == 'amount') {
+      double? weight = AppLocalizations.of(context)!.weight(value);
+      return weight!.toPrecision(2);
+    }
+    return value;
+  }
+
+  @override
+  String? suffixText(GridColumn column) {
+    if (column.columnName == 'amount') {
+      return AppLocalizations.of(context)!.weightSuffix();
+    }
+    return null;
   }
 
   @override
@@ -253,13 +266,23 @@ class MiscellaneousDataSource extends EditDataSource {
             value = e.value?.get(AppLocalizations.of(context)!.locale);
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
-            if (e.columnName == 'duration') {
-              value = AppLocalizations.of(context)!.duration(e.value);
+            if (e.columnName == 'amount') {
+              value = AppLocalizations.of(context)!.weightFormat(e.value);
+            } if (e.columnName == 'duration') {
+              value = AppLocalizations.of(context)!.durationFormat(e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {
             alignment = Alignment.center;
             value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+          } else {
+            if (e.columnName == 'amount') {
+              return Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.all(4),
+                child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
+              );
+            }
           }
           return Container(
             alignment: alignment,
@@ -276,7 +299,7 @@ class MiscellaneousDataSource extends EditDataSource {
         .firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
     final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (newCellValue == null || oldValue == newCellValue) {
+    if (dataRowIndex == -1 || oldValue == newCellValue) {
       return;
     }
     int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
@@ -284,7 +307,7 @@ class MiscellaneousDataSource extends EditDataSource {
       case 'amount':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = newCellValue as double;
+        data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
         break;
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -297,20 +320,20 @@ class MiscellaneousDataSource extends EditDataSource {
       case 'type':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Misc>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue as Misc;
+        data[dataRowIndex].type = newCellValue;
         break;
       case 'use':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Use>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].use = newCellValue as Use;
+        data[dataRowIndex].use = newCellValue;
         break;
       case 'time':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].time = newCellValue as int;
+        data[dataRowIndex].time = newCellValue;
         break;
     }
-    onChanged?.call(data[dataRowIndex]);
+    onChanged?.call(data[dataRowIndex], dataRowIndex);
     updateDataSource();
   }
 

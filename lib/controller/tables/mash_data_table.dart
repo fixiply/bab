@@ -63,28 +63,25 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
   Widget build(BuildContext context) {
     return Container(
       color: widget.color,
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-            child:  Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(child: widget.title ?? Container()),
-                SizedBox(width: 4),
-                if(widget.allowEditing == true) TextButton(
-                  child: Icon(Icons.add),
-                  style: TextButton.styleFrom(
-                    backgroundColor: FillColor,
-                    shape: CircleBorder(),
-                  ),
-                  onPressed: _add,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(child: widget.title ?? Container()),
+              SizedBox(width: 4),
+              if(widget.allowEditing == true) TextButton(
+                child: Icon(Icons.add),
+                style: TextButton.styleFrom(
+                  backgroundColor: FillColor,
+                  shape: CircleBorder(),
                 ),
-              ],
-            )
+                onPressed: _add,
+              ),
+            ],
           ),
           Flexible(
             child: SfDataGridTheme(

@@ -6,12 +6,12 @@ import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/controller/yeasts_page.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/models/receipt_model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/quantity.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
+import 'package:bb/widgets/search_text.dart';
 
 // External package
 import 'package:flutter/services.dart';
@@ -26,6 +26,7 @@ class YeastsDataTable extends StatefulWidget {
   bool allowSorting;
   bool allowAdding;
   bool sort;
+  bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
@@ -39,6 +40,7 @@ class YeastsDataTable extends StatefulWidget {
     this.allowSorting = true,
     this.allowAdding = false,
     this.sort = true,
+    this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.single,
@@ -65,18 +67,16 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
     _dataSource = YeastDataSource(context,
         showQuantity: widget.data != null,
         showCheckboxColumn: widget.showCheckboxColumn!,
-        onChanged: (YeastModel value) {
-          var quantity = Quantity(uuid: value.uuid, amount: value.amount);
-          debugPrint('before amount ${value.amount}');
-          if (quantity.amount == null) {
-            var amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, value.cells!, rate: value.pitchingRate(widget.receipt!.og));
-            quantity.amount = amount.truncateToDouble();
+        onChanged: (YeastModel value, int dataRowIndex) {
+          var amount = value.amount;
+          /// Calculate if null
+          if (amount == null) {
+            amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, value.cells!, rate: value.pitchingRate(widget.receipt!.og));
           }
           if (widget.data != null) {
-            widget.data!.remove(quantity);
-            widget.data!.add(quantity);
+            widget.data![dataRowIndex].amount = amount;
           }
-          widget.onChanged?.call(widget.data ?? [quantity]);
+          widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: amount)]);
         }
     );
     _fetch();
@@ -86,38 +86,38 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
   Widget build(BuildContext context) {
     return Container(
       color: widget.color,
-      padding: EdgeInsets.all(8.0),
+      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-            child:  Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Expanded(child: widget.title ?? (widget.data == null ? _buildSearchField() : Container())),
-                SizedBox(width: 4),
-                if(widget.allowEditing == true) TextButton(
-                  child: Icon(Icons.add),
-                  style: TextButton.styleFrom(
-                    backgroundColor: FillColor,
-                    shape: CircleBorder(),
-                  ),
-                  onPressed: _add,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(child: widget.title ?? (widget.data == null ? SearchText(
+                _searchQueryController,
+                () {  _fetch(); }
+              ) : Container())),
+              SizedBox(width: 4),
+              if(widget.allowEditing == true) TextButton(
+                child: Icon(Icons.add),
+                style: TextButton.styleFrom(
+                  backgroundColor: FillColor,
+                  shape: CircleBorder(),
                 ),
-                if(_selected.isNotEmpty) TextButton(
-                  child: Icon(Icons.delete_outline),
-                  style: TextButton.styleFrom(
-                    backgroundColor: FillColor,
-                    shape: CircleBorder(),
-                  ),
-                  onPressed: () {
+                onPressed: _add,
+              ),
+              if(_selected.isNotEmpty) TextButton(
+                child: Icon(Icons.delete_outline),
+                style: TextButton.styleFrom(
+                  backgroundColor: FillColor,
+                  shape: CircleBorder(),
+                ),
+                onPressed: () {
 
-                  },
-                )
-              ],
-            )
+                },
+              )
+            ],
           ),
           Flexible(
             child: SfDataGridTheme(
@@ -126,7 +126,12 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                 future: _data,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    _dataSource.buildDataGridRows(snapshot.data!);
+                    if (widget.loadMore) {
+                      _dataSource.data = snapshot.data!;
+                      _dataSource.handleLoadMoreRows();
+                    } else {
+                      _dataSource.buildDataGridRows(snapshot.data!);
+                    }
                     _dataSource.notifyListeners();
                     return EditSfDataGrid(
                       context,
@@ -172,49 +177,6 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
           )
         ]
       )
-    );
-  }
-
-  Widget _buildSearchField() {
-    return Container(
-        margin: EdgeInsets.zero,
-        padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: FillColor
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Flexible(
-              child: TextField(
-                controller: _searchQueryController,
-                decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.all(14),
-                    icon: Padding(
-                        padding: EdgeInsets.only(left: 4.0),
-                        child: Icon(Icons.search, color: Theme.of(context).primaryColor)
-                    ),
-                    hintText: AppLocalizations.of(context)!.text('search_hint'),
-                    hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                    border: InputBorder.none
-                ),
-                style: TextStyle(fontSize: 14.0),
-                onChanged: (query) {
-                  return _fetch();
-                },
-              )
-            ),
-            if (_searchQueryController.text.length > 0) IconButton(
-                icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-                onPressed: () {
-                  _searchQueryController.clear();
-                  _fetch();
-                }
-            )
-          ],
-        )
     );
   }
 

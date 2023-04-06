@@ -51,11 +51,9 @@ class _LocalizedTextFieldState extends FormFieldState<dynamic> {
         initialValue: widget.initialValue != null ? widget.initialValue.toString() : null,
         textCapitalization: widget.textCapitalization ?? TextCapitalization.sentences,
         onChanged: (value) => setState(() {
-          if (widget.initialValue is String) {
-            widget.initialValue = value;
-          } if (widget.initialValue is LocalizedText) {
-            widget.initialValue.map[AppLocalizations.of(context)!.locale.toString()] = value;
-          }
+          LocalizedText text =  widget.initialValue is LocalizedText ? widget.initialValue : LocalizedText();
+          text.add(AppLocalizations.of(context)!.locale, value);
+          widget.initialValue = text.size() > 0 ? text : value;
           didChange(widget.initialValue);
         }),
         decoration: widget.decoration!,
@@ -63,28 +61,20 @@ class _LocalizedTextFieldState extends FormFieldState<dynamic> {
         validator: widget.validator,
       ),
       children: locales.map((locale) {
-        LocalizedText localizedTextModel = LocalizedText();
-        if (widget.initialValue is LocalizedText) {
-          localizedTextModel.map!.addAll(widget.initialValue.map);
-        }
         return ListTile(
           dense: true,
           contentPadding: EdgeInsets.zero,
           leading: Text(LocalizedText.emoji(locale.countryCode!),
-            style: TextStyle(
-              fontSize: 20,
-              fontFamily: 'Emoji',
-            ),
+            style: TextStyle( fontSize: 20, fontFamily: 'Emoji'),
           ),
           title: TextFormField(
-            initialValue: localizedTextModel.map![locale.toString()],
+            initialValue: widget.initialValue is LocalizedText ? widget.initialValue.get(locale)  : null,
             textCapitalization: widget.textCapitalization ?? TextCapitalization.sentences,
             onChanged: (value) => setState(() {
-              if (widget.initialValue is String) {
-                localizedTextModel.add(AppLocalizations.of(context)!.locale, widget.initialValue);
-              }
-              localizedTextModel.add(locale, value);
-              didChange(localizedTextModel);
+              LocalizedText text =  widget.initialValue is LocalizedText ? widget.initialValue : LocalizedText();
+              text.add(locale, value);
+              widget.initialValue = text.size() > 0 ? text : value;
+              didChange(widget.initialValue);
             }),
             decoration: FormDecoration(
               // labelText: locale.toString(),

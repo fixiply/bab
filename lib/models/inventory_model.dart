@@ -83,23 +83,6 @@ class InventoryModel<T> extends Model {
     return 'InventoryModel: $ingredient, UUID: $uuid';
   }
 
-  String? localizedName(Locale? locale) {
-    if (this.ingredient != null) {
-      if (this.ingredient!.name is LocalizedText) {
-        return this.ingredient!.name.get(locale);
-      }
-      return this.ingredient!.name;
-    }
-    return null;
-  }
-
-  String localizedAmount(Locale? locale) {
-    if (this.amount != null) {
-      return amount.toString();
-    }
-    return '';
-  }
-
   static dynamic serialize(dynamic data) {
     if (data != null) {
       if (data is InventoryModel) {

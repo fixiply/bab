@@ -1,26 +1,16 @@
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:bb/models/inventory_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
+import 'package:bb/models/inventory_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:bb/utils/color_units.dart';
 import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/forms/color_field.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
+import 'package:bb/widgets/search_text.dart';
 
 // External package
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
-import 'package:xml/xml.dart';
-
 
 class InventoryDataTable extends StatefulWidget {
   final Ingredient ingredient;
@@ -63,7 +53,10 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
                   padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                   child:  Row(
                     children: [
-                      Expanded(child: _buildSearchField()),
+                      Expanded(child: SearchText(
+                        _searchQueryController,
+                        () {  _fetch(); }
+                      )),
                       SizedBox(width: 4),
                       if (widget.edit) TextButton(
                         child: Icon(Icons.add),
@@ -91,103 +84,103 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
                     scrollDirection: Axis.vertical,
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
-                        child: DataTable(
-                          dataRowHeight: dataRowHeight,
-                          columnSpacing: 10,
-                          sortColumnIndex: _currentSortColumn,
-                          sortAscending: _isAscending,
-                          headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
-                          columns: <DataColumn>[
-                            DataColumn(label: Text(AppLocalizations.of(context)!.text('name')),
-                              onSort: (columnIndex, _) {
-                                setState(() {
-                                  _currentSortColumn = columnIndex;
-                                  if (_isAscending == true) {
-                                    _isAscending = false;
-                                    // sort the product list in Ascending, order by Price
-                                    snapshot.data!.sort((e1, e2) =>
-                                        e2.localizedName(locale)!.compareTo(e1.localizedName(locale)!));
-                                  } else {
-                                    _isAscending = true;
-                                    // sort the product list in Descending, order by Price
-                                    snapshot.data!.sort((e1, e2) =>
-                                        e1.localizedName(locale)!.compareTo(e2.localizedName(locale)!));
-                                  }
-                                });
-                              }
-                            ),
-                            DataColumn(label: Text(AppLocalizations.of(context)!.text('type')),
-                              onSort: (columnIndex, _) {
-                                setState(() {
-                                  _currentSortColumn = columnIndex;
-                                  if (_isAscending == true) {
-                                    _isAscending = false;
-                                    snapshot.data!.sort((e1, e2) =>
-                                        AppLocalizations.of(context)!.text(e2.type.toString().toLowerCase()).compareTo(AppLocalizations.of(context)!.text(e1.type.toString().toLowerCase())));
-                                  } else {
-                                    _isAscending = true;
-                                    // sort the product list in Descending, order by Price
-                                    snapshot.data!.sort((e1, e2) =>
-                                        AppLocalizations.of(context)!.text(e1.type.toString().toLowerCase()).compareTo(AppLocalizations.of(context)!.text(e2.type.toString().toLowerCase())));
-                                  }
-                                });
-                              }
-                            ),
-                            DataColumn(label: Text(AppLocalizations.of(context)!.text('amount')), numeric: true),
-                          ],
-                          rows: List<DataRow>.generate(snapshot.hasData ? snapshot.data!.length : 0, (int index) {
-                            InventoryModel model = snapshot.data![index];
-                            Function(InventoryModel) onEdit = (model) {
-                              if (model.isEdited == null || model.isEdited == false) {
-                                setState(() {
-                                  model.isEdited = true;
-                                });
-                              }
-                            };
-                            Function(InventoryModel) onSave = (model) {
-                              Database().update(model).then((value) async {
-                                setState(() {
-                                  model.isEdited = false;
-                                });
-                                _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
-                              }).onError((e, s) {
-                                _showSnackbar(e.toString());
-                              });
-                            };
-                            return DataRow(
-                              selected: _selected.contains(model),
-                              onSelectChanged: (bool? value) {
-                                setState(() {
-                                  if (_selected.contains(model)) {
-                                    _selected.remove(model);
-                                  } else {
-                                    _selected.add(model);
-                                  }
-                                });
-                              },
-                              cells: [
-                                DataCell(
-                                  Text(model.localizedName(locale) ?? ''),
-                                  placeholder: true,
-                                  onDoubleTap: () => onEdit(model)
-                                ),
-                                DataCell(model.isEdited == true ? TextFormField(
-                                  style: TextStyle(height: dataRowHeight),
-                                  initialValue: model.localizedAmount(locale),
-                                  keyboardType: TextInputType.number,
-                                  inputFormatters: <TextInputFormatter>[
-                                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
-                                  ], // Only numbers can be entered
-                                  onEditingComplete: () => onSave(model),
-                                  onChanged: (value) => model.amount = double.tryParse(value)
-                                ) : Text(model.localizedAmount(locale)),
-                                  placeholder: true,
-                                  onDoubleTap: () => onEdit(model)
-                                ),
-                              ]
-                            );
-                          })
-                        )
+                        // child: DataTable(
+                        //   dataRowHeight: dataRowHeight,
+                        //   columnSpacing: 10,
+                        //   sortColumnIndex: _currentSortColumn,
+                        //   sortAscending: _isAscending,
+                        //   headingTextStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black),
+                        //   columns: <DataColumn>[
+                        //     DataColumn(label: Text(AppLocalizations.of(context)!.text('name')),
+                        //       onSort: (columnIndex, _) {
+                        //         setState(() {
+                        //           _currentSortColumn = columnIndex;
+                        //           if (_isAscending == true) {
+                        //             _isAscending = false;
+                        //             // sort the product list in Ascending, order by Price
+                        //             snapshot.data!.sort((e1, e2) =>
+                        //                 e2.localizedName(locale)!.compareTo(e1.localizedName(locale)!));
+                        //           } else {
+                        //             _isAscending = true;
+                        //             // sort the product list in Descending, order by Price
+                        //             snapshot.data!.sort((e1, e2) =>
+                        //                 e1.localizedName(locale)!.compareTo(e2.localizedName(locale)!));
+                        //           }
+                        //         });
+                        //       }
+                        //     ),
+                        //     DataColumn(label: Text(AppLocalizations.of(context)!.text('type')),
+                        //       onSort: (columnIndex, _) {
+                        //         setState(() {
+                        //           _currentSortColumn = columnIndex;
+                        //           if (_isAscending == true) {
+                        //             _isAscending = false;
+                        //             snapshot.data!.sort((e1, e2) =>
+                        //                 AppLocalizations.of(context)!.text(e2.type.toString().toLowerCase()).compareTo(AppLocalizations.of(context)!.text(e1.type.toString().toLowerCase())));
+                        //           } else {
+                        //             _isAscending = true;
+                        //             // sort the product list in Descending, order by Price
+                        //             snapshot.data!.sort((e1, e2) =>
+                        //                 AppLocalizations.of(context)!.text(e1.type.toString().toLowerCase()).compareTo(AppLocalizations.of(context)!.text(e2.type.toString().toLowerCase())));
+                        //           }
+                        //         });
+                        //       }
+                        //     ),
+                        //     DataColumn(label: Text(AppLocalizations.of(context)!.text('amount')), numeric: true),
+                        //   ],
+                        //   rows: List<DataRow>.generate(snapshot.hasData ? snapshot.data!.length : 0, (int index) {
+                        //     InventoryModel model = snapshot.data![index];
+                        //     Function(InventoryModel) onEdit = (model) {
+                        //       if (model.isEdited == null || model.isEdited == false) {
+                        //         setState(() {
+                        //           model.isEdited = true;
+                        //         });
+                        //       }
+                        //     };
+                        //     Function(InventoryModel) onSave = (model) {
+                        //       Database().update(model).then((value) async {
+                        //         setState(() {
+                        //           model.isEdited = false;
+                        //         });
+                        //         _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
+                        //       }).onError((e, s) {
+                        //         _showSnackbar(e.toString());
+                        //       });
+                        //     };
+                        //     return DataRow(
+                        //       selected: _selected.contains(model),
+                        //       onSelectChanged: (bool? value) {
+                        //         setState(() {
+                        //           if (_selected.contains(model)) {
+                        //             _selected.remove(model);
+                        //           } else {
+                        //             _selected.add(model);
+                        //           }
+                        //         });
+                        //       },
+                        //       cells: [
+                        //         DataCell(
+                        //           Text(model.localizedName(locale) ?? ''),
+                        //           placeholder: true,
+                        //           onDoubleTap: () => onEdit(model)
+                        //         ),
+                        //         DataCell(model.isEdited == true ? TextFormField(
+                        //           style: TextStyle(height: dataRowHeight),
+                        //           initialValue: model.localizedAmount(locale),
+                        //           keyboardType: TextInputType.number,
+                        //           inputFormatters: <TextInputFormatter>[
+                        //             FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                        //           ], // Only numbers can be entered
+                        //           onEditingComplete: () => onSave(model),
+                        //           onChanged: (value) => model.amount = double.tryParse(value)
+                        //         ) : Text(model.localizedAmount(locale)),
+                        //           placeholder: true,
+                        //           onDoubleTap: () => onEdit(model)
+                        //         ),
+                        //       ]
+                        //     );
+                        //   })
+                        // )
                     ),
                   ),
                 ),
@@ -203,49 +196,6 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
               )
           );
         }
-      )
-    );
-  }
-
-  Widget _buildSearchField() {
-    return Container(
-      margin: EdgeInsets.zero,
-      padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(18),
-        color: FillColor
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Flexible(
-            child: TextField(
-              controller: _searchQueryController,
-              decoration: InputDecoration(
-                isDense: true,
-                contentPadding: EdgeInsets.all(8),
-                icon: Padding(
-                  padding: EdgeInsets.only(left: 4.0),
-                  child: Icon(Icons.search, color: Theme.of(context).primaryColor)
-                ),
-                hintText: AppLocalizations.of(context)!.text('search_hint'),
-                hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                border: InputBorder.none
-              ),
-              style: TextStyle(fontSize: 14.0),
-              onChanged: (query) {
-                return _fetch();
-              },
-            )
-          ),
-          if (_searchQueryController.text.length > 0) IconButton(
-              icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-              onPressed: () {
-                _searchQueryController.clear();
-                _fetch();
-              }
-          )
-        ],
       )
     );
   }

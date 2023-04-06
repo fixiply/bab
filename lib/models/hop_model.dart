@@ -24,6 +24,10 @@ enum Use with Enums { mash, first_wort, boil, aroma, dry_hop;
   List<Enum> get enums => [ mash, first_wort, boil, aroma, dry_hop ];
 }
 
+extension Ex on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
+}
+
 class HopModel<T> extends Model {
   Status? status;
   dynamic? name;
@@ -120,35 +124,6 @@ class HopModel<T> extends Model {
     return 'HopModel: $name, UUID: $uuid';
   }
 
-  String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
-    }
-    return this.name;
-  }
-
-  String? localizedNotes(Locale? locale) {
-    if (this.notes is LocalizedText) {
-      return this.notes.get(locale);
-    }
-    return this.notes;
-  }
-
-  void merge(List<Quantity>? quantities) {
-    if (quantities != null) {
-      for (Quantity item in quantities) {
-        if (item.uuid == uuid) {
-          this.amount = item.amount;
-          this.duration = item.duration;
-          this.use = item.use != null
-              ? Use.values.elementAt(item.use!.index)
-              : Use.boil;
-          break;
-        }
-      }
-    }
-  }
-
   /// Returns the bitterness index, based on the given conditions.
   ///
   /// The `amount` argument is relative to the amount of hops in grams.
@@ -162,6 +137,27 @@ class HopModel<T> extends Model {
   /// The `volume` argument is relative to the final volume.
   double ibu(double? og, int? duration, double? volume, {double? maximum})  {
     return FormulaHelper.ibu(this.amount, this.alpha, og, this.duration, volume, maximum: maximum);
+  }
+
+  static List<HopModel> merge(List<Quantity>? quantities, List<HopModel> hops) {
+    List<HopModel> list = [];
+    if (quantities != null && hops != null) {
+      for (Quantity quantity in quantities) {
+        for (HopModel hop in hops) {
+          if (quantity.uuid == hop.uuid) {
+            HopModel model = hop.copy();
+            model.amount = quantity.amount;
+            model.duration = quantity.duration;
+            model.use = quantity.use != null
+                ? Use.values.elementAt(quantity.use!)
+                : Use.boil;
+            list.add(model);
+            break;
+          }
+        }
+      }
+    }
+    return list;
   }
 
   static dynamic serialize(dynamic data) {
@@ -283,7 +279,7 @@ class HopModel<T> extends Model {
 
 class HopDataSource extends EditDataSource {
   List<HopModel> data = [];
-  final void Function(HopModel value)? onChanged;
+  final void Function(HopModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
@@ -302,6 +298,23 @@ class HopDataSource extends EditDataSource {
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
       if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
     ])).toList();
+  }
+
+  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+    var value = super.getValue(dataGridRow, rowColumnIndex, column);
+    if (value != null && column.columnName == 'amount') {
+      double? weight = AppLocalizations.of(context)!.weight(value);
+      return weight!.toPrecision(2);
+    }
+    return value;
+  }
+
+  @override
+  String? suffixText(GridColumn column) {
+    if (column.columnName == 'amount') {
+      return AppLocalizations.of(context)!.weightSuffix();
+    }
+    return null;
   }
 
   @override
@@ -328,16 +341,25 @@ class HopDataSource extends EditDataSource {
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
             if (e.columnName == 'amount') {
-              value = AppLocalizations.of(context)!.weight(e.value);
+              value = AppLocalizations.of(context)!.weightFormat(e.value);
             } else if (e.columnName == 'alpha') {
-              value = AppLocalizations.of(context)!.percent(e.value);
+              value = AppLocalizations.of(context)!.percentFormat(e.value);
             } else if (e.columnName == 'duration') {
-              value = AppLocalizations.of(context)!.duration(e.value);
+              var use = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'use').value;
+              value = AppLocalizations.of(context)!.durationFormat(use == Use.dry_hop ? e.value * 1440 : e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {
             alignment = Alignment.center;
             value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+          } else {
+            if (e.columnName == 'amount') {
+              return Container(
+                alignment: Alignment.center,
+                margin: EdgeInsets.all(4),
+                child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
+              );
+            }
           }
           if (e.columnName == 'origin') {
             if (value != null) {
@@ -359,11 +381,10 @@ class HopDataSource extends EditDataSource {
 
   @override
   void onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
-    final dynamic oldValue = dataGridRow.getCells()
-        .firstWhere((DataGridCell dataGridCell) =>
-    dataGridCell.columnName == column.columnName).value ?? '';
+    final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
+      dataGridCell.columnName == column.columnName).value ?? '';
     final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (newCellValue == null || oldValue == newCellValue) {
+    if (dataRowIndex == -1 || oldValue == newCellValue) {
       return;
     }
     int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
@@ -371,7 +392,7 @@ class HopDataSource extends EditDataSource {
       case 'amount':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = newCellValue as double;
+        data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
         break;
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -389,30 +410,30 @@ class HopDataSource extends EditDataSource {
       case 'alpha':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].alpha = newCellValue as double;
+        data[dataRowIndex].alpha = newCellValue;
         break;
       case 'form':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Hop>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].form = newCellValue as Hop;
+        data[dataRowIndex].form = newCellValue;
         break;
       case 'type':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue as Type;
+        data[dataRowIndex].type = newCellValue;
         break;
       case 'use':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Use>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].use = newCellValue as Use;
+        data[dataRowIndex].use = newCellValue;
         break;
       case 'duration':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].duration = newCellValue as int;
+        data[dataRowIndex].duration = newCellValue;
         break;
     }
-    onChanged?.call(data[dataRowIndex]);
+    onChanged?.call(data[dataRowIndex], dataRowIndex);
     updateDataSource();
   }
 

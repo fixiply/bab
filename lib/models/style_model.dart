@@ -8,14 +8,24 @@ class StyleModel<T> extends Model {
   Status? status;
   Fermentation? fermentation;
   dynamic? name;
-  dynamic? text;
+  String? number;
   dynamic? category;
-  double? min_abv;
-  double? max_abv;
-  double? min_ibu;
-  double? max_ibu;
-  double? min_srm;
-  double? max_srm;
+  dynamic? overallimpression;
+  dynamic? aroma;
+  dynamic? appareance;
+  dynamic? flavor;
+  dynamic? mouthfeel;
+  dynamic? comments;
+  double? ogmin;
+  double? ogmax;
+  double? fgmin;
+  double? fgmax;
+  double? abvmin;
+  double? abvmax;
+  double? ibumin;
+  double? ibumax;
+  int? ebcmin;
+  int? ebcmax;
 
   StyleModel({
     String? uuid,
@@ -25,14 +35,24 @@ class StyleModel<T> extends Model {
     this.status = Status.publied,
     this.fermentation = Fermentation.hight,
     this.name,
-    this.text,
+    this.number,
     this.category,
-    this.min_abv,
-    this.max_abv,
-    this.min_ibu,
-    this.max_ibu,
-    this.min_srm,
-    this.max_srm
+    this.overallimpression,
+    this.aroma,
+    this.appareance,
+    this.flavor,
+    this.mouthfeel,
+    this.comments,
+    this.ogmin,
+    this.ogmax,
+    this.fgmin,
+    this.fgmax,
+    this.abvmin,
+    this.abvmax,
+    this.ibumin,
+    this.ibumax,
+    this.ebcmin,
+    this.ebcmax
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
   void fromMap(Map<String, dynamic> map) {
@@ -40,17 +60,24 @@ class StyleModel<T> extends Model {
     this.status = Status.values.elementAt(map['status']);
     this.fermentation = Fermentation.values.elementAt(map['fermentation']);
     this.name = LocalizedText.deserialize(map['name']);
-    if (name == null) {
-      this.name = LocalizedText.deserialize(map['title']);
-    }
-    this.text = LocalizedText.deserialize(map['text']);
+    this.number = map['number'];
     this.category = LocalizedText.deserialize(map['category']);
-    if (map['min_abv'] != null) this.min_abv = map['min_abv'].toDouble();
-    if (map['max_abv'] != null) this.max_abv = map['max_abv'].toDouble();
-    if (map['min_ibu'] != null) this.min_ibu = map['min_ibu'].toDouble();
-    if (map['max_ibu'] != null) this.max_ibu = map['max_ibu'].toDouble();
-    if (map['min_srm'] != null) this.min_srm = map['min_srm'].toDouble();
-    if (map['max_srm'] != null) this.max_srm = map['max_srm'].toDouble();
+    this.overallimpression = LocalizedText.deserialize(map['overallimpression']);
+    this.aroma = LocalizedText.deserialize(map['aroma']);
+    this.appareance = LocalizedText.deserialize(map['appareance']);
+    this.flavor = LocalizedText.deserialize(map['flavor']);
+    this.mouthfeel = LocalizedText.deserialize(map['mouthfeel']);
+    this.comments = LocalizedText.deserialize(map['comments']);
+    if (map['ogmin'] != null) this.ogmin = map['ogmin'].toDouble();
+    if (map['ogmax'] != null) this.ogmax = map['ogmax'].toDouble();
+    if (map['fgmin'] != null) this.fgmin = map['fgmin'].toDouble();
+    if (map['fgmax'] != null) this.fgmax = map['fgmax'].toDouble();
+    if (map['abvmin'] != null) this.abvmin = map['abvmin'].toDouble();
+    if (map['abvmax'] != null) this.abvmax = map['abvmax'].toDouble();
+    if (map['ibumin'] != null) this.ibumin = map['ibumin'].toDouble();
+    if (map['ibumax'] != null) this.ibumax = map['ibumax'].toDouble();
+    this.ebcmin = map['ebcmin'];
+    this.ebcmax = map['ebcmax'];
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -59,14 +86,24 @@ class StyleModel<T> extends Model {
       'status': this.status!.index,
       'fermentation': this.fermentation!.index,
       'name': LocalizedText.serialize(this.name),
-      'text': LocalizedText.serialize(this.text),
+      'number': this.number,
       'category': LocalizedText.serialize(this.category),
-      'min_abv': this.min_abv,
-      'max_abv': this.max_abv,
-      'min_ibu': this.min_ibu,
-      'max_ibu': this.max_ibu,
-      'min_srm': this.min_srm,
-      'max_srm': this.max_srm,
+      'overallimpression': LocalizedText.serialize(this.overallimpression),
+      'aroma': LocalizedText.serialize(this.aroma),
+      'appareance': LocalizedText.serialize(this.appareance),
+      'flavor': LocalizedText.serialize(this.flavor),
+      'mouthfeel': LocalizedText.serialize(this.mouthfeel),
+      'comments': LocalizedText.serialize(this.comments),
+      'ogmin': this.ogmin,
+      'ogmax': this.ogmax,
+      'fgmin': this.fgmin,
+      'fgmax': this.fgmax,
+      'abvmin': this.abvmin,
+      'abvmax': this.abvmax,
+      'ibumin': this.ibumin,
+      'ibumax': this.ibumax,
+      'ebcmin': this.ebcmin,
+      'ebcmax': this.ebcmax,
     });
     return map;
   }
@@ -80,14 +117,24 @@ class StyleModel<T> extends Model {
       status: this.status,
       fermentation: this.fermentation,
       name: this.name,
-      text: this.text,
+      number: this.number,
       category: this.category,
-      min_abv: this.min_abv,
-      max_abv: this.max_abv,
-      min_ibu: this.min_ibu,
-      max_ibu: this.max_ibu,
-      min_srm: this.min_srm,
-      max_srm: this.max_srm,
+      overallimpression: this.overallimpression,
+      aroma: this.aroma,
+      appareance: this.appareance,
+      flavor: this.flavor,
+      mouthfeel: this.comments,
+      comments: this.mouthfeel,
+      ogmin: this.ogmin,
+      ogmax: this.ogmax,
+      fgmin: this.fgmin,
+      fgmax: this.fgmax,
+      abvmin: this.abvmin,
+      abvmax: this.abvmax,
+      ibumin: this.ibumin,
+      ibumax: this.ibumax,
+      ebcmin: this.ebcmin,
+      ebcmax: this.ebcmax,
     );
   }
 
@@ -99,26 +146,5 @@ class StyleModel<T> extends Model {
   @override
   String toString() {
     return 'Style: $name, UUID: $uuid';
-  }
-
-  String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
-    }
-    return this.name;
-  }
-
-  String? localizedText(Locale? locale) {
-    if (this.text is LocalizedText) {
-      return this.text.get(locale);
-    }
-    return this.text;
-  }
-
-  String? localizedCategory(Locale? locale) {
-    if (this.category is LocalizedText) {
-      return this.category.get(locale);
-    }
-    return this.category;
   }
 }

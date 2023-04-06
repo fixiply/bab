@@ -12,6 +12,7 @@ import 'package:bb/utils/color_units.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_track_shape.dart';
 
@@ -45,7 +46,7 @@ class _StylePageState extends State<StylePage> {
       key: _scaffoldKey,
       backgroundColor: FillColor,
       appBar: AppBar(
-        title: Text(widget.model.localizedName(AppLocalizations.of(context)!.locale) ?? ''),
+        title: Text(AppLocalizations.of(context)!.localizedText(widget.model.name)),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -81,6 +82,20 @@ class _StylePageState extends State<StylePage> {
                 _edit(widget.model);
               },
             ),
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+            units: true,
+            onSelected: (value) {
+              if (value is Unit) {
+                setState(() {
+                  AppLocalizations.of(context)!.unit = value;
+                });
+              }
+            },
+          )
         ],
       ),
       body: SingleChildScrollView(
@@ -95,7 +110,7 @@ class _StylePageState extends State<StylePage> {
                   Text(AppLocalizations.of(context)!.text('ibu'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 25, child: Text((widget.model.min_ibu ?? 0).round().toString(), style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text((widget.model.ibumin ?? 0).round().toString(), style: TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
@@ -111,20 +126,20 @@ class _StylePageState extends State<StylePage> {
                           child: RangeSlider(
                             min: 0,
                             max: MAX_IBU,
-                            values: RangeValues(widget.model.min_ibu ?? 0, widget.model.max_ibu ?? MAX_IBU),
-                            labels: RangeLabels(IBU.label(widget.model.min_ibu ?? 0), IBU.label(widget.model.max_ibu ?? MAX_IBU)),
+                            values: RangeValues(widget.model.ibumin ?? 0, widget.model.ibumax ?? MAX_IBU),
+                            labels: RangeLabels(IBU.label(widget.model.ibumin ?? 0), IBU.label(widget.model.ibumax ?? MAX_IBU)),
                             onChanged: (values) {
                             },
                           )
                         )
                       ),
-                      SizedBox(width: 25, child: Text((widget.model.max_ibu ?? MAX_IBU).round().toString(), style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text((widget.model.ibumax ?? MAX_IBU).round().toString(), style: TextStyle(fontSize: 12))),
                     ]
                   ),
                   Text(AppLocalizations.of(context)!.text('abv'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 25, child: Text('${ widget.model.min_abv != null ?  widget.model.min_abv!.toStringAsPrecision(2) : 0}°', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text('${ widget.model.abvmin != null ?  widget.model.abvmin!.toStringAsPrecision(2) : 0}%', softWrap: false, style: TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
@@ -139,20 +154,20 @@ class _StylePageState extends State<StylePage> {
                           child: RangeSlider(
                             min: 0,
                             max: MAX_ABV,
-                            values: RangeValues(widget.model.min_abv ?? 0, widget.model.max_abv ?? MAX_ABV),
+                            values: RangeValues(widget.model.abvmin ?? 0, widget.model.abvmax ?? MAX_ABV),
                             // labels: RangeLabels((_startAlcohol ?? _minAlcohol).toStringAsPrecision(2), (_endAlcohol ?? _maxAlcohol).toStringAsPrecision(2)),
                             onChanged: (values) {
                             },
                           )
                         )
                       ),
-                      SizedBox(width: 25, child: Text('${(widget.model.max_abv ?? MAX_ABV).toStringAsPrecision(2)}°', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text('${(widget.model.abvmax ?? MAX_ABV).toStringAsPrecision(2)}%', softWrap: false, style: TextStyle(fontSize: 12))),
                     ]
                   ),
-                  Text(AppLocalizations.of(context)!.text('srm'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
+                  Text('${AppLocalizations.of(context)!.colorUnit} - ${AppLocalizations.of(context)!.text('color')}', style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 20, child: Text('${widget.model.min_srm != null ?  widget.model.min_srm : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text(AppLocalizations.of(context)!.colorFormat(widget.model.ebcmin ?? 0) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
@@ -164,14 +179,17 @@ class _StylePageState extends State<StylePage> {
                           ),
                           child: RangeSlider(
                             onChanged: (values) {  },
-                            values: RangeValues(widget.model.min_srm ?? 0, widget.model.max_srm != null ? widget.model.max_srm! : SRM_COLORS.length.toDouble()),
+                            values: RangeValues(
+                              ColorUnits.toSRM(widget.model.ebcmin).toDouble(),
+                              widget.model.ebcmax != null ? ColorUnits.toSRM(widget.model.ebcmax).toDouble() : AppLocalizations.of(context)!.maxColor.toDouble()
+                            ),
                             min: 0,
-                            max: SRM_COLORS.length.toDouble(),
-                            divisions: SRM_COLORS.length
+                            max: AppLocalizations.of(context)!.maxColor.toDouble(),
+                            divisions: AppLocalizations.of(context)!.maxColor
                           )
                         )
                       ),
-                      SizedBox(width: 20, child: Text('${widget.model.max_srm != null ? widget.model.max_srm : SRM_COLORS.length}', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text(AppLocalizations.of(context)!.colorFormat(widget.model.ebcmax ?? AppLocalizations.of(context)!.maxColor) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
                     ]
                   )
                 ]
@@ -186,14 +204,14 @@ class _StylePageState extends State<StylePage> {
                 });
               },
               children: [
-                ExpansionPanel(
+                if (widget.model.overallimpression != null) ExpansionPanel(
                   isExpanded: _expanded,
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('features'),
+                      title: Text(AppLocalizations.of(context)!.text('overall_impression'),
                           style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
@@ -201,13 +219,101 @@ class _StylePageState extends State<StylePage> {
                     alignment: Alignment.centerLeft,
                     padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
-                      data: widget.model.localizedText(AppLocalizations.of(context)!.locale) ?? '',
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.overallimpression),
                       softLineBreak: true,
                       styleSheet:
                       MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
                     )
                   ),
-                )
+                ),
+                if (widget.model.aroma != null) ExpansionPanel(
+                  isExpanded: _expanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      title: Text(AppLocalizations.of(context)!.text('aroma'),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    child: MarkdownBody(
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.aroma),
+                      softLineBreak: true,
+                      styleSheet:
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                    )
+                  ),
+                ),
+                if (widget.model.flavor != null) ExpansionPanel(
+                  isExpanded: _expanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      title: Text(AppLocalizations.of(context)!.text('flavor'),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    child: MarkdownBody(
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.flavor),
+                      softLineBreak: true,
+                      styleSheet:
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                    )
+                  ),
+                ),
+                if (widget.model.mouthfeel != null) ExpansionPanel(
+                  isExpanded: _expanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      title: Text(AppLocalizations.of(context)!.text('mouthfeel'),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    child: MarkdownBody(
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.mouthfeel),
+                      softLineBreak: true,
+                      styleSheet:
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      )
+                  ),
+                ),
+                if (widget.model.comments != null) ExpansionPanel(
+                  isExpanded: _expanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      title: Text(AppLocalizations.of(context)!.text('comments'),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    child: MarkdownBody(
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.comments),
+                      softLineBreak: true,
+                      styleSheet:
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                    )
+                  ),
+                ),
               ]
             )
           ]

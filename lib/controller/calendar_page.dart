@@ -1,14 +1,19 @@
-import 'package:bb/models/product_model.dart';
-import 'package:bb/utils/database.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/widgets/days.dart';
+import 'package:bb/controller/basket_page.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
+import 'package:bb/widgets/days.dart';
 
 // External package
 import 'package:table_calendar/table_calendar.dart';
+import 'package:badges/badges.dart' as badge;
+import 'package:provider/provider.dart';
 
 class CalendarPage extends StatefulWidget {
   _CalendarPageState createState() => new _CalendarPageState();
@@ -23,6 +28,7 @@ class Event {
 
 
 class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
+  int _baskets = 0;
   Future<List<ProductModel>>? _products;
   late final ValueNotifier<List<Event>> _selectedEvents;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -36,6 +42,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
+    _initialize();
     _fetch();
   }
 
@@ -55,7 +62,33 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         title: Text(AppLocalizations.of(context)!.text('calendar')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
-        backgroundColor: Colors.white
+        backgroundColor: Colors.white,
+        actions: [
+          badge.Badge(
+            position: badge.BadgePosition.topEnd(top: 0, end: 3),
+            animationDuration: Duration(milliseconds: 300),
+            animationType: badge.BadgeAnimationType.slide,
+            showBadge: _baskets > 0,
+            badgeContent: _baskets > 0 ? Text(
+              _baskets.toString(),
+              style: TextStyle(color: Colors.white),
+            ) : null,
+            child: IconButton(
+              icon: Icon(Icons.shopping_cart_outlined),
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return BasketPage();
+                }));
+              },
+            ),
+          ),
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -107,6 +140,18 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         ]
       )
     );
+  }
+
+  _initialize() async {
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
+    // _fetch();
   }
 
   _fetch() async {

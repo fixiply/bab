@@ -45,8 +45,13 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     return containsKey(locale.languageCode);
   }
 
-  void add(Locale locale, String value)  {
-    map![locale.languageCode] = value;
+  void add(Locale? locale, String? value)  {
+    if (locale != null) {
+      if (value != null) {
+        map![locale.languageCode] = value;
+      }
+      else map!.remove(locale);
+    }
   }
 
   String? get(Locale? locale)  {
@@ -74,6 +79,17 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     } else {
       return data;
     }
+  }
+
+  static dynamic? init(Locale? locale, String? value) {
+
+  }
+
+  static String text(Locale? locale, dynamic? value) {
+    if (value is LocalizedText) {
+      return value.get(locale) ?? '';
+    }
+    return value ?? '';
   }
 
   static String emoji(String country) {

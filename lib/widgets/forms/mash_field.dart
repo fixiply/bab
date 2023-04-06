@@ -48,7 +48,7 @@ class _MashFieldState extends FormFieldState<List<Mash>> {
         padding: EdgeInsets.symmetric(vertical: 8.0),
         child: MashDataTable(key: _datatableKey,
           data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+          title: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           allowEditing: true,
           color: FillColor,
           showCheckboxColumn: false,

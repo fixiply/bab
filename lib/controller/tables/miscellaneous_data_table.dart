@@ -5,12 +5,12 @@ import 'package:bb/controller/miscellaneous_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/models/miscellaneous_model.dart';
 import 'package:bb/models/receipt_model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/quantity.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
+import 'package:bb/widgets/search_text.dart';
 
 // External package
 import 'package:flutter/services.dart';
@@ -25,6 +25,7 @@ class MiscellaneousDataTable extends StatefulWidget {
   bool allowSorting;
   bool allowAdding;
   bool sort;
+  bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
@@ -38,6 +39,7 @@ class MiscellaneousDataTable extends StatefulWidget {
     this.allowSorting = true,
     this.allowAdding = false,
     this.sort = true,
+    this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.multiple,
@@ -64,13 +66,13 @@ class MiscellaneousDataTableState extends State<MiscellaneousDataTable> with Aut
     _dataSource = MiscellaneousDataSource(context,
         showQuantity: widget.data != null,
         showCheckboxColumn: widget.showCheckboxColumn!,
-        onChanged: (MiscellaneousModel value) {
-          var quantity = Quantity(uuid: value.uuid, amount: value.amount, use: value.use, duration: value.time);
+        onChanged: (MiscellaneousModel value, int dataRowIndex) {
           if (widget.data != null) {
-            widget.data!.remove(quantity);
-            widget.data!.add(quantity);
+            widget.data![dataRowIndex].amount = value.amount;
+            widget.data![dataRowIndex].use = value.use?.index;
+            widget.data![dataRowIndex].duration = value.time;
           }
-          widget.onChanged?.call(widget.data ?? [quantity]);
+          widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.time)]);
         }
     );
     _fetch();
@@ -80,37 +82,38 @@ class MiscellaneousDataTableState extends State<MiscellaneousDataTable> with Aut
   Widget build(BuildContext context) {
     return Container(
       color: widget.color,
+      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-              padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-              child:  Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Expanded(child: widget.title ?? (widget.data == null ? _buildSearchField() : Container())),
-                  SizedBox(width: 4),
-                  if(widget.allowEditing == true) TextButton(
-                    child: Icon(Icons.add),
-                    style: TextButton.styleFrom(
-                      backgroundColor: FillColor,
-                      shape: CircleBorder(),
-                    ),
-                    onPressed: _add,
-                  ),
-                  if(_selected.isNotEmpty) TextButton(
-                    child: Icon(Icons.delete_outline),
-                    style: TextButton.styleFrom(
-                      backgroundColor: FillColor,
-                      shape: CircleBorder(),
-                    ),
-                    onPressed: () {
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Expanded(child: widget.title ?? (widget.data == null ? SearchText(
+                _searchQueryController,
+                () {  _fetch(); }
+              ) : Container())),
+              SizedBox(width: 4),
+              if(widget.allowEditing == true) TextButton(
+                child: Icon(Icons.add),
+                style: TextButton.styleFrom(
+                  backgroundColor: FillColor,
+                  shape: CircleBorder(),
+                ),
+                onPressed: _add,
+              ),
+              if(_selected.isNotEmpty) TextButton(
+                child: Icon(Icons.delete_outline),
+                style: TextButton.styleFrom(
+                  backgroundColor: FillColor,
+                  shape: CircleBorder(),
+                ),
+                onPressed: () {
 
-                    },
-                  )
-                ],
+                },
               )
+            ],
           ),
           Flexible(
             child: SfDataGridTheme(
@@ -119,7 +122,12 @@ class MiscellaneousDataTableState extends State<MiscellaneousDataTable> with Aut
                 future: _data,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
-                    _dataSource.buildDataGridRows(snapshot.data!);
+                    if (widget.loadMore) {
+                      _dataSource.data = snapshot.data!;
+                      _dataSource.handleLoadMoreRows();
+                    } else {
+                      _dataSource.buildDataGridRows(snapshot.data!);
+                    }
                     _dataSource.notifyListeners();
                     return EditSfDataGrid(
                       context,
@@ -165,49 +173,6 @@ class MiscellaneousDataTableState extends State<MiscellaneousDataTable> with Aut
           )
         ]
       )
-    );
-  }
-
-  Widget _buildSearchField() {
-    return Container(
-        margin: EdgeInsets.zero,
-        padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(8),
-            color: FillColor
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Flexible(
-                child: TextField(
-                  controller: _searchQueryController,
-                  decoration: InputDecoration(
-                      isDense: true,
-                      contentPadding: EdgeInsets.all(14),
-                      icon: Padding(
-                          padding: EdgeInsets.only(left: 4.0),
-                          child: Icon(Icons.search, color: Theme.of(context).primaryColor)
-                      ),
-                      hintText: AppLocalizations.of(context)!.text('search_hint'),
-                      hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                      border: InputBorder.none
-                  ),
-                  style: TextStyle(fontSize: 14.0),
-                  onChanged: (query) {
-                    return _fetch();
-                  },
-                )
-            ),
-            if (_searchQueryController.text.length > 0) IconButton(
-                icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-                onPressed: () {
-                  _searchQueryController.clear();
-                  _fetch();
-                }
-            )
-          ],
-        )
     );
   }
 

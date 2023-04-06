@@ -8,6 +8,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
 
 class CompaniesPage extends StatefulWidget {
@@ -38,7 +39,15 @@ class _CompaniesPageState extends State<CompaniesPage> with AutomaticKeepAliveCl
         title: Text(AppLocalizations.of(context)!.text('companies')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
-        backgroundColor: Colors.white
+        backgroundColor: Colors.white,
+        actions: [
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+          )
+        ],
       ),
       body: Container(
         child: RefreshIndicator(

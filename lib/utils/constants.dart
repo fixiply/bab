@@ -42,30 +42,9 @@ mixin Enums<T extends Enum> on Enum {
 enum Fermentation with Enums { hight, low, spontaneous;
   List<Enum> get enums => [ hight, low, spontaneous ];
 }
-// enum HopType with Enums { aroma, bittering, both;
-//   List<Enum> get enums => [ aroma, bittering, both ];
-// }
-// enum HopUse with Enums { mash, first_wort, boil, aroma, dry_hop;
-//   List<Enum> get enums => [ mash, first_wort, boil, aroma, dry_hop ];
-// }
-// enum Hops with Enums { leaf, pellet, plug, other;
-//   List<Enum> get enums => [ leaf, pellet, plug, other ];
-// }
 enum Ingredient with Enums { fermentable, hops, yeast, misc;
   List<Enum> get enums => [ fermentable, hops, yeast, misc ];
 }
-// enum Method with Enums { mashed,  steeped;
-//   List<Enum> get enums => [ mashed,  steeped ];
-// }
-// enum Mash with Enums { infusion, temperature, decoction;
-//   List<Enum> get enums => [ infusion, temperature, decoction ];
-// }
-// enum Misc with Enums { spice, fining, water_agent, herb, flavor, other;
-//   List<Enum> get enums => [ spice, fining, water_agent, herb, flavor, other ];
-// }
-// enum MiscUse with Enums { boil, mash, primary, secondary, bottling, sparge;
-//   List<Enum> get enums => [ boil, mash, primary, secondary, bottling, sparge ];
-// }
 enum Payments with Enums { credit_card, paypal, apple_pay, google_pay;
   List<Enum> get enums => [ credit_card, paypal, apple_pay, google_pay ];
 }
@@ -78,12 +57,8 @@ enum Role with Enums { admin, editor, customer;
 }
 enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size }
 enum Status { pending, publied, disabled }
-enum Unit with Enums { weight, volume, pressure, time, temperature;
-  List<Enum> get enums => [ weight, volume, pressure, time, temperature ];
-}
-// enum Yeast with Enums { liquid, dry, slant, culture;
-//   List<Enum> get enums => [ liquid, dry, slant, culture ];
-// }
+enum Unit { metric, imperial }
+enum Weight { kilo, gram }
 
 //Colors
 const Color PrimaryColor = const Color(0xFF008351);

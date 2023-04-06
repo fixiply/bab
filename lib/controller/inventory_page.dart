@@ -1,15 +1,19 @@
-
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
 import 'package:bb/controller/tables/miscellaneous_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 
 // External package
+import 'package:badges/badges.dart' as badge;
+import 'package:provider/provider.dart';
 
 class InventoryPage extends StatefulWidget {
   InventoryPage({Key? key}) : super(key: key);
@@ -17,7 +21,7 @@ class InventoryPage extends StatefulWidget {
 }
 
 class _InventoryPageState extends State<InventoryPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<InventoryPage> {
-  late TabController _tabController;
+  int _baskets = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -37,6 +41,12 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
   );
 
   @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 4,
@@ -48,6 +58,32 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
           elevation: 0,
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
+          actions: [
+            badge.Badge(
+              position: badge.BadgePosition.topEnd(top: 0, end: 3),
+              animationDuration: Duration(milliseconds: 300),
+              animationType: badge.BadgeAnimationType.slide,
+              showBadge: _baskets > 0,
+              badgeContent: _baskets > 0 ? Text(
+                _baskets.toString(),
+                style: TextStyle(color: Colors.white),
+              ) : null,
+              child: IconButton(
+                icon: Icon(Icons.shopping_cart_outlined),
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return BasketPage();
+                  }));
+                },
+              ),
+            ),
+            CustomMenuButton(
+              context: context,
+              publish: false,
+              filtered: false,
+              archived: false,
+            )
+          ],
           bottom: PreferredSize(
             preferredSize: _tabBar.preferredSize,
             child: ColoredBox(
@@ -66,6 +102,17 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
         ),
       )
     );
+  }
+
+  _initialize() async {
+    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
+    _baskets = basketProvider.size;
+    basketProvider.addListener(() {
+      if (!mounted) return;
+      setState(() {
+        _baskets = basketProvider.size;
+      });
+    });
   }
 
   _showSnackbar(String message) {

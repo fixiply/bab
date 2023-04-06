@@ -98,6 +98,6 @@ class UserModel<T> {
 
   @override
   String toString() {
-    return 'Role: $role, UUID: $uuid';
+    return 'User: $role, UUID: $uuid';
   }
 }

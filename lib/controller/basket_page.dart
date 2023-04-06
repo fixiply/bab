@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/controller/forms/form_address_page.dart';
 import 'package:bb/controller/payments_page.dart';
-import 'package:bb/utils/adress.dart';
 import 'package:bb/models/basket_model.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
+import 'package:bb/utils/adress.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
@@ -349,7 +349,7 @@ class _BasketPageState extends State<BasketPage> {
   String _style(String? uuid) {
     for (StyleModel model in _styles!) {
       if (model.uuid == uuid) {
-        return model.localizedName(AppLocalizations.of(context)!.locale) ?? '';
+        return AppLocalizations.of(context)!.localizedText(model.name);
       }
     }
     return '';

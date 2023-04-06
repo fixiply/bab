@@ -1,16 +1,16 @@
-import 'package:bb/controller/product_page.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/forms/form_product_page.dart';
-import 'package:bb/models/product_model.dart';
 import 'package:bb/models/image_model.dart';
+import 'package:bb/models/product_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/custom_image.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
 
 class ProductsPage extends StatefulWidget {
@@ -29,7 +29,7 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
   void initState() {
     super.initState();
     _controller = ScrollController();
-    _initialize();
+    _fetch();
   }
 
   @override
@@ -41,7 +41,15 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
         title: Text(AppLocalizations.of(context)!.text('products')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
-        backgroundColor: Colors.white
+        backgroundColor: Colors.white,
+        actions: [
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+          )
+        ],
       ),
       body: Container(
         child: RefreshIndicator(
@@ -121,10 +129,6 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
         child: const Icon(Icons.add)
       )
     );
-  }
-
-  _initialize() async {
-    _fetch();
   }
 
   _fetch() async {

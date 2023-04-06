@@ -74,13 +74,20 @@ class _AppState extends State<MyApp> {
     final localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
     localeNotifier.addListener(() {
       if (!mounted) return;
-      onLocaleChange(localeNotifier.getlocale!);
+      onLocaleChange(localeNotifier.locale!);
     });
   }
 
   void onLocaleChange(Locale locale) {
     setState(() {
       _newLocaleDelegate = TranslationsDelegate(newLocale: locale);
+    });
+  }
+
+  void onUnitChange(Unit unit) {
+    debugPrint('unit ${AppLocalizations.of(context)}');
+    setState(() {
+      // AppLocalizations.of(context)!.setUnit(unit);
     });
   }
 

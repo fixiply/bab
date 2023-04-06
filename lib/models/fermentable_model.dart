@@ -22,6 +22,10 @@ enum Method with Enums { mashed,  steeped;
   List<Enum> get enums => [ mashed,  steeped ];
 }
 
+extension Ex on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
+}
+
 class FermentableModel<T> extends Model {
   Status? status;
   dynamic? name;
@@ -30,7 +34,7 @@ class FermentableModel<T> extends Model {
   double? amount;
   Method? method;
   double? efficiency;
-  double? srm;
+  int? ebc;
   dynamic? notes;
 
   FermentableModel({
@@ -47,7 +51,7 @@ class FermentableModel<T> extends Model {
     this.amount,
     this.method = Method.mashed,
     this.efficiency,
-    this.srm,
+    this.ebc,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
@@ -60,7 +64,7 @@ class FermentableModel<T> extends Model {
     // if (map['amount'] != null) this.amount = map['amount'].toDouble();
     // this.method = Method.values.elementAt(map['method']);
     if (map['efficiency'] != null) this.efficiency = map['efficiency'].toDouble();
-    if (map['srm'] != null) this.srm = map['srm'].toDouble();
+    this.ebc = map['ebc'];
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
@@ -74,7 +78,7 @@ class FermentableModel<T> extends Model {
       // 'amount': this.amount,
       // 'method': this.method!.index,
       'efficiency': this.efficiency,
-      'srm': this.srm,
+      'ebc': this.ebc,
       'notes': LocalizedText.serialize(this.notes),
     });
     return map;
@@ -93,7 +97,7 @@ class FermentableModel<T> extends Model {
       amount: this.amount,
       method: this.method,
       efficiency: this.efficiency,
-      srm: this.srm,
+      ebc: this.ebc,
       notes: this.notes,
     );
   }
@@ -106,41 +110,6 @@ class FermentableModel<T> extends Model {
   @override
   String toString() {
     return 'FermentableModel: $name, UUID: $uuid';
-  }
-
-  String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
-    }
-    return this.name;
-  }
-
-  String localizedColor(Locale? locale) {
-    if (this.srm != null) {
-      return NumberFormat("#0.#", locale?.languageCode).format(this.srm);
-    }
-    return '';
-  }
-
-  String? localizedNotes(Locale? locale) {
-    if (this.notes is LocalizedText) {
-      return this.notes.get(locale);
-    }
-    return this.notes;
-  }
-
-  void merge(List<Quantity>? quantities) {
-    if (quantities != null) {
-      for (Quantity item in quantities) {
-        if (item.uuid == uuid) {
-          this.amount = item.amount;
-          this.method = item.use != null
-              ? Method.values.elementAt(item.use!.index)
-              : Method.mashed;
-          break;
-        }
-      }
-    }
   }
 
   /// Returns the dry extract, based on the given conditions.
@@ -164,6 +133,26 @@ class FermentableModel<T> extends Model {
       }
     }
     return null;
+  }
+
+  static List<FermentableModel> merge(List<Quantity>? quantities, List<FermentableModel> fermentables) {
+    List<FermentableModel> list = [];
+    if (quantities != null && fermentables != null) {
+      for (Quantity quantity in quantities) {
+        for (FermentableModel fermentable in fermentables) {
+          if (quantity.uuid == fermentable.uuid) {
+            FermentableModel model = fermentable.copy();
+            model.amount = quantity.amount;
+            model.method = quantity.use != null
+                ? Method.values.elementAt(quantity.use!)
+                : Method.mashed;
+            list.add(model);
+            break;
+          }
+        }
+      }
+    }
+    return list;
   }
 
   static List<FermentableModel> deserialize(dynamic data) {
@@ -252,7 +241,7 @@ class FermentableModel<T> extends Model {
           label: Container(
               padding: EdgeInsets.all(8.0),
               alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('color'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
     ];
@@ -260,16 +249,19 @@ class FermentableModel<T> extends Model {
 }
 
 class FermentableDataSource extends EditDataSource {
-  List<FermentableModel> data = [];
-  final void Function(FermentableModel value)? onChanged;
+  List<FermentableModel> _data = [];
+  final void Function(FermentableModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<FermentableModel> data) {
-    this.data = data;
-    dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
+  List<FermentableModel> get data => _data;
+  set data(List<FermentableModel> data) => _data = data;
+
+  List<DataGridRow> getDataRows({List<FermentableModel>? data}) {
+    List<FermentableModel>? list = data ?? _data;
+    return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
@@ -277,8 +269,42 @@ class FermentableDataSource extends EditDataSource {
       DataGridCell<Type>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Method>(columnName: 'method', value: e.method),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
-      DataGridCell<double>(columnName: 'color', value: e.srm),
+      DataGridCell<int>(columnName: 'color', value: e.ebc),
     ])).toList();
+  }
+
+  void buildDataGridRows(List<FermentableModel> data) {
+    this.data = data;
+    dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Future<void> handleLoadMoreRows() async {
+    await Future.delayed(Duration(seconds: 5));
+    _addMoreRows(20);
+    notifyListeners();
+  }
+
+  void _addMoreRows(int count) {
+    List<FermentableModel>? list = data.skip(dataGridRows.length).toList().take(count).toList();
+    dataGridRows.addAll(getDataRows(data: list));
+  }
+
+  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+    var value = super.getValue(dataGridRow, rowColumnIndex, column);
+    if (value != null && column.columnName == 'amount') {
+      double? weight = AppLocalizations.of(context)!.weight(value * 1000, weight: Weight.kilo);
+      return weight!.toPrecision(2);
+    }
+    return value;
+  }
+
+  @override
+  String? suffixText(GridColumn column) {
+    if (column.columnName == 'amount') {
+      return AppLocalizations.of(context)!.weightSuffix(weight: Weight.kilo);
+    }
+    return null;
   }
 
   @override
@@ -306,14 +332,22 @@ class FermentableDataSource extends EditDataSource {
           alignment = Alignment.centerLeft;
         } else if (e.value is num) {
           if (e.columnName == 'amount') {
-            value = AppLocalizations.of(context)!.weight(e.value * 100);
+            value = AppLocalizations.of(context)!.weightFormat(e.value * 1000);
           } else if (e.columnName == 'efficiency') {
-            value = AppLocalizations.of(context)!.percent(e.value);
+            value = AppLocalizations.of(context)!.percentFormat(e.value);
           } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
           alignment = Alignment.centerRight;
         } else if (e.value is Enum) {
           alignment = Alignment.center;
           value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+        } else {
+          if (e.columnName == 'amount') {
+            return Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.all(4),
+              child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
+            );
+          }
         }
         if (e.columnName == 'color') {
           return Container(
@@ -346,7 +380,7 @@ class FermentableDataSource extends EditDataSource {
     final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
       dataGridCell.columnName == column.columnName).value ?? '';
     final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (newCellValue == null || oldValue == newCellValue) {
+    if (dataRowIndex == -1 || oldValue == newCellValue) {
       return;
     }
     int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
@@ -354,43 +388,43 @@ class FermentableDataSource extends EditDataSource {
       case 'amount':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = newCellValue as double;
+        _data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
         break;
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        if (data[dataRowIndex].name is LocalizedText) {
-          data[dataRowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
+        if (_data[dataRowIndex].name is LocalizedText) {
+          _data[dataRowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
         }
-        else data[dataRowIndex].name = newCellValue;
+        else _data[dataRowIndex].name = newCellValue;
         break;
       case 'origin':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].name = newCellValue;
+        _data[dataRowIndex].name = newCellValue;
         break;
       case 'type':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue as Type;
+        _data[dataRowIndex].type = newCellValue;
         break;
       case 'method':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Method>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].method = newCellValue as Method;
+        _data[dataRowIndex].method = newCellValue;
         break;
       case 'efficiency':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].efficiency = newCellValue as double;
+        _data[dataRowIndex].efficiency = newCellValue;
         break;
       case 'color':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].srm = newCellValue as double;
+        _data[dataRowIndex].ebc = newCellValue;
         break;
     }
-    onChanged?.call(data[dataRowIndex]);
+    onChanged?.call(_data[dataRowIndex], dataRowIndex);
     updateDataSource();
   }
 

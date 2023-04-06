@@ -63,11 +63,6 @@ class Mash<T> {
     );
   }
 
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return (other is String && other == uuid || other is Mash && other.uuid == uuid);
-  }
-
   @override
   String toString() {
     return 'Mash: $uuid';
@@ -201,9 +196,9 @@ class MashDataSource extends EditDataSource {
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
             if (e.columnName == 'temperature') {
-              value = AppLocalizations.of(context)!.temperature(e.value);
+              value = AppLocalizations.of(context)!.tempFormat(e.value);
             } else if (e.columnName == 'duration') {
-              value = AppLocalizations.of(context)!.duration(e.value);
+              value = AppLocalizations.of(context)!.durationFormat(e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {

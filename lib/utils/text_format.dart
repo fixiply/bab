@@ -16,12 +16,12 @@ class TextFormat<T> {
     this.underline = false,
     this.color,
   }) {
-    if (color == null) { color = Colors.black.value; }
+    color ??= Colors.black.value;
   }
 
   void fromMap(Map<String, dynamic> map) {
-    this.text = map['text'];
-    if (map['size'] != null) this.size = map['size'].toDouble();
+    text = map['text'];
+    if (map['size'] != null) size = map['size'].toDouble();
     this.bold = map['bold'];
     this.italic = map['italic'];
     this.underline = map['underline'];

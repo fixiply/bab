@@ -74,10 +74,10 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
           ),
           tabs: [
-            Tab(icon: Icon(Icons.tune, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Saveur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.palette_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Couleur', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Type', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.style_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text('Style', style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+            Tab(icon: Icon(Icons.tune, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('flavor'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+            Tab(icon: Icon(Icons.palette_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('color'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+            Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+            Tab(icon: Icon(Icons.style_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('style'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
           ],
         ),
         flexibleSpace: FlexibleSpaceBar(
@@ -126,7 +126,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
           Text(AppLocalizations.of(context)!.text('ibu'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 25, child: Text((widget.ibu.start ?? widget.ibu.min).round().toString(), style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text((widget.ibu.start ?? widget.ibu.min).round().toString(), style: TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
@@ -155,13 +155,13 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   )
                 )
               ),
-              SizedBox(width: 25, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: TextStyle(fontSize: 12))),
             ]
           ),
           Text(AppLocalizations.of(context)!.text('abv'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 25, child: Text('${(widget.abv.start ?? widget.abv.min).toStringAsPrecision(2)}°', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text('${(widget.abv.start ?? widget.abv.min).toStringAsPrecision(2)}%', softWrap: false, style: TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
@@ -189,7 +189,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   )
                 )
               ),
-              SizedBox(width: 25, child: Text('${(widget.abv.end ?? widget.abv.max).toStringAsPrecision(2)}°', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text('${(widget.abv.end ?? widget.abv.max).toStringAsPrecision(2)}%', softWrap: false, style: TextStyle(fontSize: 12))),
             ]
           ),
         ]
@@ -203,10 +203,10 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(AppLocalizations.of(context)!.text('color'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
+          Text('${AppLocalizations.of(context)!.colorUnit} - ${AppLocalizations.of(context)!.text('color')}', style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 20, child: Text('${widget.cu.start != null ?  widget.cu.start!.round() : 0}', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 20, child: Text(AppLocalizations.of(context)!.numberFormat(widget.cu.start ?? 0) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
@@ -225,14 +225,14 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                       });
                       widget.onColorChanged?.call(values.start, values.end);
                     },
-                    values: RangeValues(widget.cu.start ?? 0, widget.cu.end ?? SRM_COLORS.length.toDouble()),
+                    values: RangeValues(widget.cu.start ?? 0, widget.cu.end ?? AppLocalizations.of(context)!.maxColor.toDouble()),
                     min: 0,
-                    max: SRM_COLORS.length.toDouble(),
-                    divisions: SRM_COLORS.length
+                    max: AppLocalizations.of(context)!.maxColor.toDouble(),
+                    divisions: AppLocalizations.of(context)!.maxColor
                   )
                 )
               ),
-              SizedBox(width: 20, child: Text('${widget.cu.end != null ? widget.cu.end!.round() : SRM_COLORS.length}', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 20, child: Text(AppLocalizations.of(context)!.numberFormat(widget.cu.end ?? AppLocalizations.of(context)!.maxColor) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
             ]
           )
         ]

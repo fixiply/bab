@@ -18,6 +18,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
+import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/paints/bezier_clipper.dart';
 import 'package:bb/widgets/paints/circle_clipper.dart';
 
@@ -61,7 +62,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         ),
         flexibleSpace: FlexibleSpaceBar(
           titlePadding: EdgeInsets.only(left: 170, bottom: 15),
-          title: Text(widget.model.localizedTitle(AppLocalizations.of(context)!.locale) ?? ''),
+          title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
           background: Stack(
             children: [
             Opacity(
@@ -81,14 +82,14 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   children: [
                     Container(
                       padding: EdgeInsets.only(left: 30),
-                      child: Image.asset('assets/images/beer3.png', color: ColorUnits.color(widget.model.srm)
-                        // fit: BoxFit.fill,
-                        // colorBlendMode: BlendMode.modulate
-                        ),
+                      child: Image.asset('assets/images/beer_1.png',
+                        color: ColorUnits.color(widget.model.ebc) ?? SRM_COLORS[0],
+                        colorBlendMode: BlendMode.modulate
+                      ),
                     ),
                     Container(
                       padding: EdgeInsets.only(left: 30),
-                      child: Image.asset('assets/images/beer2.png'),
+                      child: Image.asset('assets/images/beer_2.png'),
                     ),
                   ]
                 ),
@@ -103,11 +104,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
                         ),
                       ),
                       Padding(
-                        padding: EdgeInsets.only(top: 25.0),
+                        padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
+                            if (widget.model.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.ebc)}', style: TextStyle(fontSize: 18, color: Colors.white)),
                             if (widget.model.ibu != null) Text('IBU: ${widget.model.localizedIBU(AppLocalizations.of(context)!.locale)}', style: TextStyle(fontSize: 18, color: Colors.white)),
                             if (widget.model.abv != null) Text(widget.model.localizedABV(AppLocalizations.of(context)!.locale)!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                           ],
@@ -146,6 +148,20 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 _edit(widget.model);
               },
             ),
+          CustomMenuButton(
+            context: context,
+            publish: false,
+            filtered: false,
+            archived: false,
+            units: true,
+            onSelected: (value) {
+              if (value is Unit) {
+                setState(() {
+                  AppLocalizations.of(context)!.unit = value;
+                });
+              }
+            },
+          )
         ],
       ),
       if (_style != null) SliverToBoxAdapter(
@@ -189,7 +205,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   alignment: Alignment.centerLeft,
                   padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
                   child: MarkdownBody(
-                    data: widget.model.localizedText(AppLocalizations.of(context)!.locale) ?? '',
+                    data: AppLocalizations.of(context)!.localizedText(widget.model.text),
                     fitContent: true,
                     shrinkWrap: true,
                     softLineBreak: true,
@@ -247,10 +263,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
   }
 
   _fetch() async {
-    StyleModel? style = await Database().getStyle(widget.model.style!);
-    setState(() {
-      _style = style;
-    });
+    if (widget.model.style != null) {
+      StyleModel? style = await Database().getStyle(widget.model.style!);
+      setState(() {
+        _style = style;
+      });
+    }
   }
 
   _edit(ReceiptModel model) {
@@ -261,7 +279,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
 
   String _labelStyle() {
     if (_style != null) {
-      return _style!.localizedName(AppLocalizations.of(context)!.locale) ?? '';
+      return AppLocalizations.of(context)!.localizedText(_style!.name);
     }
     return '';
   }

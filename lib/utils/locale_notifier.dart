@@ -3,11 +3,11 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
 class LocaleNotifier with ChangeNotifier {
-  Locale? locale;
-  Locale? get getlocale => locale;
+  Locale? _locale;
+  Locale? get locale => _locale;
 
   void set(Locale l) {
-    locale = l;
+    _locale = l;
     notifyListeners();
   }
 }

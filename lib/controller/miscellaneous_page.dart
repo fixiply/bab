@@ -1,35 +1,30 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/helpers/import_helper.dart';
 import 'package:bb/models/miscellaneous_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:bb/utils/quantity.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
+import 'package:bb/widgets/search_text.dart';
 
 // External package
 import 'package:expandable_text/expandable_text.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:xml/xml.dart';
 
 class MiscellaneousPage extends StatefulWidget {
-  bool? showCheckboxColumn;
-  bool? showQuantity;
+  bool showCheckboxColumn;
+  bool showQuantity;
+  bool loadMore;
   ReceiptModel? receipt;
-  MiscellaneousPage({Key? key, this.showCheckboxColumn = false, this.showQuantity = false, this.receipt}) : super(key: key);
+  MiscellaneousPage({Key? key, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
 
   _MiscellaneousPageState createState() => new _MiscellaneousPageState();
 }
@@ -56,7 +51,7 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
     _dataSource = MiscellaneousDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn!,
-      onChanged: (MiscellaneousModel value) {
+      onChanged: (MiscellaneousModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
@@ -74,7 +69,10 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
       key: _scaffoldKey,
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: _buildSearchField(),
+        title: SearchText(
+          _searchQueryController,
+          () {  _fetch(); }
+        ),
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         elevation: 0,
@@ -90,7 +88,11 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.download_outlined),
             tooltip: AppLocalizations.of(context)!.text('import'),
-            onPressed: _import,
+            onPressed: () {
+              ImportHelper.miscellaneous(context, () {
+                _fetch();
+              });
+            }
           ),
           IconButton(
             padding: EdgeInsets.zero,
@@ -113,11 +115,17 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
                   return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
                 }
                 if (_showList || widget.showCheckboxColumn == true) {
-                  _dataSource.buildDataGridRows(snapshot.data!);
+                  if (widget.loadMore) {
+                    _dataSource.data = snapshot.data!;
+                    _dataSource.handleLoadMoreRows();
+                  } else {
+                    _dataSource.buildDataGridRows(snapshot.data!);
+                  }
+                  _dataSource.notifyListeners();
                   return EditSfDataGrid(
                     context,
                     allowEditing: currentUser != null && currentUser!.isAdmin(),
-                    showCheckboxColumn: widget.showCheckboxColumn!,
+                    showCheckboxColumn: widget.showCheckboxColumn,
                     selectionMode: SelectionMode.multiple,
                     source: _dataSource,
                     controller: _dataGridController,
@@ -164,63 +172,20 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
     );
   }
 
-  Widget _buildSearchField() {
-    return Container(
-      margin: EdgeInsets.zero,
-      padding: EdgeInsets.zero,
-      decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(8),
-          color: FillColor
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Flexible(
-              child: TextField(
-                controller: _searchQueryController,
-                decoration: InputDecoration(
-                    isDense: true,
-                    contentPadding: EdgeInsets.all(14),
-                    icon: Padding(
-                        padding: EdgeInsets.only(left: 4.0),
-                        child: Icon(Icons.search, color: Theme.of(context).primaryColor)
-                    ),
-                    hintText: AppLocalizations.of(context)!.text('search_hint'),
-                    hintStyle: TextStyle(color: Theme.of(context).primaryColor),
-                    border: InputBorder.none
-                ),
-                style: TextStyle(fontSize: 14.0),
-                onChanged: (query) {
-                  return _fetch();
-                },
-              )
-          ),
-          if (_searchQueryController.text.length > 0) IconButton(
-              icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
-              onPressed: () {
-                _searchQueryController.clear();
-                _fetch();
-              }
-          )
-        ],
-      )
-    );
-  }
-
   Widget _item(MiscellaneousModel model) {
     Locale locale = AppLocalizations.of(context)!.locale;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
         contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        title: Text(model.localizedName(locale) ?? '',  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        title: Text(AppLocalizations.of(context)!.localizedText(model.name),  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             if (model.type != Misc.other) Text(AppLocalizations.of(context)!.text(model.type.toString().toLowerCase()), style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54)),
             if (model.notes != null ) ExpandableText(
-              model.localizedNotes(locale) ?? '',
+              AppLocalizations.of(context)!.localizedText(model.notes),
               linkColor: Theme.of(context).primaryColor,
               expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
               collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
@@ -270,101 +235,6 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
     // Navigator.push(context, MaterialPageRoute(builder: (context) {
     //   return FormProductPage(model);
     // })).then((value) { _fetch(); });
-  }
-
-  _import() async {
-    try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: ['xml'],
-      );
-      if (result != null) {
-        try {
-          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
-
-          final XmlDocument document;
-          if(DeviceHelper.isDesktop) {
-            document = XmlDocument.parse(utf8.decode(result.files.single.bytes!));
-          } else {
-            File file = File(result.files.single.path!);
-            document = XmlDocument.parse(file.readAsStringSync());
-          }
-          if (document != null) {
-            final fermentables = document.findAllElements('Misc');
-            for(XmlElement element in fermentables) {
-              final model = MiscellaneousModel(
-                  name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.text})
-              );
-              int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
-              if (time != null) {
-                model.time = time;
-              }
-              final desc = element.getElement('F_M_NOTES');
-              if (desc != null && desc.text.isNotEmpty) {
-                String text = desc.text.replaceAll(RegExp(r'\n'), '');
-                text = desc.text.replaceAll(RegExp(r'\r'), '');
-                text = desc.text.replaceAll('  ', '');
-                model.notes = LocalizedText(map: { 'en': text.trim()});
-              }
-              int type = int.parse(element.getElement('F_M_TYPE')!.text);
-              switch (type) {
-                case 0:
-                  model.type = Misc.spice;
-                  break;
-                case 1:
-                  model.type = Misc.fining;
-                  break;
-                case 2:
-                  model.type = Misc.herb;
-                  break;
-                case 3:
-                  model.type = Misc.flavor;
-                  break;
-                case 4:
-                  model.type = Misc.other;
-                  break;
-                case 5:
-                  model.type = Misc.water_agent;
-                  break;
-              }
-              int use = int.parse(element.getElement('F_M_USE')!.text);
-              switch (use) {
-                case 0:
-                  model.use = Use.boil;
-                  break;
-                case 1:
-                  model.use = Use.mash;
-                  break;
-                case 2:
-                  model.use = Use.primary;
-                  break;
-                case 3:
-                  model.use = Use.secondary;
-                  break;
-                case 4:
-                  model.use = Use.bottling;
-                  break;
-                case 5:
-                  model.use = Use.sparge;
-                  break;
-              }
-              List<MiscellaneousModel> list = await Database().getMiscellaneous(name: model.name.toString());
-              if (list.isEmpty) {
-                Database().add(model, ignoreAuth: true);
-              }
-            }
-            _fetch();
-          }
-        } finally {
-          EasyLoading.dismiss();
-        }
-      }
-    } on PlatformException catch (e) {
-      _showSnackbar("Unsupported operation" + e.toString());
-    } catch (ex) {
-      debugPrint(ex.toString());
-      _showSnackbar(ex.toString());
-    }
   }
 
   _showSnackbar(String message) {

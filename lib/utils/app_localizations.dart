@@ -1,16 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
+
+// Internal package
+import 'package:bb/helpers/formula_helper.dart';
+import 'package:bb/utils/color_units.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/localized_text.dart';
 
 // External package
 import 'package:intl/intl.dart';
 
 class AppLocalizations {
   final Locale locale;
+  Unit unit;
   static Map<dynamic, dynamic>? _localisedValues;
 
-  AppLocalizations(this.locale) {
+  AppLocalizations(this.locale, this.unit) {
     _localisedValues = null;
   }
 
@@ -19,7 +27,11 @@ class AppLocalizations {
   }
 
   static Future<AppLocalizations> load(Locale locale) async {
-    AppLocalizations appTranslations = AppLocalizations(locale);
+    Unit unit = Unit.metric;
+    if (locale.countryCode == 'US') {
+      unit = Unit.imperial;
+    }
+    AppLocalizations appTranslations = AppLocalizations(locale, unit);
     String jsonContent = await rootBundle.loadString("assets/locales/${locale.languageCode}.json");
     _localisedValues = json.decode(jsonContent);
     return appTranslations;
@@ -34,6 +46,10 @@ class AppLocalizations {
     return _localisedValues![key] ?? "$key not found";
   }
 
+  String localizedText(dynamic? value, {Locale? locale}) {
+    return LocalizedText.text(locale ?? this.locale, value);
+  }
+
   String get colon {
     if (currentLanguage == 'fr') {
       return ' :';
@@ -41,64 +57,221 @@ class AppLocalizations {
     return ':';
   }
 
-  String? number(double? number, {String? symbol}) {
+  String get liquidUnit {
+    if (unit == Unit.imperial) {
+      return text('gallons');
+    }
+    return text('liters');
+  }
+
+  String get colorUnit {
+    if (unit == Unit.imperial) {
+      return 'SRM';
+    }
+    return 'EBC';
+  }
+
+  int get maxColor {
+    if (unit == Unit.imperial) {
+      return 40;
+    }
+    return 80;
+  }
+
+  /// Returns the number format.
+  double? decimal(number) {
+    if (number == null || number.isEmpty) {
+      return null;
+    }
+    return NumberFormat.decimalPattern(locale.toString()).parse(number) as double;
+  }
+
+  /// Returns the formatted decimal.
+  String? numberFormat(number, {String? symbol}) {
     if (number == null) {
       return null;
     }
-    return NumberFormat("#0.#", currentLanguage).format(number) + symbol!;
+    return NumberFormat("#0.#", currentLanguage).format(number) + (symbol ?? '');
   }
 
-  String? currency(double? number) {
+  /// Returns the formatted currency.
+  String? currencyFormat(number) {
     if (number == null) {
       return null;
     }
     return NumberFormat.simpleCurrency(locale: currentLanguage).format(number);
   }
 
-  String? temperature(double? number) {
+  /// Returns the formatted temperature.
+  String? tempFormat(number) {
     if (number == null) {
       return null;
+    }
+    if (unit == Unit.imperial) {
+      return NumberFormat("#0.#°F", currentLanguage).format(number);
     }
     return NumberFormat("#0.#°C", currentLanguage).format(number);
   }
 
-  /// Returns the localized duration, based on the given conditions.
-  ///
-  /// The `number` argument is relative to the number in minutes.
-  String? duration(int? number) {
+  /// Returns the formatted percent.
+  String? percentFormat(number) {
     if (number == null) {
       return null;
+    }
+    return this.numberFormat(number, symbol: '%');
+  }
+
+  /// Returns the formatted duration, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in minutes.
+  String? durationFormat(number) {
+    if (number == null) {
+      return null;
+    }
+    if (number >= 2880) {
+      return '${number/1440} ${text('days')}';
+    } else if (number >= 1440) {
+      return '${number/1440} ${text('day')}';
     }
     return '$number min';
   }
 
-  String? percent(double? number) {
+  /// Returns the formatted weight, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in grams.
+  String? weightFormat(number) {
     if (number == null) {
       return null;
     }
-    return this.number(number, symbol: '%');
+    if (unit == Unit.imperial) {
+      number = FormulaHelper.convertGramToOunce(number);
+      var suffix = ' oz';
+      if (number >= 10) {
+        number = FormulaHelper.convertOunceToLivre(number);
+        suffix = ' lb';
+      }
+      return this.numberFormat(number, symbol: suffix);
+    }
+
+    var suffix = ' g';
+    if (number >= 1000) {
+      number = number / 1000;
+      suffix = ' kg';
+    }
+    return this.numberFormat(number, symbol: suffix);
+  }
+
+  /// Returns the suffix weight, based on the given conditions.
+  ///
+  /// The `weight` argument is relative to the number in grams.
+  String? weightSuffix({Weight? weight = Weight.gram}) {
+    if (unit == Unit.imperial) {
+      if (weight == Weight.gram) {
+        return 'oz';
+      }
+      return 'lb';
+    }
+
+    if (weight == Weight.gram) {
+      return 'g';
+    }
+    return 'kg';
   }
 
   /// Returns the localized weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in grams.
-  String? weight(double? number) {
+  double? weight(number, {Weight? weight = Weight.gram}) {
     if (number == null) {
       return null;
     }
-    var suffix = ' g';
-    if (number >= 100) {
-      number = number / 100;
-      suffix = ' kg';
+    if (unit == Unit.imperial) {
+      number = FormulaHelper.convertGramToOunce(number);
+      if (weight == Weight.kilo) {
+        number = FormulaHelper.convertOunceToLivre(number);
+      }
+
+      return number;
     }
-    return this.number(number, symbol: suffix);
+
+    if (weight == Weight.kilo) {
+      number = number / 1000;
+    }
+    return number;
   }
 
-  String? volume(double? number) {
+
+  /// Returns the localized weight to gram, based on the given conditions.
+  double? gram(number, {Weight? weight = Weight.gram}) {
     if (number == null) {
       return null;
     }
-    return this.number(number, symbol: ' L');
+    if (unit == Unit.imperial) {
+      if (weight == Weight.kilo) {
+        number = FormulaHelper.convertLivreToOunce(number);
+      }
+      number =  FormulaHelper.convertOunceToGram(number);
+    }
+    if (weight == Weight.kilo) {
+      number = number / 1000;
+    }
+    return number;
+  }
+
+
+  /// Returns the formatted volume, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in litters.
+  String? volumeFormat(number, {bool? symbol = true}) {
+    if (number == null) {
+      return null;
+    }
+    if (unit == Unit.imperial) {
+      return this.numberFormat(FormulaHelper.convertLiterToGallon(number), symbol: (symbol == true ? ' gal' : null));
+    }
+    return this.numberFormat(number, symbol: (symbol == true ? ' L' : null));
+  }
+
+  /// Returns the localized volume to litter, based on the given conditions.
+  double? volume(number) {
+    if (number == null) {
+      return null;
+    }
+    if (unit == Unit.imperial) {
+      return FormulaHelper.convertGallonToLiter(number);
+    }
+    return number;
+  }
+
+  /// Returns the formatted color, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in ebc color.
+  String? colorFormat(number) {
+    if (number == null) {
+      return null;
+    }
+    if (unit == Unit.imperial) {
+      return this.numberFormat(ColorUnits.toSRM(number));
+    }
+    return this.numberFormat(number);
+  }
+
+  /// Returns the localized volume to litter, based on the given conditions.
+  int? color(number) {
+    if (number == null) {
+      return null;
+    }
+    if (unit == Unit.imperial) {
+      number = ColorUnits.toSRM(number);
+    }
+    return number > maxColor ? maxColor : number;
+  }
+
+  int? fromSRM(number) {
+    if (number != null && unit == Unit.metric) {
+      return ColorUnits.toEBC(number);
+    }
+    return number;
   }
 }
 
