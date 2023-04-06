@@ -69,7 +69,8 @@ class _LoginPageState extends State<LoginPage> {
                   Expanded(
                     child: Text('Se connecter', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
                   ),
-                  GestureDetector(
+                  InkWell(
+                    hoverColor: Colors.white,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
@@ -156,7 +157,13 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(height: 6),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text('Mot de passe oublié ?', style: TextStyle(color: Theme.of(context).primaryColor)),
+                child: InkWell(
+                  hoverColor: Colors.white,
+                  child: Text('Mot de passe oublié ?', style: TextStyle(color: Theme.of(context).primaryColor)),
+                  onTap: () {
+
+                  },
+                ),
               ),
               SizedBox(height: 18),
               Text.rich(

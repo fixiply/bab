@@ -61,7 +61,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     Expanded(
                         child: Text('S\'inscrire', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
                     ),
-                    GestureDetector(
+                    InkWell(
+                      hoverColor: Colors.white,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
