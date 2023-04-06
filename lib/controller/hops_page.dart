@@ -21,11 +21,12 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class HopsPage extends StatefulWidget {
+  bool allowEditing;
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
   ReceiptModel? receipt;
-  HopsPage({Key? key, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
+  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
 
   _HopsPageState createState() => new _HopsPageState();
 }
@@ -51,7 +52,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
     _controller = ScrollController();
     _dataSource = HopDataSource(context,
       showQuantity: widget.showQuantity,
-      showCheckboxColumn: widget.showCheckboxColumn!,
+      showCheckboxColumn: widget.showCheckboxColumn,
       onChanged: (HopModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -85,7 +86,17 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
           }
         ) : null,
         actions: [
-          if (currentUser != null && currentUser!.isAdmin()) IconButton(
+          if (_showList && widget.allowEditing) IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.delete_outline),
+              tooltip: AppLocalizations.of(context)!.text('delete'),
+              onPressed: () {
+                ImportHelper.yeasts(context, () {
+                  _fetch();
+                });
+              }
+          ),
+          if (widget.allowEditing) IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.download_outlined),
             tooltip: AppLocalizations.of(context)!.text('import'),
@@ -125,8 +136,8 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
                   _dataSource.notifyListeners();
                   return EditSfDataGrid(
                     context,
-                    allowEditing: currentUser != null && currentUser!.isAdmin(),
-                    showCheckboxColumn: widget.showCheckboxColumn,
+                    allowEditing: widget.allowEditing,
+                    showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
                     selectionMode: SelectionMode.multiple,
                     source: _dataSource,
                     controller: _dataGridController,
@@ -174,7 +185,6 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
   }
 
   Widget _item(HopModel model) {
-    Locale locale = AppLocalizations.of(context)!.locale;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(

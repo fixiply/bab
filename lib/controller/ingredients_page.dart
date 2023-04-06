@@ -12,7 +12,6 @@ import 'package:bb/widgets/custom_menu_button.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
-import 'package:provider/provider.dart';
 
 class IngredientsPage extends StatefulWidget {
   IngredientsPage({Key? key}) : super(key: key);
@@ -95,10 +94,10 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
         ),
         body: TabBarView(
           children: [
-            FermentablesPage(),
-            HopsPage(),
-            YeastsPage(),
-            MiscellaneousPage(),
+            FermentablesPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
+            HopsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
+            YeastsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
+            MiscellaneousPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
           ]
         ),
       )

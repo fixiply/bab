@@ -82,6 +82,14 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
               publish: false,
               filtered: false,
               archived: false,
+              units: true,
+              onSelected: (value) {
+                if (value is Unit) {
+                  setState(() {
+                    AppLocalizations.of(context)!.unit = value;
+                  });
+                }
+              },
             )
           ],
           bottom: PreferredSize(
@@ -94,10 +102,10 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
         ),
         body: TabBarView(
           children: [
-            FermentablesDataTable(color: Colors.white),
-            HopsDataTable(color: Colors.white),
-            YeastsDataTable(color: Colors.white),
-            MiscellaneousDataTable(color: Colors.white),
+            FermentablesDataTable(data: [], color: Colors.white),
+            HopsDataTable(data: [], color: Colors.white),
+            YeastsDataTable(data: [], color: Colors.white),
+            MiscellaneousDataTable(data: [], color: Colors.white),
           ]
         ),
       )

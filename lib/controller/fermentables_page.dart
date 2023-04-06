@@ -22,11 +22,12 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class FermentablesPage extends StatefulWidget {
+  bool allowEditing;
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
   ReceiptModel? receipt;
-  FermentablesPage({Key? key, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
+  FermentablesPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
 
   _FermentablesPageState createState() => new _FermentablesPageState();
 }
@@ -52,7 +53,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
     _controller = ScrollController();
     _dataSource = FermentableDataSource(context,
       showQuantity: widget.showQuantity,
-      showCheckboxColumn: widget.showCheckboxColumn!,
+      showCheckboxColumn: widget.showCheckboxColumn,
       onChanged: (FermentableModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -86,7 +87,17 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
           }
         ) : null,
         actions: [
-          if (currentUser != null && currentUser!.isAdmin()) IconButton(
+          if (_showList && widget.allowEditing) IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.delete_outline),
+              tooltip: AppLocalizations.of(context)!.text('delete'),
+              onPressed: () {
+                ImportHelper.yeasts(context, () {
+                  _fetch();
+                });
+              }
+          ),
+          if (widget.allowEditing) IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.download_outlined),
             tooltip: AppLocalizations.of(context)!.text('import'),
@@ -112,13 +123,11 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
           child: FutureBuilder<List<FermentableModel>>(
             future: _data,
             builder: (context, snapshot) {
-              debugPrint('builder');
               if (snapshot.hasData) {
                 if (snapshot.data!.length == 0) {
                   return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
                 }
                 if (_showList || widget.showCheckboxColumn == true) {
-                  debugPrint('before build');
                   if (widget.loadMore) {
                     _dataSource.data = snapshot.data!;
                     _dataSource.handleLoadMoreRows();
@@ -126,11 +135,10 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
                     _dataSource.buildDataGridRows(snapshot.data!);
                   }
                   _dataSource.notifyListeners();
-                  debugPrint('after Build');
                   return EditSfDataGrid(
                     context,
-                    allowEditing: currentUser != null && currentUser!.isAdmin(),
-                    showCheckboxColumn: widget.showCheckboxColumn,
+                    allowEditing: widget.allowEditing,
+                    showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
                     selectionMode: SelectionMode.multiple,
                     source: _dataSource,
                     controller: _dataGridController,
@@ -178,7 +186,6 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
   }
 
   Widget _item(FermentableModel model) {
-    Locale locale = AppLocalizations.of(context)!.locale;
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
@@ -270,7 +277,6 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
 
   _fetch() async {
     setState(() {
-      debugPrint('fetch');
       _data = Database().getFermentables(searchText: _searchQueryController.value.text, ordered: true);
     });
   }

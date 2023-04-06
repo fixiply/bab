@@ -28,10 +28,14 @@ const double DEFAULT_HEAD_LOSS = 2.0;
 //User Global
 UserModel? currentUser;
 
-mixin Enums<T extends Enum> on Enum {
+mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   List<Enum> get enums;
   String getLabel(BuildContext context) {
     return AppLocalizations.of(context)!.text(this.toString().toLowerCase());
+  }
+
+  int compareTo(other) {
+    return this.index.compareTo(other.index);
   }
 }
 
