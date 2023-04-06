@@ -67,15 +67,15 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text('Se connecter', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
+                    child: Text(AppLocalizations.of(context)!.text('to_connect'), style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
                   ),
                   InkWell(
                     hoverColor: Colors.white,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('Pas encore inscrit ?', style: TextStyle(color: Theme.of(context).primaryColor)),
-                        Text('Inscrivez-vous', style: TextStyle(color: Theme.of(context).primaryColor)),
+                        Text(AppLocalizations.of(context)!.text('not_registered'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                        Text(AppLocalizations.of(context)!.text('sign_up'), style: TextStyle(color: Theme.of(context).primaryColor)),
                       ],
                     ),
                     onTap: () {
@@ -159,54 +159,57 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.centerLeft,
                 child: InkWell(
                   hoverColor: Colors.white,
-                  child: Text('Mot de passe oublié ?', style: TextStyle(color: Theme.of(context).primaryColor)),
+                  child: Text(AppLocalizations.of(context)!.text('forgot_password'), style: TextStyle(color: Theme.of(context).primaryColor)),
                   onTap: () {
 
                   },
                 ),
               ),
               SizedBox(height: 18),
-              Text.rich(
+              Align(
+                alignment: Alignment.centerLeft,
+                child:Text.rich(
                   TextSpan(
-                      text:  'En cliquant sur l\'une des réponses ci-après, j\'accepte les ',
-                      style: regular14pt.copyWith(color: TextGrey),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: 'Conditions Générales d\'Utilisation',
+                    text:  AppLocalizations.of(context)!.text('cgu_1'),
+                    style: regular14pt.copyWith(color: TextGrey),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: AppLocalizations.of(context)!.text('terms_of_use'),
+                          style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
+                          recognizer: TapGestureRecognizer()..onTap = () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return MarkdownDialog(filename: TERMS_CONDITIONS);
+                                }
+                            );
+                          }
+                      ),
+                      TextSpan(
+                        text: AppLocalizations.of(context)!.text('cgu_2'),
+                        style: regular14pt.copyWith(color: TextGrey),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: '${AppLocalizations.of(context)!.text('privacy_policy')}.',
                             style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
                             recognizer: TapGestureRecognizer()..onTap = () {
                               showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return MarkdownDialog(filename: TERMS_CONDITIONS);
+                                    return MarkdownDialog(filename: PRIVACY_POLICY);
                                   }
                               );
                             }
-                        ),
-                        TextSpan(
-                          text: ' et je reconnais avoir lu la ',
-                          style: regular14pt.copyWith(color: TextGrey),
-                          children: <TextSpan>[
-                            TextSpan(
-                              text: 'Politique de Confidentalié.',
-                              style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
-                              recognizer: TapGestureRecognizer()..onTap = () {
-                                showDialog(
-                                    context: context,
-                                    builder: (context) {
-                                      return MarkdownDialog(filename: PRIVACY_POLICY);
-                                    }
-                                );
-                              }
-                            )
-                          ]
-                        )
-                      ]
+                          )
+                        ]
+                      )
+                    ]
                   )
+                ),
               ),
               SizedBox(height: 18),
               CustomPrimaryButton(
-                textValue: 'Se connecter',
+                textValue: AppLocalizations.of(context)!.text('to_connect'),
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {
                     await _signInWithEmailAndPassword();
@@ -230,7 +233,7 @@ class _LoginPageState extends State<LoginPage> {
 
   _signInWithEmailAndPassword() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
@@ -239,9 +242,9 @@ class _LoginPageState extends State<LoginPage> {
       Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        _showSnackbar('No user found for that email.');
+        _showSnackbar(AppLocalizations.of(context)!.text('no_user_found'));
       } else if (e.code == 'wrong-password') {
-        _showSnackbar('Wrong password provided for that user.');
+        _showSnackbar(AppLocalizations.of(context)!.text('wrong_password'));
       }
     }
   }

@@ -157,43 +157,46 @@ class _RegisterPageState extends State<RegisterPage> {
                   }
               ),
               SizedBox(height: 18),
-              Text.rich(
+              Align(
+                alignment: Alignment.centerLeft,
+                child:Text.rich(
                   TextSpan(
-                      text:  'En cliquant sur l\'une des réponses ci-après, j\'accepte les ',
-                      style: regular14pt.copyWith(color: TextGrey),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: 'Conditions Générales d\'Utilisation',
-                            style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
-                            recognizer: TapGestureRecognizer()..onTap = () {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return MarkdownDialog(filename: TERMS_CONDITIONS);
-                                  }
-                              );
-                            }
-                        ),
-                        TextSpan(
-                            text: ' et je reconnais avoir lu la ',
-                            style: regular14pt.copyWith(color: TextGrey),
-                            children: <TextSpan>[
-                              TextSpan(
-                                  text: 'Politique de Confidentalié.',
-                                  style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
-                                  recognizer: TapGestureRecognizer()..onTap = () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return MarkdownDialog(filename: PRIVACY_POLICY);
-                                        }
-                                    );
-                                  }
-                              )
-                            ]
-                        )
-                      ]
+                    text:  AppLocalizations.of(context)!.text('cgu_1'),
+                    style: regular14pt.copyWith(color: TextGrey),
+                    children: <TextSpan>[
+                      TextSpan(
+                          text: AppLocalizations.of(context)!.text('terms_of_use'),
+                          style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
+                          recognizer: TapGestureRecognizer()..onTap = () {
+                            showDialog(
+                                context: context,
+                                builder: (context) {
+                                  return MarkdownDialog(filename: TERMS_CONDITIONS);
+                                }
+                            );
+                          }
+                      ),
+                      TextSpan(
+                          text: AppLocalizations.of(context)!.text('cgu_2'),
+                          style: regular14pt.copyWith(color: TextGrey),
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: '${AppLocalizations.of(context)!.text('privacy_policy')}.',
+                                style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
+                                recognizer: TapGestureRecognizer()..onTap = () {
+                                  showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return MarkdownDialog(filename: PRIVACY_POLICY);
+                                      }
+                                  );
+                                }
+                            )
+                          ]
+                      )
+                    ]
                   )
+                ),
               ),
               SizedBox(height: 18),
               CustomPrimaryButton(
