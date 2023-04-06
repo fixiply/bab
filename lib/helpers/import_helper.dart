@@ -61,9 +61,15 @@ class ImportHelper {
             if (map['ibumax'] != null) model.ibumax = double.tryParse(map['ibumax']);
             if (map['srmmin'] != null) model.ebcmin = ColorUnits.toEBC(int.tryParse(map['srmmin']));
             if (map['srmmax'] != null) model.ebcmax = ColorUnits.toEBC(int.tryParse(map['srmmax']));
-            List<StyleModel> list = await Database().getStyles(name: model.name.toString());
+            List<StyleModel> list = await Database().getStyles(number: model.number);
             if (list.isEmpty) {
               Database().add(model, ignoreAuth: true);
+            } else {
+              if (list.length == 1) {
+                // list.first.mouthfeel.add(const Locale('en', 'US'), model.mouthfeel.get(const Locale('en', 'US')));
+                // list.first.comments.add(const Locale('en', 'US'), model.comments.get(const Locale('en', 'US')));
+                // Database().update(list.first, updateAll: false);
+              }
             }
           }
           onImported.call();

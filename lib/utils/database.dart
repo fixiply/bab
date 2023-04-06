@@ -322,11 +322,14 @@ class Database {
     return null;
   }
 
-  Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, String? name, bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, String? name, String? number, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
     if (name != null) {
       query = query.where('name', isEqualTo: name);
+    }
+    if (number != null) {
+      query = query.where('number', isEqualTo: number);
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
