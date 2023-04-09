@@ -43,7 +43,7 @@ class ReceiptModel<T> extends Model {
     this.image,
     this.style,
     this.volume,
-    this.boil,
+    this.boil = 60,
     this.efficiency = DEFAULT_YIELD,
     this.og,
     this.fg,

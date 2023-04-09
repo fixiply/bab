@@ -75,7 +75,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
         widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.duration)]);
       }
     );
-    _dataSource.sortedColumns.add(const SortColumnDetails(name: 'duration', sortDirection: DataGridSortDirection.descending));
+    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'duration', sortDirection: DataGridSortDirection.descending));
     _fetch();
   }
 

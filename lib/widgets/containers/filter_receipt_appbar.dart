@@ -13,14 +13,16 @@ import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
 // External package
 
 class FilterReceiptAppBar extends StatefulWidget {
-  ColorUnits cu;
   IBU ibu;
   ABV abv;
+  ColorUnits cu;
+  bool my_receips;
   RangeValues? srm_values;
   List<Fermentation>? selectedFermentations = [];
   List<Category>? categories;
   List<Category>? selectedCategories = [];
   final Function(double start, double end)? onColorChanged;
+  final Function(bool value)? onMyChanged;
   final Function(double start, double end)? onIBUChanged;
   final Function(double start, double end)? onAlcoholChanged;
   final Function(Fermentation value)? onFermentationChanged;
@@ -28,13 +30,15 @@ class FilterReceiptAppBar extends StatefulWidget {
   final Function()? onReset;
 
   FilterReceiptAppBar({Key? key,
-    required this.cu,
     required this.ibu,
     required this.abv,
+    required this.cu,
+    this.my_receips = true,
     this.selectedFermentations,
     this.categories,
     this.selectedCategories,
     this.onColorChanged,
+    this.onMyChanged,
     this.onIBUChanged,
     this.onAlcoholChanged,
     this.onFermentationChanged,
@@ -99,20 +103,65 @@ class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTi
         child: Container(
           padding: EdgeInsets.all(8.0),
           alignment: Alignment.centerRight,
-          child: TextButton.icon(
-            icon: Icon(Icons.clear, size: 12),
-            label: Text(AppLocalizations.of(context)!.text('erase_all')),
-            style: TextButton.styleFrom(
-              backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
-              textStyle: const TextStyle(fontSize: 12),
-            ),
-            onPressed: changed ? () {
-              setState(() {
-                changed = false;
-              });
-              widget.onReset?.call();
-            } : null
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              // if (currentUser != null) Spacer(),
+              if (currentUser != null) Flexible(
+                child: InkWell(
+                  onTap: () {
+                    setState(() {
+                      widget.my_receips = !widget.my_receips;
+                    });
+                    widget.onMyChanged?.call(widget.my_receips);
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    decoration: ShapeDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Icon(widget.my_receips ? Icons.done : null, size: 12),
+                        SizedBox(width: 8),
+                        Flexible(child: Text(AppLocalizations.of(context)!.text('my_recipes'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13))),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(width: 10),
+              Flexible(
+                child: InkWell(
+                  onTap: changed ? () {
+                    setState(() {
+                      changed = false;
+                    });
+                    widget.onReset?.call();
+                  } : null,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                    decoration: ShapeDecoration(
+                      color: Theme.of(context).primaryColor.withOpacity(0.2),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        Icon(Icons.clear, size: 12),
+                        SizedBox(width: 8),
+                        Flexible(child: Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13))),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
           )
         )
       )

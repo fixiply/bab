@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/controller/forms/form_yeast_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
@@ -172,7 +173,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
         ),
       ),
       floatingActionButton: Visibility(
-        visible: currentUser != null && currentUser!.hasRole(),
+        visible: currentUser != null && currentUser!.isAdmin(),
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,
@@ -193,7 +194,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name),  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              if (model.product != null) TextSpan(text: '  ${model.product}'),
+              if (model.reference != null) TextSpan(text: '  ${model.reference}'),
             ],
           ),
         ),
@@ -257,15 +258,15 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
 
   _new() {
     YeastModel newModel = YeastModel();
-    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-    //   return FormProductPage(newModel);
-    // })).then((value) { _fetch(); });
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormYeastPage(newModel);
+    })).then((value) { _fetch(); });
   }
 
   _edit(YeastModel model) {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-    //   return FormProductPage(model);
-    // })).then((value) { _fetch(); });
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormYeastPage(model);
+    })).then((value) { _fetch(); });
   }
 
   _showSnackbar(String message) {

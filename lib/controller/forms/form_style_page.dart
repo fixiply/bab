@@ -191,7 +191,7 @@ class _FormStylePageState extends State<FormStylePage> {
                       onChanged: (value) {
                         widget.model.fermentation = value;
                       }
-                  )
+                    )
                   ),
                 ]
               ),

@@ -7,12 +7,13 @@ import 'package:bb/utils/app_localizations.dart';
 
 class ConfirmDialog extends StatefulWidget {
   final String? title;
+  final scrollable;
   final Widget content;
   final void Function()? onOk;
   final void Function()? onCancel;
   final String? ok;
   final String? cancel;
-  ConfirmDialog({this.title, required this.content, this.onOk, this.onCancel, this.ok, this.cancel});
+  ConfirmDialog({this.title, this.scrollable = false, required this.content, this.onOk, this.onCancel, this.ok, this.cancel});
 
   @override
   State<StatefulWidget> createState() {
@@ -52,6 +53,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       );
     }
     return AlertDialog(
+      scrollable: widget.scrollable,
       title: widget.title != null ? Text(widget.title!) : null,
       content: widget.content,
       actions: <Widget>[

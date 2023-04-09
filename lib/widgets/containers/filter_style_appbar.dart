@@ -97,20 +97,29 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
           child: Container(
             padding: EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
-            child: TextButton.icon(
-              icon: Icon(Icons.clear, size: 12),
-              label: Text(AppLocalizations.of(context)!.text('erase_all')),
-              style: TextButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
-                textStyle: const TextStyle(fontSize: 12),
-              ),
-              onPressed: changed ? () {
+            child: InkWell(
+              onTap: changed ? () {
                 setState(() {
                   changed = false;
                 });
                 widget.onReset?.call();
-              } : null
+              } : null,
+              child: Container(
+                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
+                decoration: ShapeDecoration(
+                  color: Theme.of(context).primaryColor.withOpacity(0.2),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: <Widget>[
+                    Icon(Icons.clear, size: 12),
+                    SizedBox(width: 8),
+                    Flexible(child: Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13))),
+                  ],
+                ),
+              ),
             )
           )
         )

@@ -245,14 +245,14 @@ class Database {
     return null;
   }
 
-  Future<List<ReceiptModel>> getReceipts({String? searchText, bool archived = false, bool all = false, bool ordered = true}) async {
+  Future<List<ReceiptModel>> getReceipts({String? searchText, String? user, bool? myData, bool all = false, bool ordered = true}) async {
     List<ReceiptModel> list = [];
     Query query = receipts;
     if (all == false) {
-      if (archived == true) {
-        query = query.where('status', isEqualTo: Status.disabled.index);
-      } else {
-        query = query.where('status', isLessThanOrEqualTo: Status.publied.index);
+      if (myData == false || user == null) {
+        query = query.where('shared', isEqualTo: true);
+      } else if (user != null) {
+        query = query.where('creator', isEqualTo: user);
       }
     }
     await query.get().then((result) {

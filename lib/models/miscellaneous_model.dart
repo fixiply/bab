@@ -99,6 +99,26 @@ class MiscellaneousModel<T> extends Model {
     return 'MiscellaneousModel: $name, UUID: $uuid';
   }
 
+  @override
+  bool isNumericType(String columnName) {
+    return columnName == 'amount' || columnName == 'time';
+  }
+
+  @override
+  bool isTextType(String columnName) {
+    return columnName == 'name' || columnName == 'notes';
+  }
+
+  @override
+  List<Enums>? isEnumType(String columnName) {
+    if (columnName == 'type') {
+      return Misc.values;
+    } else  if (columnName == 'use') {
+      return Use.values;
+    }
+    return null;
+  }
+
   static List<MiscellaneousModel> merge(List<Quantity>? quantities, List<MiscellaneousModel> miscellaneous) {
     List<MiscellaneousModel> list = [];
     if (quantities != null && miscellaneous != null) {
@@ -245,15 +265,12 @@ class MiscellaneousDataSource extends EditDataSource {
 
   @override
   bool isNumericType(GridColumn column) {
-    return column.columnName == 'amount' || column.columnName == 'time';
+    return MiscellaneousModel().isNumericType(column.columnName);
   }
 
   @override
-  Enums? isEnums(GridColumn column) {
-    if (column.columnName == 'use') {
-      return Use.mash;
-    }
-    return null;
+  List<Enums>? isEnumType(GridColumn column) {
+    return MiscellaneousModel().isEnumType(column.columnName);
   }
 
   @override

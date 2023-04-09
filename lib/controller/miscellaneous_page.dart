@@ -2,6 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/controller/forms/form_misc_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
@@ -172,7 +173,7 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
         ),
       ),
       floatingActionButton: Visibility(
-        visible: currentUser != null && currentUser!.hasRole(),
+        visible: currentUser != null && currentUser!.isAdmin(),
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,
@@ -236,15 +237,15 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
 
   _new() {
     MiscellaneousModel newModel = MiscellaneousModel();
-    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-    //   return FormProductPage(newModel);
-    // })).then((value) { _fetch(); });
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormMiscPage(newModel);
+    })).then((value) { _fetch(); });
   }
 
   _edit(MiscellaneousModel model) {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-    //   return FormProductPage(model);
-    // })).then((value) { _fetch(); });
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormMiscPage(model);
+    })).then((value) { _fetch(); });
   }
 
   _showSnackbar(String message) {

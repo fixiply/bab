@@ -27,6 +27,7 @@ import 'package:bb/widgets/search_text.dart';
 // External package
 import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 
@@ -44,6 +45,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
 
   IBU _ibu = IBU();
   ABV _abv = ABV();
+  bool _my_receips = true;
   ColorUnits _cu = ColorUnits();
   List<Fermentation> _selectedFermentations = [];
   List<Category> _selectedCategories = [];
@@ -113,9 +115,10 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
             return CustomScrollView(
               slivers: [
                 FilterReceiptAppBar(
-                  cu: _cu,
                   ibu: _ibu,
                   abv: _abv,
+                  cu: _cu,
+                  my_receips: _my_receips,
                   selectedFermentations: _selectedFermentations,
                   categories: _categories,
                   selectedCategories: _selectedCategories,
@@ -123,6 +126,12 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
                     setState(() {
                       _cu.start = start;
                       _cu.end = end;
+                    });
+                    _fetch();
+                  },
+                  onMyChanged: (value) {
+                    setState(() {
+                      _my_receips = value;
                     });
                     _fetch();
                   },
@@ -196,7 +205,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,
-          tooltip: AppLocalizations.of(context)!.text('new'),
+          tooltip: AppLocalizations.of(context)!.text('new_recipe'),
           child: const Icon(Icons.add)
         )
       )
@@ -336,6 +345,9 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   }
 
   _initialize() async {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      _fetch();
+    });
     final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
     _baskets = basketProvider.size;
     basketProvider.addListener(() {
@@ -350,7 +362,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   _fetch() async {
     _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
     Category.populate(_categories, _styles, AppLocalizations.of(context)!.locale);
-    List<ReceiptModel> list = await Database().getReceipts(ordered: true);
+    List<ReceiptModel> list = await Database().getReceipts(user: currentUser?.uuid, myData: _my_receips, ordered: true);
     setState(() {
       _receipts = _filter(list);
     });

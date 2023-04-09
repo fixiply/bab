@@ -9,16 +9,15 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/image_field.dart';
+import 'package:bb/widgets/forms/localized_text_field.dart';
 import 'package:bb/widgets/forms/period_field.dart';
+import 'package:bb/widgets/forms/text_input_field.dart';
 import 'package:bb/widgets/forms/weekdays_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
-
-// External package
-import 'package:markdown_editable_textinput/format_markdown.dart';
-import 'package:markdown_editable_textinput/markdown_text_input.dart';
 
 class FormProductPage extends StatefulWidget {
   final ProductModel model;
@@ -155,34 +154,34 @@ class _FormProductPageState extends State<FormProductPage> {
               ),
               Divider(height: 10),
               if (widget.model.product == Product.article) FutureBuilder<List<ReceiptModel>>(
-                  future: _receipts,
-                  builder: (context, snapshot) {
-                    if (snapshot.data != null) {
-                      return DropdownButtonFormField<String>(
-                          value: widget.model.receipt,
-                          decoration: FormDecoration(
-                            icon: Icon(Icons.receipt_outlined),
-                            labelText: AppLocalizations.of(context)!.text('receipt'),
-                          ),
-                          items: snapshot.data!.map((ReceiptModel model) {
-                            return DropdownMenuItem<String>(
-                              value: model.uuid,
-                              child: Text(AppLocalizations.of(context)!.localizedText(model.title)));
-                          }).toList(),
-                          onChanged: (value) =>
-                              setState(() {
-                                widget.model.receipt = value;
-                              }),
-                          validator: (value) {
-                            if (value == null) {
-                              return AppLocalizations.of(context)!.text('required_field');
-                            }
-                            return null;
+                future: _receipts,
+                builder: (context, snapshot) {
+                  if (snapshot.data != null) {
+                    return DropdownButtonFormField<String>(
+                        value: widget.model.receipt,
+                        decoration: FormDecoration(
+                          icon: Icon(Icons.receipt_outlined),
+                          labelText: AppLocalizations.of(context)!.text('receipt'),
+                        ),
+                        items: snapshot.data!.map((ReceiptModel model) {
+                          return DropdownMenuItem<String>(
+                            value: model.uuid,
+                            child: Text(AppLocalizations.of(context)!.localizedText(model.title)));
+                        }).toList(),
+                        onChanged: (value) =>
+                            setState(() {
+                              widget.model.receipt = value;
+                            }),
+                        validator: (value) {
+                          if (value == null) {
+                            return AppLocalizations.of(context)!.text('required_field');
                           }
-                      );
-                    }
-                    return Container();
+                          return null;
+                        }
+                    );
                   }
+                  return Container();
+                }
               ),
               if (widget.model.product == Product.article) Divider(height: 10),
               FutureBuilder<List<CompanyModel>>(
@@ -216,15 +215,13 @@ class _FormProductPageState extends State<FormProductPage> {
                 }
               ),
               Divider(height: 10),
-              TextFormField(
-                // focusNode: _focusTitle,
+              LocalizedTextField(
+                context: context,
                 initialValue: widget.model.title,
                 textCapitalization: TextCapitalization.sentences,
-                onChanged: (text) => setState(() {
-                  widget.model.title = text;
-                }),
+                onChanged: (value) => widget.model.title = value,
                 decoration: FormDecoration(
-                  icon: Icon(Icons.title),
+                  icon: const Icon(Icons.title),
                   labelText: AppLocalizations.of(context)!.text('title'),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true
@@ -238,18 +235,24 @@ class _FormProductPageState extends State<FormProductPage> {
                 }
               ),
               Divider(height: 10),
-              TextFormField(
+              LocalizedTextField(
+                context: context,
                 initialValue: widget.model.subtitle,
                 textCapitalization: TextCapitalization.sentences,
-                onChanged: (text) => setState(() {
-                  widget.model.subtitle = text;
-                }),
+                onChanged: (value) => widget.model.subtitle = value,
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.subtitles_outlined),
-                    labelText: AppLocalizations.of(context)!.text('subtitle'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                )
+                  icon: const Icon(Icons.subtitles_outlined),
+                  labelText: AppLocalizations.of(context)!.text('subtitle'),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return AppLocalizations.of(context)!.text('validator_field_required');
+                  }
+                  return null;
+                }
               ),
               Divider(height: 10),
               TextFormField(
@@ -285,43 +288,54 @@ class _FormProductPageState extends State<FormProductPage> {
                   fillColor: FillColor, filled: true
                 ),
               ),
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 2.5,
-                    child: TextFormField(
-                      initialValue: widget.model.min != null ? widget.model.min.toString() : null,
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) => setState(() {
-                        widget.model.min = int.tryParse(value);
-                      }),
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.first_page),
-                        labelText: AppLocalizations.of(context)!.text('min'),
-                        border: InputBorder.none,
-                        fillColor: FillColor, filled: true
-                      ),
+              Divider(height: 10),
+              FormField(
+                builder: (FormFieldState<int> state) {
+                  return InputDecorator(
+                    decoration: FormDecoration(
+                      icon: const Icon(Icons.backpack_outlined),
                     ),
-                  ),
-                  SizedBox(
-                    width: MediaQuery.of(context).size.width / 2.5,
-                    child: TextFormField(
-                      initialValue: widget.model.max != null ? widget.model.max.toString() : null,
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) => setState(() {
-                        widget.model.max = int.tryParse(value);
-                      }),
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.last_page),
-                        labelText: AppLocalizations.of(context)!.text('max'),
-                        border: InputBorder.none,
-                        fillColor: FillColor, filled: true
-                      ),
-                    ),
-                  ),
-                ],
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: widget.model.min != null ?  widget.model.min.toString() :  '',
+                            keyboardType: TextInputType.numberWithOptions(decimal: false),
+                            onChanged: (value) => widget.model.min = int.parse(value),
+                            decoration: FormDecoration(
+                                labelText: 'min',
+                                border: InputBorder.none,
+                                suffixIcon: Tooltip(
+                                  message:  'Vendu par X au minimum',
+                                  child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                                ),
+                                fillColor: FillColor, filled: true,
+                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.2)
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 12),
+                        Expanded(
+                          child: TextFormField(
+                            initialValue: widget.model.max != null ?  widget.model.max.toString() :  '',
+                            keyboardType: TextInputType.numberWithOptions(decimal: false),
+                            onChanged: (value) => widget.model.max = int.parse(value),
+                            decoration: FormDecoration(
+                                labelText: 'max',
+                                border: InputBorder.none,
+                                suffixIcon: Tooltip(
+                                  message:  'Vendu par X au maximum',
+                                  child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                                ),
+                                fillColor: FillColor, filled: true,
+                                constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width / 2.5)
+                            ),
+                          )
+                        ),
+                      ],
+                    )
+                  );
+                }
               ),
               if (widget.model.product == Product.booking) Divider(height: 10),
               if (widget.model.product == Product.booking) WeekdaysField(
@@ -339,18 +353,15 @@ class _FormProductPageState extends State<FormProductPage> {
                 }),
               ),
               if (widget.model.product == Product.booking) Divider(height: 10),
-              MarkdownTextInput(
-                (String value) => setState(() {
-                  widget.model.text = value;
-                }),
-                widget.model.text ?? '',
-                label: AppLocalizations.of(context)!.text('text'),
-                maxLines: 10,
-                actions: MarkdownType.values,
-                // controller: _controller,
-                validators: (value) {
-                  return null;
-                }
+              TextInputField(
+                context: context,
+                initialValue: widget.model.text,
+                title: AppLocalizations.of(context)!.text('text'),
+                onChanged: (locale, value) {
+                  LocalizedText text =  widget.model.text is LocalizedText ? widget.model.text : LocalizedText();
+                  text.add(locale, value);
+                  widget.model.text = text.size() > 0 ? text : value;
+                },
               ),
               Divider(height: 10),
               ImageField(

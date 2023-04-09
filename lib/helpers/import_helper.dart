@@ -298,13 +298,13 @@ class ImportHelper {
             for(XmlElement element in fermentables) {
               final model = yeast.YeastModel(
                   name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.text}),
-                  product: element.getElement('F_Y_PRODUCT_ID')!.text,
+                  reference: element.getElement('F_Y_PRODUCT_ID')!.text,
                   laboratory: element.getElement('F_Y_LAB')!.text,
                   cells: double.tryParse(element.getElement('F_Y_CELLS')!.text)! / 10,
-                  min_attenuation: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
-                  max_attenuation: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
-                  min_temp: double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text),
-                  max_temp: double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text)
+                  attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
+                  attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
+                  tempmin: double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text),
+                  tempmax: double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text)
               );
               final desc = element.getElement('F_Y_NOTES');
               if (desc != null && desc.text.isNotEmpty) {

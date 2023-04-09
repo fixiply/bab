@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/controller/forms/form_hop_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
@@ -173,7 +174,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
         ),
       ),
         floatingActionButton: Visibility(
-          visible: currentUser != null && currentUser!.hasRole(),
+          visible: currentUser != null && currentUser!.isAdmin(),
           child: FloatingActionButton(
             onPressed: _new,
             backgroundColor: Theme.of(context).primaryColor,
@@ -260,15 +261,15 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
 
   _new() {
     HopModel newModel = HopModel();
-    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-    //   return FormProductPage(newModel);
-    // })).then((value) { _fetch(); });
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormHopPage(newModel);
+    })).then((value) { _fetch(); });
   }
 
   _edit(HopModel model) {
-    // Navigator.push(context, MaterialPageRoute(builder: (context) {
-    //   return FormProductPage(model);
-    // })).then((value) { _fetch(); });
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormHopPage(model);
+    })).then((value) { _fetch(); });
   }
 
   _showSnackbar(String message) {

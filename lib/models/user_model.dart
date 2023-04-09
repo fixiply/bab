@@ -26,7 +26,7 @@ class UserModel<T> {
     this.full_name,
     this.email,
     this.user,
-    this.role = Role.customer,
+    this.role = Role.editor,
     this.company,
     this.addresses,
     this.payments

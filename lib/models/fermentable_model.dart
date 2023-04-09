@@ -119,6 +119,26 @@ class FermentableModel<T> extends Model {
     return FormulaHelper.extract(this.amount, this.efficiency, efficiency);
   }
 
+  @override
+  bool isNumericType(String columnName) {
+    return columnName == 'amount' || columnName == 'efficiency';
+  }
+
+  @override
+  bool isTextType(String columnName) {
+    return columnName == 'name' || columnName == 'notes';
+  }
+
+  @override
+  List<Enums>? isEnumType(String columnName) {
+    if (columnName == 'type') {
+      return Type.values;
+    } else if (columnName == 'method') {
+      return Method.values;
+    }
+    return null;
+  }
+
   static dynamic serialize(dynamic data) {
     if (data != null) {
       if (data is FermentableModel) {
@@ -309,15 +329,12 @@ class FermentableDataSource extends EditDataSource {
 
   @override
   bool isNumericType(GridColumn column) {
-    return column.columnName == 'amount' || column.columnName == 'efficiency';
+    return FermentableModel().isNumericType(column.columnName);
   }
 
   @override
-  Enums? isEnums(GridColumn column) {
-    if (column.columnName == 'method') {
-      return Method.mashed;
-    }
-    return null;
+  List<Enums>? isEnumType(GridColumn column) {
+    return FermentableModel().isEnumType(column.columnName);
   }
 
   @override

@@ -5,7 +5,6 @@ import 'package:bb/controller/fermentables_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/receipt_model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/quantity.dart';
@@ -76,7 +75,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
         widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.method!.index)]);
       }
     );
-    _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
+    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
     _fetch();
   }
 

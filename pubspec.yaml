@@ -38,6 +38,7 @@ dependencies:
   cloud_functions: ^4.0.3
   code_text_field: ^1.0.2
   devicelocale: ^0.5.5
+#  dropdown_search: ^5.0.3
   easy_sidemenu: ^0.4.1
   expandable_text: ^2.3.0
   extended_image: ^6.3.1

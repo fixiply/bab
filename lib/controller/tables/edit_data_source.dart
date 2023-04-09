@@ -30,11 +30,11 @@ abstract class EditDataSource extends DataGridSource {
     return false;
   }
 
-  String? suffixText(GridColumn column) {
+  List<Enums>? isEnumType(GridColumn column) {
     return null;
   }
 
-  Enums? isEnums(GridColumn column) {
+  String? suffixText(GridColumn column) {
     return null;
   }
 
@@ -48,12 +48,12 @@ abstract class EditDataSource extends DataGridSource {
     var value = getValue(dataGridRow, rowColumnIndex, column);
     newCellValue = value;
     if (value is Enums) {
-      return buildDropDownWidget(value, submitCell);
+      return dropDownWidget(value, submitCell);
     }
-    return buildTextFieldWidget(value?.toString() ?? '', column, submitCell);
+    return textFieldWidget(value?.toString() ?? '', column, submitCell);
   }
 
-  Widget buildTextFieldWidget(String displayText, GridColumn column, CellSubmit submitCell) {
+  Widget textFieldWidget(String displayText, GridColumn column, CellSubmit submitCell) {
     RegExp regExp = isNumericType(column) ? RegExp('[0-9.,]') : RegExp('[a-zA-Z ]');
     return Container(
       padding: const EdgeInsets.all(8.0),
@@ -95,7 +95,7 @@ abstract class EditDataSource extends DataGridSource {
     );
   }
 
-  Widget buildDropDownWidget(Enums value, CellSubmit submitCell) {
+  Widget dropDownWidget(Enums value, CellSubmit submitCell) {
     return Container(
       padding: const EdgeInsets.all(8.0),
       alignment: Alignment.centerLeft,
@@ -122,34 +122,34 @@ abstract class EditDataSource extends DataGridSource {
     );
   }
 
-  Widget buildTypeHeadWidget(Enums value, CellSubmit submitCell) {
+  Widget typeHeadWidget(Enums value, CellSubmit submitCell) {
     return Container(
       padding: const EdgeInsets.all(8.0),
       alignment: Alignment.centerLeft,
       child: TypeAheadField(
-          itemBuilder: (context, String suggestion) {
-            return Padding(
-              padding: const EdgeInsets.all(4.0),
-              child: Text(
-                suggestion,
-              ),
-            );
-          },
-          suggestionsCallback: (pattern) {
-            List<String> matches = value.enums.map((Enum e) {
-              return AppLocalizations.of(context)!.text(e.toString().toLowerCase());
-            }).toList();
-            matches.retainWhere((s) => s.toLowerCase().contains(pattern.toLowerCase()));
-            return Future.delayed(
-              Duration(seconds: 1), () => matches,
-            );
-          },
-          onSuggestionSelected: (String value) {
-            newCellValue = value;
-            /// Call [CellSubmit] callback to fire the canSubmitCell and
-            /// onCellSubmit to commit the new value in single place.
-            submitCell();
-          },
+        itemBuilder: (context, String suggestion) {
+          return Padding(
+            padding: const EdgeInsets.all(4.0),
+            child: Text(
+              suggestion,
+            ),
+          );
+        },
+        suggestionsCallback: (pattern) {
+          List<String> matches = value.enums.map((Enum e) {
+            return AppLocalizations.of(context)!.text(e.toString().toLowerCase());
+          }).toList();
+          matches.retainWhere((s) => s.toLowerCase().contains(pattern.toLowerCase()));
+          return Future.delayed(
+            Duration(seconds: 1), () => matches,
+          );
+        },
+        onSuggestionSelected: (String value) {
+          newCellValue = value;
+          /// Call [CellSubmit] callback to fire the canSubmitCell and
+          /// onCellSubmit to commit the new value in single place.
+          submitCell();
+        },
       ),
     );
   }

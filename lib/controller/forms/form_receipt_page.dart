@@ -357,7 +357,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 ingredient: Ingredient.yeast,
                 data: widget.model.yeasts,
                 receipt: widget.model,
-                onChanged: (values) => widget.model.yeasts = values,
+                onChanged: (values) {
+                  widget.model.yeasts = values;
+                  _calculate();
+                },
               ),
               Divider(height: 10),
               IngredientsField(
@@ -456,7 +459,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     List<FermentableModel> fermentables = await Database().getFermentables(quantities: widget.model.fermentables);
     for(FermentableModel item in fermentables) {
       if (item.method == Method.mashed) {
-        double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
+        // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
         extract += item.extract(widget.model.efficiency);
         mcu += ColorUnits.mcu(item.ebc, item.amount, widget.model.volume);
       }

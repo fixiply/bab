@@ -2,6 +2,7 @@
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/term.dart';
 
 class ProductModel<T> extends Model {
@@ -9,15 +10,15 @@ class ProductModel<T> extends Model {
   Product? product;
   String? company;
   String? receipt;
-  String? title;
-  String? subtitle;
+  dynamic? title;
+  dynamic? subtitle;
   double? price;
   int? pack;
   int? max;
   int? min;
   List<dynamic>? weekdays;
   Term? term;
-  String? text;
+  dynamic? text;
   ImageModel? image;
 
   ProductModel({
@@ -50,15 +51,15 @@ class ProductModel<T> extends Model {
     this.product = Product.values.elementAt(map['product']);
     this.company = map['company'];
     this.receipt = map['receipt'];
-    this.title = map['title'];
-    this.subtitle = map['subtitle'];
+    this.title = LocalizedText.deserialize(map['title']);
+    this.subtitle = LocalizedText.deserialize(map['subtitle']);
     if (map['price'] != null) this.price = map['price'].toDouble();
     if (map['pack'] != null) this.pack = map['pack'];
     if (map['max'] != null) this.max = map['max'];
     if (map['min'] != null) this.min = map['min'];
     if (map['weekdays'] != null) this.weekdays = map['weekdays'];
     if (map['term'] != null) this.term = Term.deserialize(map['term']);
-    this.text = map['text'];
+    this.text = LocalizedText.deserialize(map['text']);
     this.image = ImageModel.fromJson(map['image']);
   }
 
@@ -69,15 +70,15 @@ class ProductModel<T> extends Model {
       'product': this.product!.index,
       'company': this.company,
       'receipt': this.receipt,
-      'title': this.title,
-      'subtitle': this.subtitle,
+      'title': LocalizedText.serialize(this.title),
+      'subtitle': LocalizedText.serialize(this.subtitle),
       'price': this.price,
       'pack': this.pack,
       'max': this.max,
       'min': this.min,
       'weekdays': this.weekdays,
       'term': Term.serialize(this.term),
-      'text': this.text,
+      'text': LocalizedText.serialize(this.text),
       'image': ImageModel.serialize(this.image)
     });
     return map;

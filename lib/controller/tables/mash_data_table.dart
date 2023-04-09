@@ -56,7 +56,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
         widget.onChanged?.call([value]);
       }
     );
-    _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
+    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
   }
 
   @override

@@ -139,6 +139,28 @@ class HopModel<T> extends Model {
     return FormulaHelper.ibu(this.amount, this.alpha, og, this.duration, volume, maximum: maximum);
   }
 
+  @override
+  bool isNumericType(String columnName) {
+    return columnName == 'amount' || columnName == 'alpha' || columnName == 'duration';
+  }
+
+  @override
+  bool isTextType(String columnName) {
+    return columnName == 'name' || columnName == 'notes';
+  }
+
+  @override
+  List<Enums>? isEnumType(String columnName) {
+    if (columnName == 'form') {
+      return Hop.values;
+    } else if (columnName == 'type') {
+      return Type.values;
+    } else if (columnName == 'use') {
+      return Use.values;
+    }
+    return null;
+  }
+
   static List<HopModel> merge(List<Quantity>? quantities, List<HopModel> hops) {
     List<HopModel> list = [];
     if (quantities != null && hops != null) {
@@ -319,15 +341,12 @@ class HopDataSource extends EditDataSource {
 
   @override
   bool isNumericType(GridColumn column) {
-    return column.columnName == 'amount' || column.columnName == 'alpha' || column.columnName == 'duration';
+    return HopModel().isNumericType(column.columnName);
   }
 
   @override
-  Enums? isEnums(GridColumn column) {
-    if (column.columnName == 'use') {
-      return Use.boil;
-    }
-    return null;
+  List<Enums>? isEnumType(GridColumn column) {
+    return HopModel().isEnumType(column.columnName);
   }
 
   @override

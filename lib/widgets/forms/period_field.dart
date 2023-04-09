@@ -40,43 +40,39 @@ class _PeriodFieldState extends FormFieldState<Term> {
         icon: Icon(Icons.date_range_outlined)
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 2.5,
-            child: TextFormField(
-              initialValue: widget.initialValue!.each != null ? widget.initialValue!.each.toString() : null,
-              keyboardType: TextInputType.number,
-              onChanged: (value) => setState(() {
-                widget.initialValue!.each = int.tryParse(value);
-                didChange(widget.initialValue);
-              }),
-              decoration: FormDecoration(
-                labelText: AppLocalizations.of(context)!.text('period'),
-                border: InputBorder.none,
-                fillColor: FillColor, filled: true
+          children: [
+            Expanded(
+              child: TextFormField(
+                initialValue: widget.initialValue!.each != null ? widget.initialValue!.each.toString() : null,
+                keyboardType: TextInputType.number,
+                onChanged: (value) => setState(() {
+                  widget.initialValue!.each = int.tryParse(value);
+                  didChange(widget.initialValue);
+                }),
+                decoration: FormDecoration(
+                    labelText: AppLocalizations.of(context)!.text('period'),
+                    border: InputBorder.none,
+                    fillColor: FillColor, filled: true
+                ),
               ),
             ),
-          ),
-          SizedBox(width: 4),
-          SizedBox(
-            width: MediaQuery.of(context).size.width / 2.5,
-            child: DropdownButtonFormField<Period>(
-              value: widget.initialValue!.period,
-              items: Period.values.map((Period period) {
-                return DropdownMenuItem<Period>(
-                    value: period,
-                    child: Text(AppLocalizations.of(context)!.text(period.toString().toLowerCase())));
-              }).toList(),
-              onChanged: (value) => setState(() {
-                widget.initialValue!.period = value;
-                didChange(widget.initialValue);
-              }),
-              decoration: FormDecoration(),
+            SizedBox(width: 12),
+            Expanded(
+              child: DropdownButtonFormField<Period>(
+                value: widget.initialValue!.period,
+                items: Period.values.map((Period period) {
+                  return DropdownMenuItem<Period>(
+                      value: period,
+                      child: Text(AppLocalizations.of(context)!.text(period.toString().toLowerCase())));
+                }).toList(),
+                onChanged: (value) => setState(() {
+                  widget.initialValue!.period = value;
+                  didChange(widget.initialValue);
+                }),
+                decoration: FormDecoration(),
+              )
             ),
-          ),
-        ]
+          ],
       )
     );
   }

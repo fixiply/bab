@@ -153,25 +153,25 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 icon: Icon(Icons.outdoor_grill_outlined),
                 title: AppLocalizations.of(context)!.text('brews'),
               ),
-              if (DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole()) SideMenuItem(
+              if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
                 priority: 6,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.inventory_outlined),
                 title: AppLocalizations.of(context)!.text('inventory'),
               ),
-              if (DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole()) SideMenuItem(
+              if (currentUser != null && currentUser!.hasRole()) SideMenuItem(
                 priority: 7,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.calendar_month_outlined),
                 title: AppLocalizations.of(context)!.text('calendar'),
               ),
-              if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
+              if (currentUser != null && currentUser!.hasRole()) SideMenuItem(
                 priority: 8,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.build_outlined),
                 title: AppLocalizations.of(context)!.text('tools'),
               ),
-              if (DeviceHelper.isDesktop && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+              if (currentUser != null && currentUser!.hasRole()) SideMenuItem(
                 priority: 9,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.local_offer_outlined),

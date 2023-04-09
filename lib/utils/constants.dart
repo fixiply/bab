@@ -6,7 +6,7 @@ import 'package:bb/models/user_model.dart';
 
 const String APP_NAME = 'BB';
 const String BUNDLE_IDENTIFIER = 'com.fixiply.bb';
-const String RECIPIENT = 'contact@fixiply.com';
+const String RECIPIENT = 'contact@beandbrew.com';
 const String PROJECT_ID = 'brasseur-bordelais';
 const String BUCKET = '$PROJECT_ID.appspot.com';
 const NOTIFICATION_TOPIC = 'default';

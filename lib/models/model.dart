@@ -48,4 +48,16 @@ class Model<T> {
     }
     return false;
   }
+
+  bool isNumericType(String columnName) {
+    return false;
+  }
+
+  bool isTextType(String columnName) {
+    return false;
+  }
+
+  List<Enums>? isEnumType(String columnName) {
+    return null;
+  }
 }

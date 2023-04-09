@@ -166,7 +166,7 @@ class MashDataSource extends EditDataSource {
 
   Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
     if (column.columnName == 'name') {
-      return super.buildTypeHeadWidget(Bearing.protein, submitCell);
+      return super.typeHeadWidget(Bearing.protein, submitCell);
     }
     return super.buildEditWidget(dataGridRow, rowColumnIndex, column, submitCell);
   }
@@ -177,9 +177,9 @@ class MashDataSource extends EditDataSource {
   }
 
   @override
-  Enums? isEnums(GridColumn column) {
+  List<Enums>? isEnumType(GridColumn column) {
     if (column.columnName == 'type') {
-      return Type.infusion;
+      return Type.values;
     }
     return null;
   }

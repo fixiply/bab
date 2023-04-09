@@ -70,8 +70,11 @@ class _WeekdaysFieldState extends FormFieldState<List<dynamic>> {
         contentPadding: EdgeInsets.all(0.0),
         icon: Icon(Icons.calendar_view_day)
       ),
-      child: Wrap(
-        children: widgets,
+      child: Container(
+        padding: EdgeInsets.only(top: 4, bottom: 16),
+        child: Wrap(
+          children: widgets,
+        )
       )
     );
   }

@@ -268,7 +268,7 @@ class AppLocalizations {
   }
 
   int? fromSRM(number) {
-    if (number != null && unit == Unit.metric) {
+    if (number != null && unit == Unit.imperial) {
       return ColorUnits.toEBC(number);
     }
     return number;

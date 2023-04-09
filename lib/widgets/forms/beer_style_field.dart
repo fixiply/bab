@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/styles_page.dart';
-import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
+
+// External package
+// import 'package:dropdown_search/dropdown_search.dart';
 
 class BeerStyleField extends FormField<String> {
   final String? title;
@@ -59,6 +60,19 @@ class _BeerStyleFieldState extends FormFieldState<String> {
         future: _style,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
+            // return DropdownSearch<StyleModel>(
+            //   key: _key,
+            //   // value: snapshot.data!.contains(widget.initialValue) ? widget.initialValue : null,
+            //   // selectedItem: widget.initialValue,
+            //   itemAsString: (StyleModel model) => AppLocalizations.of(context)!.localizedText(model.name),
+            //   items: snapshot.data!,
+            //   onChanged: (value) {
+            //     if (value != null) {
+            //       didChange(value.uuid!);
+            //     }
+            //   },
+            //   // validator: widget.validator,
+            // );
             return DropdownButtonFormField<String>(
               key: _key,
               value: snapshot.data!.contains(widget.initialValue) ? widget.initialValue : null,
