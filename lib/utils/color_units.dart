@@ -58,11 +58,11 @@ class ColorUnits {
     end = null;
   }
 
-  static int toSRM(int? ebc) {
+  static int toSRM(ebc) {
     return ebc != null ? (ebc * 0.508).toInt() : 0;
   }
 
-  static int toEBC(int? srm) {
+  static int toEBC(srm) {
     return srm != null ? (srm * 1.97).round() : 0;
   }
 
