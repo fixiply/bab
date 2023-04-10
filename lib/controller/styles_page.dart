@@ -122,89 +122,94 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
         ]
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
-      body: FutureBuilder<List<StyleModel>>(
-        future: _styles,
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return CustomScrollView(
-              slivers: [
-                FilterStyleAppBar(
-                  cu: _cu,
-                  ibu: _ibu,
-                  abv: _abv,
-                  selectedFermentations: _selectedFermentations,
-                  categories: _categories,
-                  selectedCategories: _selectedCategories,
-                  onColorChanged: (start, end) {
-                    setState(() {
-                      _cu.start = start;
-                      _cu.end = end;
-                    });
-                    _fetch();
-                  },
-                  onIBUChanged: (start, end) {
-                    setState(() {
-                      _ibu.start = start;
-                      _ibu.end = end;
-                    });
-                    _fetch();
-                  },
-                  onAlcoholChanged: (start, end) {
-                    setState(() {
-                      _abv.start = start;
-                      _abv.end = end;
-                    });
-                    _fetch();
-                  },
-                  onFermentationChanged: (value) {
-                    setState(() {
-                      if (_selectedFermentations.contains(value)) {
-                        _selectedFermentations.remove(value);
-                      } else {
-                        _selectedFermentations.add(value);
-                      }
-                    });
-                    _fetch();
-                  },
-                  onCategoryChanged: (value) {
-                    setState(() {
-                      if (_selectedCategories.contains(value)) {
-                        _selectedCategories.remove(value);
-                      } else {
-                        _selectedCategories.add(value);
-                      }
-                    });
-                    _fetch();
-                  },
-                  onReset: () => _clear()
-                ),
-                SliverToBoxAdapter(
-                  child: Container(
-                    color: Colors.white,
-                    padding: EdgeInsets.symmetric(vertical: 6.0),
-                    child: Center(
-                        child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'styles': 'style')}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+      body: Container(
+        child: RefreshIndicator(
+          onRefresh: () => _fetch(),
+          child: FutureBuilder<List<StyleModel>>(
+            future: _styles,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return CustomScrollView(
+                  slivers: [
+                    FilterStyleAppBar(
+                      cu: _cu,
+                      ibu: _ibu,
+                      abv: _abv,
+                      selectedFermentations: _selectedFermentations,
+                      categories: _categories,
+                      selectedCategories: _selectedCategories,
+                      onColorChanged: (start, end) {
+                        setState(() {
+                          _cu.start = start;
+                          _cu.end = end;
+                        });
+                        _fetch();
+                      },
+                      onIBUChanged: (start, end) {
+                        setState(() {
+                          _ibu.start = start;
+                          _ibu.end = end;
+                        });
+                        _fetch();
+                      },
+                      onAlcoholChanged: (start, end) {
+                        setState(() {
+                          _abv.start = start;
+                          _abv.end = end;
+                        });
+                        _fetch();
+                      },
+                      onFermentationChanged: (value) {
+                        setState(() {
+                          if (_selectedFermentations.contains(value)) {
+                            _selectedFermentations.remove(value);
+                          } else {
+                            _selectedFermentations.add(value);
+                          }
+                        });
+                        _fetch();
+                      },
+                      onCategoryChanged: (value) {
+                        setState(() {
+                          if (_selectedCategories.contains(value)) {
+                            _selectedCategories.remove(value);
+                          } else {
+                            _selectedCategories.add(value);
+                          }
+                        });
+                        _fetch();
+                      },
+                      onReset: () => _clear()
+                    ),
+                    SliverToBoxAdapter(
+                      child: Container(
+                        color: Colors.white,
+                        padding: EdgeInsets.symmetric(vertical: 6.0),
+                        child: Center(
+                            child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'styles': 'style')}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                        )
+                      )
+                    ),
+                    SliverList(
+                      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                        StyleModel model = snapshot.data![index];
+                        return _item(model);
+                      }, childCount: snapshot.data!.length)
                     )
+                  ]
+                );
+              }
+              if (snapshot.hasError) {
+                return ErrorContainer(snapshot.error.toString());
+              }
+              return Center(
+                  child: ImageAnimateRotate(
+                    child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
                   )
-                ),
-                SliverList(
-                  delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                    StyleModel model = snapshot.data![index];
-                    return _item(model);
-                  }, childCount: snapshot.data!.length)
-                )
-              ]
-            );
-          }
-          if (snapshot.hasError) {
-            return ErrorContainer(snapshot.error.toString());
-          }
-          return Center(
-              child: ImageAnimateRotate(
-                child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
-              )
-          );
-        }
+              );
+            }
+          ),
+        ),
       ),
       floatingActionButton: Visibility(
         visible: currentUser != null && currentUser!.isAdmin(),
