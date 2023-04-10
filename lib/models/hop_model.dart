@@ -399,7 +399,7 @@ class HopDataSource extends EditDataSource {
   }
 
   @override
-  void onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+  Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
     final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
       dataGridCell.columnName == column.columnName).value ?? '';
     final int dataRowIndex = dataGridRows.indexOf(dataGridRow);

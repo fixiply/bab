@@ -101,28 +101,28 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
               // Free-style eraser
               IconButton(
                 icon: Icon(
-                  PhosphorIcons.trash
+                  PhosphorIcons.regular.trash
                 ),
                 onPressed: controller.selectedObjectDrawable == null ? null : removeSelectedDrawable,
               ),
               // Free-style drawing
               IconButton(
                 icon: Icon(
-                    PhosphorIcons.cameraRotate
+                    PhosphorIcons.regular.cameraRotate
                 ),
                 onPressed: controller.selectedObjectDrawable != null && controller.selectedObjectDrawable is ImageDrawable ? flipSelectedImageDrawable : null,
               ),
               // Add text
               IconButton(
                 icon: Icon(
-                  PhosphorIcons.arrowClockwise,
+                  PhosphorIcons.regular.arrowClockwise,
                 ),
                 onPressed: controller.canRedo ? redo : null,
               ),
               // Add sticker image
               IconButton(
-                icon: const Icon(
-                  PhosphorIcons.arrowCounterClockwise,
+                icon: Icon(
+                  PhosphorIcons.regular.arrowCounterClockwise,
                 ),
                 onPressed: controller.canUndo ? undo : null,
               ),
@@ -357,7 +357,7 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
             // Free-style eraser
             IconButton(
               icon: Icon(
-                PhosphorIcons.eraser,
+                PhosphorIcons.regular.eraser,
                 color: controller.freeStyleMode == FreeStyleMode.erase ? Theme.of(context).colorScheme.secondary : null,
               ),
               onPressed: toggleFreeStyleErase,
@@ -365,7 +365,7 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
             // Free-style drawing
             IconButton(
               icon: Icon(
-                PhosphorIcons.scribbleLoop,
+                PhosphorIcons.regular.scribbleLoop,
                 color: controller.freeStyleMode == FreeStyleMode.draw ? Theme.of(context).colorScheme.secondary : null,
               ),
               onPressed: toggleFreeStyleDraw,
@@ -373,15 +373,15 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
             // Add text
             IconButton(
               icon: Icon(
-                PhosphorIcons.textT,
+                PhosphorIcons.regular.textT,
                 color: textFocusNode.hasFocus ? Theme.of(context).colorScheme.secondary : null,
               ),
               onPressed: addText,
             ),
             // Add sticker image
             IconButton(
-              icon: const Icon(
-                PhosphorIcons.sticker,
+              icon: Icon(
+                PhosphorIcons.regular.sticker,
               ),
               onPressed: addSticker,
             ),
@@ -452,14 +452,14 @@ class _ImageEditorPageState extends State<ImageEditorPage> {
   }
 
   static IconData getShapeIcon(ShapeFactory? shapeFactory) {
-    if (shapeFactory is LineFactory) return PhosphorIcons.lineSegment;
-    if (shapeFactory is ArrowFactory) return PhosphorIcons.arrowUpRight;
+    if (shapeFactory is LineFactory) return PhosphorIcons.regular.lineSegment;
+    if (shapeFactory is ArrowFactory) return PhosphorIcons.regular.arrowUpRight;
     if (shapeFactory is DoubleArrowFactory) {
-      return PhosphorIcons.arrowsHorizontal;
+      return PhosphorIcons.regular.arrowsHorizontal;
     }
-    if (shapeFactory is RectangleFactory) return PhosphorIcons.rectangle;
-    if (shapeFactory is OvalFactory) return PhosphorIcons.circle;
-    return PhosphorIcons.polygon;
+    if (shapeFactory is RectangleFactory) return PhosphorIcons.regular.rectangle;
+    if (shapeFactory is OvalFactory) return PhosphorIcons.regular.circle;
+    return PhosphorIcons.regular.polygon;
   }
 
   void undo() {

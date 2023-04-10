@@ -14,19 +14,17 @@ class GradientRectSliderTrackShape extends SliderTrackShape with BaseSliderTrack
 
   @override
   void paint(
-      PaintingContext context,
-      Offset offset,
-      {
-        required RenderBox parentBox,
-        required SliderThemeData sliderTheme,
-        required Animation<double> enableAnimation,
-        required TextDirection textDirection,
-        required Offset thumbCenter,
-        bool isDiscrete = false,
-        bool isEnabled = false,
-        double additionalActiveTrackHeight = 2,
-      }
-      ) {
+    PaintingContext context,
+    Offset offset, {
+      required RenderBox parentBox,
+      required SliderThemeData sliderTheme,
+      required Animation<double> enableAnimation,
+      required Offset thumbCenter,
+      Offset? secondaryOffset,
+      bool isEnabled = false,
+      bool isDiscrete = false,
+      required TextDirection textDirection,
+    }) {
     assert(sliderTheme.disabledActiveTrackColor != null);
     assert(sliderTheme.disabledInactiveTrackColor != null);
     assert(sliderTheme.activeTrackColor != null);
@@ -45,11 +43,11 @@ class GradientRectSliderTrackShape extends SliderTrackShape with BaseSliderTrack
     final activeGradientRect = Rect.fromLTRB(
       trackRect.left,
       (textDirection == TextDirection.ltr)
-          ? trackRect.top - (additionalActiveTrackHeight / 2)
+          ? trackRect.top - (sliderTheme.trackHeight! / 2)
           : trackRect.top,
       trackRect.right,
       (textDirection == TextDirection.ltr)
-          ? trackRect.bottom + (additionalActiveTrackHeight / 2)
+          ? trackRect.bottom + (sliderTheme.trackHeight! / 2)
           : trackRect.bottom,
     );
 
@@ -89,11 +87,11 @@ class GradientRectSliderTrackShape extends SliderTrackShape with BaseSliderTrack
       RRect.fromLTRBAndCorners(
         trackRect.left,
         (textDirection == TextDirection.ltr)
-            ? trackRect.top - (additionalActiveTrackHeight / 2)
+            ? trackRect.top - (sliderTheme.trackHeight! / 2)
             : trackRect.top,
         trackRect.right,
         (textDirection == TextDirection.ltr)
-            ? trackRect.bottom + (additionalActiveTrackHeight / 2)
+            ? trackRect.bottom + (sliderTheme.trackHeight! / 2)
             : trackRect.bottom,
         topLeft: (textDirection == TextDirection.ltr)
             ? activeTrackRadius

@@ -8,12 +8,12 @@ import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 // External package
-// import 'package:dropdown_search/dropdown_search.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class BeerStyleField extends FormField<String> {
   final String? title;
   final void Function(String? value)? onChanged;
-  final FormFieldValidator<String>? validator;
+  final FormFieldValidator<dynamic>? validator;
 
   BeerStyleField({Key? key, required BuildContext context, String? initialValue, this.title, this.onChanged, this.validator}) : super(
       key: key,
@@ -60,37 +60,25 @@ class _BeerStyleFieldState extends FormFieldState<String> {
         future: _style,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
-            // return DropdownSearch<StyleModel>(
-            //   key: _key,
-            //   // value: snapshot.data!.contains(widget.initialValue) ? widget.initialValue : null,
-            //   // selectedItem: widget.initialValue,
-            //   itemAsString: (StyleModel model) => AppLocalizations.of(context)!.localizedText(model.name),
-            //   items: snapshot.data!,
-            //   onChanged: (value) {
-            //     if (value != null) {
-            //       didChange(value.uuid!);
-            //     }
-            //   },
-            //   // validator: widget.validator,
-            // );
-            return DropdownButtonFormField<String>(
+            return DropdownSearch<StyleModel>(
               key: _key,
-              value: snapshot.data!.contains(widget.initialValue) ? widget.initialValue : null,
-              iconEnabledColor: Colors.black45,
-              isExpanded: true,
-              decoration: FormDecoration(
-                // icon: const Icon(Icons.how_to_reg),
-                labelText: widget.title ?? AppLocalizations.of(context)!.text('style'),
+              selectedItem: widget.initialValue != null ? snapshot.data!.singleWhere((element) => element.uuid == widget.initialValue) : null,
+              compareFn: (item1, item2) => item1.uuid == item2.uuid,
+              itemAsString: (StyleModel model) => AppLocalizations.of(context)!.localizedText(model.name),
+              asyncItems: (String filter) async {
+                return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
+              },
+              popupProps: PopupProps.menu(
+                showSelectedItems: true,
+                showSearchBox: true,
               ),
-              items: _items(snapshot.data as List<StyleModel>),
-              onChanged: (value) {
-                if (value != null) {
-                  if (value.length == 0) {
-                    value = null;
-                    _key.currentState!.reset();
-                  }
-                }
-                didChange(value);
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                dropdownSearchDecoration: FormDecoration(
+                  labelText: widget.title ?? AppLocalizations.of(context)!.text('style'),
+                )
+              ),
+              onChanged: (value) async {
+                didChange(value?.uuid);
               },
               validator: widget.validator,
             );
@@ -105,21 +93,5 @@ class _BeerStyleFieldState extends FormFieldState<String> {
     setState(() {
       _style = Database().getStyles(ordered: true);
     });
-  }
-
-  List<DropdownMenuItem<String>> _items(List<StyleModel> values) {
-    List<DropdownMenuItem<String>> items = [
-      DropdownMenuItem<String>(
-          value: '',
-          child: Icon(Icons.clear)
-      )
-    ];
-    for (StyleModel value in values) {
-      items.add(DropdownMenuItem(
-          value: value.uuid,
-          child: Text(AppLocalizations.of(context)!.localizedText(value.name), overflow: TextOverflow.ellipsis)
-      ));
-    };
-    return items;
   }
 }
