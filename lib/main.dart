@@ -87,7 +87,6 @@ class _AppState extends State<MyApp> {
   }
 
   void onUnitChange(Unit unit) {
-    debugPrint('unit ${AppLocalizations.of(context)}');
     setState(() {
       // AppLocalizations.of(context)!.setUnit(unit);
     });
