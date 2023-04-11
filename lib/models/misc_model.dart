@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -11,35 +10,28 @@ import 'package:bb/utils/quantity.dart';
 // External package
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-enum Hop with Enums { leaf, pellet, plug, other;
-  List<Enum> get enums => [ leaf, pellet, plug, other ];
+enum Misc with Enums { spice, fining, water_agent, herb, flavor, other;
+  List<Enum> get enums => [ spice, fining, water_agent, herb, flavor, other ];
 }
 
-enum Type with Enums { aroma, bittering, both;
-  List<Enum> get enums => [ aroma, bittering, both ];
-}
-enum Use with Enums { mash, first_wort, boil, aroma, dry_hop;
-  List<Enum> get enums => [ mash, first_wort, boil, aroma, dry_hop ];
+enum Use with Enums { boil, mash, primary, secondary, bottling, sparge;
+  List<Enum> get enums => [ boil, mash, primary, secondary, bottling, sparge ];
 }
 
 extension Ex on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 
-class HopModel<T> extends Model {
+class MiscModel<T> extends Model {
   Status? status;
   dynamic? name;
-  String? origin;
-  double? alpha;
-  double? beta;
-  double? amount;
-  Hop? form;
-  Type? type;
+  Misc? type;
   Use? use;
-  int? duration;
+  int? time;
+  double? amount;
   dynamic? notes;
 
-  HopModel({
+  MiscModel({
     String? uuid,
     DateTime? inserted_at,
     DateTime? updated_at,
@@ -48,14 +40,10 @@ class HopModel<T> extends Model {
     bool? isSelected,
     this.status = Status.publied,
     this.name,
-    this.origin,
-    this.alpha,
-    this.beta,
+    this.type = Misc.flavor,
+    this.use = Use.mash,
+    this.time,
     this.amount,
-    this.form = Hop.pellet,
-    this.type = Type.both,
-    this.use = Use.boil,
-    this.duration,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
@@ -63,14 +51,9 @@ class HopModel<T> extends Model {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
     this.name = LocalizedText.deserialize(map['name']);
-    this.origin = map['origin'];
-    if (map['alpha'] != null) this.alpha = map['alpha'].toDouble();
-    if (map['beta'] != null) this.beta = map['beta'].toDouble();
-    // if (map['amount'] != null) this.amount = map['amount'].toDouble();
-    this.form = Hop.values.elementAt(map['form']);
-    this.type = Type.values.elementAt(map['type']);
-    // if (map['use'] != null) this.use = HopUse.values.elementAt(map['use']);
-    // this.duration = map['duration'];
+    this.type = Misc.values.elementAt(map['type']);
+    // if (map['use'] != null) this.use = MiscUse.values.elementAt(map['use']);
+    // this.time = map['time'];
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
@@ -79,67 +62,44 @@ class HopModel<T> extends Model {
     map.addAll({
       'status': this.status!.index,
       'name': LocalizedText.serialize(this.name),
-      'origin': this.origin,
-      'alpha': this.alpha,
-      'beta': this.beta,
-      // 'amount': this.amount,
-      'form': this.form!.index,
       'type': this.type!.index,
       // 'use': this.use!.index,
-      // 'duration': this.duration,
+      // 'time': this.time,
+      // 'amount': this.amount,
       'notes': LocalizedText.serialize(this.notes),
     });
     return map;
   }
 
-  HopModel copy() {
-    return HopModel(
+  MiscModel copy() {
+    return MiscModel(
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
       creator: this.creator,
       status: this.status,
       name: this.name,
-      origin: this.origin,
-      alpha: this.alpha,
-      beta: this.beta,
-      amount: this.amount,
-      form: this.form,
       type: this.type,
       use: this.use,
-      duration: this.duration,
+      time: this.time,
+      amount: this.amount,
       notes: this.notes,
     );
   }
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is HopModel && other.uuid == uuid);
+    return (other is MiscModel && other.uuid == uuid);
   }
 
   @override
   String toString() {
-    return 'HopModel: $name, UUID: $uuid';
-  }
-
-  /// Returns the bitterness index, based on the given conditions.
-  ///
-  /// The `amount` argument is relative to the amount of hops in grams.
-  ///
-  /// The `alpha` argument is relative to the hops alpha acid.
-  ///
-  /// The `og` argument is relative to the original gravity.
-  ///
-  /// The `duration` argument is relative to the boil duration in minute.
-  ///
-  /// The `volume` argument is relative to the final volume.
-  double ibu(double? og, int? duration, double? volume, {double? maximum})  {
-    return FormulaHelper.ibu(this.amount, this.alpha, og, this.duration, volume, maximum: maximum);
+    return 'MiscellaneousModel: $name, UUID: $uuid';
   }
 
   @override
   bool isNumericType(String columnName) {
-    return columnName == 'amount' || columnName == 'alpha' || columnName == 'duration';
+    return columnName == 'amount' || columnName == 'time';
   }
 
   @override
@@ -149,25 +109,23 @@ class HopModel<T> extends Model {
 
   @override
   List<Enums>? isEnumType(String columnName) {
-    if (columnName == 'form') {
-      return Hop.values;
-    } else if (columnName == 'type') {
-      return Type.values;
-    } else if (columnName == 'use') {
+    if (columnName == 'type') {
+      return Misc.values;
+    } else  if (columnName == 'use') {
       return Use.values;
     }
     return null;
   }
 
-  static List<HopModel> merge(List<Quantity>? quantities, List<HopModel> hops) {
-    List<HopModel> list = [];
-    if (quantities != null && hops != null) {
+  static List<MiscModel> merge(List<Quantity>? quantities, List<MiscModel> miscellaneous) {
+    List<MiscModel> list = [];
+    if (quantities != null && miscellaneous != null) {
       for (Quantity quantity in quantities) {
-        for (HopModel hop in hops) {
-          if (quantity.uuid == hop.uuid) {
-            HopModel model = hop.copy();
+        for (MiscModel misc in miscellaneous) {
+          if (quantity.uuid == misc.uuid) {
+            MiscModel model = misc.copy();
             model.amount = quantity.amount;
-            model.duration = quantity.duration;
+            model.time = quantity.duration;
             model.use = quantity.use != null
                 ? Use.values.elementAt(quantity.use!)
                 : Use.boil;
@@ -182,7 +140,7 @@ class HopModel<T> extends Model {
 
   static dynamic serialize(dynamic data) {
     if (data != null) {
-      if (data is HopModel) {
+      if (data is MiscModel) {
         return data.toMap();
       }
       if (data is List) {
@@ -196,15 +154,15 @@ class HopModel<T> extends Model {
     return null;
   }
 
-  static List<HopModel> deserialize(dynamic data) {
-    List<HopModel> values = [];
+  static List<MiscModel> deserialize(dynamic data) {
+    List<MiscModel> values = [];
     if (data != null) {
       if (data is List) {
         for(final value in data) {
           values.addAll(deserialize(value));
         }
       } else {
-        HopModel model = new HopModel();
+        MiscModel model = new MiscModel();
         model.fromMap(data);
         values.add(model);
       }

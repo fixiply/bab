@@ -6,7 +6,7 @@ import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_track_shape.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
 
@@ -15,7 +15,7 @@ import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
 class FilterReceiptAppBar extends StatefulWidget {
   IBU ibu;
   ABV abv;
-  ColorUnits cu;
+  ColorHelper cu;
   bool my_receips;
   RangeValues? srm_values;
   List<Fermentation>? selectedFermentations = [];

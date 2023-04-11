@@ -49,7 +49,7 @@ const List<Color> SRM_COLORS = [
   const Color(0xFF36080A),
 ];
 
-class ColorUnits {
+class ColorHelper {
   double? start;
   double? end;
 
@@ -102,7 +102,7 @@ class ColorUnits {
 
   static Color? color(int? ebc) {
     if (ebc != null) {
-      int srm = ColorUnits.toSRM(ebc);
+      int srm = ColorHelper.toSRM(ebc);
       if (srm < 0) return SRM_COLORS[0];
       if (srm < SRM_COLORS.length) return SRM_COLORS[srm];
       if (srm >= SRM_COLORS.length) return SRM_COLORS[SRM_COLORS.length-1];

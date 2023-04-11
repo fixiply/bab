@@ -11,7 +11,7 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
@@ -461,7 +461,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       if (item.method == Method.mashed) {
         // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
         extract += item.extract(widget.model.efficiency);
-        mcu += ColorUnits.mcu(item.ebc, item.amount, widget.model.volume);
+        mcu += ColorHelper.mcu(item.ebc, item.amount, widget.model.volume);
       }
     }
     if (extract != 0) {
@@ -484,7 +484,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       if (og != 0) widget.model.og = og;
       if (fg != 0) widget.model.fg = fg;
       if (og != 0 && fg != 0) widget.model.abv = FormulaHelper.abv(og, fg);
-      if (mcu != 0) widget.model.ebc = ColorUnits.ratingEBC(mcu).toInt();
+      if (mcu != 0) widget.model.ebc = ColorHelper.ratingEBC(mcu).toInt();
       if (ibu != 0) widget.model.ibu = ibu;
     });
   }

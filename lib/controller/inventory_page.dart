@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
-import 'package:bb/controller/tables/miscellaneous_data_table.dart';
+import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
@@ -105,7 +105,7 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
             FermentablesDataTable(data: [], color: Colors.white),
             HopsDataTable(data: [], color: Colors.white),
             YeastsDataTable(data: [], color: Colors.white),
-            MiscellaneousDataTable(data: [], color: Colors.white),
+            MiscDataTable(data: [], color: Colors.white),
           ]
         ),
       )

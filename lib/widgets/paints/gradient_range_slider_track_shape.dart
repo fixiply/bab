@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 
 class GradientRangeSliderTrackShape extends RangeSliderTrackShape {
   GradientRangeSliderTrackShape({

@@ -1,15 +1,16 @@
-import 'package:bb/controller/forms/form_fermentable_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/controller/forms/form_fermentable_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
@@ -153,7 +154,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
                         _selected.remove(snapshot.data![index]);
                       }
                     },
-                    columns: FermentableModel.columns(context: context, showQuantity: false),
+                    columns: FermentableDataSource.columns(context: context, showQuantity: false),
                   );
                 }
                 return ListView.builder(
@@ -196,7 +197,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
             Container(
               // color: SRM[model.getSRM()],
               child: Image.asset('assets/images/beer_1.png',
-                color: ColorUnits.color(model.ebc) ?? SRM_COLORS[0],
+                color: ColorHelper.color(model.ebc) ?? SRM_COLORS[0],
                 colorBlendMode: BlendMode.modulate
               ),
               width: 30,

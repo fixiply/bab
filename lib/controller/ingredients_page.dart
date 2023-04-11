@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/fermentables_page.dart';
 import 'package:bb/controller/hops_page.dart';
-import 'package:bb/controller/miscellaneous_page.dart';
+import 'package:bb/controller/misc_page.dart';
 import 'package:bb/controller/yeasts_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -97,7 +97,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
             FermentablesPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
             HopsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
             YeastsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
-            MiscellaneousPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
+            MiscPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
           ]
         ),
       )

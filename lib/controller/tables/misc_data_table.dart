@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/hops_page.dart';
+import 'package:bb/controller/misc_page.dart';
 import 'package:bb/controller/tables/edit_data_source.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
-import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -21,7 +21,7 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class HopsDataTable extends StatefulWidget {
+class MiscDataTable extends StatefulWidget {
   List<Quantity>? data;
   Widget? title;
   bool inventory;
@@ -35,7 +35,7 @@ class HopsDataTable extends StatefulWidget {
   SelectionMode? selectionMode;
   ReceiptModel? receipt;
   final void Function(List<Quantity> value)? onChanged;
-  HopsDataTable({Key? key,
+  MiscDataTable({Key? key,
     this.data,
     this.title,
     this.inventory = false,
@@ -49,37 +49,36 @@ class HopsDataTable extends StatefulWidget {
     this.selectionMode = SelectionMode.multiple,
     this.receipt,
     this.onChanged}) : super(key: key);
-  HopsDataTableState createState() => new HopsDataTableState();
+  MiscDataTableState createState() => new MiscDataTableState();
 }
 
-class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveClientMixin {
-  late HopDataSource _dataSource;
+class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveClientMixin {
+  late MiscDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
   final TextEditingController _searchQueryController = TextEditingController();
   double dataRowHeight = 30;
-  List<HopModel> _selected = [];
-  Future<List<HopModel>>? _data;
+  List<MiscModel> _selected = [];
+  Future<List<MiscModel>>? _data;
 
-  List<HopModel> get selected => _selected;
+  List<MiscModel> get selected => _selected;
 
   @override
   bool get wantKeepAlive => true;
 
   void initState() {
     super.initState();
-    _dataSource = HopDataSource(context,
-      showQuantity: widget.data != null,
-      showCheckboxColumn: widget.showCheckboxColumn!,
-      onChanged: (HopModel value, int dataRowIndex) {
-        if (widget.data != null) {
-          widget.data![dataRowIndex].amount = value.amount;
-          widget.data![dataRowIndex].use = value.use?.index;
-          widget.data![dataRowIndex].duration = value.duration;
+    _dataSource = MiscDataSource(context,
+        showQuantity: widget.data != null,
+        showCheckboxColumn: widget.showCheckboxColumn!,
+        onChanged: (MiscModel value, int dataRowIndex) {
+          if (widget.data != null) {
+            widget.data![dataRowIndex].amount = value.amount;
+            widget.data![dataRowIndex].use = value.use?.index;
+            widget.data![dataRowIndex].duration = value.time;
+          }
+          widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.time)]);
         }
-        widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.duration)]);
-      }
     );
-    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'duration', sortDirection: DataGridSortDirection.descending));
     _fetch();
   }
 
@@ -108,12 +107,22 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
                 ),
                 onPressed: _add,
               ),
+              if(_selected.isNotEmpty) TextButton(
+                child: Icon(Icons.delete_outline),
+                style: TextButton.styleFrom(
+                  backgroundColor: FillColor,
+                  shape: CircleBorder(),
+                ),
+                onPressed: () {
+
+                },
+              )
             ],
           ),
           Flexible(
             child: SfDataGridTheme(
               data: SfDataGridThemeData(),
-              child: FutureBuilder<List<HopModel>>(
+              child: FutureBuilder<List<MiscModel>>(
                 future: _data,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -151,7 +160,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
                           }
                         }
                       },
-                      columns: HopDataSource.columns(context: context, showQuantity: widget.data != null),
+                      columns: MiscDataSource.columns(context: context, showQuantity: widget.data != null),
                     );
                   }
                   if (snapshot.hasError) {
@@ -173,23 +182,22 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
 
   _fetch() async {
     setState(() {
-      _data = Database().getHops(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getMiscellaneous(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
   _add() async {
     if (widget.allowAdding == true) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return HopsPage(showCheckboxColumn: true);
+        return MiscPage(showCheckboxColumn: true);
       })).then((values) {
         if (values != null) {
           setState(() {
             _data!.then((value) => value.addAll(values));
           });
           if (widget.data != null) {
-            for(HopModel model in values) {
-              model.duration = widget.receipt?.boil;
-              widget.data!.add(Quantity(uuid: model.uuid, use: Use.boil.index, duration: widget.receipt?.boil));
+            for(MiscModel model in values) {
+              widget.data!.add(Quantity(uuid: model.uuid));
             }
             widget.onChanged?.call(widget.data!);
           }
@@ -198,7 +206,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
     } else if (widget.allowEditing == true) {
       setState(() {
         _data!.then((value) {
-          value.insert(0, HopModel(isEdited: true));
+          value.insert(0, MiscModel(isEdited: true));
           return value;
         });
       });
@@ -215,26 +223,24 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
   }
 }
 
-class HopDataSource extends EditDataSource {
-  List<HopModel> data = [];
-  final void Function(HopModel value, int dataRowIndex)? onChanged;
+
+class MiscDataSource extends EditDataSource {
+  List<MiscModel> data = [];
+  final void Function(MiscModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
+  MiscDataSource(BuildContext context, {List<MiscModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<HopModel> data) {
+  void buildDataGridRows(List<MiscModel> data) {
     this.data = data;
     dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
-      DataGridCell<dynamic>(columnName: 'origin', value: e.origin),
-      DataGridCell<double>(columnName: 'alpha', value: e.alpha),
-      DataGridCell<Hop>(columnName: 'form', value: e.form),
-      DataGridCell<Type>(columnName: 'type', value: e.type),
+      DataGridCell<Misc>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
-      if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
+      if (showQuantity == true)  DataGridCell<int>(columnName: 'time', value: e.time),
     ])).toList();
   }
 
@@ -257,12 +263,12 @@ class HopDataSource extends EditDataSource {
 
   @override
   bool isNumericType(GridColumn column) {
-    return HopModel().isNumericType(column.columnName);
+    return MiscModel().isNumericType(column.columnName);
   }
 
   @override
   List<Enums>? isEnumType(GridColumn column) {
-    return HopModel().isEnumType(column.columnName);
+    return MiscModel().isEnumType(column.columnName);
   }
 
   @override
@@ -277,11 +283,8 @@ class HopDataSource extends EditDataSource {
           } else if (e.value is num) {
             if (e.columnName == 'amount') {
               value = AppLocalizations.of(context)!.weightFormat(e.value);
-            } else if (e.columnName == 'alpha') {
-              value = AppLocalizations.of(context)!.percentFormat(e.value);
-            } else if (e.columnName == 'duration') {
-              var use = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'use').value;
-              value = AppLocalizations.of(context)!.durationFormat(use == Use.dry_hop ? e.value * 1440 : e.value);
+            } if (e.columnName == 'duration') {
+              value = AppLocalizations.of(context)!.durationFormat(e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {
@@ -296,15 +299,6 @@ class HopDataSource extends EditDataSource {
               );
             }
           }
-          if (e.columnName == 'origin') {
-            if (value != null) {
-              return Container(
-                  margin: EdgeInsets.all(4),
-                  child: Center(child: Text(LocalizedText.emoji(value),
-                      style: TextStyle(fontSize: 16, fontFamily: 'Emoji')))
-              );
-            }
-          }
           return Container(
             alignment: alignment,
             padding: EdgeInsets.all(8.0),
@@ -316,7 +310,8 @@ class HopDataSource extends EditDataSource {
 
   @override
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
-    final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
+    final dynamic oldValue = dataGridRow.getCells()
+        .firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
     final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
     if (dataRowIndex == -1 || oldValue == newCellValue) {
@@ -337,24 +332,9 @@ class HopDataSource extends EditDataSource {
         }
         else data[dataRowIndex].name = newCellValue;
         break;
-      case 'origin':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].name = newCellValue;
-        break;
-      case 'alpha':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].alpha = newCellValue;
-        break;
-      case 'form':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Hop>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].form = newCellValue;
-        break;
       case 'type':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
+            DataGridCell<Misc>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].type = newCellValue;
         break;
       case 'use':
@@ -362,10 +342,10 @@ class HopDataSource extends EditDataSource {
             DataGridCell<Use>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].use = newCellValue;
         break;
-      case 'duration':
+      case 'time':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].duration = newCellValue;
+        data[dataRowIndex].time = newCellValue;
         break;
     }
     onChanged?.call(data[dataRowIndex], dataRowIndex);
@@ -377,7 +357,7 @@ class HopDataSource extends EditDataSource {
   }
 
   static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
-    return <GridColumn>[
+    return [
       GridColumn(
           columnName: 'uuid',
           visible: false,
@@ -402,36 +382,6 @@ class HopDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          width: 50,
-          columnName: 'origin',
-          allowEditing: showQuantity == false,
-          allowSorting: false,
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      GridColumn(
-          width: 90,
-          columnName: 'alpha',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('alpha'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      GridColumn(
-          columnName: 'form',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      GridColumn(
           columnName: 'type',
           allowEditing: showQuantity == false,
           label: Container(
@@ -450,11 +400,11 @@ class HopDataSource extends EditDataSource {
       ),
       if (showQuantity == true) GridColumn(
           width: 90,
-          columnName: 'duration',
+          columnName: 'time',
           label: Container(
               padding: EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('time'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
     ];

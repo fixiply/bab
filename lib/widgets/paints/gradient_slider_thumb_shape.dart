@@ -1,5 +1,5 @@
 import 'dart:math' as math;
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:flutter/material.dart';
 
 class GradientSliderThumbShape implements SliderComponentShape {

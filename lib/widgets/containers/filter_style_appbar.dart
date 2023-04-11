@@ -6,14 +6,14 @@ import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_track_shape.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
 
 // External package
 
 class FilterStyleAppBar extends StatefulWidget {
-  ColorUnits cu;
+  ColorHelper cu;
   IBU ibu;
   ABV abv;
   RangeValues? srm_values;

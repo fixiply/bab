@@ -8,7 +8,7 @@ import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
@@ -180,8 +180,8 @@ class _StylePageState extends State<StylePage> {
                           child: RangeSlider(
                             onChanged: (values) {  },
                             values: RangeValues(
-                              ColorUnits.toSRM(widget.model.ebcmin).toDouble(),
-                              widget.model.ebcmax != null ? ColorUnits.toSRM(widget.model.ebcmax).toDouble() : AppLocalizations.of(context)!.maxColor.toDouble()
+                              ColorHelper.toSRM(widget.model.ebcmin).toDouble(),
+                              widget.model.ebcmax != null ? ColorHelper.toSRM(widget.model.ebcmax).toDouble() : AppLocalizations.of(context)!.maxColor.toDouble()
                             ),
                             min: 0,
                             max: AppLocalizations.of(context)!.maxColor.toDouble(),

@@ -9,7 +9,7 @@ import 'package:bb/models/event_model.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/hop_model.dart';
 import 'package:bb/models/inventory_model.dart';
-import 'package:bb/models/miscellaneous_model.dart';
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/models/purchase_model.dart';
@@ -62,7 +62,7 @@ class Database {
       return hops;
     } else if (o is InventoryModel) {
       return inventory;
-    } else if (o is MiscellaneousModel) {
+    } else if (o is MiscModel) {
       return miscellaneous;
     } else if (o is ProductModel) {
       return products;
@@ -523,10 +523,10 @@ class Database {
     return list;
   }
 
-  Future<MiscellaneousModel?> getMisc(String uuid) async {
+  Future<MiscModel?> getMisc(String uuid) async {
     DocumentSnapshot snapshot = await miscellaneous.doc(uuid).get();
     if (snapshot.exists) {
-      MiscellaneousModel model = MiscellaneousModel();
+      MiscModel model = MiscModel();
       model.uuid = snapshot.id;
       model.fromMap(snapshot.data() as Map<String, dynamic>);
       return model;
@@ -534,8 +534,8 @@ class Database {
     return null;
   }
 
-  Future<List<MiscellaneousModel>> getMiscellaneous({List<Quantity>? quantities, String? name, String? searchText, bool ordered = false}) async {
-    List<MiscellaneousModel> list = [];
+  Future<List<MiscModel>> getMiscellaneous({List<Quantity>? quantities, String? name, String? searchText, bool ordered = false}) async {
+    List<MiscModel> list = [];
     Query query = miscellaneous;
     if (name != null) {
       query = query.where('name', isEqualTo: name);
@@ -555,7 +555,7 @@ class Database {
           }
         }
         if (canBeAdded) {
-          MiscellaneousModel model = MiscellaneousModel();
+          MiscModel model = MiscModel();
           model.uuid = doc.id;
           model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
@@ -563,7 +563,7 @@ class Database {
       });
     });
     if (quantities != null) {
-      return MiscellaneousModel.merge(quantities, list);
+      return MiscModel.merge(quantities, list);
     }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));

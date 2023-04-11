@@ -6,7 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 // Internal package
 import 'package:bb/helpers/formula_helper.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
 
@@ -251,7 +251,7 @@ class AppLocalizations {
       return null;
     }
     if (unit == Unit.imperial) {
-      return this.numberFormat(ColorUnits.toSRM(number));
+      return this.numberFormat(ColorHelper.toSRM(number));
     }
     return this.numberFormat(number);
   }
@@ -262,14 +262,14 @@ class AppLocalizations {
       return null;
     }
     if (unit == Unit.imperial) {
-      number = ColorUnits.toSRM(number);
+      number = ColorHelper.toSRM(number);
     }
     return number > maxColor ? maxColor : number;
   }
 
   int? fromSRM(number) {
     if (number != null && unit == Unit.imperial) {
-      return ColorUnits.toEBC(number);
+      return ColorHelper.toEBC(number);
     }
     return number;
   }

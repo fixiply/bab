@@ -5,11 +5,11 @@ import 'dart:io';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/fermentable_model.dart' as fermentable;
 import 'package:bb/models/hop_model.dart' as hop;
-import 'package:bb/models/miscellaneous_model.dart' as misc;
+import 'package:bb/models/misc_model.dart' as misc;
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/yeast_model.dart' as yeast;
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
@@ -59,8 +59,8 @@ class ImportHelper {
             if (map['abvmax'] != null) model.abvmax = double.tryParse(map['abvmax']);
             if (map['ibumin'] != null) model.ibumin = double.tryParse(map['ibumin']);
             if (map['ibumax'] != null) model.ibumax = double.tryParse(map['ibumax']);
-            if (map['srmmin'] != null) model.ebcmin = ColorUnits.toEBC(int.tryParse(map['srmmin']));
-            if (map['srmmax'] != null) model.ebcmax = ColorUnits.toEBC(int.tryParse(map['srmmax']));
+            if (map['srmmin'] != null) model.ebcmin = ColorHelper.toEBC(int.tryParse(map['srmmin']));
+            if (map['srmmax'] != null) model.ebcmax = ColorHelper.toEBC(int.tryParse(map['srmmax']));
             List<StyleModel> list = await Database().getStyles(number: model.number);
             if (list.isEmpty) {
               Database().add(model, ignoreAuth: true);
@@ -122,7 +122,7 @@ class ImportHelper {
               );
               final color = element.getElement('F_G_COLOR');
               if (color != null && color.text.isNotEmpty) {
-                model.ebc = ColorUnits.toEBC(double.tryParse(color.text)!.toInt());
+                model.ebc = ColorHelper.toEBC(double.tryParse(color.text)!.toInt());
               }
               final desc = element.getElement('F_G_NOTES');
               if (desc != null && desc.text.isNotEmpty) {
@@ -391,7 +391,7 @@ class ImportHelper {
           if (document != null) {
             final fermentables = document.findAllElements('Misc');
             for(XmlElement element in fermentables) {
-              final model = misc.MiscellaneousModel(
+              final model = misc.MiscModel(
                   name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.text})
               );
               int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
@@ -447,7 +447,7 @@ class ImportHelper {
                   model.use = misc.Use.sparge;
                   break;
               }
-              List<misc.MiscellaneousModel> list = await Database().getMiscellaneous(name: model.name.toString());
+              List<misc.MiscModel> list = await Database().getMiscellaneous(name: model.name.toString());
               if (list.isEmpty) {
                 Database().add(model, ignoreAuth: true);
               }

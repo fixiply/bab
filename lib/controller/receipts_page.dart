@@ -12,7 +12,7 @@ import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/category.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
@@ -46,7 +46,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   IBU _ibu = IBU();
   ABV _abv = ABV();
   bool _my_receips = true;
-  ColorUnits _cu = ColorUnits();
+  ColorHelper _cu = ColorHelper();
   List<Fermentation> _selectedFermentations = [];
   List<Category> _selectedCategories = [];
 
@@ -226,7 +226,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
           children: [
             Container(
               child: Image.asset('assets/images/beer_1.png',
-                color: ColorUnits.color(model.ebc) ?? SRM_COLORS[0],
+                color: ColorHelper.color(model.ebc) ?? SRM_COLORS[0],
                 colorBlendMode: BlendMode.modulate
               ),
               width: 30,

@@ -4,9 +4,10 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/controller/forms/form_misc_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
-import 'package:bb/models/miscellaneous_model.dart';
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
@@ -20,28 +21,28 @@ import 'package:bb/widgets/search_text.dart';
 import 'package:expandable_text/expandable_text.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class MiscellaneousPage extends StatefulWidget {
+class MiscPage extends StatefulWidget {
   bool allowEditing;
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
   ReceiptModel? receipt;
-  MiscellaneousPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
+  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
 
-  _MiscellaneousPageState createState() => new _MiscellaneousPageState();
+  _MiscPageState createState() => new _MiscPageState();
 }
 
-class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKeepAliveClientMixin<MiscellaneousPage> {
+class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<MiscPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  late MiscellaneousDataSource _dataSource;
+  late MiscDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
   final TextEditingController _searchQueryController = TextEditingController();
   ScrollController? _controller;
-  Future<List<MiscellaneousModel>>? _data;
-  List<MiscellaneousModel> _selected = [];
+  Future<List<MiscModel>>? _data;
+  List<MiscModel> _selected = [];
   bool _showList = false;
 
-  List<MiscellaneousModel> get selected => _selected;
+  List<MiscModel> get selected => _selected;
 
   @override
   bool get wantKeepAlive => true;
@@ -50,10 +51,10 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
   void initState() {
     super.initState();
     _controller = ScrollController();
-    _dataSource = MiscellaneousDataSource(context,
+    _dataSource = MiscDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
-      onChanged: (MiscellaneousModel value, int dataRowIndex) {
+      onChanged: (MiscModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
@@ -119,7 +120,7 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
-          child: FutureBuilder<List<MiscellaneousModel>>(
+          child: FutureBuilder<List<MiscModel>>(
             future: _data,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
@@ -151,7 +152,7 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
                         _selected.remove(snapshot.data![index]);
                       }
                     },
-                    columns: MiscellaneousModel.columns(context: context, showQuantity: false),
+                    columns: MiscDataSource.columns(context: context, showQuantity: false),
                   );
                 }
                 return ListView.builder(
@@ -159,7 +160,7 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
                   physics: const AlwaysScrollableScrollPhysics(),
                   itemCount: snapshot.hasData ? snapshot.data!.length : 0,
                   itemBuilder: (context, index) {
-                    MiscellaneousModel model = snapshot.data![index];
+                    MiscModel model = snapshot.data![index];
                     return _item(model);
                   }
                 );
@@ -184,7 +185,7 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
     );
   }
 
-  Widget _item(MiscellaneousModel model) {
+  Widget _item(MiscModel model) {
     return Card(
       margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
@@ -236,13 +237,13 @@ class _MiscellaneousPageState extends State<MiscellaneousPage> with AutomaticKee
   }
 
   _new() {
-    MiscellaneousModel newModel = MiscellaneousModel();
+    MiscModel newModel = MiscModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormMiscPage(newModel);
     })).then((value) { _fetch(); });
   }
 
-  _edit(MiscellaneousModel model) {
+  _edit(MiscModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormMiscPage(model);
     })).then((value) { _fetch(); });

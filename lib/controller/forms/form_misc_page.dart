@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/miscellaneous_model.dart';
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
@@ -15,7 +15,7 @@ import 'package:bb/widgets/forms/text_input_field.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 
 class FormMiscPage extends StatefulWidget {
-  final MiscellaneousModel model;
+  final MiscModel model;
   FormMiscPage(this.model);
   _FormMiscPageState createState() => new _FormMiscPageState();
 }

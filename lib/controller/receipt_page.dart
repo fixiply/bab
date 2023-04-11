@@ -6,14 +6,14 @@ import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
 import 'package:bb/controller/tables/mash_data_table.dart';
-import 'package:bb/controller/tables/miscellaneous_data_table.dart';
+import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
@@ -83,7 +83,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     Container(
                       padding: EdgeInsets.only(left: 30),
                       child: Image.asset('assets/images/beer_1.png',
-                        color: ColorUnits.color(widget.model.ebc) ?? SRM_COLORS[0],
+                        color: ColorHelper.color(widget.model.ebc) ?? SRM_COLORS[0],
                         colorBlendMode: BlendMode.modulate
                       ),
                     ),
@@ -232,7 +232,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false
           ),
-          if (widget.model.miscellaneous != null && widget.model.miscellaneous!.isNotEmpty) MiscellaneousDataTable(
+          if (widget.model.miscellaneous != null && widget.model.miscellaneous!.isNotEmpty) MiscDataTable(
               data: widget.model.miscellaneous,
               title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false

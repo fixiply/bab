@@ -1,4 +1,4 @@
-import 'package:bb/utils/color_units.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:flutter/material.dart';
 
 class GradientRectSliderTrackShape extends SliderTrackShape with BaseSliderTrackShape {

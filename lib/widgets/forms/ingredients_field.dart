@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
-import 'package:bb/controller/tables/miscellaneous_data_table.dart';
+import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -85,7 +85,7 @@ class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
           }
         );
       case Ingredient.misc:
-        return MiscellaneousDataTable(key: _datatableKey,
+        return MiscDataTable(key: _datatableKey,
           data: widget.initialValue,
           title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           color: FillColor,

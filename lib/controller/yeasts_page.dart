@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 // Internal package
 import 'package:bb/controller/forms/form_yeast_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/controller/tables/yeasts_data_table.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
 import 'package:bb/models/receipt_model.dart';
@@ -151,7 +152,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
                         _selected.remove(snapshot.data![index]);
                       }
                     },
-                    columns: YeastModel.columns(context: context, showQuantity: false),
+                    columns: YeastDataSource.columns(context: context, showQuantity: false),
                   );
                 }
                 return ListView.builder(

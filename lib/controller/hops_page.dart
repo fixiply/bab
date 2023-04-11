@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 // Internal package
 import 'package:bb/controller/forms/form_hop_page.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/controller/tables/hops_data_table.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/import_helper.dart';
 import 'package:bb/models/hop_model.dart';
@@ -152,7 +153,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
                         _selected.remove(snapshot.data![index]);
                       }
                     },
-                    columns: HopModel.columns(context: context, showQuantity: false),
+                    columns: HopDataSource.columns(context: context, showQuantity: false),
                   );
                 }
                 return ListView.builder(
