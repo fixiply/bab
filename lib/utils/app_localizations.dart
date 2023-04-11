@@ -78,6 +78,14 @@ class AppLocalizations {
     return 80;
   }
 
+  /// Returns the formatted datetime.
+  String? datetimeFormat(datetime) {
+    if (datetime == null) {
+      return null;
+    }
+    return DateFormat.yMd(currentLanguage).add_jm().format(datetime);
+  }
+
   /// Returns the number format.
   double? decimal(number) {
     if (number == null || number.isEmpty) {

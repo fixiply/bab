@@ -1,8 +1,8 @@
-import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/models/user_model.dart';
+import 'package:bb/utils/app_localizations.dart';
 
 const String APP_NAME = 'BB';
 const String BUNDLE_IDENTIFIER = 'com.fixiply.bb';

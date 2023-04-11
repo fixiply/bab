@@ -312,6 +312,9 @@ class FermentableDataSource extends EditDataSource {
           } else if (e.value is Enum) {
             alignment = Alignment.center;
             value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+          } else if (e.value is DateTime) {
+            alignment = Alignment.centerRight;
+            value = AppLocalizations.of(context)!.datetimeFormat(e.value);
           } else {
             if (e.columnName == 'amount') {
               return Container(

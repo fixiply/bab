@@ -57,6 +57,10 @@ class Model<T> {
     return false;
   }
 
+  bool isDateTimeType(String columnName) {
+    return false;
+  }
+
   List<Enums>? isEnumType(String columnName) {
     return null;
   }
