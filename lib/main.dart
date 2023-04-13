@@ -101,9 +101,9 @@ class _AppState extends State<MyApp> {
       primaryColor: PrimaryColor,
       primaryColorLight: PrimaryColorLight,
       primaryColorDark: PrimaryColorDark,
-      toggleableActiveColor: PrimaryColor,
-      bottomAppBarColor: PrimaryColor,
-      backgroundColor: PrimaryColor,
+      // toggleableActiveColor: PrimaryColor,
+      // bottomAppBarColor: PrimaryColor,
+      // backgroundColor: PrimaryColor,
     );
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
@@ -143,8 +143,9 @@ class _AppState extends State<MyApp> {
 
   _authStateChanges() async {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      debugPrint('authStateChanges $user ${user != null ? user.emailVerified : null}');
       UserModel? model;
-      if (user != null) {
+      if (user != null && user.emailVerified) {
         model = await Database().getUser(user.uid);
         if (model != null) {
           model.user = user;

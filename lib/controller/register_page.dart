@@ -59,15 +59,15 @@ class _RegisterPageState extends State<RegisterPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Expanded(
-                        child: Text('S\'inscrire', style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
+                        child: Text(AppLocalizations.of(context)!.text('register'), style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
                     ),
                     InkWell(
                       hoverColor: Colors.white,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          Text('Vous avez un compte ?', style: TextStyle(color: Theme.of(context).primaryColor)),
-                          Text('Identifiez-vous', style: TextStyle(color: Theme.of(context).primaryColor)),
+                          Text(AppLocalizations.of(context)!.text('have_an_account'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                          Text(AppLocalizations.of(context)!.text('identify_yourself'), style: TextStyle(color: Theme.of(context).primaryColor)),
                         ],
                       ),
                       onTap: () {
@@ -200,7 +200,7 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
               SizedBox(height: 18),
               CustomPrimaryButton(
-                textValue: 'S\'inscrire',
+                textValue: AppLocalizations.of(context)!.text('register'),
                 onTap: () async {
                   if (_formKey.currentState!.validate()) {
                     await _createUserWithEmailAndPassword();
@@ -220,22 +220,26 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      credential.user!.sendEmailVerification();
       debugPrint('createUserWithEmailAndPassword ${credential.user!.uid}');
       UserModel user = UserModel(
         full_name: _fullNameController.text,
         email: _emailController.text.trim(),
         user: credential.user
       );
-      if (Database().set(credential.user!.uid, user) == true) {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
-        Navigator.pop(context, user);
-      }
+      Database().set(credential.user!.uid, user).then((value) async {
+        if (value == true) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
+          _showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
+          Navigator.pop(context);
+        }
+      });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        _showSnackbar('The password provided is too weak.');
+        _showSnackbar(AppLocalizations.of(context)!.text('weak_password'));
       } else if (e.code == 'email-already-in-use') {
-        _showSnackbar('The account already exists for that email.');
+        _showSnackbar(AppLocalizations.of(context)!.text('email_already_in_use'));
       }
     } catch (e) {
       print(e);

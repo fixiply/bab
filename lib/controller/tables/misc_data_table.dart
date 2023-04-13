@@ -254,21 +254,21 @@ class MiscDataSource extends EditDataSource {
   }
 
   @override
-  String? suffixText(GridColumn column) {
-    if (column.columnName == 'amount') {
+  String? suffixText(String columnName) {
+    if (columnName == 'amount') {
       return AppLocalizations.of(context)!.weightSuffix();
     }
     return null;
   }
 
   @override
-  bool isNumericType(GridColumn column) {
-    return MiscModel().isNumericType(column.columnName);
+  bool isNumericType(String columnName) {
+    return MiscModel().isNumericType(columnName);
   }
 
   @override
-  List<Enums>? isEnumType(GridColumn column) {
-    return MiscModel().isEnumType(column.columnName);
+  List<Enums>? isEnumType(String columnName) {
+    return MiscModel().isEnumType(columnName);
   }
 
   @override

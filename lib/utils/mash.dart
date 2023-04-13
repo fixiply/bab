@@ -172,13 +172,13 @@ class MashDataSource extends EditDataSource {
   }
 
   @override
-  bool isNumericType(GridColumn column) {
-    return column.columnName == 'temperature' || column.columnName == 'duration';
+  bool isNumericType(String columnName) {
+    return columnName == 'temperature' || columnName == 'duration';
   }
 
   @override
-  List<Enums>? isEnumType(GridColumn column) {
-    if (column.columnName == 'type') {
+  List<Enums>? isEnumType(String columnName) {
+    if (columnName == 'type') {
       return Type.values;
     }
     return null;

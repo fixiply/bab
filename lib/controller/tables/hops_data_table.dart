@@ -248,21 +248,21 @@ class HopDataSource extends EditDataSource {
   }
 
   @override
-  String? suffixText(GridColumn column) {
-    if (column.columnName == 'amount') {
+  String? suffixText(String columnName) {
+    if (columnName == 'amount') {
       return AppLocalizations.of(context)!.weightSuffix();
     }
     return null;
   }
 
   @override
-  bool isNumericType(GridColumn column) {
-    return HopModel().isNumericType(column.columnName);
+  bool isNumericType(String columnName) {
+    return HopModel().isNumericType(columnName);
   }
 
   @override
-  List<Enums>? isEnumType(GridColumn column) {
-    return HopModel().isEnumType(column.columnName);
+  List<Enums>? isEnumType(String columnName) {
+    return HopModel().isEnumType(columnName);
   }
 
   @override

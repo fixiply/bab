@@ -262,8 +262,8 @@ class YeastDataSource extends EditDataSource {
   }
 
   @override
-  bool isNumericType(GridColumn column) {
-    return YeastModel().isNumericType(column.columnName);
+  bool isNumericType(String columnName) {
+    return YeastModel().isNumericType(columnName);
   }
 
   @override

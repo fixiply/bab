@@ -26,15 +26,23 @@ abstract class EditDataSource extends DataGridSource {
 
   TextEditingController editingController = TextEditingController();
 
-  bool isNumericType(GridColumn column) {
+  bool isNumericType(String columnName) {
     return false;
   }
 
-  List<Enums>? isEnumType(GridColumn column) {
+  bool isDateTimeType(String columnName) {
+    return false;
+  }
+
+  bool isDateType(String columnName) {
+    return false;
+  }
+
+  List<Enums>? isEnumType(String columnName) {
     return null;
   }
 
-  String? suffixText(GridColumn column) {
+  String? suffixText(String columnName) {
     return null;
   }
 
@@ -47,32 +55,33 @@ abstract class EditDataSource extends DataGridSource {
     // Text going to display on editable widget
     var value = getValue(dataGridRow, rowColumnIndex, column);
     newCellValue = value;
-    if (value is Enums) {
-      return dropDownWidget(value, submitCell);
+    List<Enums>? enums = isEnumType(column.columnName);
+    if (enums != null) {
+      return dropDownWidget(value, enums, submitCell);
     }
     return textFieldWidget(value?.toString() ?? '', column, submitCell);
   }
 
   Widget textFieldWidget(String displayText, GridColumn column, CellSubmit submitCell) {
-    RegExp regExp = isNumericType(column) ? RegExp('[0-9.,]') : RegExp('[a-zA-Z ]');
+    RegExp regExp = isNumericType(column.columnName) ? RegExp('[0-9.,]') : RegExp('[a-zA-Z ]');
     return Container(
       padding: const EdgeInsets.all(8.0),
-      alignment: isNumericType(column) ? Alignment.centerRight : Alignment.centerLeft,
+      alignment: isNumericType(column.columnName) ? Alignment.centerRight : Alignment.centerLeft,
       child: TextField(
         autofocus: true,
         controller: editingController..text = displayText,
-        textAlign: isNumericType(column) ? TextAlign.right : TextAlign.left,
+        textAlign: isNumericType(column.columnName) ? TextAlign.right : TextAlign.left,
         decoration: InputDecoration(
           contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 16.0),
-          suffixText: suffixText(column)
+          suffixText: suffixText(column.columnName)
         ),
-        keyboardType: isNumericType(column) ? TextInputType.number : TextInputType.text,
+        keyboardType: isNumericType(column.columnName) ? TextInputType.number : TextInputType.text,
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(regExp)
         ],
         onChanged: (String value) {
           if (value.isNotEmpty) {
-            if (isNumericType(column)) {
+            if (isNumericType(column.columnName)) {
               try {
                 newCellValue = NumberFormat.decimalPattern(AppLocalizations.of(context)!.locale.toString()).parse(value);
               } catch(e) {
@@ -95,7 +104,7 @@ abstract class EditDataSource extends DataGridSource {
     );
   }
 
-  Widget dropDownWidget(Enums value, CellSubmit submitCell) {
+  Widget dropDownWidget(Enums value, List<Enums> enums, CellSubmit submitCell) {
     return Container(
       padding: const EdgeInsets.all(8.0),
       alignment: Alignment.centerLeft,
@@ -112,7 +121,7 @@ abstract class EditDataSource extends DataGridSource {
           /// onCellSubmit to commit the new value in single place.
           submitCell();
         },
-        items: value.enums.map<DropdownMenuItem<Enum>>((Enum e) {
+        items: enums.map<DropdownMenuItem<Enum>>((Enum e) {
           return DropdownMenuItem<Enum>(
             value: e,
             child: Text(AppLocalizations.of(context)!.text(e.toString().toLowerCase()))

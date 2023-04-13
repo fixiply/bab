@@ -110,19 +110,17 @@ class Database {
       if (ignoreAuth == false && d is Model && _auth.currentUser != null) {
         d.creator = _auth.currentUser!.uid;
       }
-      await getTableName(d)!.doc(id).set(d.toMap())
-      .then((value) {
+      bool updated = await getTableName(d)!.doc(id).set(d.toMap()).then((value) {
         return true;
-      })
-      .catchError((error) {
-        return true;
+      }).catchError((error) {
+        return false;
       });
+      return updated;
     }
     catch (e, s) {
       debugPrint(s.toString());
       throw e;
     }
-    return false;
   }
 
   //Returns document iD if the record is created, null is updated.

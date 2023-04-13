@@ -275,21 +275,21 @@ class FermentableDataSource extends EditDataSource {
   }
 
   @override
-  String? suffixText(GridColumn column) {
-    if (column.columnName == 'amount') {
+  String? suffixText(String columnName) {
+    if (columnName == 'amount') {
       return AppLocalizations.of(context)!.weightSuffix(weight: Weight.kilo);
     }
     return null;
   }
 
   @override
-  bool isNumericType(GridColumn column) {
-    return FermentableModel().isNumericType(column.columnName);
+  bool isNumericType(String columnName) {
+    return FermentableModel().isNumericType(columnName);
   }
 
   @override
-  List<Enums>? isEnumType(GridColumn column) {
-    return FermentableModel().isEnumType(column.columnName);
+  List<Enums>? isEnumType(String columnName) {
+    return FermentableModel().isEnumType(columnName);
   }
 
   @override

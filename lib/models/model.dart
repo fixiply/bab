@@ -57,6 +57,14 @@ class Model<T> {
     return false;
   }
 
+  bool isDateType(String columnName) {
+    return columnName == 'inserted_at' || columnName == 'updated_at';
+  }
+
+  bool isUserType(String columnName) {
+    return columnName == 'creator';
+  }
+
   bool isDateTimeType(String columnName) {
     return false;
   }

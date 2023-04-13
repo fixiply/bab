@@ -11,6 +11,7 @@ class UserModel<T> {
   String? uuid;
   DateTime? inserted_at;
   DateTime? updated_at;
+  bool? verified;
   String? full_name;
   String? email;
   User? user;
@@ -23,6 +24,7 @@ class UserModel<T> {
     this.uuid,
     this.inserted_at,
     this.updated_at,
+    this.verified = false,
     this.full_name,
     this.email,
     this.user,
@@ -52,6 +54,7 @@ class UserModel<T> {
     if (map.containsKey('uuid')) this.uuid = map['uuid'];
     this.inserted_at = DateHelper.parse(map['inserted_at']);
     this.updated_at = DateHelper.parse(map['updated_at']);
+    this.verified = map['verified'];
     this.full_name = map['full_name'];
     this.email = map['email'];
     this.role = Role.values.elementAt(map['role']);
@@ -64,6 +67,7 @@ class UserModel<T> {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at!.toIso8601String(),
       'updated_at': DateTime.now().toIso8601String(),
+      'verified': this.verified,
       'full_name': this.full_name,
       'email': this.email,
       'role': this.role!.index,
@@ -82,6 +86,7 @@ class UserModel<T> {
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
+      verified: this.verified,
       full_name: this.full_name,
       email: this.email,
       user: this.user,

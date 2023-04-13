@@ -233,13 +233,20 @@ class _LoginPageState extends State<LoginPage> {
 
   _signInWithEmailAndPassword() async {
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
+      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
-      Navigator.pop(context);
+      if (credential != null) {
+        if (!credential.user!.emailVerified) {
+          _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'));
+        } else {
+          FirebaseAuth.instance.signOut();
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+          await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
+          Navigator.pop(context);
+        }
+      }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
         _showSnackbar(AppLocalizations.of(context)!.text('no_user_found'));
