@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/hops_page.dart';
+import 'package:bb/controller/tanks_page.dart';
 import 'package:bb/controller/tables/edit_data_source.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
-import 'package:bb/models/hop_model.dart';
-import 'package:bb/models/receipt_model.dart';
+import 'package:bb/models/equipment_model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
@@ -21,10 +21,10 @@ import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class HopsDataTable extends StatefulWidget {
+
+class TanksDataTable extends StatefulWidget {
   List<Quantity>? data;
   Widget? title;
-  bool inventory;
   bool allowEditing;
   bool allowSorting;
   bool allowAdding;
@@ -33,12 +33,9 @@ class HopsDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  ReceiptModel? receipt;
-  final void Function(List<Quantity> value)? onChanged;
-  HopsDataTable({Key? key,
+  TanksDataTable({Key? key,
     this.data,
     this.title,
-    this.inventory = false,
     this.allowEditing = true,
     this.allowSorting = true,
     this.allowAdding = false,
@@ -46,40 +43,32 @@ class HopsDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
-    this.selectionMode = SelectionMode.multiple,
-    this.receipt,
-    this.onChanged}) : super(key: key);
-  HopsDataTableState createState() => new HopsDataTableState();
+    this.selectionMode = SelectionMode.multiple}) : super(key: key);
+  TanksDataTableState createState() => new TanksDataTableState();
 }
 
-class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveClientMixin {
-  late HopDataSource _dataSource;
+class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveClientMixin {
+  late TankDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
   final TextEditingController _searchQueryController = TextEditingController();
   double dataRowHeight = 30;
-  List<HopModel> _selected = [];
-  Future<List<HopModel>>? _data;
+  List<EquipmentModel> _selected = [];
+  Future<List<EquipmentModel>>? _data;
 
-  List<HopModel> get selected => _selected;
+  List<EquipmentModel> get selected => _selected;
 
   @override
   bool get wantKeepAlive => true;
 
   void initState() {
     super.initState();
-    _dataSource = HopDataSource(context,
-      showQuantity: widget.data != null,
+    _dataSource = TankDataSource(context,
       showCheckboxColumn: widget.showCheckboxColumn!,
-      onChanged: (HopModel value, int dataRowIndex) {
-        if (widget.data != null) {
-          widget.data![dataRowIndex].amount = value.amount;
-          widget.data![dataRowIndex].use = value.use?.index;
-          widget.data![dataRowIndex].duration = value.duration;
-        }
-        widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.duration)]);
+      onChanged: (EquipmentModel value, int dataRowIndex) {
+
       }
     );
-    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'duration', sortDirection: DataGridSortDirection.descending));
+    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
     _fetch();
   }
 
@@ -113,7 +102,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
           Flexible(
             child: SfDataGridTheme(
               data: SfDataGridThemeData(),
-              child: FutureBuilder<List<HopModel>>(
+              child: FutureBuilder<List<EquipmentModel>>(
                 future: _data,
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -138,7 +127,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
                           _data!.then((value) => value.removeAt(rowIndex));
                         });
                         widget.data!.removeAt(rowIndex);
-                        widget.onChanged?.call(widget.data!);
+                        // widget.onChanged?.call(widget.data!);
                       },
                       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                         if (widget.showCheckboxColumn == true) {
@@ -152,7 +141,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
                           }
                         }
                       },
-                      columns: HopDataSource.columns(context: context, showQuantity: widget.data != null),
+                      columns: TankDataSource.columns(context: context, showQuantity: widget.data != null),
                     );
                   }
                   if (snapshot.hasError) {
@@ -174,75 +163,100 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
 
   _fetch() async {
     setState(() {
-      _data = Database().getHops(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getEquipments(type: Equipment.tank, searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
   _add() async {
     if (widget.allowAdding == true) {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return HopsPage(showCheckboxColumn: true);
+        return TanksPage(showCheckboxColumn: true);
       })).then((values) {
         if (values != null) {
           setState(() {
             _data!.then((value) => value.addAll(values));
           });
           if (widget.data != null) {
-            for(HopModel model in values) {
-              model.duration = widget.receipt?.boil;
-              widget.data!.add(Quantity(uuid: model.uuid, use: Use.boil.index, duration: widget.receipt?.boil));
+            for(EquipmentModel model in values) {
+              widget.data!.add(Quantity(uuid: model.uuid));
             }
-            widget.onChanged?.call(widget.data!);
+            // widget.onChanged?.call(widget.data!);
           }
         }
       });
     } else if (widget.allowEditing == true) {
       setState(() {
         _data!.then((value) {
-          value.insert(0, HopModel(isEdited: true));
+          value.insert(0, EquipmentModel(isEdited: true));
           return value;
         });
       });
     }
   }
 
+  _remove() async {
+    if (widget.allowEditing == false) {
+
+    } else {
+
+    }
+  }
+
   _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(message),
-            duration: Duration(seconds: 10)
+          content: Text(message),
+          duration: Duration(seconds: 10)
         )
     );
   }
 }
 
-class HopDataSource extends EditDataSource {
-  List<HopModel> data = [];
-  final void Function(HopModel value, int dataRowIndex)? onChanged;
+class TankDataSource extends EditDataSource {
+  List<EquipmentModel> _data = [];
+  final void Function(EquipmentModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
+  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<HopModel> data) {
-    this.data = data;
-    dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
+  List<EquipmentModel> get data => _data;
+  set data(List<EquipmentModel> data) => _data = data;
+
+  List<DataGridRow> getDataRows({List<EquipmentModel>? data}) {
+    List<EquipmentModel>? list = data ?? _data;
+    return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
-      DataGridCell<dynamic>(columnName: 'name', value: e.name),
-      DataGridCell<dynamic>(columnName: 'origin', value: e.origin),
-      DataGridCell<double>(columnName: 'alpha', value: e.alpha),
-      DataGridCell<Hop>(columnName: 'form', value: e.form),
-      DataGridCell<Type>(columnName: 'type', value: e.type),
-      if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
-      if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
+      DataGridCell<String>(columnName: 'name', value: e.name),
+      DataGridCell<double>(columnName: 'volume', value: e.volume),
+      DataGridCell<double>(columnName: 'size', value: e.mash_volume),
+      DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
+      DataGridCell<double>(columnName: 'absorption', value: e.absorption),
+      DataGridCell<double>(columnName: 'lost_volume', value: e.lost_volume),
     ])).toList();
+  }
+
+  void buildDataGridRows(List<EquipmentModel> data) {
+    this.data = data;
+    dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Future<void> handleLoadMoreRows() async {
+    await Future.delayed(Duration(seconds: 5));
+    _addMoreRows(20);
+    notifyListeners();
+  }
+
+  void _addMoreRows(int count) {
+    List<EquipmentModel>? list = data.skip(dataGridRows.length).toList().take(count).toList();
+    dataGridRows.addAll(getDataRows(data: list));
   }
 
   dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     var value = super.getValue(dataGridRow, rowColumnIndex, column);
     if (value != null && column.columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value);
+      double? weight = AppLocalizations.of(context)!.weight(value * 1000, weight: Weight.kilo);
       return weight!.toPrecision(2);
     }
     return value;
@@ -251,25 +265,26 @@ class HopDataSource extends EditDataSource {
   @override
   String? suffixText(String columnName) {
     if (columnName == 'amount') {
-      return AppLocalizations.of(context)!.weightSuffix();
+      return AppLocalizations.of(context)!.weightSuffix(weight: Weight.kilo);
     }
     return null;
   }
 
   @override
   bool isNumericType(String columnName) {
-    return HopModel().isNumericType(columnName);
+    return EquipmentModel().isNumericType(columnName);
   }
 
   @override
   List<Enums>? isEnumType(String columnName) {
-    return HopModel().isEnumType(columnName);
+    return EquipmentModel().isEnumType(columnName);
   }
 
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
         cells: row.getCells().map<Widget>((e) {
+          Color? color;
           String? value = e.value?.toString();
           var alignment = Alignment.centerLeft;
           if (e.value is LocalizedText) {
@@ -277,12 +292,9 @@ class HopDataSource extends EditDataSource {
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
             if (e.columnName == 'amount') {
-              value = AppLocalizations.of(context)!.weightFormat(e.value);
-            } else if (e.columnName == 'alpha') {
+              value = AppLocalizations.of(context)!.weightFormat(e.value * 1000);
+            } else if (e.columnName == 'efficiency') {
               value = AppLocalizations.of(context)!.percentFormat(e.value);
-            } else if (e.columnName == 'duration') {
-              var use = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'use').value;
-              value = AppLocalizations.of(context)!.durationFormat(use == Use.dry_hop ? e.value * 1440 : e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {
@@ -300,6 +312,13 @@ class HopDataSource extends EditDataSource {
               );
             }
           }
+          if (e.columnName == 'color') {
+            return Container(
+                margin: EdgeInsets.all(4),
+                color: ColorHelper.color(e.value),
+                child: Center(child: Text(value ?? '', style: TextStyle(color: Colors.white, fontSize: 14)))
+            );
+          }
           if (e.columnName == 'origin') {
             if (value != null) {
               return Container(
@@ -310,6 +329,7 @@ class HopDataSource extends EditDataSource {
             }
           }
           return Container(
+            color: color,
             alignment: alignment,
             padding: EdgeInsets.all(8.0),
             child: Text(value ?? ''),
@@ -328,51 +348,38 @@ class HopDataSource extends EditDataSource {
     }
     int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
-      case 'amount':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
-        break;
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        if (data[dataRowIndex].name is LocalizedText) {
-          data[dataRowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
-        }
-        else data[dataRowIndex].name = newCellValue;
+        _data[dataRowIndex].name = newCellValue;
         break;
-      case 'origin':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].name = newCellValue;
-        break;
-      case 'alpha':
+      case 'volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].alpha = newCellValue;
+        _data[dataRowIndex].volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
         break;
-      case 'form':
+      case 'size':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Hop>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].form = newCellValue;
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        _data[dataRowIndex].mash_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
         break;
-      case 'type':
+      case 'efficiency':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue;
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        _data[dataRowIndex].efficiency = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
         break;
-      case 'use':
+      case 'absorption':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Use>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].use = newCellValue;
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        _data[dataRowIndex].absorption = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
         break;
-      case 'duration':
+      case 'lost_volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].duration = newCellValue;
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        _data[dataRowIndex].lost_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
         break;
     }
-    onChanged?.call(data[dataRowIndex], dataRowIndex);
+    onChanged?.call(_data[dataRowIndex], dataRowIndex);
     updateDataSource();
   }
 
@@ -387,15 +394,6 @@ class HopDataSource extends EditDataSource {
           visible: false,
           label: Container()
       ),
-      if (showQuantity == true) GridColumn(
-          width: 90,
-          columnName: 'amount',
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
       GridColumn(
           columnName: 'name',
           allowEditing: showQuantity == false,
@@ -406,59 +404,48 @@ class HopDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          width: 50,
-          columnName: 'origin',
-          allowEditing: showQuantity == false,
-          allowSorting: false,
+          width: 90,
+          columnName: 'volume',
           label: Container(
               padding: EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('tank_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(
           width: 90,
-          columnName: 'alpha',
-          allowEditing: showQuantity == false,
+          columnName: 'size',
           label: Container(
               padding: EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('alpha'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('mash_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(
-          columnName: 'form',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      GridColumn(
-          columnName: 'type',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      if (showQuantity == true) GridColumn(
-          columnName: 'use',
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('use'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      if (showQuantity == true) GridColumn(
           width: 90,
-          columnName: 'duration',
+          columnName: 'efficiency',
           label: Container(
               padding: EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('mash_efficiency'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
+      ),
+      GridColumn(
+          width: 90,
+          columnName: 'absorption',
+          label: Container(
+              padding: EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('absorption'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
+      ),
+      GridColumn(
+          width: 90,
+          columnName: 'lost_volume',
+          label: Container(
+              padding: EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('lost_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
     ];

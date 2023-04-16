@@ -5,6 +5,10 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/term.dart';
 
+enum Product with Enums { article, booking, other;
+  List<Enum> get enums => [ article, booking, other ];
+}
+
 class ProductModel<T> extends Model {
   Status? status;
   Product? product;

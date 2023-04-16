@@ -94,6 +94,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                 allowEditing: widget.allowEditing,
                 allowSorting: widget.allowSorting,
                 controller: _dataGridController,
+                verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                 onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                   if (widget.showCheckboxColumn == true) {
                     for (var row in addedRows) {

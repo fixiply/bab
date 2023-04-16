@@ -1,15 +1,9 @@
-import 'package:flutter/material.dart';
-
 // Internal package
 import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/quantity.dart';
-
-// External package
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 enum Hop with Enums { leaf, pellet, plug, other;
   List<Enum> get enums => [ leaf, pellet, plug, other ];

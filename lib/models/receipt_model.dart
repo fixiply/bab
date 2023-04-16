@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
+import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/mash.dart';
 import 'package:bb/utils/quantity.dart';
@@ -14,8 +16,7 @@ class ReceiptModel<T> extends Model {
   dynamic? title;
   dynamic? text;
   bool? shared;
-  ImageModel? image;
-  String? style;
+  StyleModel? style;
   double? volume;
   int? boil;
   double? efficiency;
@@ -30,6 +31,7 @@ class ReceiptModel<T> extends Model {
   List<Quantity>? yeasts;
   List<Mash>? mash;
   dynamic? notes;
+  ImageModel? image;
 
   ReceiptModel({
     String? uuid,
@@ -40,7 +42,6 @@ class ReceiptModel<T> extends Model {
     this.title,
     this.text,
     this.shared = false,
-    this.image,
     this.style,
     this.volume,
     this.boil = 60,
@@ -55,7 +56,8 @@ class ReceiptModel<T> extends Model {
     this.miscellaneous,
     this.yeasts,
     this.mash,
-    this.notes
+    this.notes,
+    this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     if (fermentables == null) { fermentables = []; }
     if (hops == null) { hops = []; }
@@ -64,14 +66,13 @@ class ReceiptModel<T> extends Model {
     if (mash == null) { mash = []; }
   }
 
-  void fromMap(Map<String, dynamic> map) {
+  Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
     this.title = LocalizedText.deserialize(map['title']);
     this.text = LocalizedText.deserialize(map['text']);
     if (map.containsKey('shared')) this.shared = map['shared'];
-    this.image = ImageModel.fromJson(map['image']);
-    this.style = map['style'];
+    if (map['style'] != null) this.style = await Database().getStyle(map['style']);
     if (map['volume'] != null) this.volume = map['volume'].toDouble();
     if (map['boil'] != null) this.boil = map['boil'];
     if (map['efficiency'] != null) this.efficiency = map['efficiency'].toDouble();
@@ -86,6 +87,7 @@ class ReceiptModel<T> extends Model {
     this.yeasts = Quantity.deserialize(map['yeasts']);
     this.mash = Mash.deserialize(map['mash']);
     this.notes = LocalizedText.deserialize(map['notes']);
+    this.image = ImageModel.fromJson(map['image']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -95,8 +97,7 @@ class ReceiptModel<T> extends Model {
       'title': LocalizedText.serialize(this.title),
       'text': LocalizedText.serialize(this.text),
       'shared': this.shared,
-      'image': ImageModel.serialize(this.image),
-      'style': this.style,
+      'style': this.style != null ? this.style!.uuid : null,
       'volume': this.volume,
       'boil': this.boil,
       'efficiency': this.efficiency,
@@ -111,6 +112,7 @@ class ReceiptModel<T> extends Model {
       'yeasts': Quantity.serialize(this.yeasts),
       'mash': Mash.serialize(this.mash),
       'notes': LocalizedText.serialize(this.notes),
+      'image': ImageModel.serialize(this.image),
     });
     return map;
   }
@@ -125,7 +127,6 @@ class ReceiptModel<T> extends Model {
       title: this.title,
       text: this.text,
       shared: this.shared,
-      image: this.image,
       style: this.style,
       volume: this.volume,
       boil: this.boil,
@@ -140,7 +141,8 @@ class ReceiptModel<T> extends Model {
       miscellaneous: this.miscellaneous,
       yeasts: this.yeasts,
       mash: this.mash,
-      notes: this.notes
+      notes: this.notes,
+      image: this.image,
     );
   }
 

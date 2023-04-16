@@ -14,6 +14,9 @@ import 'package:bb/widgets/forms/localized_text_field.dart';
 import 'package:bb/widgets/forms/text_input_field.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 
+// External package
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+
 class FormHopPage extends StatefulWidget {
   final HopModel model;
   FormHopPage(this.model);
@@ -117,7 +120,10 @@ class _FormHopPageState extends State<FormHopPage> {
               Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.origin ?? '',
-                textCapitalization: TextCapitalization.sentences,
+                maxLength: 2,
+                inputFormatters: [
+                  UpperCaseTextFormatter(),
+                ],
                 onChanged: (value) => widget.model.origin = value,
                 decoration: FormDecoration(
                     icon: const Icon(Icons.flag_outlined),

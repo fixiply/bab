@@ -113,7 +113,19 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
               return [ Event('Hello')];
             },
             calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, _) {
+              markerBuilder: (BuildContext context, date, events) {
+                return Align(
+                  alignment: Alignment.bottomRight,
+                  child: Container(
+                    width: 20,
+                    padding: EdgeInsets.all(4.0),
+                    decoration: BoxDecoration(
+                      color: Colors.redAccent,
+                      shape: BoxShape.circle
+                    ),
+                    child: Text(events.length.toString(), textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
+                  )
+                );
               },
               selectedBuilder: (context, day, focusedDay) {
                 return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: PrimaryColor);

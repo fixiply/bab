@@ -10,17 +10,21 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class EditSfDataGrid extends SfDataGrid {
   final void Function(DataGridRow row, int rowIndex)? onRemove;
+  final void Function(DataGridRow row, int rowIndex)? onEdit;
   EditSfDataGrid(BuildContext context, {
     required EditDataSource source,
     required List<GridColumn> columns,
     this.onRemove,
+    this.onEdit,
     SelectionChangedCallback? onSelectionChanged,
     DataGridController? controller,
     bool allowEditing = true,
     bool allowSorting = true,
     bool showCheckboxColumn = true,
     bool? loadMoreRows,
-    SelectionMode selectionMode = SelectionMode.multiple
+    SelectionMode selectionMode = SelectionMode.multiple,
+    ScrollPhysics? verticalScrollPhysics,
+    ScrollPhysics? horizontalScrollPhysics
   }) : super(
     source: source,
     columns: columns,
@@ -36,6 +40,8 @@ class EditSfDataGrid extends SfDataGrid {
     shrinkWrapRows: true,
     showCheckboxColumn: showCheckboxColumn,
     selectionMode: selectionMode,
+    verticalScrollPhysics: verticalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
+    horizontalScrollPhysics: horizontalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
     loadMoreViewBuilder: loadMoreRows == true ? (BuildContext context, LoadMoreRows loadMoreRows) {
       Future<String> loadRows() async {
         // Call the loadMoreRows function to call the
@@ -90,7 +96,7 @@ class EditSfDataGrid extends SfDataGrid {
     startSwipeActionsBuilder: (BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
         onTap: () {
-
+          onEdit?.call(row, rowIndex);
         },
         child: Container(
           color: Colors.blueAccent,

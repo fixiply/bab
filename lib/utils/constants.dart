@@ -21,9 +21,9 @@ const String channelId = 'high_importance_channel';
 const String TERMS_CONDITIONS = 'terms/terms_conditions.md';
 const String PRIVACY_POLICY = 'terms/privacy_policy.md';
 
-const double DEFAULT_YIELD = 72.0;
-const double DEFAULT_LOSS_BOIL = 2.0;
-const double DEFAULT_HEAD_LOSS = 2.0;
+const double DEFAULT_YIELD = 75.0;
+const double DEFAULT_BOIL_LOSS = 2.0;
+const double DEFAULT_WORT_SHRINKAGE = 2.0;
 
 //User Global
 UserModel? currentUser;
@@ -53,9 +53,6 @@ enum Payments with Enums { credit_card, paypal, apple_pay, google_pay;
   List<Enum> get enums => [ credit_card, paypal, apple_pay, google_pay ];
 }
 enum Period { day, week, month, year }
-enum Product with Enums { article, booking, other;
-  List<Enum> get enums => [ article, booking, other ];
-}
 enum Role with Enums { admin, editor, customer;
   List<Enum> get enums => [ admin, editor, customer ];
 }

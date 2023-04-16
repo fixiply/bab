@@ -134,8 +134,8 @@ class _FormProductPageState extends State<FormProductPage> {
               DropdownButtonFormField<Product>(
                 value: widget.model.product,
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.article_outlined),
-                    labelText: AppLocalizations.of(context)!.text('product')
+                  icon: const Icon(Icons.article_outlined),
+                  labelText: AppLocalizations.of(context)!.text('product')
                 ),
                 items: Product.values.map((Product display) {
                   return DropdownMenuItem<Product>(

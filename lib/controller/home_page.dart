@@ -14,7 +14,7 @@ import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/controller/styles_page.dart';
-import 'package:bb/controller/tanks_page.dart';
+import 'package:bb/controller/equipments_page.dart';
 import 'package:bb/controller/tools_page.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -243,7 +243,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                   onGenerateRoute: (RouteSettings settings) {
                     return MaterialPageRoute(
                       fullscreenDialog: true,
-                      builder: (_) => TanksPage(),
+                      builder: (_) => EquipmentsPage(),
                     );
                   }
                 ),

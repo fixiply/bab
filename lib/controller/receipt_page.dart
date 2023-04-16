@@ -37,7 +37,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
   // Edition mode
   bool _editable = false;
   bool _expanded = true;
-  StyleModel? _style;
   int _baskets = 0;
 
   @override
@@ -164,23 +163,25 @@ class _ReceiptPageState extends State<ReceiptPage> {
           )
         ],
       ),
-      if (_style != null) SliverToBoxAdapter(
+      if (widget.model.style != null) SliverToBoxAdapter(
         child: Padding( 
           padding: EdgeInsets.all(8.0),
           child: RichText(
             textAlign: TextAlign.left,
             overflow: TextOverflow.ellipsis,
             text: TextSpan(
-              style: DefaultTextStyle.of(context).style,
+              style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
               children: [
-                TextSpan(text: '${AppLocalizations.of(context)!.text('style')}${AppLocalizations.of(context)!.colon}  ', style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-                TextSpan(text: _labelStyle(), style: TextStyle(fontSize: 20)),
+                TextSpan(text: '${AppLocalizations.of(context)!.text('style')}${AppLocalizations.of(context)!.colon}  ', style: TextStyle(fontWeight: FontWeight.w600)),
+                TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.style!.name)),
               ]
             )
           )
         )
       ),
       if (widget.model.text != null && widget.model.text!.isNotEmpty) SliverToBoxAdapter(
+        child: Padding(
+        padding: EdgeInsets.all(8.0),
           child: ExpansionPanelList(
             elevation: 1,
             expandedHeaderPadding: EdgeInsets.zero,
@@ -215,32 +216,48 @@ class _ReceiptPageState extends State<ReceiptPage> {
               )
           ])
         ),
+      ),
       SliverList(delegate: SliverChildListDelegate(
         [
-          if (widget.model.fermentables != null && widget.model.fermentables!.isNotEmpty) FermentablesDataTable(
+          if (widget.model.fermentables != null && widget.model.fermentables!.isNotEmpty) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: FermentablesDataTable(
               data: widget.model.fermentables,
               title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false
+            ),
           ),
-          if (widget.model.hops != null && widget.model.hops!.isNotEmpty) HopsDataTable(
+          if (widget.model.hops != null && widget.model.hops!.isNotEmpty) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: HopsDataTable(
               data: widget.model.hops,
               title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false
+            ),
           ),
-          if (widget.model.yeasts != null && widget.model.yeasts!.isNotEmpty) YeastsDataTable(
+          if (widget.model.yeasts != null && widget.model.yeasts!.isNotEmpty) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: YeastsDataTable(
               data: widget.model.yeasts,
               title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false
+            ),
           ),
-          if (widget.model.miscellaneous != null && widget.model.miscellaneous!.isNotEmpty) MiscDataTable(
+          if (widget.model.miscellaneous != null && widget.model.miscellaneous!.isNotEmpty) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: MiscDataTable(
               data: widget.model.miscellaneous,
               title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false
+            ),
           ),
-          if (widget.model.mash != null && widget.model.mash!.isNotEmpty) MashDataTable(
+          if (widget.model.mash != null && widget.model.mash!.isNotEmpty) Padding(
+            padding: EdgeInsets.all(8.0),
+            child: MashDataTable(
               data: widget.model.mash,
               title: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
               allowEditing: false, allowSorting: false, showCheckboxColumn: false
+            )
           )
         ]
       )),
@@ -259,28 +276,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
     });
     final provider = Provider.of<EditionNotifier>(context, listen: false);
     _editable = provider.editable;
-    _fetch();
-  }
-
-  _fetch() async {
-    if (widget.model.style != null) {
-      StyleModel? style = await Database().getStyle(widget.model.style!);
-      setState(() {
-        _style = style;
-      });
-    }
   }
 
   _edit(ReceiptModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormReceiptPage(model);
     }));
-  }
-
-  String _labelStyle() {
-    if (_style != null) {
-      return AppLocalizations.of(context)!.localizedText(_style!.name);
-    }
-    return '';
   }
 }

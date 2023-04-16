@@ -14,6 +14,9 @@ import 'package:bb/widgets/forms/localized_text_field.dart';
 import 'package:bb/widgets/forms/text_input_field.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 
+// External package
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+
 class FormFermentablePage extends StatefulWidget {
   final FermentableModel model;
   FormFermentablePage(this.model);
@@ -135,7 +138,10 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
               Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.origin ?? '',
-                textCapitalization: TextCapitalization.characters,
+                maxLength: 2,
+                inputFormatters: [
+                  UpperCaseTextFormatter(),
+                ],
                 onChanged: (value) => widget.model.origin = value,
                 decoration: FormDecoration(
                     icon: const Icon(Icons.flag_outlined),

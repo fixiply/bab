@@ -133,6 +133,10 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
                       controller: _dataGridController,
+                      verticalScrollPhysics: const NeverScrollableScrollPhysics(),
+                      onEdit: (DataGridRow row, int rowIndex) {
+                        widget.onChanged?.call(widget.data!);
+                      },
                       onRemove: (DataGridRow row, int rowIndex) {
                         setState(() {
                           _data!.then((value) => value.removeAt(rowIndex));
@@ -202,14 +206,6 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
           return value;
         });
       });
-    }
-  }
-
-  _remove() async {
-    if (widget.allowEditing == false) {
-
-    } else {
-
     }
   }
 

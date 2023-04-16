@@ -86,20 +86,32 @@ class AppLocalizations {
     return DateFormat.yMd(currentLanguage).add_jm().format(datetime);
   }
 
+  String? dateFormat(datetime) {
+    if (datetime == null) {
+      return null;
+    }
+    return DateFormat.yMd(currentLanguage).format(datetime);
+  }
+
   /// Returns the number format.
   double? decimal(number) {
     if (number == null || number.isEmpty) {
       return null;
     }
-    return NumberFormat.decimalPattern(locale.toString()).parse(number) as double;
+    try {
+      return NumberFormat.decimalPattern(locale.toString()).parse(number) as double;
+    }
+    catch(e) {
+      return double.tryParse(number);
+    }
   }
 
   /// Returns the formatted decimal.
-  String? numberFormat(number, {String? symbol}) {
+  String? numberFormat(number, {String newPattern = "#0.#", String? symbol}) {
     if (number == null) {
       return null;
     }
-    return NumberFormat("#0.#", currentLanguage).format(number) + (symbol ?? '');
+    return NumberFormat(newPattern, currentLanguage).format(number) + (symbol ?? '');
   }
 
   /// Returns the formatted currency.

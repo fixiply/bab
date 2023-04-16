@@ -262,7 +262,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.style != null) TextSpan(text: _style(model.style), style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.style != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.style!.name), style: TextStyle(fontWeight: FontWeight.bold)),
                   if (model.style != null && (model.ibu != null || model.abv != null)) TextSpan(text: '  -  '),
                   if (model.ibu != null) TextSpan(text: 'IBU: ${model.localizedIBU(AppLocalizations.of(context)!.locale)}'),
                   if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
@@ -338,15 +338,6 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
       _selectedCategories.clear();
     });
     _fetch();
-  }
-
-  String _style(String? uuid) {
-    for (StyleModel model in _styles) {
-      if (model.uuid == uuid) {
-        return AppLocalizations.of(context)!.localizedText(model.name);
-      }
-    }
-    return '';
   }
 
   _initialize() async {

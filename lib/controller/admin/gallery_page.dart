@@ -742,11 +742,11 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
       };
     } else if (sort == Sort.asc_size) {
       return (a, b) {
-        return a.size!.compareTo(b.size!);
+        return a.mash_volume!.compareTo(b.mash_volume!);
       };
     } else if (sort == Sort.desc_size) {
       return (a, b) {
-        return b.size!.compareTo(a.size!);
+        return b.mash_volume!.compareTo(a.mash_volume!);
       };
     }
     return (a, b) {

@@ -241,7 +241,6 @@ class _LoginPageState extends State<LoginPage> {
         if (!credential.user!.emailVerified) {
           _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'));
         } else {
-          FirebaseAuth.instance.signOut();
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
           Navigator.pop(context);

@@ -141,6 +141,7 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
                       controller: _dataGridController,
+                      verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onRemove: (DataGridRow row, int rowIndex) {
                         setState(() {
                           _data!.then((value) => value.removeAt(rowIndex));

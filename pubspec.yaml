@@ -71,6 +71,7 @@ dependencies:
   shared_preferences: ^2.1.0
   shimmer: ^2.0.0
   stack_board: ^0.1.2
+#  syncfusion_flutter_calendar: ^21.1.39
   syncfusion_flutter_core: ^21.1.38
   syncfusion_flutter_datagrid: ^21.1.38
   syncfusion_flutter_sliders: ^21.1.38

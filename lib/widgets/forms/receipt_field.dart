@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/style_model.dart';
+import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
@@ -10,15 +10,15 @@ import 'package:bb/widgets/form_decoration.dart';
 // External package
 import 'package:dropdown_search/dropdown_search.dart';
 
-class BeerStyleField extends FormField<StyleModel> {
+class ReceiptField extends FormField<ReceiptModel> {
   final String? title;
-  final void Function(StyleModel? value)? onChanged;
+  final void Function(ReceiptModel? value)? onChanged;
   final FormFieldValidator<dynamic>? validator;
 
-  BeerStyleField({Key? key, required BuildContext context, StyleModel? initialValue, this.title, this.onChanged, this.validator}) : super(
+  ReceiptField({Key? key, required BuildContext context, ReceiptModel? initialValue, this.title, this.onChanged, this.validator}) : super(
       key: key,
       initialValue: initialValue,
-      builder: (FormFieldState<StyleModel> field) {
+      builder: (FormFieldState<ReceiptModel> field) {
         return field.build(field.context);
       }
   );
@@ -27,12 +27,12 @@ class BeerStyleField extends FormField<StyleModel> {
   _BeerStyleFieldState createState() => _BeerStyleFieldState();
 }
 
-class _BeerStyleFieldState extends FormFieldState<StyleModel> {
+class _BeerStyleFieldState extends FormFieldState<ReceiptModel> {
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-  Future<List<StyleModel>>? _styles;
+  Future<List<ReceiptModel>>? _receipts;
 
   @override
-  BeerStyleField get widget => super.widget as BeerStyleField;
+  ReceiptField get widget => super.widget as ReceiptField;
 
   @override
   void initState() {
@@ -41,7 +41,7 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
   }
 
   @override
-  void didChange(StyleModel? value) {
+  void didChange(ReceiptModel? value) {
     widget.onChanged?.call(value);
     super.didChange(value);
     _fetch();
@@ -52,21 +52,21 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
     return InputDecorator(
       decoration: FormDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        icon: Icon(Icons.how_to_reg),
+        icon: Icon(Icons.sports_bar_outlined),
         fillColor: FillColor,
         filled: true,
       ),
-      child: FutureBuilder<List<StyleModel>>(
-        future: _styles,
+      child: FutureBuilder<List<ReceiptModel>>(
+        future: _receipts,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
-            return DropdownSearch<StyleModel>(
+            return DropdownSearch<ReceiptModel>(
               key: _key,
               selectedItem: widget.initialValue != null ? snapshot.data!.singleWhere((element) => element == widget.initialValue) : null,
               compareFn: (item1, item2) => item1.uuid == item2.uuid,
-              itemAsString: (StyleModel model) => AppLocalizations.of(context)!.localizedText(model.name),
+              itemAsString: (ReceiptModel model) => AppLocalizations.of(context)!.localizedText(model.title),
               asyncItems: (String filter) async {
-                return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
+                return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.title).contains(filter)).toList();
               },
               popupProps: PopupProps.menu(
                 showSelectedItems: true,
@@ -80,10 +80,19 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
               onChanged: (value) async {
                 didChange(value);
               },
+              autoValidateMode: AutovalidateMode.onUserInteraction,
               validator: widget.validator,
             );
           }
-          return Container();
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+
+              },
+              child: Text(AppLocalizations.of(context)!.text('add_recipe')),
+            )
+          );
         }
       ),
     );
@@ -91,7 +100,7 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
 
   _fetch() async {
     setState(() {
-      _styles = Database().getStyles(ordered: true);
+      _receipts = Database().getReceipts(user: currentUser?.uuid, myData: true, ordered: true);
     });
   }
 }

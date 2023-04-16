@@ -1,34 +1,38 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/tanks_page.dart';
-import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/controller/forms/form_equipment_page.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
-class EquipmentField extends FormField<String> {
-  final String? title;
-  final void Function(String? value)? onChanged;
-  final FormFieldValidator<String>? validator;
+// External package
+import 'package:dropdown_search/dropdown_search.dart';
 
-  EquipmentField({Key? key, required BuildContext context, String? dataset, this.title, this.onChanged, this.validator}) : super(
+class EquipmentField extends FormField<EquipmentModel> {
+  final Icon? icon;
+  final String? title;
+  final Equipment type;
+  final void Function(EquipmentModel? value)? onChanged;
+  final FormFieldValidator<dynamic>? validator;
+
+  EquipmentField({Key? key, required BuildContext context, EquipmentModel? initialValue, this.icon, this.title, required this.type, this.onChanged, this.validator}) : super(
       key: key,
-      initialValue: dataset,
-      builder: (FormFieldState<String> field) {
+      initialValue: initialValue,
+      builder: (FormFieldState<EquipmentModel> field) {
         return field.build(field.context);
       }
   );
 
   @override
-  _BeerStyleFieldState createState() => _BeerStyleFieldState();
+  _EquipmentFieldState createState() => _EquipmentFieldState();
 }
 
-class _BeerStyleFieldState extends FormFieldState<String> {
+class _EquipmentFieldState extends FormFieldState<EquipmentModel> {
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-  Future<List<EquipmentModel>>? _equipment;
+  Future<List<EquipmentModel>>? _equipments;
 
   @override
   EquipmentField get widget => super.widget as EquipmentField;
@@ -40,7 +44,7 @@ class _BeerStyleFieldState extends FormFieldState<String> {
   }
 
   @override
-  void didChange(String? value) {
+  void didChange(EquipmentModel? value) {
     widget.onChanged?.call(value);
     super.didChange(value);
     _fetch();
@@ -51,77 +55,63 @@ class _BeerStyleFieldState extends FormFieldState<String> {
     return InputDecorator(
       decoration: FormDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        icon: Icon(Icons.propane_tank_outlined),
-        fillColor: FillColor, filled: true,
-        suffix: DeviceHelper.isDesktop ? Padding(
-          padding: EdgeInsets.only(left: 20.0, right: 15.0),
-          child: IconButton(
-            icon: Icon(Icons.chevron_right),
-            onPressed: () {
-              _showPage();
-            },
-          )
-        ) : null,
+        icon: widget.icon ?? Icon(Icons.propane_tank_outlined),
+        fillColor: FillColor,
+        filled: true,
       ),
       child: FutureBuilder<List<EquipmentModel>>(
-        future: _equipment,
-        builder: (context, snapshot) {
-          if (snapshot.data != null) {
-            return DropdownButtonFormField<String>(
-              key: _key,
-              value: widget.initialValue,
-              iconEnabledColor: Colors.black45,
-              isExpanded: true,
-              decoration: FormDecoration(
-                // icon: const Icon(Icons.how_to_reg),
-                labelText: widget.title ?? AppLocalizations.of(context)!.text('style'),
-              ),
-              items: _items(snapshot.data as List<EquipmentModel>),
-              onChanged: (value) {
-                if (value != null) {
-                  if (value.length == 0) {
-                    value = null;
-                    _key.currentState!.reset();
-                  }
-                }
-                didChange(value);
-              },
-              validator: widget.validator,
+          future: _equipments,
+          builder: (context, snapshot) {
+            if (snapshot.data != null) {
+              return DropdownSearch<EquipmentModel>(
+                key: _key,
+                selectedItem: widget.initialValue != null ? snapshot.data!.singleWhere((element) => element == widget.initialValue) : null,
+                compareFn: (item1, item2) => item1.uuid == item2.uuid,
+                itemAsString: (EquipmentModel model) => AppLocalizations.of(context)!.localizedText(model.name),
+                asyncItems: (String filter) async {
+                  return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
+                },
+                popupProps: PopupProps.menu(
+                  showSelectedItems: true,
+                  showSearchBox: true,
+                ),
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                    dropdownSearchDecoration: FormDecoration(
+                      labelText: widget.title ?? AppLocalizations.of(context)!.text('equipment'),
+                    )
+                ),
+                onChanged: (value) async {
+                  didChange(value);
+                },
+                autoValidateMode: AutovalidateMode.onUserInteraction,
+                validator: widget.validator,
+              );
+            }
+            return Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed: () {
+                  EquipmentModel newModel = EquipmentModel(
+                    type: widget.type
+                  );
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return FormEquipmentPage(
+                      newModel, widget.type,
+                      title: AppLocalizations.of(context)!.text(widget.type == Equipment.fermenter ? 'fermenter' : 'tank'),
+                    );
+                  })).then((value) { _fetch(); });
+                },
+                child: Text(AppLocalizations.of(context)!.text(widget.type == Equipment.fermenter ? 'add_fermenter' : 'add_tank')),
+              )
             );
           }
-          return Container();
-        }
       ),
     );
   }
 
   _fetch() async {
     setState(() {
-      _equipment = Database().getEquipments();
-    });
-  }
-
-  List<DropdownMenuItem<String>> _items(List<EquipmentModel> values) {
-    List<DropdownMenuItem<String>> items = [
-      DropdownMenuItem<String>(
-          value: null,
-          child: Text('Par défaut, rendement à $DEFAULT_YIELD%')
-      )
-    ];
-    for (EquipmentModel value in values) {
-      items.add(DropdownMenuItem(
-          value: value.uuid,
-          child: Text(AppLocalizations.of(context)!.localizedText(value.name), overflow: TextOverflow.ellipsis)
-      ));
-    };
-    return items;
-  }
-
-  _showPage() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return TanksPage();
-    })).then((articles) {
-      _fetch();
+      _equipments = Database().getEquipments(type: widget.type, ordered: true);
     });
   }
 }

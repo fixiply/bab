@@ -1,14 +1,8 @@
-import 'package:flutter/material.dart';
-
 // Internal package
 import 'package:bb/models/model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/quantity.dart';
-
-// External package
-import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 enum Misc with Enums { spice, fining, water_agent, herb, flavor, other;
   List<Enum> get enums => [ spice, fining, water_agent, herb, flavor, other ];

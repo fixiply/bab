@@ -1,21 +1,32 @@
-import 'package:flutter/material.dart';
-
 // Internal package
-import 'package:bb/controller/tables/edit_data_source.dart';
+import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
-import 'package:bb/utils/quantity.dart';
 
 // External package
 
+enum Equipment with Enums { tank, fermenter;
+  List<Enum> get enums => [ tank, fermenter ];
+}
+
+extension Ex on double {
+  double toPrecision(int n) => double.parse(toStringAsFixed(n));
+}
+
 class EquipmentModel<T> extends Model {
   Status? status;
-  dynamic? name;
-  double? loss_boil;
-  double? head_loss;
-  dynamic? desc;
+  String? name;
+  Equipment? type;
+  double? volume;
+  double? mash_volume;
+  double? efficiency;
+  double? absorption;
+  double? lost_volume;
+  double? boil_loss;
+  double? shrinkage;
+  dynamic? notes;
+  ImageModel? image;
 
   EquipmentModel({
     String? uuid,
@@ -26,28 +37,49 @@ class EquipmentModel<T> extends Model {
     bool? isSelected,
     this.status = Status.publied,
     this.name,
-    this.loss_boil = DEFAULT_LOSS_BOIL,
-    this.head_loss = DEFAULT_HEAD_LOSS,
-    this.desc,
+    this.type,
+    this.volume,
+    this.mash_volume,
+    this.efficiency = DEFAULT_YIELD,
+    this.absorption,
+    this.lost_volume,
+    this.boil_loss = DEFAULT_BOIL_LOSS,
+    this.shrinkage = DEFAULT_WORT_SHRINKAGE,
+    this.notes,
+    this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.name = LocalizedText.deserialize(map['name']);
-    if (map['loss_boil'] != null) this.loss_boil = map['loss_boil'].toDouble();
-    if (map['head_loss'] != null) this.head_loss = map['head_loss'].toDouble();
-    this.desc = LocalizedText.deserialize(map['desc']);
+    this.name = map['name'];
+    this.type = Equipment.values.elementAt(map['type']);
+    if (map['volume'] != null) this.volume = map['volume'].toDouble();
+    if (map['mash_volume'] != null) this.mash_volume = map['mash_volume'].toDouble();
+    if (map['efficiency'] != null) this.efficiency = map['efficiency'].toDouble();
+    if (map['absorption'] != null) this.absorption = map['absorption'].toDouble();
+    if (map['lost_volume'] != null) this.lost_volume = map['lost_volume'].toDouble();
+    if (map['boil_loss'] != null) this.boil_loss = map['boil_loss'].toDouble();
+    if (map['shrinkage'] != null) this.shrinkage = map['shrinkage'].toDouble();
+    this.notes = LocalizedText.deserialize(map['notes']);
+    this.image = ImageModel.fromJson(map['image']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
-      'name': LocalizedText.serialize(this.name),
-      'loss_boil': this.loss_boil,
-      'head_loss': this.head_loss,
-      'desc': LocalizedText.serialize(this.desc),
+      'name': this.name,
+      'type': this.type!.index,
+      'volume': this.volume,
+      'mash_volume': this.mash_volume,
+      'efficiency': this.efficiency,
+      'absorption': this.absorption,
+      'lost_volume': this.lost_volume,
+      'boil_loss': this.boil_loss,
+      'shrinkage': this.shrinkage,
+      'notes': LocalizedText.serialize(this.notes),
+      'image': ImageModel.serialize(this.image),
     });
     return map;
   }
@@ -60,9 +92,16 @@ class EquipmentModel<T> extends Model {
       creator: this.creator,
       status: this.status,
       name: this.name,
-      loss_boil: this.loss_boil,
-      head_loss: this.head_loss,
-      desc: this.desc,
+      type: this.type,
+      volume: this.volume,
+      mash_volume: this.mash_volume,
+      efficiency: this.efficiency,
+      absorption: this.absorption,
+      lost_volume: this.lost_volume,
+      boil_loss: this.boil_loss,
+      shrinkage: this.shrinkage,
+      notes: this.notes,
+      image: this.image,
     );
   }
 
@@ -83,11 +122,11 @@ class EquipmentModel<T> extends Model {
     if (volume == null) {
       return 0;
     }
-    double loss_boil = DEFAULT_LOSS_BOIL;
-    double head_loss = DEFAULT_HEAD_LOSS;
+    double loss_boil = DEFAULT_BOIL_LOSS;
+    double head_loss = DEFAULT_WORT_SHRINKAGE;
     if (equipment != null) {
-      loss_boil = equipment.loss_boil!;
-      head_loss = equipment.head_loss!;
+      loss_boil = equipment.boil_loss!;
+      head_loss = equipment.shrinkage!;
     }
     return (volume + loss_boil + head_loss) * 1.04;
   }

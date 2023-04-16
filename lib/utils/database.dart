@@ -1,8 +1,10 @@
+import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter/widgets.dart';
 
 // Internal package
 import 'package:bb/helpers/class_helper.dart';
 import 'package:bb/models/basket_model.dart';
+import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/company_model.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/models/event_model.dart';
@@ -18,7 +20,7 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/models/yeast_model.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/utils/quantity.dart';
 
 // External package
@@ -29,10 +31,12 @@ class Database {
   static final firestore = FirebaseFirestore.instance;
 
   final baskets = firestore.collection("baskets");
+  final brews = firestore.collection("brews");
   final companies = firestore.collection("companies");
-  final equipment = firestore.collection("equipment");
+  final equipments = firestore.collection("equipments");
   final events = firestore.collection("events");
   final fermentables = firestore.collection("fermentables");
+  final fermenters = firestore.collection("fermenters");
   final hops = firestore.collection("hops");
   final inventory = firestore.collection("inventory");
   final miscellaneous = firestore.collection("miscellaneous");
@@ -50,10 +54,12 @@ class Database {
   CollectionReference<Map<String, dynamic>>? getTableName(dynamic o) {
     if (o is BasketModel) {
       return baskets;
+    } else if (o is BrewModel) {
+      return brews;
     } else if (o is CompanyModel) {
       return companies;
     } else if (o is EquipmentModel) {
-      return equipment;
+      return equipments;
     } else if (o is EventModel) {
       return events;
     } else if (o is FermentableModel) {
@@ -130,7 +136,7 @@ class Database {
     }
     try {
       if (updateAll == true) {
-        if (ClassHelper.hasStatus(d) && d.status == Status.disabled) {
+        if (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled) {
           d.status = Status.pending;
         }
         if (d is Model && _auth.currentUser != null) {
@@ -162,7 +168,7 @@ class Database {
           canBeUpdated = creator == null || _auth.currentUser!.uid == map['creator'];
         }
         if (canBeUpdated) {
-          collection.doc(doc.id).update({'status': Status.publied.index});
+          collection.doc(doc.id).update({'status': constants.Status.publied.index});
         }
       });
     });
@@ -170,11 +176,11 @@ class Database {
 
   Future<void> delete(dynamic d, {bool forced = false}) async {
     try {
-      if (forced == true || (ClassHelper.hasStatus(d) && d.status == Status.disabled)) {
+      if (forced == true || (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled)) {
         return await getTableName(d)!.doc(d.uuid).delete();
       } else {
         if (ClassHelper.hasStatus(d)) {
-          d.status = Status.disabled;
+          d.status = constants.Status.disabled;
         }
         await getTableName(d)!.doc(d.uuid).update(d.toMap());
       }
@@ -201,9 +207,9 @@ class Database {
     Query query = events;
     if (all == false) {
       if (archived == true) {
-        query = query.where('status', isEqualTo: Status.disabled.index);
+        query = query.where('status', isEqualTo: constants.Status.disabled.index);
       } else {
-        query = query.where('status', isLessThanOrEqualTo: Status.publied.index);
+        query = query.where('status', isLessThanOrEqualTo: constants.Status.publied.index);
       }
     }
     await query.get().then((result) {
@@ -253,8 +259,8 @@ class Database {
         query = query.where('creator', isEqualTo: user);
       }
     }
-    await query.get().then((result) {
-      result.docs.forEach((doc) {
+    await query.get().then((result) async {
+      for(QueryDocumentSnapshot doc in result.docs) {
         bool canBeAdded = true;
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
@@ -268,10 +274,10 @@ class Database {
         if (canBeAdded) {
           ReceiptModel model = ReceiptModel();
           model.uuid = doc.id;
-          model.fromMap(doc.data() as Map<String, dynamic>);
+          await model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      });
+      };
     });
     if (ordered == true) {
       list.sort((a, b) => a.title!.toString().toLowerCase().compareTo(b.title!.toString().toLowerCase()));
@@ -320,7 +326,7 @@ class Database {
     return null;
   }
 
-  Future<List<StyleModel>> getStyles({List<Fermentation>? fermentations, String? name, String? number, bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({List<constants.Fermentation>? fermentations, String? name, String? number, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
     if (name != null) {
@@ -334,7 +340,7 @@ class Database {
       result.docs.forEach((doc) {
         bool canBeAdded = true;
         if (fermentations != null && fermentations.length > 0) {
-          Fermentation fermentation = Fermentation.values.elementAt(doc['fermentation']);
+          constants.Fermentation fermentation = constants.Fermentation.values.elementAt(doc['fermentation']);
           canBeAdded = fermentations.contains(fermentation);
         }
         if (canBeAdded) {
@@ -628,7 +634,7 @@ class Database {
     return null;
   }
 
-  Future<List<InventoryModel>> getInventories({Ingredient? ingredient, bool ordered = false}) async {
+  Future<List<InventoryModel>> getInventories({constants.Ingredient? ingredient, bool ordered = false}) async {
     List<InventoryModel> list = [];
     Query query = inventory;
     if (ingredient != null) {
@@ -649,8 +655,40 @@ class Database {
     return list;
   }
 
+  Future<BrewModel?> getBrew(String uuid) async {
+    DocumentSnapshot snapshot = await brews.doc(uuid).get();
+    if (snapshot.exists) {
+      BrewModel model = BrewModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
+  Future<List<BrewModel>> getBrews({String? user, bool ordered = false}) async {
+    List<BrewModel> list = [];
+    Query query = brews;
+    if (user != null) {
+      query = query.where('creator', isEqualTo: user);
+    }
+    query = query.orderBy('updated_at', descending: true);
+    await query.get().then((result) async {
+      for(QueryDocumentSnapshot doc in result.docs) {
+        BrewModel model = BrewModel();
+        model.uuid = doc.id;
+        await model.fromMap(doc.data() as Map<String, dynamic>);
+        list.add(model);
+      };
+    });
+    if (ordered == true) {
+      list.sort((a, b) => a.inserted_at!.toString().toLowerCase().compareTo(b.inserted_at!.toString().toLowerCase()));
+    }
+    return list;
+  }
+
   Future<EquipmentModel?> getEquipment(String uuid) async {
-    DocumentSnapshot snapshot = await equipment.doc(uuid).get();
+    DocumentSnapshot snapshot = await equipments.doc(uuid).get();
     if (snapshot.exists) {
       EquipmentModel model = EquipmentModel();
       model.uuid = snapshot.id;
@@ -660,16 +698,29 @@ class Database {
     return null;
   }
 
-  Future<List<EquipmentModel>> getEquipments({bool ordered = false}) async {
+  Future<List<EquipmentModel>> getEquipments({Equipment? type, String? searchText, bool ordered = false}) async {
     List<EquipmentModel> list = [];
-    Query query = equipment;
+    Query query = equipments;
+    if (type != null) {
+      query = query.where('type', isEqualTo: type.index);
+    }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
-        EquipmentModel model = EquipmentModel();
-        model.uuid = doc.id;
-        model.fromMap(doc.data() as Map<String, dynamic>);
-        list.add(model);
+        bool canBeAdded = true;
+        if (searchText != null && searchText.length > 0) {
+          canBeAdded = false;
+          String name = doc['name'].toString();
+          if (name.toLowerCase().contains(searchText.toLowerCase())) {
+            canBeAdded = true;
+          }
+        }
+        if (canBeAdded) {
+          EquipmentModel model = EquipmentModel();
+          model.uuid = doc.id;
+          model.fromMap(doc.data() as Map<String, dynamic>);
+          list.add(model);
+        }
       });
     });
     if (ordered == true) {

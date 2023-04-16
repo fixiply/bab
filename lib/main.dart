@@ -142,19 +142,25 @@ class _AppState extends State<MyApp> {
   }
 
   _authStateChanges() async {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      debugPrint('authStateChanges $user ${user != null ? user.emailVerified : null}');
-      UserModel? model;
-      if (user != null && user.emailVerified) {
-        model = await Database().getUser(user.uid);
-        if (model != null) {
-          model.user = user;
-          print('[$APP_NAME] User \'${user.email}\' is signed in with \'${model.role}\'.');
-        }
+    FirebaseAuth.instance.userChanges().listen((User? user) async {
+      _loadUser(user);
+    });
+    // FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+    //   _loadUser(user);
+    // });
+  }
+
+  _loadUser(User? user) async {
+    UserModel? model;
+    if (user != null && user.emailVerified) {
+      model = await Database().getUser(user.uid);
+      if (model != null) {
+        model.user = user;
+        print('[$APP_NAME] User \'${user.email}\' is signed in with \'${model.role}\'.');
       }
-      setState(() {
-        currentUser = model;
-      });
+    }
+    setState(() {
+      currentUser = model;
     });
   }
 

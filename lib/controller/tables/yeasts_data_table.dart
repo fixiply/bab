@@ -145,6 +145,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
                       controller: _dataGridController,
+                      verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onRemove: (DataGridRow row, int rowIndex) {
                         setState(() {
                           _data!.then((value) => value.removeAt(rowIndex));
@@ -172,7 +173,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                   }
                   return Center(
                     child: ImageAnimateRotate(
-                    child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                      child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
                     )
                   );
                 }
