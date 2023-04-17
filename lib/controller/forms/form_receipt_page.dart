@@ -284,10 +284,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.waves_outlined),
-                        labelText: AppLocalizations.of(context)!.text('volume'),
+                        labelText: AppLocalizations.of(context)!.text('mash_volume'),
                         suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
                         suffixIcon: Tooltip(
-                          message: 'Volume final après transfert',
+                          message: AppLocalizations.of(context)!.text('final_volume'),
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                         ),
                         border: InputBorder.none,

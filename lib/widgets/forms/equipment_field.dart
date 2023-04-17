@@ -55,7 +55,7 @@ class _EquipmentFieldState extends FormFieldState<EquipmentModel> {
     return InputDecorator(
       decoration: FormDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        icon: widget.icon ?? Icon(Icons.propane_tank_outlined),
+        icon: widget.icon ?? Icon(Icons.delete_outline),
         fillColor: FillColor,
         filled: true,
       ),

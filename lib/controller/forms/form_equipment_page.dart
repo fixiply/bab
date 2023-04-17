@@ -149,15 +149,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   _calculate();
                 },
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.waves_outlined),
-                    labelText: AppLocalizations.of(context)!.text('tank_volume'),
-                    suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
-                    suffixIcon: Tooltip(
-                      message: 'Volume final',
-                      child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
-                    ),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
+                  icon: const Icon(Icons.waves_outlined),
+                  labelText: AppLocalizations.of(context)!.text('tank_volume'),
+                  suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
@@ -178,15 +174,15 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   _calculate();
                 },
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.waves_outlined),
-                    labelText: AppLocalizations.of(context)!.text('mash_volume'),
-                    suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
-                    suffixIcon: Tooltip(
-                      message: 'Volume final',
-                      child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
-                    ),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
+                  icon: const Icon(Icons.waves_outlined),
+                  labelText: AppLocalizations.of(context)!.text('mash_volume'),
+                  suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                  suffixIcon: Tooltip(
+                    message: AppLocalizations.of(context)!.text('final_volume'),
+                    child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                  ),
+                  border: InputBorder.none,
+                  fillColor: FillColor, filled: true
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {

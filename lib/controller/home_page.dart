@@ -144,7 +144,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
               if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
                 priority: 4,
                 onTap: (page, _) => _sideMenu.changePage(page),
-                icon: Icon(Icons.propane_tank_outlined),
+                icon: Icon(Icons.delete_outline),
                 title: AppLocalizations.of(context)!.text('equipments'),
               ),
               if (currentUser != null && currentUser!.isEditor()) SideMenuItem(

@@ -29,7 +29,7 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
     ),
     tabs: [
-      Tab(icon: Icon(Icons.bloodtype_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('tanks'), overflow: TextOverflow.ellipsis, style: TextStyle(color: Theme.of(context).primaryColor))),
+      Tab(icon: Icon(Icons.delete_outline, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('tanks'), overflow: TextOverflow.ellipsis, style: TextStyle(color: Theme.of(context).primaryColor))),
       Tab(icon: Icon(Icons.propane_tank_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('fermenters'), overflow: TextOverflow.ellipsis, style: TextStyle(color: Theme.of(context).primaryColor))),
     ],
   );

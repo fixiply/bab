@@ -266,7 +266,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                   if (model.tank != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank')} : '),
                   if (model.tank != null) TextSpan(text: model.tank!.name, style: TextStyle(fontWeight: FontWeight.bold)),
                   if (model.tank != null && model.volume != null) TextSpan(text: '  -  '),
-                  if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('final_volume')} : '),
+                  if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
                   if (model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),

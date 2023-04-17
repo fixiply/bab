@@ -178,61 +178,23 @@ class _BrewPageState extends State<BrewPage> {
             )
           ),
         if (widget.model.tank != null) SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: RichText(
-                textAlign: TextAlign.left,
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
-                  children: [
-                    if (widget.model.tank != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank')} : '),
-                    if (widget.model.tank != null) TextSpan(text: widget.model.tank!.name),
-                    if (widget.model.tank != null && widget.model.volume != null) TextSpan(text: '  -  '),
-                    if (widget.model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('final_volume')} : '),
-                    if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume)),
-                  ]
-                )
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            child: RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
+                children: [
+                  if (widget.model.tank != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank')} : '),
+                  if (widget.model.tank != null) TextSpan(text: widget.model.tank!.name),
+                  if (widget.model.tank != null && widget.model.volume != null) TextSpan(text: '  -  '),
+                  if (widget.model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
+                  if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume)),
+                ]
               )
             )
-          ),
-        if (widget.model.notes != null) SliverToBoxAdapter(
-          child: Padding(
-            padding: EdgeInsets.all(8.0),
-            child: ExpansionPanelList(
-            elevation: 1,
-            expandedHeaderPadding: EdgeInsets.zero,
-            expansionCallback: (int index, bool isExpanded) {
-              setState(() {
-                _expanded = !isExpanded;
-              });
-            },
-            children: [
-              ExpansionPanel(
-                isExpanded: _expanded,
-                canTapOnHeader: true,
-                headerBuilder: (context, isExpanded) {
-                  return ListTile(
-                    dense: true,
-                    contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                    title: Text(AppLocalizations.of(context)!.text('notes'),
-                        style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                  );
-                },
-                body: Container(
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
-                  child: MarkdownBody(
-                    data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
-                    fitContent: true,
-                    shrinkWrap: true,
-                    softLineBreak: true,
-                    styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
-                  )
-                ),
-              )
-            ])
-          ),
+          )
         ),
         SliverList(
           delegate: SliverChildListDelegate([
@@ -279,13 +241,51 @@ class _BrewPageState extends State<BrewPage> {
           ])
         ),
         SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
+        if (widget.model.notes != null) SliverToBoxAdapter(
+          child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: ExpansionPanelList(
+                  elevation: 1,
+                  expandedHeaderPadding: EdgeInsets.zero,
+                  expansionCallback: (int index, bool isExpanded) {
+                    setState(() {
+                      _expanded = !isExpanded;
+                    });
+                  },
+                  children: [
+                    ExpansionPanel(
+                      isExpanded: _expanded,
+                      canTapOnHeader: true,
+                      headerBuilder: (context, isExpanded) {
+                        return ListTile(
+                          dense: true,
+                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                          title: Text(AppLocalizations.of(context)!.text('notes'),
+                              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                        );
+                      },
+                      body: Container(
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                          child: MarkdownBody(
+                            data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
+                            fitContent: true,
+                            shrinkWrap: true,
+                            softLineBreak: true,
+                            styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                          )
+                      ),
+                    )
+                  ])
+          ),
+        ),
       ]
     ),
     floatingActionButton: FloatingActionButton.extended(
         onPressed: _start,
         backgroundColor: Colors.redAccent,
         label: Text(AppLocalizations.of(context)!.text('start')),
-        icon: const Icon(Icons.start)
+        icon: const Icon(Icons.play_circle_outline)
       )
     );
   }

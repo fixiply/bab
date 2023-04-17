@@ -171,7 +171,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
               EquipmentField(
                 context: context,
                 type: Equipment.tank,
-                icon: Icon(Icons.bloodtype_outlined),
+                icon: Icon(Icons.delete_outline),
                 initialValue: widget.model.tank,
                 title: AppLocalizations.of(context)!.text('equipment'),
                 onChanged: (value) => widget.model.tank = value,
@@ -186,6 +186,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
               EquipmentField(
                 context: context,
                 type: Equipment.fermenter,
+                icon: Icon(Icons.propane_tank_outlined),
                 initialValue: widget.model.fermenter,
                 title: AppLocalizations.of(context)!.text('fermenter'),
                 onChanged: (value) => widget.model.fermenter = value
@@ -201,10 +202,10 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 },
                 decoration: FormDecoration(
                   icon: const Icon(Icons.waves_outlined),
-                  labelText: AppLocalizations.of(context)!.text('volume'),
+                  labelText: AppLocalizations.of(context)!.text('mash_volume'),
                   suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
                   suffixIcon: Tooltip(
-                    message: 'Volume final après transfert',
+                    message: AppLocalizations.of(context)!.text('final_volume'),
                     child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                   ),
                   border: InputBorder.none,
