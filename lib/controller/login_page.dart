@@ -239,7 +239,15 @@ class _LoginPageState extends State<LoginPage> {
       );
       if (credential != null) {
         if (!credential.user!.emailVerified) {
-          _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'));
+          _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
+            action: SnackBarAction(
+              textColor: Colors.white,
+              label: AppLocalizations.of(context)!.text('resend'),
+              onPressed: () {
+                credential.user!.sendEmailVerification();
+              }
+            ),
+          );
         } else {
           SharedPreferences prefs = await SharedPreferences.getInstance();
           await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
@@ -255,11 +263,12 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  _showSnackbar(String message) {
+  _showSnackbar(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text(message),
-            duration: Duration(seconds: 10)
+          content: Text(message),
+          duration: Duration(seconds: 10),
+          action: action
         )
     );
   }

@@ -21,6 +21,7 @@ import 'package:bb/widgets/search_text.dart';
 
 // External package
 import 'package:expandable_text/expandable_text.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class FermentablesPage extends StatefulWidget {
@@ -90,14 +91,12 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
         ) : null,
         actions: [
           if (_showList && widget.allowEditing) IconButton(
-              padding: EdgeInsets.zero,
-              icon: const Icon(Icons.delete_outline),
-              tooltip: AppLocalizations.of(context)!.text('delete'),
-              onPressed: () {
-                ImportHelper.yeasts(context, () {
-                  _fetch();
-                });
-              }
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.delete_outline),
+            tooltip: AppLocalizations.of(context)!.text('delete'),
+            onPressed: () {
+              _delete();
+            }
           ),
           if (widget.allowEditing) IconButton(
             padding: EdgeInsets.zero,
@@ -143,16 +142,18 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
                     showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
                     selectionMode: SelectionMode.multiple,
                     source: _dataSource,
-                    controller: _dataGridController,
+                    controller: getDataGridController(),
                     onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                      for(var row in addedRows) {
-                        final index = _dataSource.rows.indexOf(row);
-                        _selected.add(snapshot.data![index]);
-                      }
-                      for(var row in removedRows) {
-                        final index = _dataSource.rows.indexOf(row);
-                        _selected.remove(snapshot.data![index]);
-                      }
+                      setState(() {
+                        for(var row in addedRows) {
+                          final index = _dataSource.rows.indexOf(row);
+                          _selected.add(snapshot.data![index]);
+                        }
+                        for(var row in removedRows) {
+                          final index = _dataSource.rows.indexOf(row);
+                          _selected.remove(snapshot.data![index]);
+                        }
+                      });
                     },
                     columns: FermentableDataSource.columns(context: context, showQuantity: false),
                   );
@@ -185,6 +186,18 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
         )
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(FermentableModel model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   Widget _item(FermentableModel model) {
@@ -294,6 +307,35 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormFermentablePage(model);
     })).then((value) { _fetch(); });
+  }
+
+  Future<bool> _delete() async {
+    bool confirm = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return DeleteDialog(
+            title: AppLocalizations.of(context)!.text('delete_items_title'),
+          );
+        }
+    );
+    if (confirm) {
+      try {
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        for (FermentableModel model in _selected) {
+          await Database().delete(model, forced: true);
+        }
+        setState(() {
+          _selected.clear();
+        });
+      } catch (e) {
+        _showSnackbar(e.toString());
+      } finally {
+        EasyLoading.dismiss();
+      }
+      _fetch();
+      return true;
+    }
+    return false;
   }
 
   _showSnackbar(String message) {

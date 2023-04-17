@@ -17,6 +17,7 @@ import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/custom_image.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/search_text.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
 // External package
@@ -135,9 +136,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
               icon: const Icon(Icons.delete_outline),
               tooltip: AppLocalizations.of(context)!.text('delete'),
               onPressed: () {
-                ImportHelper.yeasts(context, () {
-                  _fetch();
-                });
+                _delete();
               }
           ),
           if (widget.allowEditing) IconButton(
@@ -184,16 +183,18 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
                     showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
                     selectionMode: SelectionMode.multiple,
                     source: _dataSource,
-                    controller: _dataGridController,
+                    controller: getDataGridController(),
                     onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                      for(var row in addedRows) {
-                        final index = _dataSource.rows.indexOf(row);
-                        _selected.add(snapshot.data![index]);
-                      }
-                      for(var row in removedRows) {
-                        final index = _dataSource.rows.indexOf(row);
-                        _selected.remove(snapshot.data![index]);
-                      }
+                      setState(() {
+                        for(var row in addedRows) {
+                          final index = _dataSource.rows.indexOf(row);
+                          _selected.add(snapshot.data![index]);
+                        }
+                        for(var row in removedRows) {
+                          final index = _dataSource.rows.indexOf(row);
+                          _selected.remove(snapshot.data![index]);
+                        }
+                      });
                     },
                     columns: TankDataSource.columns(context: context, showQuantity: false),
                   );
@@ -227,6 +228,18 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
         )
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(EquipmentModel model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   Widget _item(EquipmentModel model) {
@@ -317,6 +330,35 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormEquipmentPage(model, Equipment.tank);
     })).then((value) { _fetch(); });
+  }
+
+  Future<bool> _delete() async {
+    bool confirm = await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return DeleteDialog(
+            title: AppLocalizations.of(context)!.text('delete_items_title'),
+          );
+        }
+    );
+    if (confirm) {
+      try {
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        for (EquipmentModel model in _selected) {
+          await Database().delete(model, forced: true);
+        }
+        setState(() {
+          _selected.clear();
+        });
+      } catch (e) {
+        _showSnackbar(e.toString());
+      } finally {
+        EasyLoading.dismiss();
+      }
+      _fetch();
+      return true;
+    }
+    return false;
   }
 
   _showSnackbar(String message) {
