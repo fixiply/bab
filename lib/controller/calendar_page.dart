@@ -1,3 +1,5 @@
+import 'package:bb/helpers/date_helper.dart';
+import 'package:bb/models/brew_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -29,8 +31,8 @@ class Event {
 
 class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
   int _baskets = 0;
-  Future<List<ProductModel>>? _products;
-  late final ValueNotifier<List<Event>> _selectedEvents;
+  List<BrewModel>? _data = [];
+  final ValueNotifier<List<Event>> _selectedEvents = ValueNotifier([]);
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   DateTime? _selectedDay;
   DateTime _focusedDay = DateTime.now();
@@ -109,23 +111,27 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                 });
               }
             },
-            eventLoader: (day) {
-              return [ Event('Hello')];
-            },
+            eventLoader: _getEventsForDay,
             calendarBuilders: CalendarBuilders(
               markerBuilder: (BuildContext context, date, events) {
-                return Align(
-                  alignment: Alignment.bottomRight,
-                  child: Container(
-                    width: 20,
-                    padding: EdgeInsets.all(4.0),
-                    decoration: BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.circle
-                    ),
-                    child: Text(events.length.toString(), textAlign: TextAlign.center, style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white)),
-                  )
-                );
+                if (events.length > 0) {
+                  return Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      width: 20,
+                      padding: EdgeInsets.all(4.0),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle
+                      ),
+                      child: Text(events.length.toString(),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
+                    )
+                  );
+                }
               },
               selectedBuilder: (context, day, focusedDay) {
                 return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: PrimaryColor);
@@ -167,12 +173,15 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   }
 
   _fetch() async {
-    _products = Database().getProducts(product: Product.booking);
-    _selectedEvents = ValueNotifier(_getEventsForDay(_selectedDay!));
+    _data = await Database().getBrews(user: currentUser!.uuid, ordered: true);
+    _selectedEvents.value =  _getEventsForDay(_selectedDay!);
   }
 
   List<Event> _getEventsForDay(DateTime day) {
+    List<BrewModel> brews  = _data!.where((element) => DateHelper.toDate(element.inserted_at!) == DateHelper.toDate(day)).toList();
     // Implementation example
+    debugPrint('day: $day brews: ${brews.length}');
+    return brews.map((e) => Event(e.identifier!)).toList();
     return [];
   }
 

@@ -243,7 +243,7 @@ class Database {
     if (snapshot.exists) {
       ReceiptModel model = ReceiptModel();
       model.uuid = snapshot.id;
-      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      await model.fromMap(snapshot.data() as Map<String, dynamic>);
       return model;
     }
     return null;
@@ -660,7 +660,7 @@ class Database {
     if (snapshot.exists) {
       BrewModel model = BrewModel();
       model.uuid = snapshot.id;
-      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      await model.fromMap(snapshot.data() as Map<String, dynamic>);
       return model;
     }
     return null;
