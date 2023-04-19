@@ -5,7 +5,6 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
-import 'package:flutter/material.dart';
 
 enum Status with Enums { pending, started, finished, stoped;
   List<Enum> get enums => [ pending, started, finished, stoped ];
@@ -17,7 +16,7 @@ extension DoubleParsing on double {
 
 class BrewModel<T> extends Model {
   Status? status;
-  String? identifier;
+  String? reference;
   ReceiptModel? receipt;
   EquipmentModel? tank;
   EquipmentModel? fermenter;
@@ -31,7 +30,7 @@ class BrewModel<T> extends Model {
     DateTime? updated_at,
     String? creator,
     this.status = Status.pending,
-    this.identifier,
+    this.reference,
     this.receipt,
     this.tank,
     this.fermenter,
@@ -43,7 +42,7 @@ class BrewModel<T> extends Model {
   Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.identifier = map['identifier'];
+    this.reference = map['reference'];
     if (map['receipt'] != null) this.receipt = await Database().getReceipt(map['receipt']);
     if (map['tank'] != null) this.tank = await Database().getEquipment(map['tank']);
     if (map['fermenter'] != null) this.fermenter = await Database().getEquipment(map['fermenter']);
@@ -56,7 +55,7 @@ class BrewModel<T> extends Model {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
-      'identifier': this.identifier,
+      'reference': this.reference,
       'receipt': this.receipt != null ? this.receipt!.uuid : null,
       'tank': this.tank != null ? this.tank!.uuid : null,
       'fermenter': this.fermenter != null ? this.fermenter!.uuid : null,
@@ -74,7 +73,7 @@ class BrewModel<T> extends Model {
       updated_at: this.updated_at,
       creator: this.creator,
       status: this.status,
-      identifier: this.identifier,
+      reference: this.reference,
       receipt: this.receipt,
       tank: this.tank,
       fermenter: this.fermenter,
@@ -91,6 +90,6 @@ class BrewModel<T> extends Model {
 
   @override
   String toString() {
-    return 'Breaw: $identifier, UUID: $uuid';
+    return 'Breaw: $reference, UUID: $uuid';
   }
 }

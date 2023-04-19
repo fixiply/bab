@@ -1,3 +1,4 @@
+import 'package:bb/utils/database.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -13,7 +14,7 @@ import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/constants.dart' as constant;
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -59,7 +60,7 @@ class _BrewPageState extends State<BrewPage> {
           ),
           flexibleSpace: FlexibleSpaceBar(
             titlePadding: EdgeInsets.only(left: 170, bottom: 15),
-            title: Text('${AppLocalizations.of(context)!.localizedText(widget.model.identifier)} - ${AppLocalizations.of(context)!.dateFormat(widget.model.inserted_at)}'),
+            title: Text('#${AppLocalizations.of(context)!.localizedText(widget.model.reference)} - ${AppLocalizations.of(context)!.dateFormat(widget.model.inserted_at)}'),
             background: Stack(
               children: [
               Opacity(
@@ -138,7 +139,7 @@ class _BrewPageState extends State<BrewPage> {
                 },
               ),
             ),
-            if (currentUser != null && (currentUser!.isAdmin() || widget.model.creator == currentUser!.uuid))
+            if (constant.currentUser != null && (constant.currentUser!.isAdmin() || widget.model.creator == constant.currentUser!.uuid))
               IconButton(
                 icon: Icon(Icons.edit_note),
                 onPressed: () {
@@ -152,7 +153,7 @@ class _BrewPageState extends State<BrewPage> {
               archived: false,
               units: true,
               onSelected: (value) {
-                if (value is Unit) {
+                if (value is constant.Unit) {
                   setState(() {
                     AppLocalizations.of(context)!.unit = value;
                   });
@@ -284,8 +285,8 @@ class _BrewPageState extends State<BrewPage> {
     floatingActionButton: FloatingActionButton.extended(
         onPressed: _start,
         backgroundColor: Colors.redAccent,
-        label: Text(AppLocalizations.of(context)!.text('start')),
-        icon: const Icon(Icons.play_circle_outline)
+        label: Text(AppLocalizations.of(context)!.text(widget.model.status == Status.pending || widget.model.status == Status.stoped ? 'start' : 'stop')),
+        icon: Icon(widget.model.status == Status.pending || widget.model.status == Status.stoped ? Icons.play_circle_outline : Icons.stop_circle_outlined)
       )
     );
   }
@@ -309,7 +310,23 @@ class _BrewPageState extends State<BrewPage> {
     }));
   }
 
-  _start() {
+  _start() async {
+    if (widget.model.inserted_at!.isAfter(DateTime.now())) {
+      setState(() {
+        widget.model.status = widget.model.status == Status.pending || widget.model.status == Status.stoped ? Status.started : Status.stoped;
+      });
+      Database().update(widget.model);
+    } else {
+      _showSnackbar(AppLocalizations.of(context)!.text('brew_start_error'));
+    }
+  }
 
+  _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 10)
+      )
+    );
   }
 }

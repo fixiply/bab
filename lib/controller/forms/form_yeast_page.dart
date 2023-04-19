@@ -138,7 +138,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                 initialValue: widget.model.reference ?? '',
                 onChanged: (value) => widget.model.reference = value,
                 decoration: FormDecoration(
-                  icon: const Icon(Icons.bookmark_outline_outlined),
+                  icon: const Icon(Icons.tag),
                   labelText: AppLocalizations.of(context)!.text('reference'),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true

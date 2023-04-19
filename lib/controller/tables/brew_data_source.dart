@@ -25,7 +25,7 @@ class BrewDataSource extends EditDataSource {
     this.data = data;
     dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      DataGridCell<String>(columnName: 'identifier', value: e.identifier),
+      DataGridCell<String>(columnName: 'reference', value: e.reference),
       DataGridCell<DateTime>(columnName: 'inserted_at', value: e.inserted_at),
       DataGridCell<ReceiptModel>(columnName: 'receipt', value: e.receipt),
       DataGridCell<EquipmentModel>(columnName: 'tank', value: e.tank),
@@ -84,10 +84,10 @@ class BrewDataSource extends EditDataSource {
     }
     int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
-      case 'identifier':
+      case 'reference':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].identifier = newCellValue;
+        data[dataRowIndex].reference = newCellValue;
         break;
       case 'receipt':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -127,12 +127,12 @@ class BrewDataSource extends EditDataSource {
       ),
       GridColumn(
           width: 100,
-          columnName: 'identifier',
+          columnName: 'reference',
           allowEditing: false,
           label: Container(
               padding: EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('identifier'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('reference'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(

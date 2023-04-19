@@ -7,12 +7,12 @@ import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart' as constants;
-import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
+import 'package:bb/widgets/forms/datetime_field.dart';
 import 'package:bb/widgets/forms/equipment_field.dart';
 import 'package:bb/widgets/forms/receipt_field.dart';
 import 'package:bb/widgets/forms/switch_field.dart';
@@ -119,6 +119,25 @@ class _FormBrewPageState extends State<FormBrewPage> {
           },
           child: Column(
             children: <Widget>[
+              if (widget.model.status == Status.pending) DateTimeField(
+                context: context,
+                datetime: widget.model.inserted_at,
+                decoration: FormDecoration(
+                    icon: const Icon(Icons.event_available),
+                    labelText: AppLocalizations.of(context)!.text('date'),
+                    fillColor: constants.FillColor, filled: true
+                ),
+                onChanged: (value) => setState(() {
+                  widget.model.inserted_at = value;
+                }),
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return AppLocalizations.of(context)!.text('validator_field_required');
+                  }
+                  return null;
+                }
+              ),
+              Divider(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -126,12 +145,12 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       // initialValue: widget.model.identifier,
                       controller:  _identifierController,
                       onChanged: (text) => setState(() {
-                        widget.model.identifier = text;
+                        widget.model.reference = text;
                       }),
                       readOnly: _autogenerate == true,
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.bookmark_outline_outlined),
-                        labelText: AppLocalizations.of(context)!.text('identifier'),
+                        icon: const Icon(Icons.tag),
+                        labelText: AppLocalizations.of(context)!.text('reference'),
                         border: InputBorder.none,
                         fillColor: constants.FillColor, filled: true
                       ),
@@ -252,16 +271,16 @@ class _FormBrewPageState extends State<FormBrewPage> {
   _generate() async {
     if (_autogenerate && widget.model.uuid == null) {
       var newDate = DateTime.now();
-      List<BrewModel> brews = await Database().getBrews(user: currentUser!.uuid, ordered: true);
-      widget.model.identifier = '${newDate.year.toString().substring(2)}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, newPattern: "000")}';
-      _identifierController.text = widget.model.identifier!;
+      List<BrewModel> brews = await Database().getBrews(user: constants.currentUser!.uuid, ordered: true);
+      widget.model.reference = '${newDate.year.toString().substring(2)}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, newPattern: "000")}';
+      _identifierController.text = widget.model.reference!;
     }
   }
 
   _initialize() async {
     bool modified = _modified;
     _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '';
-    if (widget.model.identifier != null) _identifierController.text = widget.model.identifier!;
+    if (widget.model.reference != null) _identifierController.text = widget.model.reference!;
     await _generate();
     _modified = modified ? true : false;
   }
