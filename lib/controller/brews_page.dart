@@ -26,10 +26,8 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class BrewsPage extends StatefulWidget {
   bool allowEditing;
-  bool showCheckboxColumn;
-  bool showQuantity;
   bool loadMore;
-  BrewsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false}) : super(key: key);
+  BrewsPage({Key? key, this.allowEditing = false, this.loadMore = false}) : super(key: key);
 
   _BrewsPageState createState() => new _BrewsPageState();
 }
@@ -54,7 +52,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
     super.initState();
     _controller = ScrollController();
     _dataSource = BrewDataSource(context,
-        showCheckboxColumn: widget.showCheckboxColumn,
+        showCheckboxColumn: widget.allowEditing,
         onChanged: (BrewModel value, int dataRowIndex) {
           Database().update(value).then((value) async {
             _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -74,16 +72,9 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
         backgroundColor: Colors.white,
         appBar: AppBar(
           title: SearchText(_searchQueryController, () {  _fetch(); }),
+          elevation: 0,
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
-          elevation: 0,
-          automaticallyImplyLeading: widget.showCheckboxColumn == true,
-          leading: widget.showCheckboxColumn == true ? IconButton(
-              icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
-              onPressed:() async {
-                Navigator.pop(context, selected);
-              }
-          ) : null,
           actions: [
             if (_showList && widget.allowEditing) IconButton(
                 padding: EdgeInsets.zero,
@@ -123,7 +114,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                   if (snapshot.data!.length == 0) {
                     return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
                   }
-                  if (_showList || widget.showCheckboxColumn == true) {
+                  if (_showList) {
                     if (widget.loadMore) {
                       _dataSource.data = snapshot.data!;
                       _dataSource.handleLoadMoreRows();
@@ -134,7 +125,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                     return EditSfDataGrid(
                       context,
                       allowEditing: widget.allowEditing,
-                      showCheckboxColumn: widget.allowEditing ||  widget.showCheckboxColumn,
+                      showCheckboxColumn: widget.allowEditing,
                       selectionMode: SelectionMode.multiple,
                       source: _dataSource,
                       controller: getDataGridController(),
