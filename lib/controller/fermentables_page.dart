@@ -177,7 +177,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
         ),
       ),
       floatingActionButton: Visibility(
-        visible: currentUser != null && currentUser!.hasRole(),
+        visible: currentUser != null,
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,

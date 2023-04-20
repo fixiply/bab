@@ -184,7 +184,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           ),
         ),
         floatingActionButton: Visibility(
-          visible: currentUser != null && currentUser!.hasRole(),
+          visible: currentUser != null,
           child: FloatingActionButton(
               onPressed: _new,
               backgroundColor: Theme.of(context).primaryColor,
@@ -304,11 +304,9 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
             return BrewPage(model);
           }));
         },
-        onLongPress: () {
-          if (currentUser != null && (currentUser!.isAdmin() || model.creator == currentUser!.uuid)) {
-            _edit(model);
-          }
-        },
+        onLongPress: model.isEditable() ? () {
+          _edit(model);
+        } : null,
       )
     );
   }

@@ -94,10 +94,10 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
         ),
         body: TabBarView(
           children: [
-            FermentablesPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
-            HopsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
-            YeastsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
-            MiscPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
+            FermentablesPage(allowEditing: currentUser != null),
+            HopsPage(allowEditing: currentUser != null),
+            YeastsPage(allowEditing: currentUser != null),
+            MiscPage(allowEditing: currentUser != null),
           ]
         ),
       )

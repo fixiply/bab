@@ -140,7 +140,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               },
             ),
           ),
-          if (currentUser != null && (currentUser!.isAdmin() || widget.model.creator == currentUser!.uuid))
+          if (widget.model.isEditable())
             IconButton(
               icon: Icon(Icons.edit_note),
               onPressed: () {

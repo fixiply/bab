@@ -90,8 +90,8 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
         ),
         body: TabBarView(
           children: [
-            TanksPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
-            HopsPage(allowEditing: currentUser != null && currentUser!.isAdmin()),
+            TanksPage(allowEditing: currentUser != null),
+            HopsPage(allowEditing: currentUser != null),
           ]
         ),
       )

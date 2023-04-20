@@ -121,7 +121,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
             )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
@@ -289,11 +289,9 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
             return StylePage(model);
           }));
         },
-        onLongPress: () {
-          if (currentUser != null && (currentUser!.isAdmin() || model.creator == currentUser!.uuid)) {
-            _edit(model);
-          }
-        },
+        onLongPress: model.isEditable() ? () {
+          _edit(model);
+        } : null,
       )
     );
   }

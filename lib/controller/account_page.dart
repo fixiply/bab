@@ -74,7 +74,7 @@ class _AccountPageState extends State<AccountPage> {
           )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
       body: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
         child: Column(

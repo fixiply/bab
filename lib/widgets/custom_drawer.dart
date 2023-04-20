@@ -78,8 +78,8 @@ class CustomDrawer<Object> extends Drawer {
             });
           },
         ),
-        if (currentUser != null && currentUser!.isAdmin()) Divider(height: 10),
-        if (currentUser != null && currentUser!.hasRole()) ListTile(
+        if (currentUser != null) Divider(height: 10),
+        if (currentUser != null) ListTile(
           title: Text(AppLocalizations.of(context)!.text('calendar'),
               style: TextStyle(fontSize: 18)
           ),

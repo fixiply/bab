@@ -107,7 +107,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
           )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
@@ -206,7 +206,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         ),
       ),
       floatingActionButton: Visibility(
-        visible: currentUser != null && currentUser!.hasRole(),
+        visible: currentUser != null,
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,
@@ -301,11 +301,9 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
             return ReceiptPage(model);
           }));
         },
-        onLongPress: () {
-          if (currentUser != null && (currentUser!.isAdmin() || model.creator == currentUser!.uuid)) {
-            _edit(model);
-          }
-        },
+        onLongPress: model.isEditable() ? () {
+          _edit(model);
+        } : null,
       )
     );
   }

@@ -175,7 +175,7 @@ class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<
         ),
       ),
       floatingActionButton: Visibility(
-        visible: currentUser != null && currentUser!.hasRole(),
+        visible: currentUser != null,
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,

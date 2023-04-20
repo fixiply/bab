@@ -159,19 +159,19 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 icon: Icon(Icons.inventory_outlined),
                 title: AppLocalizations.of(context)!.text('inventory'),
               ),
-              if (currentUser != null && currentUser!.hasRole()) SideMenuItem(
+              if (currentUser != null) SideMenuItem(
                 priority: 7,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.calendar_month_outlined),
                 title: AppLocalizations.of(context)!.text('calendar'),
               ),
-              if (currentUser != null && currentUser!.hasRole()) SideMenuItem(
+              if (currentUser != null) SideMenuItem(
                 priority: 8,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.build_outlined),
                 title: AppLocalizations.of(context)!.text('tools'),
               ),
-              if (currentUser != null && currentUser!.hasRole()) SideMenuItem(
+              if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 9,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.local_offer_outlined),

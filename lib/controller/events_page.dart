@@ -101,7 +101,7 @@ class _EventsPageState extends State<EventsPage> {
           )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null && currentUser!.hasRole() ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
       body: Container(
         child: RefreshIndicator(
           onRefresh: () => _fetch(),
@@ -186,10 +186,7 @@ class _EventsPageState extends State<EventsPage> {
               }));
             }
           },
-          onDoubleTap: currentUser != null && currentUser!.isAdmin() ? () {
-            _edit(model);
-          } : null,
-          onLongPress: currentUser != null && currentUser!.isAdmin() ? () {
+          onLongPress: currentUser != null && (currentUser!.isAdmin() || model.creator == currentUser!.uuid) ? () {
             _edit(model);
           } : null,
           child: _event(model, grid),
