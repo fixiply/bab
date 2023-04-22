@@ -150,6 +150,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       widget.model.color = value;
                     })
                   ),
+                  SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       // initialValue: widget.model.identifier,

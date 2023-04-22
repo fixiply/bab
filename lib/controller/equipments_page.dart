@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
+import 'package:bb/controller/fermenters_page.dart';
 import 'package:bb/controller/tanks_page.dart';
-import 'package:bb/controller/hops_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -91,7 +91,7 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
         body: TabBarView(
           children: [
             TanksPage(allowEditing: currentUser != null),
-            HopsPage(allowEditing: currentUser != null),
+            FermentersPage(allowEditing: currentUser != null),
           ]
         ),
       )
