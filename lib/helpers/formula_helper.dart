@@ -77,12 +77,12 @@ class FormulaHelper {
 
   /// Returns the plato degree, based on the given conditions.
   ///
-  /// The `gravity` argument is relative to the gravity 1.xxx.
-  static double plato(double? gravity) {
-    if (gravity == null) {
+  /// The `number` argument is relative to the gravity 1.xxx.
+  static double plato(double? number) {
+    if (number == null) {
       return 0;
     }
-    return ((gravity - 1) * 1000) / 4;
+    return ((number - 1) * 1000) / 4;
   }
 
   /// Returns the yeast seeding rate, based on the given conditions.
@@ -108,63 +108,83 @@ class FormulaHelper {
 
   /// Returns the gallon to liter conversion
   ///
-  /// The `volume` argument is relative to the volume in gallon.
-  static double convertGallonToLiter(double? volume) {
-    if (volume == null) {
+  /// The `number` argument is relative to the volume in gallon.
+  static double convertGallonToLiter(double? number) {
+    if (number == null) {
       return 0;
     }
-    return volume * 3.785;
+    return number * 3.785;
   }
 
   /// Returns the liter to gallon conversion
   ///
-  /// The `volume` argument is relative to the volume in liters.
-  static double convertLiterToGallon(double? volume) {
-    if (volume == null) {
+  /// The `number` argument is relative to the volume in liters.
+  static double convertLiterToGallon(double? number) {
+    if (number == null) {
       return 0;
     }
-    return volume / 3.785;
+    return number / 3.785;
   }
 
   /// Returns the gram to ounce conversion
   ///
-  /// The `weight` argument is relative to the weight in grams.
-  static double convertGramToOunce(double? weight) {
-    if (weight == null) {
+  /// The `number` argument is relative to the weight in grams.
+  static double convertGramToOunce(double? number) {
+    if (number == null) {
       return 0;
     }
-    return weight / 28.35;
+    return number / 28.35;
   }
 
   /// Returns the ounce to gram conversion
   ///
-  /// The `weight` argument is relative to the weight in ounce.
-  static double convertOunceToGram(double? weight) {
-    if (weight == null) {
+  /// The `number` argument is relative to the weight in ounce.
+  static double convertOunceToGram(double? number) {
+    if (number == null) {
       return 0;
     }
-    return weight * 28.35;
+    return number * 28.35;
   }
 
 
   /// Returns the ounce to livre conversion
   ///
-  /// The `weight` argument is relative to the weight in ounce.
-  static double convertOunceToLivre(double? weight) {
-    if (weight == null) {
+  /// The `number` argument is relative to the weight in ounce.
+  static double convertOunceToLivre(double? number) {
+    if (number == null) {
       return 0;
     }
-    return weight / 16;
+    return number / 16;
   }
 
   /// Returns the livre to ounce conversion
   ///
-  /// The `weight` argument is relative to the weight in livre.
-  static double convertLivreToOunce(double? weight) {
-    if (weight == null) {
+  /// The `number` argument is relative to the weight in livre.
+  static double convertLivreToOunce(double? number) {
+    if (number == null) {
       return 0;
     }
-    return weight * 16;
+    return number * 16;
+  }
+
+  /// Returns the farenheit to celcius conversion
+  ///
+  /// The `number` argument is relative to the farenheit.
+  static double convertFarenheitToCelcius(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return (number - 32) * 5/9;
+  }
+
+  /// Returns the celcius to farenheit conversion
+  ///
+  /// The `number` argument is relative to the celcius.
+  static double convertCelciusToFarenheit(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return (number * 9/5) + 32;
   }
 }
 

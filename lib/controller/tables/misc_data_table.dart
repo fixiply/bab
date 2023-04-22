@@ -140,7 +140,7 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
                       source: _dataSource,
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
-                      controller: _dataGridController,
+                      controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onRemove: (DataGridRow row, int rowIndex) {
                         setState(() {
@@ -151,14 +151,16 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
                       },
                       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                         if (widget.showCheckboxColumn == true) {
-                          for (var row in addedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.add(snapshot.data![index]);
-                          }
-                          for (var row in removedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.remove(snapshot.data![index]);
-                          }
+                          setState(() {
+                            for(var row in addedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.add(snapshot.data![index]);
+                            }
+                            for(var row in removedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.remove(snapshot.data![index]);
+                            }
+                          });
                         }
                       },
                       columns: MiscDataSource.columns(context: context, showQuantity: widget.data != null),
@@ -179,6 +181,18 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
         ]
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(MiscModel model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   _fetch() async {
@@ -226,16 +240,19 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
 
 
 class MiscDataSource extends EditDataSource {
-  List<MiscModel> data = [];
+  List<MiscModel> _data = [];
   final void Function(MiscModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   MiscDataSource(BuildContext context, {List<MiscModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<MiscModel> data) {
-    this.data = data;
-    dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
+  List<MiscModel> get data => _data;
+  set data(List<MiscModel> data) => _data = data;
+
+  List<DataGridRow> getDataRows({List<MiscModel>? data}) {
+    List<MiscModel>? list = data ?? _data;
+    return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
@@ -243,6 +260,23 @@ class MiscDataSource extends EditDataSource {
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
       if (showQuantity == true)  DataGridCell<int>(columnName: 'time', value: e.time),
     ])).toList();
+  }
+
+  void buildDataGridRows(List<MiscModel> data) {
+    this.data = data;
+    dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Future<void> handleLoadMoreRows() async {
+    await Future.delayed(Duration(seconds: 5));
+    _addMoreRows(20);
+    notifyListeners();
+  }
+
+  void _addMoreRows(int count) {
+    List<MiscModel>? list = data.skip(dataGridRows.length).toList().take(count).toList();
+    dataGridRows.addAll(getDataRows(data: list));
   }
 
   dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {

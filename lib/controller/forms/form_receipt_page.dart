@@ -47,6 +47,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
   bool _modified = false;
 
   TextEditingController _volumeController = TextEditingController();
+  TextEditingController _primarydayController = TextEditingController();
+  TextEditingController _primarytempController = TextEditingController();
+  TextEditingController _secondarydayController = TextEditingController();
+  TextEditingController _secondarytempController = TextEditingController();
 
   @override
   void initState() {
@@ -82,6 +86,14 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
           }
         ),
         actions: <Widget> [
+          IconButton(
+            padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('calculate'),
+            icon: const Icon(Icons.calculate_outlined),
+            onPressed: () {
+              _calculate();
+            }
+          ),
           IconButton(
             padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text('save'),
@@ -378,6 +390,124 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 onChanged: (values) => widget.model.mash = values,
               ),
               Divider(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '',
+                      controller: _primarydayController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      onChanged: (value) {
+                        widget.model.primaryday = int.parse(value);
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.looks_one_outlined),
+                          labelText: AppLocalizations.of(context)!.text('primary_fermentation'),
+                          suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      ),
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '',
+                      controller: _primarytempController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.primarytemp = AppLocalizations.of(context)!.decimal(value);
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.device_thermostat_outlined),
+                          labelText: AppLocalizations.of(context)!.text('temperature'),
+                          suffixText: AppLocalizations.of(context)!.tempUnit,
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      ),
+                    )
+                  ),
+                ]
+              ),
+              Divider(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '',
+                      controller: _secondarydayController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      onChanged: (value) {
+                        widget.model.secondaryday = int.parse(value);
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.looks_two_outlined),
+                        labelText: AppLocalizations.of(context)!.text('secondary_fermentation'),
+                        suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      ),
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '',
+                      controller: _secondarytempController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.secondarytemp = AppLocalizations.of(context)!.decimal(value);
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.device_thermostat_outlined),
+                        labelText: AppLocalizations.of(context)!.text('temperature'),
+                        suffixText: AppLocalizations.of(context)!.tempUnit,
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      ),
+                    )
+                  ),
+                ]
+              ),
+              Divider(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.tertiaryday) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      onChanged: (value) {
+                        widget.model.tertiaryday = int.parse(value);
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.looks_3_outlined),
+                          labelText: AppLocalizations.of(context)!.text('tertiary_fermentation'),
+                          suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      ),
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.tertiarytemp) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.tertiarytemp = AppLocalizations.of(context)!.decimal(value);
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.device_thermostat_outlined),
+                          labelText: AppLocalizations.of(context)!.text('temperature'),
+                          suffixText: AppLocalizations.of(context)!.tempUnit,
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      ),
+                    )
+                  ),
+                ]
+              ),
+              Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.text = value,
                 AppLocalizations.of(context)!.localizedText(widget.model.text),
                 label: AppLocalizations.of(context)!.text('notes'),
@@ -406,6 +536,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
   _initialize() async {
     bool modified = _modified;
     _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '';
+    _primarydayController.text = AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '';
+    _primarytempController.text = AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '';
+    _secondarydayController.text = AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '';
+    _secondarytempController.text = AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '';
     _modified = modified ? true : false;
   }
 
@@ -451,11 +585,15 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
   }
 
   _calculate() async {
-    double og = 0;
-    double fg = 0;
-    double mcu = 0;
-    double ibu = 0;
-    double extract = 0;
+    double og = 0.0;
+    double fg = 0.0;
+    double mcu = 0.0;
+    double ibu = 0.0;
+    double extract = 0.0;
+    int? primaryday;
+    double? primarytemp;
+    int? secondaryday;
+    double? secondarytemp;
     List<FermentableModel> fermentables = await Database().getFermentables(quantities: widget.model.fermentables);
     for(FermentableModel item in fermentables) {
       if (item.method == Method.mashed) {
@@ -470,6 +608,19 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
 
     List<YeastModel> yeasts = await Database().getYeasts(quantities: widget.model.yeasts);
     for(YeastModel item in yeasts) {
+      primarytemp = (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
+      switch(item.type ?? Fermentation.hight) {
+        case Fermentation.hight:
+          primaryday = 21;
+          break;
+        case Fermentation.low:
+          primaryday = 14;
+          secondaryday = 21;
+          secondarytemp = 5;
+          break;
+        case Fermentation.spontaneous:
+          break;
+      }
       fg += item.density(og);
     }
 
@@ -486,6 +637,22 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       if (og != 0 && fg != 0) widget.model.abv = FormulaHelper.abv(og, fg);
       if (mcu != 0) widget.model.ebc = ColorHelper.ratingEBC(mcu).toInt();
       if (ibu != 0) widget.model.ibu = ibu;
+      if (primaryday != null && _primarydayController.text.isEmpty) {
+        widget.model.primaryday = primaryday;
+        _primarydayController.text = AppLocalizations.of(context)!.numberFormat(primaryday) ?? '';
+      }
+      if (primarytemp != null && _primarytempController.text.isEmpty) {
+        widget.model.primarytemp = primarytemp;
+        _primarytempController.text = AppLocalizations.of(context)!.numberFormat(primarytemp) ?? '';
+      }
+      if (secondaryday != null && _secondarydayController.text.isEmpty) {
+        widget.model.secondaryday = secondaryday;
+        _secondarydayController.text = AppLocalizations.of(context)!.numberFormat(secondaryday) ?? '';
+      }
+      if (secondarytemp != null && _secondarytempController.text.isEmpty) {
+        widget.model.secondarytemp = secondarytemp;
+        _secondarytempController.text = AppLocalizations.of(context)!.numberFormat(secondarytemp) ?? '';
+      }
     });
   }
 

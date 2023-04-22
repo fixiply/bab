@@ -20,7 +20,7 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/models/yeast_model.dart';
-import 'package:bb/utils/constants.dart' as constants;
+import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/quantity.dart';
 
 // External package
@@ -136,7 +136,7 @@ class Database {
     }
     try {
       if (updateAll == true) {
-        if (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled) {
+        if (ClassHelper.hasStatus(d) && d.status == CS.Status.disabled) {
           d.status = Status.pending;
         }
         if (d is Model && _auth.currentUser != null) {
@@ -168,7 +168,7 @@ class Database {
           canBeUpdated = creator == null || _auth.currentUser!.uid == map['creator'];
         }
         if (canBeUpdated) {
-          collection.doc(doc.id).update({'status': constants.Status.publied.index});
+          collection.doc(doc.id).update({'status': CS.Status.publied.index});
         }
       });
     });
@@ -176,11 +176,11 @@ class Database {
 
   Future<void> delete(dynamic d, {bool forced = false}) async {
     try {
-      if (forced == true || (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled)) {
+      if (forced == true || (ClassHelper.hasStatus(d) && d.status == CS.Status.disabled)) {
         return await getTableName(d)!.doc(d.uuid).delete();
       } else {
         if (ClassHelper.hasStatus(d)) {
-          d.status = constants.Status.disabled;
+          d.status = CS.Status.disabled;
         }
         await getTableName(d)!.doc(d.uuid).update(d.toMap());
       }
@@ -207,9 +207,9 @@ class Database {
     Query query = events;
     if (all == false) {
       if (archived == true) {
-        query = query.where('status', isEqualTo: constants.Status.disabled.index);
+        query = query.where('status', isEqualTo: CS.Status.disabled.index);
       } else {
-        query = query.where('status', isLessThanOrEqualTo: constants.Status.publied.index);
+        query = query.where('status', isLessThanOrEqualTo: CS.Status.publied.index);
       }
     }
     await query.get().then((result) {
@@ -326,7 +326,7 @@ class Database {
     return null;
   }
 
-  Future<List<StyleModel>> getStyles({List<constants.Fermentation>? fermentations, String? name, String? number, bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({List<CS.Fermentation>? fermentations, String? name, String? number, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
     if (name != null) {
@@ -340,7 +340,7 @@ class Database {
       result.docs.forEach((doc) {
         bool canBeAdded = true;
         if (fermentations != null && fermentations.length > 0) {
-          constants.Fermentation fermentation = constants.Fermentation.values.elementAt(doc['fermentation']);
+          CS.Fermentation fermentation = CS.Fermentation.values.elementAt(doc['fermentation']);
           canBeAdded = fermentations.contains(fermentation);
         }
         if (canBeAdded) {
@@ -634,7 +634,7 @@ class Database {
     return null;
   }
 
-  Future<List<InventoryModel>> getInventories({constants.Ingredient? ingredient, bool ordered = false}) async {
+  Future<List<InventoryModel>> getInventories({CS.Ingredient? ingredient, bool ordered = false}) async {
     List<InventoryModel> list = [];
     Query query = inventory;
     if (ingredient != null) {

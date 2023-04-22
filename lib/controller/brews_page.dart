@@ -240,7 +240,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(text: '#${model.reference}', style: TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(model.inserted_at)}'),
+              TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(model.started())}'),
             ],
           ),
         ),

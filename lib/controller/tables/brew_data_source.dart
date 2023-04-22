@@ -14,16 +14,19 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 
 class BrewDataSource extends EditDataSource {
-  List<BrewModel> data = [];
+  List<BrewModel> _data = [];
   final void Function(BrewModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   BrewDataSource(BuildContext context, {List<BrewModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<BrewModel> data) async {
-    this.data = data;
-    dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
+  List<BrewModel> get data => _data;
+  set data(List<BrewModel> data) => _data = data;
+
+  List<DataGridRow> getDataRows({List<BrewModel>? data}) {
+    List<BrewModel>? list = data ?? _data;
+    return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       DataGridCell<String>(columnName: 'reference', value: e.reference),
       DataGridCell<DateTime>(columnName: 'inserted_at', value: e.inserted_at),
@@ -32,6 +35,23 @@ class BrewDataSource extends EditDataSource {
       DataGridCell<EquipmentModel>(columnName: 'fermenter', value: e.fermenter),
       DataGridCell<Status>(columnName: 'status', value: e.status),
     ])).toList();
+  }
+
+  void buildDataGridRows(List<BrewModel> data) {
+    this.data = data;
+    dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Future<void> handleLoadMoreRows() async {
+    await Future.delayed(Duration(seconds: 5));
+    _addMoreRows(20);
+    notifyListeners();
+  }
+
+  void _addMoreRows(int count) {
+    List<BrewModel>? list = data.skip(dataGridRows.length).toList().take(count).toList();
+    dataGridRows.addAll(getDataRows(data: list));
   }
 
   @override

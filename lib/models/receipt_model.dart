@@ -30,6 +30,12 @@ class ReceiptModel<T> extends Model {
   List<Quantity>? miscellaneous;
   List<Quantity>? yeasts;
   List<Mash>? mash;
+  int? primaryday;
+  double? primarytemp;
+  int? secondaryday;
+  double? secondarytemp;
+  int? tertiaryday;
+  double? tertiarytemp;
   dynamic? notes;
   ImageModel? image;
 
@@ -56,6 +62,12 @@ class ReceiptModel<T> extends Model {
     this.miscellaneous,
     this.yeasts,
     this.mash,
+    this.primaryday,
+    this.primarytemp,
+    this.secondaryday,
+    this.secondarytemp,
+    this.tertiaryday,
+    this.tertiarytemp,
     this.notes,
     this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
@@ -86,6 +98,12 @@ class ReceiptModel<T> extends Model {
     this.miscellaneous = Quantity.deserialize(map['miscellaneous']);
     this.yeasts = Quantity.deserialize(map['yeasts']);
     this.mash = Mash.deserialize(map['mash']);
+    this.primaryday = map['primaryday'];
+    if (map['primarytemp'] != null) this.primarytemp = map['primarytemp'].toDouble();
+    this.secondaryday = map['secondaryday'];
+    if (map['secondarytemp'] != null) this.secondarytemp = map['secondarytemp'].toDouble();
+    this.tertiaryday = map['tertiaryday'];
+    if (map['tertiarytemp'] != null) this.tertiarytemp = map['tertiarytemp'].toDouble();
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
   }
@@ -111,6 +129,12 @@ class ReceiptModel<T> extends Model {
       'miscellaneous': Quantity.serialize(this.miscellaneous),
       'yeasts': Quantity.serialize(this.yeasts),
       'mash': Mash.serialize(this.mash),
+      'primaryday': this.primaryday,
+      'primarytemp': this.primarytemp,
+      'secondaryday': this.secondaryday,
+      'secondarytemp': this.secondarytemp,
+      'tertiaryday': this.tertiaryday,
+      'tertiarytemp': this.tertiarytemp,
       'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
     });
@@ -141,6 +165,12 @@ class ReceiptModel<T> extends Model {
       miscellaneous: this.miscellaneous,
       yeasts: this.yeasts,
       mash: this.mash,
+      primaryday: this.primaryday,
+      primarytemp: this.primarytemp,
+      secondaryday: this.secondaryday,
+      secondarytemp: this.secondarytemp,
+      tertiaryday: this.tertiaryday,
+      tertiarytemp: this.tertiarytemp,
       notes: this.notes,
       image: this.image,
     );

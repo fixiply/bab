@@ -93,18 +93,20 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                 source: _dataSource,
                 allowEditing: widget.allowEditing,
                 allowSorting: widget.allowSorting,
-                controller: _dataGridController,
+                controller: getDataGridController(),
                 verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                 onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                   if (widget.showCheckboxColumn == true) {
-                    for (var row in addedRows) {
-                      final index = _dataSource.rows.indexOf(row);
-                      _selected.add(widget.data![index]);
-                    }
-                    for (var row in removedRows) {
-                      final index = _dataSource.rows.indexOf(row);
-                      _selected.remove(widget.data![index]);
-                    }
+                    setState(() {
+                      for(var row in addedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.add(widget.data![index]);
+                      }
+                      for(var row in removedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.remove(widget.data![index]);
+                      }
+                    });
                   }
                 },
                 columns: Mash.columns(context: context, showQuantity: widget.data != null),
@@ -114,6 +116,18 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
         ]
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(Mash model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   _add() async {

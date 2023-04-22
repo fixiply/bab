@@ -62,7 +62,7 @@ class YeastModel<T> extends Model {
     // if (map['amount'] != null) this.amount = map['amount'].toDouble();
     if (map['cells'] != null) this.cells = map['cells'].toDouble();
     if (map['min_temp'] != null) this.tempmin = map['min_temp'].toDouble();
-    if (map['max_temp'] != null) this.tempmin = map['max_temp'].toDouble();
+    if (map['max_temp'] != null) this.tempmax = map['max_temp'].toDouble();
     if (map['min_attenuation'] != null) this.attmin = map['min_attenuation'].toDouble();
     if (map['max_attenuation'] != null) this.attmax = map['max_attenuation'].toDouble();
     this.notes = LocalizedText.deserialize(map['notes']);
@@ -112,8 +112,7 @@ class YeastModel<T> extends Model {
 
   // ignore: hash_and_equals
   bool operator ==(other) {
-    return (other is YeastModel && other.uuid == uuid);
-  }
+    return (other is YeastModel && other.uuid == uuid);  }
 
   @override
   String toString() {

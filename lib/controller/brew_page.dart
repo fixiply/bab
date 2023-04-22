@@ -14,7 +14,7 @@ import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/utils/constants.dart' as constant;
+import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -60,7 +60,7 @@ class _BrewPageState extends State<BrewPage> {
           ),
           flexibleSpace: FlexibleSpaceBar(
             titlePadding: EdgeInsets.only(left: 170, bottom: 15),
-            title: Text('#${AppLocalizations.of(context)!.localizedText(widget.model.reference)} - ${AppLocalizations.of(context)!.dateFormat(widget.model.inserted_at)}'),
+            title: Text('#${AppLocalizations.of(context)!.localizedText(widget.model.reference)} - ${AppLocalizations.of(context)!.dateFormat(widget.model.started())}'),
             background: Stack(
               children: [
               Opacity(
@@ -139,7 +139,7 @@ class _BrewPageState extends State<BrewPage> {
                 },
               ),
             ),
-            if (constant.currentUser != null && (constant.currentUser!.isAdmin() || widget.model.creator == constant.currentUser!.uuid))
+            if (CS.currentUser != null && (CS.currentUser!.isAdmin() || widget.model.creator == CS.currentUser!.uuid))
               IconButton(
                 icon: Icon(Icons.edit_note),
                 onPressed: () {
@@ -153,7 +153,7 @@ class _BrewPageState extends State<BrewPage> {
               archived: false,
               units: true,
               onSelected: (value) {
-                if (value is constant.Unit) {
+                if (value is CS.Unit) {
                   setState(() {
                     AppLocalizations.of(context)!.unit = value;
                   });
@@ -315,6 +315,7 @@ class _BrewPageState extends State<BrewPage> {
       setState(() {
         widget.model.status = widget.model.status == Status.pending || widget.model.status == Status.stoped ? Status.started : Status.stoped;
       });
+      widget.model.started_at = DateTime.now();
       Database().update(widget.model);
     } else {
       _showSnackbar(AppLocalizations.of(context)!.text('brew_start_error'));

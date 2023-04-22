@@ -1,3 +1,6 @@
+import 'package:bb/helpers/color_helper.dart';
+import 'package:bb/widgets/forms/color_field.dart';
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,7 +9,7 @@ import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as constants;
+import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -98,7 +101,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is constants.Unit) {
+              if (value is CS.Unit) {
                 setState(() {
                   AppLocalizations.of(context)!.unit = value;
                 });
@@ -125,7 +128,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 decoration: FormDecoration(
                     icon: const Icon(Icons.event_available),
                     labelText: AppLocalizations.of(context)!.text('date'),
-                    fillColor: constants.FillColor, filled: true
+                    fillColor: CS.FillColor, filled: true
                 ),
                 onChanged: (value) => setState(() {
                   widget.model.inserted_at = value;
@@ -140,6 +143,13 @@ class _FormBrewPageState extends State<FormBrewPage> {
               Divider(height: 10),
               Row(
                 children: [
+                  ColorField(
+                    context: context,
+                    initialValue: widget.model.color,
+                    onChanged: (value) => setState(() {
+                      widget.model.color = value;
+                    })
+                  ),
                   Expanded(
                     child: TextFormField(
                       // initialValue: widget.model.identifier,
@@ -152,7 +162,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                         icon: const Icon(Icons.tag),
                         labelText: AppLocalizations.of(context)!.text('reference'),
                         border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
+                        fillColor: CS.FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -228,7 +238,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                   ),
                   border: InputBorder.none,
-                  fillColor: constants.FillColor, filled: true
+                  fillColor: CS.FillColor, filled: true
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
@@ -247,7 +257,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   icon: const Icon(Icons.scatter_plot_outlined),
                   labelText: 'pH',
                   border: InputBorder.none,
-                  fillColor: constants.FillColor, filled: true
+                  fillColor: CS.FillColor, filled: true
                 ),
               ),
               Divider(height: 10),
@@ -271,7 +281,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
   _generate() async {
     if (_autogenerate && widget.model.uuid == null) {
       var newDate = DateTime.now();
-      List<BrewModel> brews = await Database().getBrews(user: constants.currentUser!.uuid, ordered: true);
+      List<BrewModel> brews = await Database().getBrews(user: CS.currentUser!.uuid, ordered: true);
       widget.model.reference = '${newDate.year.toString().substring(2)}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, newPattern: "000")}';
       _identifierController.text = widget.model.reference!;
     }

@@ -140,13 +140,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
               },
             ),
           ),
-          if (widget.model.isEditable())
-            IconButton(
-              icon: Icon(Icons.edit_note),
-              onPressed: () {
-                _edit(widget.model);
-              },
-            ),
+          if (widget.model.isEditable()) IconButton(
+            icon: Icon(Icons.edit_note),
+            onPressed: () {
+              _edit(widget.model);
+            },
+          ),
           CustomMenuButton(
             context: context,
             publish: false,

@@ -138,7 +138,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
                     context,
                     allowEditing: widget.allowEditing,
                     showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: SelectionMode.single,
+                    selectionMode: SelectionMode.multiple,
                     source: _dataSource,
                     controller: getDataGridController(),
                     onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {

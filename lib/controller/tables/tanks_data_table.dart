@@ -120,7 +120,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
                       source: _dataSource,
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
-                      controller: _dataGridController,
+                      controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onRemove: (DataGridRow row, int rowIndex) {
                         setState(() {
@@ -131,14 +131,16 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
                       },
                       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                         if (widget.showCheckboxColumn == true) {
-                          for (var row in addedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.add(snapshot.data![index]);
-                          }
-                          for (var row in removedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.remove(snapshot.data![index]);
-                          }
+                          setState(() {
+                            for(var row in addedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.add(snapshot.data![index]);
+                            }
+                            for(var row in removedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.remove(snapshot.data![index]);
+                            }
+                          });
                         }
                       },
                       columns: TankDataSource.columns(context: context, showQuantity: widget.data != null),
@@ -159,6 +161,18 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
         ]
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(EquipmentModel model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   _fetch() async {

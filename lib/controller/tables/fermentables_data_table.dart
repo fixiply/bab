@@ -132,7 +132,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
                       source: _dataSource,
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
-                      controller: _dataGridController,
+                      controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onEdit: (DataGridRow row, int rowIndex) {
                         widget.onChanged?.call(widget.data!);
@@ -146,14 +146,16 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
                       },
                       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                         if (widget.showCheckboxColumn == true) {
-                          for (var row in addedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.add(snapshot.data![index]);
-                          }
-                          for (var row in removedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.remove(snapshot.data![index]);
-                          }
+                          setState(() {
+                            for(var row in addedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.add(snapshot.data![index]);
+                            }
+                            for(var row in removedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.remove(snapshot.data![index]);
+                            }
+                          });
                         }
                       },
                       columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null),
@@ -174,6 +176,18 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
         ]
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(FermentableModel model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   _fetch() async {

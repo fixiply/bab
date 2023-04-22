@@ -216,6 +216,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             onChanged: (value) => widget.model.tempmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
+                              suffixText: AppLocalizations.of(context)!.tempUnit,
                               border: InputBorder.none,
                               suffixIcon: Tooltip(
                                 message: 'Température minimum',
@@ -234,6 +235,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             onChanged: (value) => widget.model.tempmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
+                              suffixText: AppLocalizations.of(context)!.tempUnit,
                               border: InputBorder.none,
                               suffixIcon: Tooltip(
                                 message:  'Température maximale',

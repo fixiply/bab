@@ -47,7 +47,7 @@ class YeastsDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
-    this.selectionMode = SelectionMode.single,
+    this.selectionMode = SelectionMode.multiple,
     this.receipt,
     this.onChanged}) : super(key: key);
   YeastsDataTableState createState() => new YeastsDataTableState();
@@ -144,7 +144,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                       source: _dataSource,
                       allowEditing: widget.allowEditing,
                       allowSorting: widget.allowSorting,
-                      controller: _dataGridController,
+                      controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onRemove: (DataGridRow row, int rowIndex) {
                         setState(() {
@@ -155,14 +155,16 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                       },
                       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                         if (widget.showCheckboxColumn == true) {
-                          for (var row in addedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.add(snapshot.data![index]);
-                          }
-                          for (var row in removedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.remove(snapshot.data![index]);
-                          }
+                          setState(() {
+                            for(var row in addedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.add(snapshot.data![index]);
+                            }
+                            for(var row in removedRows) {
+                              final index = _dataSource.rows.indexOf(row);
+                              _selected.remove(snapshot.data![index]);
+                            }
+                          });
                         }
                       },
                       columns: YeastDataSource.columns(context: context, showQuantity: widget.data != null),
@@ -183,6 +185,18 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         ]
       )
     );
+  }
+
+  DataGridController getDataGridController() {
+    List<DataGridRow> rows = [];
+    for(YeastModel model in _selected) {
+      int index = _dataSource.data.indexOf(model);
+      if (index != -1) {
+        rows.add(_dataSource.dataGridRows[index]);
+      }
+    }
+    _dataGridController.selectedRows = rows;
+    return _dataGridController;
   }
 
   _fetch() async {
@@ -232,16 +246,19 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
 
 
 class YeastDataSource extends EditDataSource {
-  List<YeastModel> data = [];
+  List<YeastModel> _data = [];
   final void Function(YeastModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<YeastModel> data) {
-    this.data = data;
-    dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
+  List<YeastModel> get data => _data;
+  set data(List<YeastModel> data) => _data = data;
+
+  List<DataGridRow> getDataRows({List<YeastModel>? data}) {
+    List<YeastModel>? list = data ?? _data;
+    return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
@@ -251,6 +268,23 @@ class YeastDataSource extends EditDataSource {
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
       DataGridCell<double>(columnName: 'attenuation', value: e.attenuation)
     ])).toList();
+  }
+
+  void buildDataGridRows(List<YeastModel> data) {
+    this.data = data;
+    dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Future<void> handleLoadMoreRows() async {
+    await Future.delayed(Duration(seconds: 5));
+    _addMoreRows(20);
+    notifyListeners();
+  }
+
+  void _addMoreRows(int count) {
+    List<YeastModel>? list = data.skip(dataGridRows.length).toList().take(count).toList();
+    dataGridRows.addAll(getDataRows(data: list));
   }
 
   dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {

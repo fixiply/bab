@@ -71,6 +71,13 @@ class AppLocalizations {
     return 'EBC';
   }
 
+  String get tempUnit {
+    if (unit == Unit.imperial) {
+      return '°F';
+    }
+    return '°C';
+  }
+
   int get maxColor {
     if (unit == Unit.imperial) {
       return 40;

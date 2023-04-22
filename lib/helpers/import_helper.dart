@@ -3,6 +3,7 @@ import 'dart:io';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/fermentable_model.dart' as fermentable;
 import 'package:bb/models/hop_model.dart' as hop;
 import 'package:bb/models/misc_model.dart' as misc;
@@ -303,8 +304,8 @@ class ImportHelper {
                   cells: double.tryParse(element.getElement('F_Y_CELLS')!.text)! / 10,
                   attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
                   attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
-                  tempmin: double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text),
-                  tempmax: double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text)
+                  tempmin: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text)),
+                  tempmax: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text))
               );
               final desc = element.getElement('F_Y_NOTES');
               if (desc != null && desc.text.isNotEmpty) {
@@ -341,10 +342,7 @@ class ImportHelper {
                   break;
               }
               if (type != 2 && type !=3) {
-                List<yeast.YeastModel> list = await Database().getYeasts(name: model.name.toString());
-                if (list.isEmpty) {
-                  Database().add(model, ignoreAuth: true);
-                }
+                Database().add(model, ignoreAuth: true);
               }
             }
             onImported.call();
