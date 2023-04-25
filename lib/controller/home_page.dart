@@ -70,7 +70,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
     //   );
     // }
     return Scaffold(
-      bottomNavigationBar: !DeviceHelper.isDesktop ? BottomNavigationBar(
+      bottomNavigationBar: !DeviceHelper.isLargeScreen(context) ? BottomNavigationBar(
         showUnselectedLabels: true,
         unselectedFontSize: 14,
         type: BottomNavigationBarType.fixed,
@@ -85,7 +85,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
           _page.jumpToPage(index);
         },
       ) : null,
-      body: !DeviceHelper.isDesktop ? _showPage() : Row(
+      body: !DeviceHelper.isLargeScreen(context) ? _showPage() : Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SideMenu(
@@ -183,13 +183,13 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 icon: Icon(Icons.photo_library_outlined),
                 title: AppLocalizations.of(context)!.text('image_gallery'),
               ),
-              if (DeviceHelper.isDesktop && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+              if (DeviceHelper.isLargeScreen(context) && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 11,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.article_outlined),
                 title: AppLocalizations.of(context)!.text('products'),
               ),
-              if (DeviceHelper.isDesktop && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
+              if (DeviceHelper.isLargeScreen(context) && currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                 priority: 12,
                 onTap: (page, _) => _sideMenu.changePage(page),
                 icon: Icon(Icons.groups_outlined),

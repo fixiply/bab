@@ -10,6 +10,16 @@ class DeviceHelper {
     return MediaQuery.of(context).size.shortestSide >= 600;
   }
 
+  static bool isLargeScreen(BuildContext context) {
+    if (isDesktop) {
+      return true;
+    }
+    if (isTablette(context) && MediaQuery.of(context).orientation == Orientation.landscape) {
+      return true;
+    }
+    return false;
+  }
+
   static bool get isDesktop {
     return Foundation.kIsWeb || Foundation.defaultTargetPlatform == TargetPlatform.linux || Foundation.defaultTargetPlatform == TargetPlatform.windows || Foundation.defaultTargetPlatform == TargetPlatform.macOS;
   }
