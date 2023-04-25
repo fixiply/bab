@@ -2,6 +2,7 @@
 import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/quantity.dart';
 
@@ -153,27 +154,6 @@ class HopModel<T> extends Model {
     return null;
   }
 
-  static List<HopModel> merge(List<Quantity>? quantities, List<HopModel> hops) {
-    List<HopModel> list = [];
-    if (quantities != null && hops != null) {
-      for (Quantity quantity in quantities) {
-        for (HopModel hop in hops) {
-          if (quantity.uuid == hop.uuid) {
-            HopModel model = hop.copy();
-            model.amount = quantity.amount;
-            model.duration = quantity.duration;
-            model.use = quantity.use != null
-                ? Use.values.elementAt(quantity.use!)
-                : Use.boil;
-            list.add(model);
-            break;
-          }
-        }
-      }
-    }
-    return list;
-  }
-
   static dynamic serialize(dynamic data) {
     if (data != null) {
       if (data is HopModel) {
@@ -204,5 +184,40 @@ class HopModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static Future<List<HopModel>> data(data) async {
+    List<HopModel>? values = [];
+    for(Quantity item in Quantity.deserialize(data)) {
+      HopModel? model = await Database().getHop(item.uuid!);
+      if (model != null) {
+        model.amount = item.amount;
+        model.duration = item.duration;
+        model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
+        values.add(model);
+      }
+    }
+    return values;
+  }
+
+  static dynamic quantities(dynamic data) {
+    if (data != null) {
+      if (data is Quantity) {
+        return data.toMap();
+      }
+      if (data is List) {
+        List<dynamic> values = [];
+        for(final item in data) {
+          Quantity model = new Quantity();
+          model.uuid = item.uuid;
+          model.amount = item.amount;
+          model.duration = item.duration;
+          model.use = item.use?.index;
+          values.add(Quantity.serialize(model));
+        }
+        return values;
+      }
+    }
+    return null;
   }
 }

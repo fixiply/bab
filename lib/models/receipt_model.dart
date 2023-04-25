@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/models/fermentable_model.dart';
+import 'package:bb/models/hop_model.dart';
 import 'package:bb/models/image_model.dart';
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/style_model.dart';
+import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
@@ -25,10 +29,10 @@ class ReceiptModel<T> extends Model {
   double? abv;
   double? ibu;
   int? ebc;
-  List<Quantity>? fermentables;
-  List<Quantity>? hops;
-  List<Quantity>? miscellaneous;
-  List<Quantity>? yeasts;
+  List<dynamic>? cacheFermentables;
+  List<dynamic>? cacheHops;
+  List<dynamic>? cacheMisc;
+  List<dynamic>? cacheYeasts;
   List<Mash>? mash;
   int? primaryday;
   double? primarytemp;
@@ -38,6 +42,11 @@ class ReceiptModel<T> extends Model {
   double? tertiarytemp;
   dynamic? notes;
   ImageModel? image;
+
+  List<FermentableModel>? _fermentables;
+  List<HopModel>? _hops;
+  List<MiscModel>? _misc;
+  List<YeastModel>? _yeasts;
 
   ReceiptModel({
     String? uuid,
@@ -57,10 +66,10 @@ class ReceiptModel<T> extends Model {
     this.abv,
     this.ibu,
     this.ebc,
-    this.fermentables,
-    this.hops,
-    this.miscellaneous,
-    this.yeasts,
+    this.cacheFermentables,
+    this.cacheHops,
+    this.cacheMisc,
+    this.cacheYeasts,
     this.mash,
     this.primaryday,
     this.primarytemp,
@@ -71,10 +80,10 @@ class ReceiptModel<T> extends Model {
     this.notes,
     this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (fermentables == null) { fermentables = []; }
-    if (hops == null) { hops = []; }
-    if (miscellaneous == null) { miscellaneous = []; }
-    if (yeasts == null) { yeasts = []; }
+    if (cacheFermentables == null) { cacheFermentables = []; }
+    if (cacheHops == null) { cacheHops = []; }
+    if (cacheMisc == null) { cacheMisc = []; }
+    if (cacheYeasts == null) { cacheYeasts = []; }
     if (mash == null) { mash = []; }
   }
 
@@ -93,10 +102,10 @@ class ReceiptModel<T> extends Model {
     if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['ibu'] != null) this.ibu = map['ibu'].toDouble();
     this.ebc = map['ebc'];
-    this.fermentables = Quantity.deserialize(map['fermentables']);
-    this.hops = Quantity.deserialize(map['hops']);
-    this.miscellaneous = Quantity.deserialize(map['miscellaneous']);
-    this.yeasts = Quantity.deserialize(map['yeasts']);
+    this.cacheFermentables = map['fermentables'];
+    this.cacheHops = map['hops'];
+    this.cacheMisc = map['miscellaneous'];
+    this.cacheYeasts = map['yeasts'];
     this.mash = Mash.deserialize(map['mash']);
     this.primaryday = map['primaryday'];
     if (map['primarytemp'] != null) this.primarytemp = map['primarytemp'].toDouble();
@@ -124,10 +133,10 @@ class ReceiptModel<T> extends Model {
       'abv': this.abv,
       'ibu': this.ibu,
       'ebc': this.ebc,
-      'fermentables': Quantity.serialize(this.fermentables),
-      'hops': Quantity.serialize(this.hops),
-      'miscellaneous': Quantity.serialize(this.miscellaneous),
-      'yeasts': Quantity.serialize(this.yeasts),
+      'fermentables': FermentableModel.quantities(this._fermentables),
+      'hops': HopModel.quantities(this._hops),
+      'miscellaneous': MiscModel.quantities(this._misc),
+      'yeasts': YeastModel.quantities(this._yeasts),
       'mash': Mash.serialize(this.mash),
       'primaryday': this.primaryday,
       'primarytemp': this.primarytemp,
@@ -160,10 +169,10 @@ class ReceiptModel<T> extends Model {
       abv: this.abv,
       ibu: this.ibu,
       ebc: this.ebc,
-      fermentables: this.fermentables,
-      hops: this.hops,
-      miscellaneous: this.miscellaneous,
-      yeasts: this.yeasts,
+      cacheFermentables: this.cacheFermentables,
+      cacheHops: this.cacheHops,
+      cacheMisc: this.cacheMisc,
+      cacheYeasts: this.cacheYeasts,
       mash: this.mash,
       primaryday: this.primaryday,
       primarytemp: this.primarytemp,
@@ -173,12 +182,60 @@ class ReceiptModel<T> extends Model {
       tertiarytemp: this.tertiarytemp,
       notes: this.notes,
       image: this.image,
-    );
+    )
+      .._fermentables = _fermentables
+      .._hops = _hops
+      .._misc = _misc
+      .._yeasts = _yeasts;
   }
 
   // ignore: hash_and_equals
   bool operator ==(other) {
     return (other is ReceiptModel && other.uuid == uuid);
+  }
+
+  set fermentables(List<FermentableModel>data) => _fermentables = data;
+
+  List<FermentableModel> get fermentables => _fermentables ?? [];
+
+  Future<List<FermentableModel>> get fermentablesAsync async {
+    if (_fermentables == null) {
+      _fermentables = await FermentableModel.data(cacheFermentables);
+    }
+    return _fermentables ?? [];
+  }
+
+  set hops(List<HopModel>data) => _hops = data;
+
+  List<HopModel> get hops => _hops ?? [];
+
+  Future<List<HopModel>> get hopsAsync async {
+    if (_hops == null) {
+      _hops = await HopModel.data(cacheHops);
+    }
+    return _hops ?? [];
+  }
+
+  set miscellaneous(List<MiscModel>data) => _misc = data;
+
+  List<MiscModel> get miscellaneous => _misc ?? [];
+
+  Future<List<MiscModel>> get miscellaneousAsync async {
+    if (_misc == null) {
+      _misc = await MiscModel.data(cacheMisc);
+    }
+    return _misc ?? [];
+  }
+
+  set yeasts(List<YeastModel>data) => _yeasts = data;
+
+  List<YeastModel> get yeasts => _yeasts ?? [];
+
+  Future<List<YeastModel>> get yeastsAsync async {
+    if (_yeasts == null) {
+      _yeasts = await YeastModel.data(cacheYeasts);
+    }
+    return _yeasts ?? [];
   }
 
   @override

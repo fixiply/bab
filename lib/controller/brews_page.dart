@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 // Internal package
 import 'package:bb/controller/brew_page.dart';
 import 'package:bb/controller/forms/form_brew_page.dart';
+import 'package:bb/controller/stepper_page.dart';
 import 'package:bb/controller/tables/brew_data_source.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/helpers/color_helper.dart';
@@ -276,28 +277,43 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
             if (model.notes != null ) _text(AppLocalizations.of(context)!.localizedText(model.notes))
           ],
         ),
-        trailing: model.isEditable() ? PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert),
-          tooltip: AppLocalizations.of(context)!.text('options'),
-          onSelected: (value) async {
-            if (value == 'edit') {
-              _edit(model);
-            } else if (value == 'remove') {
-              if (await DeleteDialog.model(context, model, forced: true)) {
-                _fetch();
-              }
-            }
-          },
-          itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            PopupMenuItem(
-              value: 'edit',
-              child: Text(AppLocalizations.of(context)!.text('edit')),
+        trailing: model.isEditable() ? Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: Icon(Icons.play_circle_outline),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (BuildContext context) {
+                      return StepperPage(model);
+                    })).then((value) {
+                });
+              },
             ),
-            PopupMenuItem(
-              value: 'remove',
-              child: Text(AppLocalizations.of(context)!.text('remove')),
-            ),
-          ]
+            PopupMenuButton<String>(
+              icon: Icon(Icons.more_vert),
+              tooltip: AppLocalizations.of(context)!.text('options'),
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  _edit(model);
+                } else if (value == 'remove') {
+                  if (await DeleteDialog.model(context, model, forced: true)) {
+                    _fetch();
+                  }
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(AppLocalizations.of(context)!.text('edit')),
+                ),
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text(AppLocalizations.of(context)!.text('remove')),
+                ),
+              ]
+            )
+          ],
         ) : null,
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -351,12 +367,12 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
 
   Future<bool> _delete() async {
     bool confirm = await showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return DeleteDialog(
-            title: AppLocalizations.of(context)!.text('delete_items_title'),
-          );
-        }
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteDialog(
+          title: AppLocalizations.of(context)!.text('delete_items_title'),
+        );
+      }
     );
     if (confirm) {
       try {

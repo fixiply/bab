@@ -10,6 +10,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/image_field.dart';
 
@@ -87,9 +88,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
             tooltip: AppLocalizations.of(context)!.text('remove'),
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              // if (await _delete(widget.article)) {
-              //   Navigator.pop(context);
-              // }
+              if (await DeleteDialog.model(context, widget.model)) {
+                Navigator.pop(context);
+              }
             }
           ),
           CustomMenuButton(

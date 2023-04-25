@@ -8,6 +8,7 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/image_field.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
@@ -72,9 +73,9 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
             tooltip: AppLocalizations.of(context)!.text('remove'),
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              // if (await _delete(widget.article)) {
-              //   Navigator.pop(context);
-              // }
+              if (await DeleteDialog.model(context, widget.model)) {
+                Navigator.pop(context);
+              }
             }
           ),
           if (widget.model.uuid != null) PopupMenuButton<String>(

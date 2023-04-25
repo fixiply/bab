@@ -1,3 +1,7 @@
+import 'package:bb/models/fermentable_model.dart';
+import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/misc_model.dart';
+import 'package:bb/models/yeast_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -10,12 +14,10 @@ import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/receipt_model.dart';
-import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -216,39 +218,71 @@ class _ReceiptPageState extends State<ReceiptPage> {
           ])
         ),
       ),
-      SliverList(delegate: SliverChildListDelegate(
-        [
-          if (widget.model.fermentables != null && widget.model.fermentables!.isNotEmpty) Padding(
-            padding: EdgeInsets.all(8.0),
-            child: FermentablesDataTable(
-              data: widget.model.fermentables,
-              title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-              allowEditing: false, allowSorting: false, showCheckboxColumn: false
-            ),
+      SliverList(
+        delegate: SliverChildListDelegate([
+          FutureBuilder<List<FermentableModel>>(
+            future: widget.model.fermentablesAsync,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: FermentablesDataTable(
+                      data: snapshot.data,
+                      title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                      allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                  ),
+                );
+              }
+              return Container();
+            }
           ),
-          if (widget.model.hops != null && widget.model.hops!.isNotEmpty) Padding(
-            padding: EdgeInsets.all(8.0),
-            child: HopsDataTable(
-              data: widget.model.hops,
-              title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-              allowEditing: false, allowSorting: false, showCheckboxColumn: false
-            ),
+          FutureBuilder<List<HopModel>>(
+            future: widget.model.hopsAsync,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: HopsDataTable(
+                      data: snapshot.data,
+                      title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                      allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                  ),
+                );
+              }
+              return Container();
+            }
           ),
-          if (widget.model.yeasts != null && widget.model.yeasts!.isNotEmpty) Padding(
-            padding: EdgeInsets.all(8.0),
-            child: YeastsDataTable(
-              data: widget.model.yeasts,
-              title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-              allowEditing: false, allowSorting: false, showCheckboxColumn: false
-            ),
+          FutureBuilder<List<YeastModel>>(
+            future: widget.model.yeastsAsync,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: YeastsDataTable(
+                      data: snapshot.data,
+                      title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                      allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                  ),
+                );
+              }
+              return Container();
+            }
           ),
-          if (widget.model.miscellaneous != null && widget.model.miscellaneous!.isNotEmpty) Padding(
-            padding: EdgeInsets.all(8.0),
-            child: MiscDataTable(
-              data: widget.model.miscellaneous,
-              title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-              allowEditing: false, allowSorting: false, showCheckboxColumn: false
-            ),
+          FutureBuilder<List<MiscModel>>(
+            future: widget.model.miscellaneousAsync,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: MiscDataTable(
+                      data: snapshot.data,
+                      title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                      allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                  ),
+                );
+              }
+              return Container();
+            }
           ),
           if (widget.model.mash != null && widget.model.mash!.isNotEmpty) Padding(
             padding: EdgeInsets.all(8.0),

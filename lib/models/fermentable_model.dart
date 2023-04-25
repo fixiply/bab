@@ -2,6 +2,7 @@
 import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/quantity.dart';
 
@@ -23,7 +24,7 @@ class FermentableModel<T> extends Model {
   Type? type;
   String? origin;
   double? amount;
-  Method? method;
+  Method? use;
   double? efficiency;
   int? ebc;
   dynamic? notes;
@@ -40,7 +41,7 @@ class FermentableModel<T> extends Model {
     this.type = Type.grain,
     this.origin,
     this.amount,
-    this.method = Method.mashed,
+    this.use = Method.mashed,
     this.efficiency,
     this.ebc,
     this.notes,
@@ -86,7 +87,7 @@ class FermentableModel<T> extends Model {
       type: this.type,
       origin: this.origin,
       amount: this.amount,
-      method: this.method,
+      use: this.use,
       efficiency: this.efficiency,
       ebc: this.ebc,
       notes: this.notes,
@@ -146,26 +147,6 @@ class FermentableModel<T> extends Model {
     return null;
   }
 
-  static List<FermentableModel> merge(List<Quantity>? quantities, List<FermentableModel> fermentables) {
-    List<FermentableModel> list = [];
-    if (quantities != null && fermentables != null) {
-      for (Quantity quantity in quantities) {
-        for (FermentableModel fermentable in fermentables) {
-          if (quantity.uuid == fermentable.uuid) {
-            FermentableModel model = fermentable.copy();
-            model.amount = quantity.amount;
-            model.method = quantity.use != null
-                ? Method.values.elementAt(quantity.use!)
-                : Method.mashed;
-            list.add(model);
-            break;
-          }
-        }
-      }
-    }
-    return list;
-  }
-
   static List<FermentableModel> deserialize(dynamic data) {
     List<FermentableModel> values = [];
     if (data != null) {
@@ -180,5 +161,38 @@ class FermentableModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static Future<List<FermentableModel>> data(data) async {
+    List<FermentableModel>? values = [];
+    for(Quantity item in Quantity.deserialize(data)) {
+      FermentableModel? model = await Database().getFermentable(item.uuid!);
+      if (model != null) {
+        model.amount = item.amount;
+        model.use = item.use != null ? Method.values.elementAt(item.use!) : Method.mashed;
+        values.add(model);
+      }
+    }
+    return values;
+  }
+
+  static dynamic quantities(dynamic data) {
+    if (data != null) {
+      if (data is Quantity) {
+        return data.toMap();
+      }
+      if (data is List) {
+        List<dynamic> values = [];
+        for(final item in data) {
+          Quantity model = new Quantity();
+          model.uuid = item.uuid;
+          model.amount = item.amount;
+          model.use = item.use?.index;
+          values.add(Quantity.serialize(model));
+        }
+        return values;
+      }
+    }
+    return null;
   }
 }

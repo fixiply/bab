@@ -1,19 +1,24 @@
+import 'package:bb/models/fermentable_model.dart';
+import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/misc_model.dart';
+import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/database.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_brew_page.dart';
+import 'package:bb/controller/stepper_page.dart';
 import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
 import 'package:bb/controller/tables/mash_data_table.dart';
 import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
@@ -199,37 +204,69 @@ class _BrewPageState extends State<BrewPage> {
         ),
         SliverList(
           delegate: SliverChildListDelegate([
-            if (widget.model.receipt!.fermentables != null && widget.model.receipt!.fermentables!.isNotEmpty) Padding(
-              padding: EdgeInsets.all(8.0),
-              child: FermentablesDataTable(
-                data: widget.model.receipt!.fermentables,
-                title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                allowEditing: false, allowSorting: false, showCheckboxColumn: false
-              ),
+            FutureBuilder<List<FermentableModel>>(
+              future: widget.model.receipt!.fermentablesAsync,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: FermentablesDataTable(
+                        data: snapshot.data,
+                        title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                    ),
+                  );
+                }
+                return Container();
+              }
             ),
-            if (widget.model.receipt!.hops != null && widget.model.receipt!.hops!.isNotEmpty) Padding(
-              padding: EdgeInsets.all(8.0),
-              child: HopsDataTable(
-                data: widget.model.receipt!.hops,
-                title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                allowEditing: false, allowSorting: false, showCheckboxColumn: false
-              ),
+            FutureBuilder<List<HopModel>>(
+              future: widget.model.receipt!.hopsAsync,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: HopsDataTable(
+                        data: snapshot.data,
+                        title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                    ),
+                  );
+                }
+                return Container();
+              }
             ),
-            if (widget.model.receipt!.yeasts != null && widget.model.receipt!.yeasts!.isNotEmpty) Padding(
-              padding: EdgeInsets.all(8.0),
-              child: YeastsDataTable(
-                data: widget.model.receipt!.yeasts,
-                title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                allowEditing: false, allowSorting: false, showCheckboxColumn: false
-              ),
+            FutureBuilder<List<YeastModel>>(
+              future: widget.model.receipt!.yeastsAsync,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: YeastsDataTable(
+                        data: snapshot.data,
+                        title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                    ),
+                  );
+                }
+                return Container();
+            }
             ),
-            if (widget.model.receipt!.miscellaneous != null && widget.model.receipt!.miscellaneous!.isNotEmpty) Padding(
-              padding: EdgeInsets.all(8.0),
-              child: MiscDataTable(
-                data: widget.model.receipt!.miscellaneous,
-                title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                allowEditing: false, allowSorting: false, showCheckboxColumn: false
-             ),
+            FutureBuilder<List<MiscModel>>(
+              future: widget.model.receipt!.miscellaneousAsync,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Padding(
+                    padding: EdgeInsets.all(8.0),
+                    child: MiscDataTable(
+                        data: snapshot.data,
+                        title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                    ),
+                  );
+                }
+                return Container();
+              }
             ),
             if (widget.model.receipt!.mash != null && widget.model.receipt!.mash!.isNotEmpty) Padding(
               padding: EdgeInsets.all(8.0),
@@ -244,49 +281,56 @@ class _BrewPageState extends State<BrewPage> {
         SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
         if (widget.model.notes != null) SliverToBoxAdapter(
           child: Padding(
-              padding: EdgeInsets.all(8.0),
-              child: ExpansionPanelList(
-                  elevation: 1,
-                  expandedHeaderPadding: EdgeInsets.zero,
-                  expansionCallback: (int index, bool isExpanded) {
-                    setState(() {
-                      _expanded = !isExpanded;
-                    });
+            padding: EdgeInsets.all(8.0),
+            child: ExpansionPanelList(
+              elevation: 1,
+              expandedHeaderPadding: EdgeInsets.zero,
+              expansionCallback: (int index, bool isExpanded) {
+                setState(() {
+                  _expanded = !isExpanded;
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  isExpanded: _expanded,
+                  canTapOnHeader: true,
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      title: Text(AppLocalizations.of(context)!.text('notes'),
+                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    );
                   },
-                  children: [
-                    ExpansionPanel(
-                      isExpanded: _expanded,
-                      canTapOnHeader: true,
-                      headerBuilder: (context, isExpanded) {
-                        return ListTile(
-                          dense: true,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                          title: Text(AppLocalizations.of(context)!.text('notes'),
-                              style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                        );
-                      },
-                      body: Container(
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
-                          child: MarkdownBody(
-                            data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
-                            fitContent: true,
-                            shrinkWrap: true,
-                            softLineBreak: true,
-                            styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
-                          )
-                      ),
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    child: MarkdownBody(
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
+                      fitContent: true,
+                      shrinkWrap: true,
+                      softLineBreak: true,
+                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
                     )
-                  ])
+                  ),
+                )
+              ]
+            )
           ),
         ),
       ]
     ),
     floatingActionButton: FloatingActionButton.extended(
-        onPressed: _start,
-        backgroundColor: Colors.redAccent,
-        label: Text(AppLocalizations.of(context)!.text(widget.model.status == Status.pending || widget.model.status == Status.stoped ? 'start' : 'stop')),
-        icon: Icon(widget.model.status == Status.pending || widget.model.status == Status.stoped ? Icons.play_circle_outline : Icons.stop_circle_outlined)
+      backgroundColor: Colors.redAccent,
+      label: Text(AppLocalizations.of(context)!.text(widget.model.status == Status.pending || widget.model.status == Status.stoped ? 'start' : 'resume')),
+      icon: Icon(Icons.play_circle_outline),
+      onPressed: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (BuildContext context) {
+              return StepperPage(widget.model);
+            })).then((value) {
+        });
+      },
       )
     );
   }

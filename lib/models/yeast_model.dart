@@ -2,6 +2,7 @@
 import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/quantity.dart';
 
@@ -171,23 +172,6 @@ class YeastModel<T> extends Model {
     return null;
   }
 
-  static List<YeastModel> merge(List<Quantity>? quantities, List<YeastModel> yeasts) {
-    List<YeastModel> list = [];
-    if (quantities != null && yeasts != null) {
-      for (Quantity quantity in quantities) {
-        for (YeastModel yeast in yeasts) {
-          if (quantity.uuid == yeast.uuid) {
-            YeastModel model = yeast.copy();
-            model.amount = quantity.amount;
-            list.add(model);
-            break;
-          }
-        }
-      }
-    }
-    return list;
-  }
-
   static dynamic serialize(dynamic data) {
     if (data != null) {
       if (data is YeastModel) {
@@ -218,5 +202,36 @@ class YeastModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static Future<List<YeastModel>> data(data) async {
+    List<YeastModel>? values = [];
+    for(Quantity item in Quantity.deserialize(data)) {
+      YeastModel? model = await Database().getYeast(item.uuid!);
+      if (model != null) {
+        model.amount = item.amount;
+        values.add(model);
+      }
+    }
+    return values;
+  }
+
+  static dynamic quantities(dynamic data) {
+    if (data != null) {
+      if (data is Quantity) {
+        return data.toMap();
+      }
+      if (data is List) {
+        List<dynamic> values = [];
+        for(final item in data) {
+          Quantity model = new Quantity();
+          model.uuid = item.uuid;
+          model.amount = item.amount;
+          values.add(Quantity.serialize(model));
+        }
+        return values;
+      }
+    }
+    return null;
   }
 }

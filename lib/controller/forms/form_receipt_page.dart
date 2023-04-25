@@ -1,12 +1,13 @@
+import 'package:bb/models/misc_model.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/formula_helper.dart';
-import 'package:bb/models/equipment_model.dart';
 import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/hop_model.dart' as hop;
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/abv.dart';
@@ -96,26 +97,38 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
           ),
           IconButton(
             padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('save'),
-            icon: const Icon(Icons.save),
-            onPressed: _modified == true ? () {
-              if (_formKey.currentState!.validate()) {
-                Database().update(widget.model).then((value) async {
-                  Navigator.pop(context, widget.model);
-                }).onError((e,s) {
-                  _showSnackbar(e.toString());
+            tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
+            icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
+            onPressed: () {
+              if (_modified == true || widget.model.uuid == null) {
+                if (_formKey.currentState!.validate()) {
+                  Database().update(widget.model).then((value) async {
+                    Navigator.pop(context, widget.model);
+                  }).onError((e, s) {
+                    _showSnackbar(e.toString());
+                  });
+                }
+              } else {
+                ReceiptModel model = widget.model.copy();
+                model.uuid = null;
+                model.title = null;
+                model.status = Status.disabled;
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormReceiptPage(model);
+                })).then((value) {
+                  Navigator.pop(context);
                 });
               }
-            } : null
+            }
           ),
           if (widget.model.uuid != null) IconButton(
             padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text('remove'),
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              // if (await _delete(widget.article)) {
-              //   Navigator.pop(context);
-              // }
+              if (await DeleteDialog.model(context, widget.model)) {
+                Navigator.pop(context);
+              }
             }
           ),
           CustomMenuButton(
@@ -345,10 +358,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               IngredientsField(
                 context: context,
                 ingredient: Ingredient.fermentable,
-                data: widget.model.fermentables,
                 receipt: widget.model,
                 onChanged: (values) {
-                  widget.model.fermentables = values;
+                  widget.model.fermentables = values as List<FermentableModel>;
                   _calculate();
                 },
               ),
@@ -356,10 +368,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               IngredientsField(
                 context: context,
                 ingredient: Ingredient.hops,
-                data: widget.model.hops,
                 receipt: widget.model,
                 onChanged: (values) {
-                  widget.model.hops = values;
+                  widget.model.hops = values as List<hop.HopModel>;
                   _calculate();
                 },
               ),
@@ -367,10 +378,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               IngredientsField(
                 context: context,
                 ingredient: Ingredient.yeast,
-                data: widget.model.yeasts,
                 receipt: widget.model,
                 onChanged: (values) {
-                  widget.model.yeasts = values;
+                  widget.model.yeasts = values as List<YeastModel>;
                   _calculate();
                 },
               ),
@@ -378,9 +388,8 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               IngredientsField(
                 context: context,
                 ingredient: Ingredient.misc,
-                data: widget.model.miscellaneous,
                 receipt: widget.model,
-                onChanged: (values) => widget.model.miscellaneous = values,
+                onChanged: (values) => widget.model.miscellaneous = values as List<MiscModel>
               ),
               Divider(height: 10),
               MashField(
@@ -594,9 +603,8 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     double? primarytemp;
     int? secondaryday;
     double? secondarytemp;
-    List<FermentableModel> fermentables = await Database().getFermentables(quantities: widget.model.fermentables);
-    for(FermentableModel item in fermentables) {
-      if (item.method == Method.mashed) {
+    for(FermentableModel item in widget.model.fermentables!) {
+      if (item.use == Method.mashed) {
         // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
         extract += item.extract(widget.model.efficiency);
         mcu += ColorHelper.mcu(item.ebc, item.amount, widget.model.volume);
@@ -606,8 +614,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       og = FormulaHelper.og(extract, widget.model.volume);
     }
 
-    List<YeastModel> yeasts = await Database().getYeasts(quantities: widget.model.yeasts);
-    for(YeastModel item in yeasts) {
+    for(YeastModel item in widget.model.yeasts!) {
       primarytemp = (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
       switch(item.type ?? Fermentation.hight) {
         case Fermentation.hight:
@@ -624,9 +631,8 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       fg += item.density(og);
     }
 
-    List<HopModel> hops = await Database().getHops(quantities: widget.model.hops);
-    for(HopModel item in hops) {
-      if (item.use == Use.boil) {
+    for(hop.HopModel item in widget.model.hops!) {
+      if (item.use == hop.Use.boil) {
         ibu += item.ibu(og, widget.model.boil, widget.model.volume);
       }
     }

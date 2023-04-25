@@ -9,6 +9,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/localized_text_field.dart';
 import 'package:bb/widgets/forms/text_input_field.dart';
@@ -73,9 +74,9 @@ class _FormHopPageState extends State<FormHopPage> {
             tooltip: AppLocalizations.of(context)!.text('remove'),
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              // if (await _delete(widget.article)) {
-              //   Navigator.pop(context);
-              // }
+              if (await DeleteDialog.model(context, widget.model)) {
+                Navigator.pop(context);
+              }
             }
           ),
           CustomMenuButton(

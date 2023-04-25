@@ -24,7 +24,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 
 class FermentablesDataTable extends StatefulWidget {
-  List<Quantity>? data;
+  List<FermentableModel>? data;
   Widget? title;
   bool inventory;
   bool allowEditing;
@@ -36,7 +36,7 @@ class FermentablesDataTable extends StatefulWidget {
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
   ReceiptModel? receipt;
-  final void Function(List<Quantity>? value)? onChanged;
+  final void Function(List<FermentableModel>? value)? onChanged;
   FermentablesDataTable({Key? key,
     this.data,
     this.title,
@@ -75,9 +75,9 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
       onChanged: (FermentableModel value, int dataRowIndex) {
         if (widget.data != null) {
           widget.data![dataRowIndex].amount = value.amount;
-          widget.data![dataRowIndex].use = value.method?.index;
+          widget.data![dataRowIndex].use = value.use;
         }
-        widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.method!.index)]);
+        widget.onChanged?.call(widget.data ?? [value]);
       }
     );
     if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
@@ -192,7 +192,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
 
   _fetch() async {
     setState(() {
-      _data = Database().getFermentables(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
+      _data = widget.data != null ? Future<List<FermentableModel>>.value(widget.data) : Database().getFermentables(searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -206,9 +206,6 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
             _data!.then((value) => value.addAll(values));
           });
           if (widget.data != null) {
-            for(FermentableModel model in values) {
-              widget.data!.add(Quantity(uuid: model.uuid));
-            }
             widget.onChanged?.call(widget.data!);
           }
         }
@@ -252,7 +249,7 @@ class FermentableDataSource extends EditDataSource {
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<dynamic>(columnName: 'origin', value: e.origin),
       DataGridCell<Type>(columnName: 'type', value: e.type),
-      if (showQuantity == true) DataGridCell<Method>(columnName: 'method', value: e.method),
+      if (showQuantity == true) DataGridCell<Method>(columnName: 'method', value: e.use),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
       DataGridCell<int>(columnName: 'color', value: e.ebc),
     ])).toList();
@@ -396,7 +393,7 @@ class FermentableDataSource extends EditDataSource {
       case 'method':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<Method>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].method = newCellValue;
+        _data[dataRowIndex].use = newCellValue;
         break;
       case 'efficiency':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =

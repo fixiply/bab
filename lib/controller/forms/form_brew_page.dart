@@ -1,6 +1,3 @@
-import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/widgets/forms/color_field.dart';
-import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -14,7 +11,9 @@ import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
+import 'package:bb/widgets/forms/color_field.dart';
 import 'package:bb/widgets/forms/datetime_field.dart';
 import 'package:bb/widgets/forms/equipment_field.dart';
 import 'package:bb/widgets/forms/receipt_field.dart';
@@ -72,26 +71,39 @@ class _FormBrewPageState extends State<FormBrewPage> {
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('save'),
-            icon: const Icon(Icons.save),
-            onPressed: _modified == true ? () {
-              if (_formKey.currentState!.validate()) {
-                Database().update(widget.model).then((value) async {
-                  Navigator.pop(context, widget.model);
-                }).onError((e,s) {
-                  _showSnackbar(e.toString());
+            tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
+            icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
+            onPressed: () {
+              if (_modified == true || widget.model.uuid == null) {
+                if (_formKey.currentState!.validate()) {
+                  Database().update(widget.model).then((value) async {
+                    Navigator.pop(context, widget.model);
+                  }).onError((e,s) {
+                    _showSnackbar(e.toString());
+                  });
+                }
+              } else {
+                BrewModel model = widget.model.copy();
+                model.uuid = null;
+                model.status = Status.pending;
+                model.started_at = null;
+                model.reference = null;
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormBrewPage(model);
+                })).then((value) {
+                  Navigator.pop(context);
                 });
               }
-            } : null
+            }
           ),
           if (widget.model.uuid != null) IconButton(
             padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text('remove'),
             icon: const Icon(Icons.delete),
             onPressed: () async {
-              // if (await _delete(widget.article)) {
-              //   Navigator.pop(context);
-              // }
+              if (await DeleteDialog.model(context, widget.model)) {
+                Navigator.pop(context);
+              }
             }
           ),
           CustomMenuButton(

@@ -34,6 +34,7 @@ dependencies:
   automated_testing_framework: ^4.0.7+5
   badges: ^2.0.3
   carousel_slider: ^4.1.1
+  circular_countdown_timer: ^0.2.3
   cloud_firestore: ^4.5.0
   cloud_functions: ^4.1.0
   code_text_field: ^1.0.2
@@ -75,6 +76,7 @@ dependencies:
 #  syncfusion_flutter_calendar: ^21.1.39
   syncfusion_flutter_core: ^21.1.38
   syncfusion_flutter_datagrid: ^21.1.38
+  syncfusion_flutter_gauges: ^21.1.38
   syncfusion_flutter_sliders: ^21.1.38
   table_calendar: ^3.0.8
   url_launcher: ^6.1.10

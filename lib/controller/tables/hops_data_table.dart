@@ -22,7 +22,7 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class HopsDataTable extends StatefulWidget {
-  List<Quantity>? data;
+  List<HopModel>? data;
   Widget? title;
   bool inventory;
   bool allowEditing;
@@ -34,7 +34,7 @@ class HopsDataTable extends StatefulWidget {
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
   ReceiptModel? receipt;
-  final void Function(List<Quantity> value)? onChanged;
+  final void Function(List<HopModel> value)? onChanged;
   HopsDataTable({Key? key,
     this.data,
     this.title,
@@ -73,10 +73,10 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
       onChanged: (HopModel value, int dataRowIndex) {
         if (widget.data != null) {
           widget.data![dataRowIndex].amount = value.amount;
-          widget.data![dataRowIndex].use = value.use?.index;
+          widget.data![dataRowIndex].use = value.use;
           widget.data![dataRowIndex].duration = value.duration;
         }
-        widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.duration)]);
+        widget.onChanged?.call(widget.data ?? [value]);
       }
     );
     if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'duration', sortDirection: DataGridSortDirection.descending));
@@ -188,7 +188,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
 
   _fetch() async {
     setState(() {
-      _data = Database().getHops(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
+      _data = widget.data != null ? Future<List<HopModel>>.value(widget.data) : Database().getHops(searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -204,7 +204,6 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
           if (widget.data != null) {
             for(HopModel model in values) {
               model.duration = widget.receipt?.boil;
-              widget.data!.add(Quantity(uuid: model.uuid, use: Use.boil.index, duration: widget.receipt?.boil));
             }
             widget.onChanged?.call(widget.data!);
           }

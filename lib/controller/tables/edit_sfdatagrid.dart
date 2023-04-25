@@ -31,7 +31,7 @@ class EditSfDataGrid extends SfDataGrid {
     rowHeight: 40.0,
     controller: controller,
     onSelectionChanged: onSelectionChanged,
-    columnWidthMode: DeviceHelper.isDesktop ? ColumnWidthMode.fill : ColumnWidthMode.none,
+    columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablette(context) ? ColumnWidthMode.fill : ColumnWidthMode.none,
     allowEditing: allowEditing,
     allowSorting: allowSorting,
     allowMultiColumnSorting: false,

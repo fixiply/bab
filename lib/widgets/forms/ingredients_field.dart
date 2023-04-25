@@ -1,4 +1,7 @@
 import 'package:bb/models/fermentable_model.dart';
+import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/misc_model.dart';
+import 'package:bb/models/yeast_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -6,21 +9,20 @@ import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
 import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
+import 'package:bb/models/model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/quantity.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
-class IngredientsField extends FormField<List<Quantity>> {
+class IngredientsField extends FormField<List<Model>> {
   final Ingredient ingredient;
   ReceiptModel? receipt;
   bool allowEditing;
-  final void Function(List<Quantity> value)? onChanged;
+  final void Function(List<Model> value)? onChanged;
 
-  IngredientsField({Key? key, required BuildContext context, required this.ingredient, List<Quantity>? data, this.receipt, this.allowEditing = false, this.onChanged}) : super(
+  IngredientsField({Key? key, required BuildContext context, required this.ingredient, this.receipt, this.allowEditing = false, this.onChanged}) : super(
       key: key,
-      initialValue: data,
       builder: (FormFieldState<List<dynamic>> field) {
         return field.build(field.context);
       }
@@ -30,14 +32,14 @@ class IngredientsField extends FormField<List<Quantity>> {
   _IngredientsFieldState createState() => _IngredientsFieldState();
 }
 
-class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
+class _IngredientsFieldState extends FormFieldState<List<Model>> {
   final _datatableKey = GlobalKey<FermentablesDataTableState>();
 
   @override
   IngredientsField get widget => super.widget as IngredientsField;
 
   @override
-  void didChange(List<Quantity>? value) {
+  void didChange(List<Model>? value) {
     widget.onChanged?.call(value!);
     super.didChange(value);
   }
@@ -72,55 +74,88 @@ class _IngredientsFieldState extends FormFieldState<List<Quantity>> {
   Widget _container() {
     switch(widget.ingredient) {
       case Ingredient.fermentable:
-        return FermentablesDataTable(key: _datatableKey,
-          data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
-          color: FillColor,
-          allowEditing: true,
-          allowAdding: true,
-          showCheckboxColumn: false,
-          receipt: widget.receipt,
-          onChanged: (List<Quantity>? values) {
-            didChange(values);
+        return FutureBuilder<List<FermentableModel>>(
+          future: widget.receipt!.fermentablesAsync,
+          builder: (context, snapshot) {
+            debugPrint('hasData ${snapshot.data?.length}');
+            if (snapshot.hasData) {
+              return FermentablesDataTable(key: _datatableKey,
+                data: snapshot.data,
+                title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                color: FillColor,
+                allowEditing: true,
+                allowAdding: true,
+                showCheckboxColumn: false,
+                receipt: widget.receipt,
+                onChanged: (List<FermentableModel>? values) {
+                  didChange(values);
+                }
+              );
+            }
+            return Container();
           }
         );
       case Ingredient.misc:
-        return MiscDataTable(key: _datatableKey,
-          data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
-          color: FillColor,
-          allowEditing: true,
-          allowAdding: true,
-          showCheckboxColumn: false,
-          receipt: widget.receipt,
-          onChanged: (List<Quantity>? values) {
-            didChange(values);
+        return FutureBuilder<List<MiscModel>>(
+          future: widget.receipt!.miscellaneousAsync,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return MiscDataTable(key: _datatableKey,
+                data: snapshot.data,
+                title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                color: FillColor,
+                allowEditing: true,
+                allowAdding: true,
+                showCheckboxColumn: false,
+                receipt: widget.receipt,
+                onChanged: (List<MiscModel>? values) {
+                  didChange(values);
+                }
+              );
+            }
+            return Container();
           }
         );
       case Ingredient.yeast:
-        return YeastsDataTable(key: _datatableKey,
-          data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
-          color: FillColor,
-          allowEditing: true,
-          allowAdding: true,
-          showCheckboxColumn: false,
-          receipt: widget.receipt,
-          onChanged: (List<Quantity>? values) {
-            didChange(values);
+        return FutureBuilder<List<YeastModel>>(
+          future: widget.receipt!.yeastsAsync,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return YeastsDataTable(key: _datatableKey,
+                data: snapshot.data,
+                title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                color: FillColor,
+                allowEditing: true,
+                allowAdding: true,
+                showCheckboxColumn: false,
+                receipt: widget.receipt,
+                onChanged: (List<YeastModel>? values) {
+                  didChange(values);
+                }
+              );
+            }
+            return Container();
           }
         );
       case Ingredient.hops:
-        return HopsDataTable(key: _datatableKey,
-          data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
-          color: FillColor,
-          allowEditing: true,
-          allowAdding: true,
-          showCheckboxColumn: false,
-          receipt: widget.receipt,
-          onChanged: (List<Quantity>? values) {
-            didChange(values);
+        return FutureBuilder<List<HopModel>>(
+          future: widget.receipt!.hopsAsync,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return HopsDataTable(key: _datatableKey,
+                data: snapshot.data,
+                title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                color: FillColor,
+                allowEditing: true,
+                allowAdding: true,
+                showCheckboxColumn: false,
+                receipt: widget.receipt,
+                onChanged: (List<HopModel>? values) {
+                  didChange(values);
+                }
+              );
+            }
+            return Container();
           }
         );
     }

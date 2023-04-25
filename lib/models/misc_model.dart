@@ -1,6 +1,7 @@
 // Internal package
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/quantity.dart';
 
@@ -21,7 +22,7 @@ class MiscModel<T> extends Model {
   dynamic? name;
   Misc? type;
   Use? use;
-  int? time;
+  int? duration;
   double? amount;
   dynamic? notes;
 
@@ -36,7 +37,7 @@ class MiscModel<T> extends Model {
     this.name,
     this.type = Misc.flavor,
     this.use = Use.mash,
-    this.time,
+    this.duration,
     this.amount,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -75,7 +76,7 @@ class MiscModel<T> extends Model {
       name: this.name,
       type: this.type,
       use: this.use,
-      time: this.time,
+      duration: this.duration,
       amount: this.amount,
       notes: this.notes,
     );
@@ -111,27 +112,6 @@ class MiscModel<T> extends Model {
     return null;
   }
 
-  static List<MiscModel> merge(List<Quantity>? quantities, List<MiscModel> miscellaneous) {
-    List<MiscModel> list = [];
-    if (quantities != null && miscellaneous != null) {
-      for (Quantity quantity in quantities) {
-        for (MiscModel misc in miscellaneous) {
-          if (quantity.uuid == misc.uuid) {
-            MiscModel model = misc.copy();
-            model.amount = quantity.amount;
-            model.time = quantity.duration;
-            model.use = quantity.use != null
-                ? Use.values.elementAt(quantity.use!)
-                : Use.boil;
-            list.add(model);
-            break;
-          }
-        }
-      }
-    }
-    return list;
-  }
-
   static dynamic serialize(dynamic data) {
     if (data != null) {
       if (data is MiscModel) {
@@ -162,5 +142,40 @@ class MiscModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static Future<List<MiscModel>> data(data) async {
+    List<MiscModel>? values = [];
+    for(Quantity item in Quantity.deserialize(data)) {
+      MiscModel? model = await Database().getMisc(item.uuid!);
+      if (model != null) {
+        model.amount = item.amount;
+        model.duration = item.duration;
+        model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
+        values.add(model);
+      }
+    }
+    return values;
+  }
+
+  static dynamic quantities(dynamic data) {
+    if (data != null) {
+      if (data is Quantity) {
+        return data.toMap();
+      }
+      if (data is List) {
+        List<dynamic> values = [];
+        for(final item in data) {
+          Quantity model = new Quantity();
+          model.uuid = item.uuid;
+          model.amount = item.amount;
+          model.duration = item.duration;
+          model.use = item.use?.index;
+          values.add(Quantity.serialize(model));
+        }
+        return values;
+      }
+    }
+    return null;
   }
 }

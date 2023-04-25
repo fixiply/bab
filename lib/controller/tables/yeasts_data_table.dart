@@ -23,7 +23,7 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class YeastsDataTable extends StatefulWidget {
-  List<Quantity>? data;
+  List<YeastModel>? data;
   Widget? title;
   bool inventory;
   bool allowEditing;
@@ -35,7 +35,7 @@ class YeastsDataTable extends StatefulWidget {
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
   ReceiptModel? receipt;
-  final void Function(List<Quantity> value)? onChanged;
+  final void Function(List<YeastModel> value)? onChanged;
   YeastsDataTable({Key? key,
     this.data,
     this.title,
@@ -80,7 +80,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
           if (widget.data != null) {
             widget.data![dataRowIndex].amount = amount;
           }
-          widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: amount)]);
+          widget.onChanged?.call(widget.data ?? [ value ]);
         }
     );
     _fetch();
@@ -201,7 +201,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
 
   _fetch() async {
     setState(() {
-      _data = Database().getYeasts(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
+      _data = widget.data != null ? Future<List<YeastModel>>.value(widget.data) : Database().getYeasts(searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -218,7 +218,6 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
             for(YeastModel model in values) {
               var amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, model.cells!, rate: model.pitchingRate(widget.receipt!.og));
               model.amount = amount.truncateToDouble();
-              widget.data!.add(Quantity(uuid: model.uuid, amount: model.amount));
             }
             widget.onChanged?.call(widget.data!);
           }

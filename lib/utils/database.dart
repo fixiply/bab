@@ -442,7 +442,7 @@ class Database {
     return null;
   }
 
-  Future<List<FermentableModel>> getFermentables({List<Quantity>? quantities, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<FermentableModel>> getFermentables({String? name, String? searchText, bool ordered = false}) async {
     List<FermentableModel> list = [];
     Query query = fermentables;
     if (name != null) {
@@ -452,9 +452,6 @@ class Database {
     await query.get().then((result) {
       result.docs.forEach((doc) {
         bool canBeAdded = true;
-        if (quantities != null) {
-          canBeAdded = quantities.contains(doc.id);
-        }
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
           String name = doc['name'].toString();
@@ -470,9 +467,6 @@ class Database {
         }
       });
     });
-    if (quantities != null) {
-      return FermentableModel.merge(quantities, list);
-    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }
@@ -490,7 +484,7 @@ class Database {
     return null;
   }
 
-  Future<List<HopModel>> getHops({List<Quantity>? quantities, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<HopModel>> getHops({String? name, String? searchText, bool ordered = false}) async {
     List<HopModel> list = [];
     Query query = hops;
     if (name != null) {
@@ -500,9 +494,6 @@ class Database {
     await query.get().then((result) {
       result.docs.forEach((doc) {
         bool canBeAdded = true;
-        if (quantities != null) {
-          canBeAdded = quantities.contains(doc.id);
-        }
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
           String name = doc['name'].toString();
@@ -518,9 +509,6 @@ class Database {
         }
       });
     });
-    if (quantities != null) {
-      return HopModel.merge(quantities, list);
-    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }
@@ -538,7 +526,7 @@ class Database {
     return null;
   }
 
-  Future<List<MiscModel>> getMiscellaneous({List<Quantity>? quantities, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<MiscModel>> getMiscellaneous({String? name, String? searchText, bool ordered = false}) async {
     List<MiscModel> list = [];
     Query query = miscellaneous;
     if (name != null) {
@@ -548,9 +536,6 @@ class Database {
     await query.get().then((result) {
       result.docs.forEach((doc) {
         bool canBeAdded = true;
-        if (quantities != null) {
-          canBeAdded = quantities.contains(doc.id);
-        }
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
           String name = doc['name'].toString();
@@ -566,9 +551,6 @@ class Database {
         }
       });
     });
-    if (quantities != null) {
-      return MiscModel.merge(quantities, list);
-    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }
@@ -586,7 +568,7 @@ class Database {
     return null;
   }
 
-  Future<List<YeastModel>> getYeasts({List<Quantity>? quantities, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<YeastModel>> getYeasts({String? name, String? searchText, bool ordered = false}) async {
     List<YeastModel> list = [];
     Query query = yeasts;
     if (name != null) {
@@ -596,9 +578,6 @@ class Database {
     await query.get().then((result) {
       result.docs.forEach((doc) {
         bool canBeAdded = true;
-        if (quantities != null) {
-          canBeAdded = quantities.contains(doc.id);
-        }
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
           String name = doc['name'].toString();
@@ -614,9 +593,6 @@ class Database {
         }
       });
     });
-    if (quantities != null) {
-      return YeastModel.merge(quantities, list);
-    }
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
     }

@@ -22,7 +22,7 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class MiscDataTable extends StatefulWidget {
-  List<Quantity>? data;
+  List<MiscModel>? data;
   Widget? title;
   bool inventory;
   bool allowEditing;
@@ -34,7 +34,7 @@ class MiscDataTable extends StatefulWidget {
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
   ReceiptModel? receipt;
-  final void Function(List<Quantity> value)? onChanged;
+  final void Function(List<MiscModel> value)? onChanged;
   MiscDataTable({Key? key,
     this.data,
     this.title,
@@ -73,10 +73,10 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
         onChanged: (MiscModel value, int dataRowIndex) {
           if (widget.data != null) {
             widget.data![dataRowIndex].amount = value.amount;
-            widget.data![dataRowIndex].use = value.use?.index;
-            widget.data![dataRowIndex].duration = value.time;
+            widget.data![dataRowIndex].use = value.use;
+            widget.data![dataRowIndex].duration = value.duration;
           }
-          widget.onChanged?.call(widget.data ?? [Quantity(uuid: value.uuid, amount: value.amount, use: value.use!.index, duration: value.time)]);
+          widget.onChanged?.call(widget.data ?? [ value ]);
         }
     );
     _fetch();
@@ -197,7 +197,7 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
 
   _fetch() async {
     setState(() {
-      _data = Database().getMiscellaneous(quantities: widget.data, searchText: _searchQueryController.value.text, ordered: true);
+      _data = widget.data != null ? Future<List<MiscModel>>.value(widget.data) : Database().getMiscellaneous(searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -211,9 +211,6 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
             _data!.then((value) => value.addAll(values));
           });
           if (widget.data != null) {
-            for(MiscModel model in values) {
-              widget.data!.add(Quantity(uuid: model.uuid));
-            }
             widget.onChanged?.call(widget.data!);
           }
         }
@@ -258,7 +255,7 @@ class MiscDataSource extends EditDataSource {
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Misc>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
-      if (showQuantity == true)  DataGridCell<int>(columnName: 'time', value: e.time),
+      if (showQuantity == true)  DataGridCell<int>(columnName: 'time', value: e.duration),
     ])).toList();
   }
 
@@ -383,7 +380,7 @@ class MiscDataSource extends EditDataSource {
       case 'time':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].time = newCellValue;
+        data[dataRowIndex].duration = newCellValue;
         break;
     }
     onChanged?.call(data[dataRowIndex], dataRowIndex);

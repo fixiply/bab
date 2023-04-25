@@ -394,7 +394,7 @@ class ImportHelper {
               );
               int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
               if (time != null) {
-                model.time = time;
+                model.duration = time;
               }
               final desc = element.getElement('F_M_NOTES');
               if (desc != null && desc.text.isNotEmpty) {
