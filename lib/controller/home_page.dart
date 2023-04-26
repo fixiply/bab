@@ -50,6 +50,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
+
       builder: (context, orientation) {
         if (DeviceHelper.isDesktop || (DeviceHelper.isTablette(context) && orientation == Orientation.landscape)) {
           return Scaffold(
