@@ -115,12 +115,12 @@ class _EventsPageState extends State<EventsPage> {
                   }
                   return EmptyContainer(message: AppLocalizations.of(context)!.text('no_event'));
                 }
-                if (DeviceHelper.isDesktop || DeviceHelper.landscapeOrientation(context)) {
+                if (DeviceHelper.isDesktop || DeviceHelper.isTablette(context)) {
                   return GridView.builder(
                     controller: _controller,
                     padding: EdgeInsets.all(4),
                     gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      maxCrossAxisExtent: MediaQuery.of(context).size.width / 2,
+                      maxCrossAxisExtent: MediaQuery.of(context).size.width / (DeviceHelper.isLargeScreen(context) ? 3 : 2),
                       childAspectRatio: 3 / 2,
                       crossAxisSpacing: 4.0,
                       mainAxisSpacing: 4.0
