@@ -60,39 +60,39 @@ class _CompaniesPageState extends State<CompaniesPage> with AutomaticKeepAliveCl
                   return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
                 }
                 return ListView.builder(
-                    controller: _controller,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                    itemBuilder: (context, index) {
-                      CompanyModel model = snapshot.data![index];
-                      return ListTile(
-                        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                        // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
-                        title: Text(model.name!),
-                        subtitle: model.text != null ? Text(model.text!) : null,
-                        trailing: PopupMenuButton<String>(
-                            icon: Icon(Icons.more_vert),
-                            tooltip: AppLocalizations.of(context)!.text('options'),
-                            onSelected: (value) {
-                              if (value == 'edit') {
-                                _edit(model);
-                              } else if (value == 'remove') {
-                                DeleteDialog.model(context, model, forced: true);
-                              }
-                            },
-                            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                              PopupMenuItem(
-                                value: 'edit',
-                                child: Text(AppLocalizations.of(context)!.text('edit')),
-                              ),
-                              PopupMenuItem(
-                                value: 'remove',
-                                child: Text(AppLocalizations.of(context)!.text('remove')),
-                              ),
-                            ]
-                        )
-                      );
-                    }
+                  controller: _controller,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  itemBuilder: (context, index) {
+                    CompanyModel model = snapshot.data![index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                      // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
+                      title: Text(model.name!),
+                      subtitle: model.text != null ? Text(model.text!) : null,
+                      trailing: PopupMenuButton<String>(
+                        icon: Icon(Icons.more_vert),
+                        tooltip: AppLocalizations.of(context)!.text('options'),
+                        onSelected: (value) {
+                          if (value == 'edit') {
+                            _edit(model);
+                          } else if (value == 'remove') {
+                            DeleteDialog.model(context, model, forced: true);
+                          }
+                        },
+                        itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                          PopupMenuItem(
+                            value: 'edit',
+                            child: Text(AppLocalizations.of(context)!.text('edit')),
+                          ),
+                          PopupMenuItem(
+                            value: 'remove',
+                            child: Text(AppLocalizations.of(context)!.text('remove')),
+                          ),
+                        ]
+                      )
+                    );
+                  }
                 );
               }
               if (snapshot.hasError) {

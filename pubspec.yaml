@@ -40,7 +40,7 @@ dependencies:
   code_text_field: ^1.0.2
   devicelocale: ^0.6.0
   dropdown_search: ^5.0.6
-  easy_sidemenu: ^0.4.1
+  easy_sidemenu: ^0.4.1+1
   expandable_text: ^2.3.0
   extended_image: ^7.0.2
   file_picker: ^5.2.7
