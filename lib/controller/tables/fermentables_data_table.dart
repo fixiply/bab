@@ -80,7 +80,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
         widget.onChanged?.call(widget.data ?? [value]);
       }
     );
-    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
+    if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'amount', sortDirection: DataGridSortDirection.descending));
     _fetch();
   }
 
@@ -202,10 +202,10 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
         return FermentablesPage(showCheckboxColumn: true);
       })).then((values) {
         if (values != null) {
-          setState(() {
-            _data!.then((value) => value.addAll(values));
-          });
           if (widget.data != null) {
+            for (FermentableModel model in values) {
+              widget.data!.add(model);
+            }
             widget.onChanged?.call(widget.data!);
           }
         }

@@ -7,6 +7,8 @@ import 'package:bb/controller/admin/gallery_page.dart';
 import 'package:bb/controller/brews_page.dart';
 import 'package:bb/controller/calendar_page.dart';
 import 'package:bb/controller/companies_page.dart';
+import 'package:bb/controller/equipments_page.dart';
+import 'package:bb/controller/event_page.dart';
 import 'package:bb/controller/events_page.dart';
 import 'package:bb/controller/ingredients_page.dart';
 import 'package:bb/controller/inventory_page.dart';
@@ -14,14 +16,17 @@ import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/controller/styles_page.dart';
-import 'package:bb/controller/equipments_page.dart';
 import 'package:bb/controller/tools_page.dart';
 import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/main.dart';
+import 'package:bb/models/event_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 
 // External package
 import 'package:easy_sidemenu/easy_sidemenu.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class HomePage extends StatefulWidget {
@@ -42,6 +47,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
     super.initState();
     _initialize();
     _configureSelectNotificationSubject();
+    _configureFirebaseMessaging();
     _sideMenu.addListener((page) {
       _page.jumpToPage(page);
     });
@@ -50,7 +56,6 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return OrientationBuilder(
-
       builder: (context, orientation) {
         if (DeviceHelper.isDesktop || (DeviceHelper.isTablette(context) && orientation == Orientation.landscape)) {
           return Scaffold(
@@ -358,6 +363,47 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       setState(() {
         _selectedIndex = 0;
       });
+      _payload(widget.payload!);
+    }
+    selectNotificationStream.stream.listen((String? payload) async {
+      if (payload != null)  {
+        _payload(payload);
+      }
+    });
+  }
+
+  void _configureFirebaseMessaging() {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      if (message != null) {
+        RemoteNotification? notification = message.notification;
+        if (notification != null) {
+          String? payload = message.data['id'];
+          _payload(payload);
+        }
+      }
+    });
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (message != null) {
+        RemoteNotification? notification = message.notification;
+        if (notification != null) {
+          String? payload = message.data['id'];
+          _payload(payload);
+        }
+      }
+    });
+  }
+
+  _payload(String? payload) async {
+    if (payload != null) {
+      EventModel? model = await Database().getEvent(payload);
+      if (model != null) {
+        Navigator.push(context,
+          MaterialPageRoute(builder: (context) =>
+            EventPage(model, cache: false)
+          ),
+        );
+      }
     }
   }
 

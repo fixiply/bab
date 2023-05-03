@@ -205,7 +205,7 @@ class _BrewPageState extends State<BrewPage> {
         SliverList(
           delegate: SliverChildListDelegate([
             FutureBuilder<List<FermentableModel>>(
-              future: widget.model.receipt!.fermentablesAsync,
+              future: widget.model.receipt!.getFermentables(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Padding(
@@ -221,7 +221,7 @@ class _BrewPageState extends State<BrewPage> {
               }
             ),
             FutureBuilder<List<HopModel>>(
-              future: widget.model.receipt!.hopsAsync,
+              future: widget.model.receipt!.gethops(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Padding(
@@ -237,7 +237,7 @@ class _BrewPageState extends State<BrewPage> {
               }
             ),
             FutureBuilder<List<YeastModel>>(
-              future: widget.model.receipt!.yeastsAsync,
+              future: widget.model.receipt!.getYeasts(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Padding(
@@ -253,7 +253,7 @@ class _BrewPageState extends State<BrewPage> {
             }
             ),
             FutureBuilder<List<MiscModel>>(
-              future: widget.model.receipt!.miscellaneousAsync,
+              future: widget.model.receipt!.getMisc(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Padding(

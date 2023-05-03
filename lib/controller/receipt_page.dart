@@ -1,22 +1,24 @@
-import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart';
-import 'package:bb/models/misc_model.dart';
-import 'package:bb/models/yeast_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
+import 'package:bb/controller/forms/form_brew_page.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/tables/fermentables_data_table.dart';
 import 'package:bb/controller/tables/hops_data_table.dart';
 import 'package:bb/controller/tables/mash_data_table.dart';
 import 'package:bb/controller/tables/misc_data_table.dart';
 import 'package:bb/controller/tables/yeasts_data_table.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/models/brew_model.dart';
+import 'package:bb/models/fermentable_model.dart';
+import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/receipt_model.dart';
+import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
@@ -50,7 +52,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(slivers: <Widget>[
-      SliverAppBar(
+        SliverAppBar(
         pinned: true,
         expandedHeight: 235.0,
         foregroundColor: Colors.white,
@@ -164,23 +166,23 @@ class _ReceiptPageState extends State<ReceiptPage> {
           )
         ],
       ),
-      if (widget.model.style != null) SliverToBoxAdapter(
-        child: Padding( 
-          padding: EdgeInsets.all(8.0),
-          child: RichText(
-            textAlign: TextAlign.left,
-            overflow: TextOverflow.ellipsis,
-            text: TextSpan(
-              style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
-              children: [
-                TextSpan(text: '${AppLocalizations.of(context)!.text('style')}${AppLocalizations.of(context)!.colon}  ', style: TextStyle(fontWeight: FontWeight.w600)),
-                TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.style!.name)),
-              ]
+        if (widget.model.style != null) SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+            child: RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
+                children: [
+                  TextSpan(text: '${AppLocalizations.of(context)!.text('style')}${AppLocalizations.of(context)!.colon}  ', style: TextStyle(fontWeight: FontWeight.w600)),
+                  TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.style!.name)),
+                ]
+              )
             )
           )
-        )
-      ),
-      if (widget.model.text != null && widget.model.text!.isNotEmpty) SliverToBoxAdapter(
+        ),
+        if (widget.model.text != null && widget.model.text!.isNotEmpty) SliverToBoxAdapter(
         child: Padding(
         padding: EdgeInsets.all(8.0),
           child: ExpansionPanelList(
@@ -218,10 +220,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
           ])
         ),
       ),
-      SliverList(
+        SliverList(
         delegate: SliverChildListDelegate([
           FutureBuilder<List<FermentableModel>>(
-            future: widget.model.fermentablesAsync,
+            future: widget.model.getFermentables(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Padding(
@@ -237,7 +239,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             }
           ),
           FutureBuilder<List<HopModel>>(
-            future: widget.model.hopsAsync,
+            future: widget.model.gethops(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Padding(
@@ -253,7 +255,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             }
           ),
           FutureBuilder<List<YeastModel>>(
-            future: widget.model.yeastsAsync,
+            future: widget.model.getYeasts(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Padding(
@@ -269,7 +271,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             }
           ),
           FutureBuilder<List<MiscModel>>(
-            future: widget.model.miscellaneousAsync,
+            future: widget.model.getMisc(),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Padding(
@@ -294,8 +296,15 @@ class _ReceiptPageState extends State<ReceiptPage> {
           )
         ]
       )),
-      SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
-    ]));
+        SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
+      ]),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _new,
+        backgroundColor: Theme.of(context).primaryColor,
+        tooltip: AppLocalizations.of(context)!.text('new_brew'),
+        child: const Icon(Icons.add)
+      )
+    );
   }
 
   _initialize() async {
@@ -314,6 +323,16 @@ class _ReceiptPageState extends State<ReceiptPage> {
   _edit(ReceiptModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormReceiptPage(model);
+    }));
+  }
+
+  _new() async {
+    BrewModel newModel = BrewModel(
+      receipt: widget.model,
+      volume: widget.model.volume
+    );
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormBrewPage(newModel);
     }));
   }
 }

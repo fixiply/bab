@@ -211,13 +211,11 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         return YeastsPage(showCheckboxColumn: true);
       })).then((values) {
         if (values != null) {
-          setState(() {
-            _data!.then((value) => value.addAll(values));
-          });
           if (widget.data != null) {
             for(YeastModel model in values) {
               var amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, model.cells!, rate: model.pitchingRate(widget.receipt!.og));
               model.amount = amount.truncateToDouble();
+              widget.data!.add(model);
             }
             widget.onChanged?.call(widget.data!);
           }

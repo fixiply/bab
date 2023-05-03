@@ -258,7 +258,6 @@ class _EventsPageState extends State<EventsPage> {
         ],
       );
     }
-
     return Stack(
       children: <Widget>[
         Column(

@@ -281,7 +281,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.play_circle_outline),
+              icon: Icon(Icons.play_circle_outline, color: Colors.redAccent),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (BuildContext context) {
@@ -317,7 +317,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
         ) : null,
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return BrewPage(model);
+            return BrewPage(model.copy());
           }));
         },
         onLongPress: model.isEditable() ? () {

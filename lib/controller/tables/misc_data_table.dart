@@ -207,10 +207,10 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
         return MiscPage(showCheckboxColumn: true);
       })).then((values) {
         if (values != null) {
-          setState(() {
-            _data!.then((value) => value.addAll(values));
-          });
           if (widget.data != null) {
+            for (MiscModel model in values) {
+              widget.data!.add(model);
+            }
             widget.onChanged?.call(widget.data!);
           }
         }

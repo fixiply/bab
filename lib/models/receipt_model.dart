@@ -1,8 +1,11 @@
+import 'package:bb/helpers/color_helper.dart';
+import 'package:bb/helpers/formula_helper.dart';
+import 'package:bb/models/hop_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/hop_model.dart' as hop;
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/model.dart';
@@ -44,7 +47,7 @@ class ReceiptModel<T> extends Model {
   ImageModel? image;
 
   List<FermentableModel>? _fermentables;
-  List<HopModel>? _hops;
+  List<hop.HopModel>? _hops;
   List<MiscModel>? _misc;
   List<YeastModel>? _yeasts;
 
@@ -134,7 +137,7 @@ class ReceiptModel<T> extends Model {
       'ibu': this.ibu,
       'ebc': this.ebc,
       'fermentables': FermentableModel.quantities(this._fermentables),
-      'hops': HopModel.quantities(this._hops),
+      'hops': hop.HopModel.quantities(this._hops),
       'miscellaneous': MiscModel.quantities(this._misc),
       'yeasts': YeastModel.quantities(this._yeasts),
       'mash': Mash.serialize(this.mash),
@@ -198,20 +201,22 @@ class ReceiptModel<T> extends Model {
 
   List<FermentableModel> get fermentables => _fermentables ?? [];
 
-  Future<List<FermentableModel>> get fermentablesAsync async {
+  Future<List<FermentableModel>> getFermentables({double? volume}) async {
     if (_fermentables == null) {
       _fermentables = await FermentableModel.data(cacheFermentables);
+      resizeFermentales(volume);
     }
     return _fermentables ?? [];
   }
 
-  set hops(List<HopModel>data) => _hops = data;
+  set hops(List<hop.HopModel>data) => _hops = data;
 
-  List<HopModel> get hops => _hops ?? [];
+  List<hop.HopModel> get hops => _hops ?? [];
 
-  Future<List<HopModel>> get hopsAsync async {
+  Future<List<hop.HopModel>> gethops({double? volume}) async {
     if (_hops == null) {
-      _hops = await HopModel.data(cacheHops);
+      _hops = await hop.HopModel.data(cacheHops);
+      resizeHops(volume);
     }
     return _hops ?? [];
   }
@@ -220,9 +225,10 @@ class ReceiptModel<T> extends Model {
 
   List<MiscModel> get miscellaneous => _misc ?? [];
 
-  Future<List<MiscModel>> get miscellaneousAsync async {
+  Future<List<MiscModel>> getMisc({double? volume}) async {
     if (_misc == null) {
       _misc = await MiscModel.data(cacheMisc);
+      resizeMisc(volume);
     }
     return _misc ?? [];
   }
@@ -231,9 +237,10 @@ class ReceiptModel<T> extends Model {
 
   List<YeastModel> get yeasts => _yeasts ?? [];
 
-  Future<List<YeastModel>> get yeastsAsync async {
+  Future<List<YeastModel>> getYeasts({double? volume}) async {
     if (_yeasts == null) {
       _yeasts = await YeastModel.data(cacheYeasts);
+      resizeYeasts(volume);
     }
     return _yeasts ?? [];
   }
@@ -269,5 +276,87 @@ class ReceiptModel<T> extends Model {
       return NumberFormat("#0.#", locale.toString()).format(ibu);
     }
     return '';
+  }
+
+  resizeFermentales(double? volume) {
+    if (volume == null || volume == this.volume)
+      return;
+    for(FermentableModel item in fermentables) {
+      item.amount = (item.amount! * (volume / this.volume!)).abs();
+    }
+    calculate(volume: volume);
+  }
+
+  resizeHops(double? volume) {
+    if (volume == null || volume == this.volume)
+      return;
+    for(HopModel item in hops) {
+      item.amount = (item.amount! * (volume / this.volume!)).abs();
+    }
+    calculate(volume: volume);
+  }
+
+  resizeYeasts(double? volume) {
+    if (volume == null || volume == this.volume)
+      return;
+    var percent = (volume - this.volume!) / this.volume!;
+
+    calculate(volume: volume);
+  }
+
+  resizeMisc(double? volume) {
+    if (volume == null || volume == this.volume)
+      return;
+    var percent = (volume - this.volume!) / this.volume!;
+
+    calculate(volume: volume);
+  }
+
+  calculate({double? volume}) async {
+    og = 0.0;
+    fg = 0.0;
+    ibu = 0.0;
+    double mcu = 0.0;
+    double extract = 0.0;
+    primaryday = null;
+    primarytemp = null;
+    secondaryday = null;
+    secondarytemp = null;
+    for(FermentableModel item in await getFermentables()) {
+      if (item.use == Method.mashed) {
+        // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
+        extract += item.extract(efficiency);
+        mcu += ColorHelper.mcu(item.ebc, item.amount, volume ?? this.volume);
+      }
+    }
+    if (extract != 0) {
+      og = FormulaHelper.og(extract, volume ?? this.volume);
+    }
+
+    for(YeastModel item in await getYeasts()) {
+      primarytemp = (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
+      switch(item.type ?? Fermentation.hight) {
+        case Fermentation.hight:
+          primaryday = 21;
+          break;
+        case Fermentation.low:
+          primaryday = 14;
+          secondaryday = 21;
+          secondarytemp = 5;
+          break;
+        case Fermentation.spontaneous:
+          break;
+      }
+      fg = (fg ?? 0) + item.density(og);
+    }
+
+    for(hop.HopModel item in await gethops()) {
+      if (item.use == hop.Use.boil) {
+        ibu = (ibu ?? 0) + item.ibu(og, boil, volume ?? this.volume);
+      }
+    }
+
+    if (og != 0 && fg != 0) abv = FormulaHelper.abv(og, fg);
+    if (mcu != 0) ebc = ColorHelper.ratingEBC(mcu).toInt();
   }
 }

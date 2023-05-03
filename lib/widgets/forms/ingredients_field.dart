@@ -75,9 +75,8 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
     switch(widget.ingredient) {
       case Ingredient.fermentable:
         return FutureBuilder<List<FermentableModel>>(
-          future: widget.receipt!.fermentablesAsync,
+          future: widget.receipt!.getFermentables(),
           builder: (context, snapshot) {
-            debugPrint('hasData ${snapshot.data?.length}');
             if (snapshot.hasData) {
               return FermentablesDataTable(key: _datatableKey,
                 data: snapshot.data,
@@ -97,7 +96,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
         );
       case Ingredient.misc:
         return FutureBuilder<List<MiscModel>>(
-          future: widget.receipt!.miscellaneousAsync,
+          future: widget.receipt!.getMisc(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return MiscDataTable(key: _datatableKey,
@@ -118,7 +117,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
         );
       case Ingredient.yeast:
         return FutureBuilder<List<YeastModel>>(
-          future: widget.receipt!.yeastsAsync,
+          future: widget.receipt!.getYeasts(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return YeastsDataTable(key: _datatableKey,
@@ -139,7 +138,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
         );
       case Ingredient.hops:
         return FutureBuilder<List<HopModel>>(
-          future: widget.receipt!.hopsAsync,
+          future: widget.receipt!.gethops(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return HopsDataTable(key: _datatableKey,

@@ -1,23 +1,21 @@
-import 'package:bb/models/misc_model.dart';
-import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/hop_model.dart' as hop;
+import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bb/widgets/dialogs/delete_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/widgets/forms/beer_style_field.dart';
 import 'package:bb/widgets/forms/image_field.dart';
@@ -552,6 +550,14 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     _modified = modified ? true : false;
   }
 
+  _calculate() async {
+    await widget.model.calculate();
+    _primarydayController.text = widget.model.primaryday != null ? AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '' : '';
+    _primarytempController.text = widget.model.primarytemp != null ? AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '' : '';
+    _secondarydayController.text = widget.model.secondaryday != null ? AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '' : '';
+    _secondarytempController.text = widget.model.secondarytemp != null ? AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '' : '';
+  }
+
   Widget _slider(String label, double value, double min, double max, double interval, {NumberFormat? format}) {
     bool error = false;
     if (value < min) {
@@ -591,75 +597,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
         )
       ]
     );
-  }
-
-  _calculate() async {
-    double og = 0.0;
-    double fg = 0.0;
-    double mcu = 0.0;
-    double ibu = 0.0;
-    double extract = 0.0;
-    int? primaryday;
-    double? primarytemp;
-    int? secondaryday;
-    double? secondarytemp;
-    for(FermentableModel item in widget.model.fermentables!) {
-      if (item.use == Method.mashed) {
-        // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
-        extract += item.extract(widget.model.efficiency);
-        mcu += ColorHelper.mcu(item.ebc, item.amount, widget.model.volume);
-      }
-    }
-    if (extract != 0) {
-      og = FormulaHelper.og(extract, widget.model.volume);
-    }
-
-    for(YeastModel item in widget.model.yeasts!) {
-      primarytemp = (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
-      switch(item.type ?? Fermentation.hight) {
-        case Fermentation.hight:
-          primaryday = 21;
-          break;
-        case Fermentation.low:
-          primaryday = 14;
-          secondaryday = 21;
-          secondarytemp = 5;
-          break;
-        case Fermentation.spontaneous:
-          break;
-      }
-      fg += item.density(og);
-    }
-
-    for(hop.HopModel item in widget.model.hops!) {
-      if (item.use == hop.Use.boil) {
-        ibu += item.ibu(og, widget.model.boil, widget.model.volume);
-      }
-    }
-
-    setState(() {
-      if (og != 0) widget.model.og = og;
-      if (fg != 0) widget.model.fg = fg;
-      if (og != 0 && fg != 0) widget.model.abv = FormulaHelper.abv(og, fg);
-      if (mcu != 0) widget.model.ebc = ColorHelper.ratingEBC(mcu).toInt();
-      if (ibu != 0) widget.model.ibu = ibu;
-      if (primaryday != null && _primarydayController.text.isEmpty) {
-        widget.model.primaryday = primaryday;
-        _primarydayController.text = AppLocalizations.of(context)!.numberFormat(primaryday) ?? '';
-      }
-      if (primarytemp != null && _primarytempController.text.isEmpty) {
-        widget.model.primarytemp = primarytemp;
-        _primarytempController.text = AppLocalizations.of(context)!.numberFormat(primarytemp) ?? '';
-      }
-      if (secondaryday != null && _secondarydayController.text.isEmpty) {
-        widget.model.secondaryday = secondaryday;
-        _secondarydayController.text = AppLocalizations.of(context)!.numberFormat(secondaryday) ?? '';
-      }
-      if (secondarytemp != null && _secondarytempController.text.isEmpty) {
-        widget.model.secondarytemp = secondarytemp;
-        _secondarytempController.text = AppLocalizations.of(context)!.numberFormat(secondarytemp) ?? '';
-      }
-    });
   }
 
   _showSnackbar(String message) {

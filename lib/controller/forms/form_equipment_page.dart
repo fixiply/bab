@@ -140,143 +140,200 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   return null;
                 }
               ),
-              TextFormField(
-                // key: UniqueKey(),
-                // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
-                controller:  _volumeController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.waves_outlined),
-                  labelText: AppLocalizations.of(context)!.text('tank_volume'),
-                  suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
-              ),
-              if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) TextFormField(
-                // key: UniqueKey(),
-                // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
-                controller:  _sizeController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.mash_volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.waves_outlined),
-                  labelText: AppLocalizations.of(context)!.text('mash_volume'),
-                  suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
-                  suffixIcon: Tooltip(
-                    message: AppLocalizations.of(context)!.text('final_volume'),
-                    child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      // key: UniqueKey(),
+                      // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
+                      controller:  _volumeController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.waves_outlined),
+                          labelText: AppLocalizations.of(context)!.text('tank_volume'),
+                          suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    )
                   ),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
+                  if (widget.equipment == Equipment.tank) SizedBox(width: 12),
+                  if (widget.equipment == Equipment.tank) Expanded(
+                    child: TextFormField(
+                    // key: UniqueKey(),
+                    // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
+                      controller:  _sizeController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.mash_volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.waves_outlined),
+                          labelText: AppLocalizations.of(context)!.text('mash_volume'),
+                          suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                          suffixIcon: Tooltip(
+                            message: AppLocalizations.of(context)!.text('final_volume'),
+                            child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                          ),
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    )
+                  ),
+                ]
               ),
               if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) TextFormField(
-                initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                    icon: const Icon(Icons.propane_tank_outlined),
-                    labelText: AppLocalizations.of(context)!.text('mash_efficiency'),
-                    suffixText: '%',
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
+              if (widget.equipment == Equipment.tank) Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.propane_tank_outlined),
+                        labelText: AppLocalizations.of(context)!.text('mash_efficiency'),
+                        suffixText: '%',
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.absorption) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.absorption = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.propane_tank_outlined),
+                        labelText: AppLocalizations.of(context)!.text('absorption_grains'),
+                        suffixText: '%',
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      )
+                    )
+                  ),
+                ]
               ),
               if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) TextFormField(
-                initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.absorption) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.absorption = AppLocalizations.of(context)!.decimal(value);
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                    icon: const Icon(Icons.propane_tank_outlined),
-                    labelText: AppLocalizations.of(context)!.text('absorption_grains'),
-                    suffixText: '%',
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                )
+              if (widget.equipment == Equipment.tank) Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.mash_ratio) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.mash_ratio = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.propane_tank_outlined),
+                        labelText: AppLocalizations.of(context)!.text('mash_ratio'),
+                        suffixText: 'L/Kg',
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.shrinkage) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.shrinkage = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.propane_tank_outlined),
+                        labelText: AppLocalizations.of(context)!.text('wort_shrinkage'),
+                        suffixText: '%',
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      )
+                    )
+                  ),
+                ]
               ),
               if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) TextFormField(
-                controller:  _lostController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.propane_tank_outlined),
-                  labelText: AppLocalizations.of(context)!.text('lost_volume'),
-                  suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                )
-              ),
-              if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) TextFormField(
-                initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.boil_loss) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                    icon: const Icon(Icons.propane_tank_outlined),
-                    labelText: AppLocalizations.of(context)!.text('boil_loss'),
-                    border: InputBorder.none,
-                    fillColor: FillColor, filled: true
-                )
-              ),
-              if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) TextFormField(
-                initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.shrinkage) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.model.shrinkage = AppLocalizations.of(context)!.decimal(value);
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.propane_tank_outlined),
-                  labelText: AppLocalizations.of(context)!.text('wort_shrinkage'),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                )
+              if (widget.equipment == Equipment.tank) Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.boil_loss) ?? '',
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (value) {
+                          widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
+                          _calculate();
+                        },
+                        decoration: FormDecoration(
+                            icon: const Icon(Icons.propane_tank_outlined),
+                            labelText: AppLocalizations.of(context)!.text('boil_loss'),
+                            suffixText: 'L/HR',
+                            border: InputBorder.none,
+                            fillColor: FillColor, filled: true
+                        )
+                      )
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        controller:  _lostController,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        onChanged: (value) {
+                          widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
+                          _calculate();
+                        },
+                        decoration: FormDecoration(
+                            icon: const Icon(Icons.propane_tank_outlined),
+                            labelText: AppLocalizations.of(context)!.text('lost_volume'),
+                            suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                            border: InputBorder.none,
+                            fillColor: FillColor, filled: true
+                        )
+                      )
+                    ),
+                  ]
               ),
               Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.notes = value,

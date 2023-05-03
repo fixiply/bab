@@ -106,6 +106,36 @@ class FormulaHelper {
     return rate * (volume * 1000) * plato(og) / (cells * 1000);
   }
 
+  /// Returns the mash water, based on the given conditions.
+  ///
+  /// The `weight` argument is relative to the weight in kilo.
+  ///
+  /// The `ratio` argument is relative to the mash ratio.
+  ///
+  /// The `lost` argument is relative to the lost volume.
+  static double mashWater(double? weight, double? ratio, double? lost) {
+    if (weight == null || ratio == null || lost == null) {
+      return 0;
+    }
+    return (weight * ratio) + lost;
+  }
+
+  /// Returns the mash water, based on the given conditions.
+  ///
+  /// The `weight` argument is relative to the weight in kilo.
+  ///
+  /// The `volume` argument is relative to the pre-boil volume.
+  ///
+  /// The `mash` argument is relative to the mash water.
+  ///
+  /// The `absorption` argument is relative to the grain absorption rate.
+  static double spargeWater(double? weight, double? volume, double? mash, {double? absorption = 0}) {
+    if (weight == null || volume == null || mash == null || absorption == null) {
+      return 0;
+    }
+    return volume - mash + (weight * absorption);
+  }
+
   /// Returns the gallon to liter conversion
   ///
   /// The `number` argument is relative to the volume in gallon.

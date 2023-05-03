@@ -453,9 +453,8 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton.icon(
-                icon: Icon(Icons.check_circle_outline_outlined, color: Theme.of(context).primaryColor),
-                label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('select_all') : '', style: TextStyle(color: Theme.of(context).primaryColor)
-                ),
+                icon: Icon(Icons.check_circle_outline_outlined),
+                label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('select_all') : ''),
                 onPressed: () async {
                   List<ImageModel>? list = await _images;
                   setState(() {
@@ -474,9 +473,8 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton.icon(
-              icon: Icon(Icons.highlight_off_outlined, color: Theme.of(context).primaryColor),
-              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('deselect') : '', style: TextStyle(color: Theme.of(context).primaryColor)
-              ),
+              icon: Icon(Icons.highlight_off_outlined),
+              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('deselect') : ''),
               onPressed: () {
                 setState(() {
                   _selected.clear();
@@ -485,17 +483,15 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
               }
             ),
             TextButton.icon(
-              icon: Icon(Icons.drive_file_move, color: Theme.of(context).primaryColor),
-              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('move') : '', style: TextStyle(color: Theme.of(context).primaryColor)
-              ),
+              icon: Icon(Icons.drive_file_move),
+              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('move') : ''),
               onPressed: () {
                 _move();
               }
             ),
             TextButton.icon(
-              icon: Icon(Icons.delete, color: Theme.of(context).primaryColor),
-              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('remove') : '', style: TextStyle(color: Theme.of(context).primaryColor)
-              ),
+              icon: Icon(Icons.delete),
+              label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('remove') : ''),
               onPressed: () {
                 _delete();
               }

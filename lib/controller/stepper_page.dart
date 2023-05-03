@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/models/brew_model.dart';
+import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/hop_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/database.dart';
 import 'package:bb/utils/mash.dart';
 import 'package:bb/widgets/circular_timer.dart';
+import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bb/widgets/form_decoration.dart';
 
 // External package
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -46,8 +51,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   int _lastIndex = 0;
   int _index = 0;
 
-  List<MyStep> _steps = [];
+  Future<List<MyStep>>? _steps;
   late SfRadialGauge _temp;
+  int _mash = 60;
 
   CountDownController _mashController = CountDownController();
   CountDownController _hopController = CountDownController();
@@ -55,27 +61,43 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   @override
   bool get wantKeepAlive => true;
 
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _initialize();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      backgroundColor: FillColor,
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('stages')),
-        elevation: 0,
-        foregroundColor: Theme.of(context).primaryColor,
-        backgroundColor: Colors.white
-      ),
-      body: FutureBuilder<List<Step>>(
-        future: _generate(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Stepper(
+    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    return WillPopScope(
+      onWillPop: () async {
+        bool? exitResult = await showDialog(
+          context: context,
+          builder: (context) => ConfirmDialog(content: Text(AppLocalizations.of(context)!.text('stop_brewing'))),
+        );
+        return exitResult ?? false;
+      },
+      child: Scaffold(
+        key: _scaffoldKey,
+        backgroundColor: CS.FillColor,
+        appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.text('stages')),
+          elevation: 0,
+          foregroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.white
+        ),
+        body: FutureBuilder<List<MyStep>>(
+          future: _steps,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return Stepper(
                 currentStep: _index,
                 onStepCancel: () {
                   if (_index > 0) {
                     try {
-                      _steps[_index].onStepCancel?.call(_index);
+                      snapshot.data![_index].onStepCancel?.call(_index);
                       setState(() {
                         _index -= 1;
                       });
@@ -85,9 +107,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   }
                 },
                 onStepContinue: () {
-                  if (_index < _steps.length - 1) {
+                  if (_index < snapshot.data!.length - 1) {
                     try {
-                      _steps[_index].onStepContinue?.call(_index);
+                      snapshot.data![_index].onStepContinue?.call(_index);
                       setState(() {
                         _index += 1;
                         if (_index > _lastIndex) _lastIndex = _index;
@@ -104,19 +126,116 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                     });
                   }
                 },
+                controlsBuilder: (BuildContext context, ControlsDetails controls) {
+                  return Container(
+                    margin: const EdgeInsets.only(top: 16.0),
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints.tightFor(height: 48.0),
+                      child: Row(
+                        children: <Widget>[
+                          ElevatedButton(
+                            onPressed: controls.onStepContinue,
+                            child: Text(_index ==  0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel),
+                          ),
+                          if (_index != 0) TextButton(
+                            onPressed: controls.onStepCancel,
+                            child: Text(
+                              AppLocalizations.of(context)!.text('return').toUpperCase(),
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ),
+                        ],
+                      )
+                    )
+                  );
+                },
                 steps: snapshot.data!
-            );
+              );
+            }
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
           }
-          return Container();
-        }
+        )
       )
     );
   }
 
-  Future<List<Step>> _generate() async {
-    _initialize();
-    ReceiptModel receipt = widget.model.receipt!;
-    _steps = [
+  _initialize() async {
+    _temp = SfRadialGauge(
+        animationDuration: 3500,
+        enableLoadingAnimation: true,
+        axes: <RadialAxis>[
+          RadialAxis(
+            ranges: <GaugeRange>[
+              GaugeRange(
+                startValue: 0,
+                endValue: 10,
+                startWidth: 0.265,
+                sizeUnit: GaugeSizeUnit.factor,
+                endWidth: 0.265,
+                color: const Color.fromRGBO(34, 195, 199, 0.75)),
+              GaugeRange(
+                startValue: 10,
+                endValue: 30,
+                startWidth: 0.265,
+                sizeUnit: GaugeSizeUnit.factor,
+                endWidth: 0.265,
+                color: const Color.fromRGBO(123, 199, 34, 0.75)),
+              GaugeRange(
+                startValue: 30,
+                endValue: 40,
+                startWidth: 0.265,
+                sizeUnit: GaugeSizeUnit.factor,
+                endWidth: 0.265,
+                color: const Color.fromRGBO(238, 193, 34, 0.75)),
+              GaugeRange(
+                startValue: 40,
+                endValue: 70,
+                startWidth: 0.265,
+                sizeUnit: GaugeSizeUnit.factor,
+                endWidth: 0.265,
+                color: const Color.fromRGBO(238, 79, 34, 0.65)),
+              GaugeRange(
+                startValue: 70,
+                endValue: 100,
+                startWidth: 0.265,
+                sizeUnit: GaugeSizeUnit.factor,
+                endWidth: 0.265,
+                color: const Color.fromRGBO(255, 0, 0, 0.65)),
+            ],
+            annotations: <GaugeAnnotation>[
+              GaugeAnnotation(
+                  angle: 90,
+                  positionFactor: 0.35,
+                  widget: Text('Temp.${AppLocalizations.of(context)!.tempUnit}', style: TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
+              GaugeAnnotation(
+                angle: 90,
+                positionFactor: 0.8,
+                widget: Text('  0  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              )
+            ],
+            pointers: <GaugePointer>[
+              NeedlePointer(
+                value: 0,
+                needleStartWidth: 0,
+                needleEndWidth: 3,
+                knobStyle: KnobStyle(knobRadius: 0.05),
+              )
+            ]
+          )
+        ]
+    );
+    setState(() {
+      _steps = _generate();
+    });
+  }
+
+  Future<List<MyStep>> _generate() async {
+    ReceiptModel receipt = widget.model.receipt!.copy();
+    List<MyStep> steps = [
       MyStep(
         index: 0,
         title: const Text('Début'),
@@ -124,17 +243,31 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           alignment: Alignment.centerLeft,
           child: const Text('Démarrage du brassin')
         ),
+        onStepContinue: (int index) {
+          if (widget.model.status == Status.pending) {
+            widget.model.status == Status.started;
+            Database().update(widget.model);
+          }
+        }
       ),
       MyStep(
         index: 1,
         title: Text('Concasser le grain'),
         content:  Container(
           alignment: Alignment.centerLeft,
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: receipt.fermentables!.map((e) {
-              return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount! * 1000)} de ${AppLocalizations.of(context)!.localizedText(e.name)}.'));
-            }).toList()
+          child: FutureBuilder<List<FermentableModel>>(
+            future: receipt.getFermentables(volume: widget.model.volume),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: snapshot.data!.map((e) {
+                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount! * 1000)} de ${AppLocalizations.of(context)!.localizedText(e.name)}.'));
+                  }).toList()
+                );
+              }
+              return Container();
+            }
           )
         ),
       ),
@@ -143,19 +276,23 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         title: Text('Ajouter l\'eau'),
         content: Container(
           alignment: Alignment.centerLeft,
-          child: Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.volume)} d\'eau dans votre cuve')
+          child: Row(
+            children: [
+              Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.volume)} d\'eau dans votre cuve')
+            ]
+          )
         ),
       ),
     ];
-    _mashs(receipt);
-    _steps.add(MyStep(
-      index: _steps.length,
+    await _mashs(receipt, steps);
+    steps.add(MyStep(
+      index: steps.length,
       title: Text('Rinçage des drêches'),
       content: Container(),
     ));
-    _steps.add(MyStep(
-      index: _steps.length,
-      title: Text('Mettre en ébullition votre cuve.'),
+    steps.add(MyStep(
+      index: steps.length,
+      title: Text('Mettre en ébullition votre cuve'),
       content: Container(
         alignment: Alignment.centerLeft,
         padding: EdgeInsets.all(8.0),
@@ -166,83 +303,108 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         )
       ),
     ));
-    await _hops(receipt);
-    _steps.add(MyStep(
-      index: _steps.length,
+    await _hops(receipt, steps);
+    steps.add(MyStep(
+      index: steps.length,
       title: Text('Faire un whirlpool'),
       content: Container(),
     ));
-    _steps.add(MyStep(
-      index: _steps.length,
-      title: Text('Transfert dans le fermenteur'),
+    steps.add(MyStep(
+      index: steps.length,
+      title: Text('Transférer le moût dans le fermenteur'),
       content: Container(),
     ));
-    await _yeasts(receipt);
-    _steps.add(MyStep(
-      index: _steps.length,
+    steps.add(MyStep(
+      index: steps.length,
+      title: Text('Prendre la densité initiale'),
+      content: TextField(
+        keyboardType: TextInputType.numberWithOptions(decimal: true),
+        onChanged: (value) {
+          widget.model.og = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+        },
+        decoration: FormDecoration(
+          icon: const Icon(Icons.first_page_outlined),
+          labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
+          border: InputBorder.none,
+          fillColor: CS.FillColor, filled: true
+        ),
+      ),
+    ));
+    await receipt.getYeasts(volume: widget.model.volume).then((values) {
+      steps.add(MyStep(
+        index: steps.length,
+        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure ${AppLocalizations.of(context)!.localizedText(receipt.yeasts!.first.name)}'),
+        content: Container(),
+      ));
+    });
+    steps.add(MyStep(
+      index: steps.length,
       title: Text('Fin'),
       content: Container(
         alignment: Alignment.centerLeft,
         child: const Text('Votre brassin est prêt.')
       ),
     ));
-    return _steps;
+    return steps;
   }
 
-  _mashs(ReceiptModel receipt) {
+  _mashs(ReceiptModel receipt, List<MyStep> steps) {
     for(int i = 0 ; i < receipt.mash!.length ; i++) {
       Mash mash = receipt.mash![i];
-      _steps.add(MyStep(
-        index: _steps.length,
+      steps.add(MyStep(
+        index: steps.length,
         title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(mash.temperature)}'),
         content: Container(
-            alignment: Alignment.centerLeft,
-            padding: EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: 140,
-              height: 140,
-              child: _temp,
-            )
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.all(8.0),
+          child: SizedBox(
+            width: 140,
+            height: 140,
+            child: _temp,
+          )
         ),
       ));
       if (i == 0) {
-        _steps.add(MyStep(
-            index: _steps.length,
-            title: Text('Ajouter le grain'),
-            content: Container(),
-            onStepContinue: (int index) {
-              if (!_mashController.isStarted) {
-                _mashController.restart(duration: 60 * 60);
-              }
-            }
-        ));
-      }
-      _steps.add(MyStep(
-          index: _steps.length,
-          title: Text('Empâtage pendant 60 minutes'),
-          content: Container(
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(8.0),
-              child: CircularTimer(_mashController,
-                  duration: 60 * 60,
-                  index: _steps.length,
-                  onComplete: (int index) {
-                    _steps[index].completed = true;
-                  }
-              )
-          ),
+        steps.add(MyStep(
+          index: steps.length,
+          title: Text('Ajouter le grain'),
+          content: Container(),
           onStepContinue: (int index) {
-            if (!_steps[index].completed) {
-              throw Exception('Le processus n\'est pas terminé.');
+            if (!_mashController.isStarted) {
+              _mashController.restart(duration: _mash * 60);
             }
           }
+        ));
+      }
+      steps.add(MyStep(
+        index: steps.length,
+        title: Text('Empâtage pendant ${_mash} minutes'),
+        content: Container(
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.all(8.0),
+          child: CircularTimer(_mashController,
+            duration: _mash * 60,
+            index: steps.length,
+            onChange: (String timeStamp) {
+              debugPrint('Countdown Changed $timeStamp');
+            },
+            onComplete: (int index) {
+              steps[index].completed = true;
+            }
+          )
+        ),
+        onStepContinue: (int index) {
+          if (!steps[index].completed) {
+            throw 'Le processus n\'est pas terminé.';
+          }
+        }
       ));
     };
   }
 
-  _hops(ReceiptModel receipt) async {
+  _hops(ReceiptModel receipt, List<MyStep> steps) async {
     List<Widget> children = [];
-    await receipt.hopsAsync.then((values) {
+    await receipt.gethops(volume: widget.model.volume).then((values) {
       List<HopModel> hops = values.where((element) => element.use == Use.boil).toList() ?? [];
       hops.sort((a, b) => a.duration!.compareTo(b.duration!));
       for(int i = 0 ; i < hops.length; i++) {
@@ -258,109 +420,31 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           children.add(SizedBox(height: 12));
           children.add(CircularTimer(_hopController,
             duration: hops[i].duration! * 60,
-            index: _steps.length,
+            index: steps.length,
           ));
         }
-        _steps.add(MyStep(
-            index: _steps.length,
-            title: Text(children.isNotEmpty ? 'Ajouter les houblons' : 'Ajouter $text'),
-            content: Container(
-                alignment: Alignment.centerLeft,
-                padding: EdgeInsets.all(8.0),
-                child: children.isNotEmpty ? Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: children,
-                ) : CircularTimer(_hopController,
-                  duration: hops[i].duration! * 60,
-                  index: _steps.length,
-                )
-              // child: timer
-            ),
-            onStepContinue: (int index) {
-              _hopController.restart(duration: hops[i].duration! * 60);
-            }
+        steps.add(MyStep(
+          index: steps.length,
+          title: Text(children.isNotEmpty ? 'Ajouter les houblons suivants...' : 'Ajouter $text'),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.all(8.0),
+            child: children.isNotEmpty ? Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children,
+            ) : CircularTimer(_hopController,
+              duration: hops[i].duration! * 60,
+              index: steps.length,
+            )
+            // child: timer
+          ),
+          onStepContinue: (int index) {
+            _hopController.restart(duration: hops[i].duration! * 60);
+          }
         ));
         children = [];
       }
     });
-  }
-
-  _yeasts(ReceiptModel receipt) async {
-    await receipt.yeastsAsync.then((values) {
-      _steps.add(MyStep(
-        index: _steps.length,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure ${AppLocalizations.of(context)!.localizedText(receipt.yeasts!.first.name)}'),
-        content: Container(),
-      ));
-    });
-  }
-
-  _initialize() async {
-    _temp = SfRadialGauge(
-      animationDuration: 3500,
-      enableLoadingAnimation: true,
-      axes: <RadialAxis>[
-        RadialAxis(
-          ranges: <GaugeRange>[
-            GaugeRange(
-              startValue: 0,
-              endValue: 10,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(34, 195, 199, 0.75)),
-            GaugeRange(
-              startValue: 10,
-              endValue: 30,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(123, 199, 34, 0.75)),
-            GaugeRange(
-              startValue: 30,
-              endValue: 40,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(238, 193, 34, 0.75)),
-            GaugeRange(
-              startValue: 40,
-              endValue: 70,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(238, 79, 34, 0.65)),
-            GaugeRange(
-              startValue: 70,
-              endValue: 100,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(255, 0, 0, 0.65)),
-          ],
-          annotations: <GaugeAnnotation>[
-            GaugeAnnotation(
-              angle: 90,
-              positionFactor: 0.35,
-              widget: Text('Temp.${AppLocalizations.of(context)!.tempUnit}', style: TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
-            GaugeAnnotation(
-              angle: 90,
-              positionFactor: 0.8,
-              widget: Text('  0  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-            )
-          ],
-          pointers: <GaugePointer>[
-            NeedlePointer(
-              value: 0,
-              needleStartWidth: 0,
-              needleEndWidth: 3,
-              knobStyle: KnobStyle(knobRadius: 0.05),
-            )
-          ]
-        )
-      ]
-    );
   }
 
   _showSnackbar(String message) {

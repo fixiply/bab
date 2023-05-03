@@ -1,4 +1,3 @@
-import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter/widgets.dart';
 
 // Internal package
@@ -21,7 +20,6 @@ import 'package:bb/models/style_model.dart';
 import 'package:bb/models/user_model.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/constants.dart' as CS;
-import 'package:bb/utils/quantity.dart';
 
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -137,7 +135,7 @@ class Database {
     try {
       if (updateAll == true) {
         if (ClassHelper.hasStatus(d) && d.status == CS.Status.disabled) {
-          d.status = Status.pending;
+          d.status = CS.Status.pending;
         }
         if (d is Model && _auth.currentUser != null) {
           d.creator = _auth.currentUser!.uid;
@@ -195,6 +193,17 @@ class Database {
     DocumentSnapshot snapshot = await users.doc(uuid).get();
     if (snapshot.exists) {
       UserModel model = UserModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
+  Future<EventModel?> getEvent(String uuid) async {
+    DocumentSnapshot snapshot = await events.doc(uuid).get();
+    if (snapshot.exists) {
+      EventModel model = EventModel();
       model.uuid = snapshot.id;
       model.fromMap(snapshot.data() as Map<String, dynamic>);
       return model;
@@ -577,18 +586,23 @@ class Database {
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
+        Map<String, dynamic>? map = doc.data() as Map<String, dynamic>;
         bool canBeAdded = true;
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
           String name = doc['name'].toString();
-          if (name.toLowerCase().contains(searchText.toLowerCase())) {
+          String reference = map['product'] ?? '';
+          String laboratory = map['laboratory'] ?? '';
+          if (name.toLowerCase().contains(searchText.toLowerCase()) ||
+            reference.toLowerCase().contains(searchText.toLowerCase()) ||
+            laboratory.toLowerCase().contains(searchText.toLowerCase())) {
             canBeAdded = true;
           }
         }
         if (canBeAdded) {
           YeastModel model = YeastModel();
           model.uuid = doc.id;
-          model.fromMap(doc.data() as Map<String, dynamic>);
+          model.fromMap(map);
           list.add(model);
         }
       });
@@ -683,10 +697,11 @@ class Database {
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
+        Map<String, dynamic>? map = doc.data() as Map<String, dynamic>;
         bool canBeAdded = true;
         if (searchText != null && searchText.length > 0) {
           canBeAdded = false;
-          String name = doc['name'].toString();
+          String name = map['name'] ?? '';
           if (name.toLowerCase().contains(searchText.toLowerCase())) {
             canBeAdded = true;
           }
@@ -694,7 +709,7 @@ class Database {
         if (canBeAdded) {
           EquipmentModel model = EquipmentModel();
           model.uuid = doc.id;
-          model.fromMap(doc.data() as Map<String, dynamic>);
+          model.fromMap(map);
           list.add(model);
         }
       });

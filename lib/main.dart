@@ -14,6 +14,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/locale_notifier.dart';
+import 'package:bb/utils/notifications.dart';
 import 'package:bb/widgets/builders/carousel_builder.dart';
 import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:bb/widgets/builders/list_builder.dart';
@@ -30,6 +31,9 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
+String? selectedNotificationPayload;
 
 final EditionNotifier editionNotifier = EditionNotifier();
 final BasketNotifier basketNotifier = BasketNotifier();
@@ -54,10 +58,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatefulWidget {
-  final String? payload;
-  MyApp({
-    Key? key, this.payload,
-  }) : super(key: key);
+  MyApp({ Key? key }) : super(key: key);
   @override
   _AppState createState() => _AppState();
 }
@@ -101,9 +102,7 @@ class _AppState extends State<MyApp> {
       primaryColor: PrimaryColor,
       primaryColorLight: PrimaryColorLight,
       primaryColorDark: PrimaryColorDark,
-      // toggleableActiveColor: PrimaryColor,
-      // bottomAppBarColor: PrimaryColor,
-      // backgroundColor: PrimaryColor,
+      bottomAppBarTheme: BottomAppBarTheme(color: PrimaryColor),
     );
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
@@ -113,6 +112,7 @@ class _AppState extends State<MyApp> {
           primary: PrimaryColor,
           secondary: PrimaryColor,
           onPrimary: Colors.white,
+          background: PrimaryColor
         ),
         appBarTheme: theme.appBarTheme.copyWith(
             backgroundColor: PrimaryColor,
@@ -170,6 +170,19 @@ class _AppState extends State<MyApp> {
       print('[$APP_NAME] Firebase messaging subscribe from "${Foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       });
+    }
+  }
+
+  Future<void> _notification(RemoteMessage message) async {
+    RemoteNotification? notification = message.notification;
+    if (notification != null) {
+      String? id = message.data['id'];
+      Notifications().showNotification(
+          id != null ? id.hashCode : 0,
+          notification.title!,
+          body: notification.body,
+          payload: id
+      );
     }
   }
 

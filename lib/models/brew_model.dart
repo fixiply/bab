@@ -1,3 +1,5 @@
+import 'package:bb/helpers/formula_helper.dart';
+import 'package:bb/models/fermentable_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -27,7 +29,12 @@ class BrewModel<T> extends Model {
   EquipmentModel? tank;
   EquipmentModel? fermenter;
   double? volume;
-  double? ph;
+  double? mash_ph;
+  double? mash_water;
+  double? sparge_ph;
+  double? sparge_water;
+  double? og;
+  double? fg;
   int? primaryday;
   int? secondaryday;
   int? tertiaryday;
@@ -46,7 +53,12 @@ class BrewModel<T> extends Model {
     this.tank,
     this.fermenter,
     this.volume,
-    this.ph,
+    this.mash_ph,
+    this.mash_water,
+    this.sparge_ph,
+    this.sparge_water,
+    this.og,
+    this.fg,
     this.primaryday,
     this.secondaryday,
     this.tertiaryday,
@@ -65,7 +77,12 @@ class BrewModel<T> extends Model {
     if (map['tank'] != null) this.tank = await Database().getEquipment(map['tank']);
     if (map['fermenter'] != null) this.fermenter = await Database().getEquipment(map['fermenter']);
     if (map['volume'] != null) this.volume = map['volume'].toDouble();
-    if (map['ph'] != null) this.ph = map['ph'].toDouble();
+    if (map['mash_ph'] != null) this.mash_ph = map['mash_ph'].toDouble();
+    if (map['mash_water'] != null) this.mash_water = map['mash_water'].toDouble();
+    if (map['sparge_ph'] != null) this.sparge_ph = map['sparge_ph'].toDouble();
+    if (map['sparge_water'] != null) this.sparge_water = map['sparge_water'].toDouble();
+    if (map['og'] != null) this.og = map['og'].toDouble();
+    if (map['fg'] != null) this.fg = map['fg'].toDouble();
     this.primaryday = map['primaryday'];
     this.secondaryday = map['secondaryday'];
     this.tertiaryday = map['tertiaryday'];
@@ -83,7 +100,12 @@ class BrewModel<T> extends Model {
       'tank': this.tank != null ? this.tank!.uuid : null,
       'fermenter': this.fermenter != null ? this.fermenter!.uuid : null,
       'volume': this.volume,
-      'ph': this.ph,
+      'mash_ph': this.mash_ph,
+      'mash_water': this.mash_water,
+      'sparge_ph': this.sparge_ph,
+      'sparge_water': this.sparge_water,
+      'og': this.og,
+      'fg': this.fg,
       'primaryday': this.primaryday,
       'secondaryday': this.secondaryday,
       'tertiaryday': this.tertiaryday,
@@ -102,11 +124,16 @@ class BrewModel<T> extends Model {
       status: this.status,
       started_at: this.started_at,
       reference: this.reference,
-      receipt: this.receipt,
+      receipt: this.receipt?.copy(),
       tank: this.tank,
       fermenter: this.fermenter,
       volume: this.volume,
-      ph: this.ph,
+      mash_ph: this.mash_ph,
+      mash_water: this.mash_water,
+      sparge_ph: this.sparge_ph,
+      sparge_water: this.sparge_water,
+      og: this.og,
+      fg: this.fg,
       primaryday: this.primaryday,
       secondaryday: this.secondaryday,
       tertiaryday: this.tertiaryday,
@@ -155,5 +182,24 @@ class BrewModel<T> extends Model {
       return DateHelper.toDate(inserted_at!.add(Duration(days: days)));
     }
     return null;
+  }
+
+  calculate() async {
+    if (receipt != null && tank != null) {
+      double weight = 0;
+      for(FermentableModel item in await receipt!.getFermentables()) {
+        if (item.use == Method.mashed) {
+          weight +=  (item.amount! * (volume! / receipt!.volume!)).abs();
+        }
+      }
+      mash_water = tank!.mash(weight);
+      debugPrint('mash_water $mash_water');
+      sparge_water = tank!.sparge(volume!, weight, duration: receipt!.boil!);
+      debugPrint('sparge_water $sparge_water');
+
+    } else {
+      mash_water = 0;
+      sparge_water = 0;
+    }
   }
 }

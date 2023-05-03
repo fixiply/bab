@@ -98,6 +98,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               TextFormField(
                 controller: _emailController,
+                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
@@ -145,6 +146,11 @@ class _LoginPageState extends State<LoginPage> {
                       onPressed: togglePassword,
                     ),
                   ),
+                  onEditingComplete: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await _signInWithEmailAndPassword();
+                    }
+                  },
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
                     if (value!.isEmpty) {

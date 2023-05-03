@@ -1,8 +1,10 @@
 // Internal package
+import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
+import 'package:flutter/material.dart';
 
 // External package
 
@@ -16,6 +18,7 @@ extension Ex on double {
 
 class EquipmentModel<T> extends Model {
   Status? status;
+  String? reference;
   String? name;
   Equipment? type;
   double? volume;
@@ -23,6 +26,7 @@ class EquipmentModel<T> extends Model {
   double? efficiency;
   double? absorption;
   double? lost_volume;
+  double? mash_ratio;
   double? boil_loss;
   double? shrinkage;
   dynamic? notes;
@@ -36,6 +40,7 @@ class EquipmentModel<T> extends Model {
     bool? isEdited,
     bool? isSelected,
     this.status = Status.publied,
+    this.reference,
     this.name,
     this.type,
     this.volume,
@@ -43,6 +48,7 @@ class EquipmentModel<T> extends Model {
     this.efficiency = DEFAULT_YIELD,
     this.absorption,
     this.lost_volume,
+    this.mash_ratio,
     this.boil_loss = DEFAULT_BOIL_LOSS,
     this.shrinkage = DEFAULT_WORT_SHRINKAGE,
     this.notes,
@@ -52,6 +58,7 @@ class EquipmentModel<T> extends Model {
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
+    this.reference = map['reference'];
     this.name = map['name'];
     this.type = Equipment.values.elementAt(map['type']);
     if (map['volume'] != null) this.volume = map['volume'].toDouble();
@@ -59,6 +66,7 @@ class EquipmentModel<T> extends Model {
     if (map['efficiency'] != null) this.efficiency = map['efficiency'].toDouble();
     if (map['absorption'] != null) this.absorption = map['absorption'].toDouble();
     if (map['lost_volume'] != null) this.lost_volume = map['lost_volume'].toDouble();
+    if (map['mash_ratio'] != null) this.mash_ratio = map['mash_ratio'].toDouble();
     if (map['boil_loss'] != null) this.boil_loss = map['boil_loss'].toDouble();
     if (map['shrinkage'] != null) this.shrinkage = map['shrinkage'].toDouble();
     this.notes = LocalizedText.deserialize(map['notes']);
@@ -69,6 +77,7 @@ class EquipmentModel<T> extends Model {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
+      'reference': this.reference,
       'name': this.name,
       'type': this.type!.index,
       'volume': this.volume,
@@ -76,6 +85,7 @@ class EquipmentModel<T> extends Model {
       'efficiency': this.efficiency,
       'absorption': this.absorption,
       'lost_volume': this.lost_volume,
+      'mash_ratio': this.mash_ratio,
       'boil_loss': this.boil_loss,
       'shrinkage': this.shrinkage,
       'notes': LocalizedText.serialize(this.notes),
@@ -91,6 +101,7 @@ class EquipmentModel<T> extends Model {
       updated_at: this.updated_at,
       creator: this.creator,
       status: this.status,
+      reference: this.reference,
       name: this.name,
       type: this.type,
       volume: this.volume,
@@ -98,6 +109,7 @@ class EquipmentModel<T> extends Model {
       efficiency: this.efficiency,
       absorption: this.absorption,
       lost_volume: this.lost_volume,
+      mash_ratio: this.mash_ratio,
       boil_loss: this.boil_loss,
       shrinkage: this.shrinkage,
       notes: this.notes,
@@ -118,17 +130,34 @@ class EquipmentModel<T> extends Model {
   /// Returns the pre-boil volume, based on the given conditions.
   ///
   /// The `volume` argument is relative to the final volume.
-  static double preBoilVolume(EquipmentModel? equipment, double? volume) {
+  ///
+  /// The `duration` argument is relative to the boil duration in minute.
+  double boil(double volume, {int duration = 60}) {
     if (volume == null) {
       return 0;
     }
-    double loss_boil = DEFAULT_BOIL_LOSS;
-    double head_loss = DEFAULT_WORT_SHRINKAGE;
-    if (equipment != null) {
-      loss_boil = equipment.boil_loss!;
-      head_loss = equipment.shrinkage!;
-    }
-    return (volume + loss_boil + head_loss) * 1.04;
+    double loss_boil = boil_loss ?? DEFAULT_BOIL_LOSS;
+    double head_loss = shrinkage ?? DEFAULT_WORT_SHRINKAGE;
+    debugPrint('boil ($volume + ($loss_boil * ($duration / 60)))) * $head_loss');
+    return (volume + (loss_boil * (duration / 60))) * 1.04;
+  }
+
+  /// Returns the mash water, based on the given conditions.
+  ///
+  /// The `weight` argument is relative to the weight in kilo.
+  double mash(double weight) {
+    return FormulaHelper.mashWater(weight, mash_ratio, lost_volume);
+  }
+
+  /// Returns the sparge water, based on the given conditions.
+  ///
+  /// The `volume` argument is relative to the final volume.
+  ///
+  /// The `weight` argument is relative to the weight in kilo.
+  ///
+  /// The `duration` argument is relative to the boil duration in minute.
+  double sparge(double volume, double weight, {int duration = 60}) {
+    return FormulaHelper.spargeWater(weight, boil(volume, duration: duration), mash(weight), absorption: absorption);
   }
 
   static dynamic serialize(dynamic data) {

@@ -71,6 +71,14 @@ class _FormBrewPageState extends State<FormBrewPage> {
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('calculate'),
+            icon: const Icon(Icons.calculate_outlined),
+            onPressed: () {
+              _calculate();
+            }
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
             icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
             onPressed: () {
@@ -134,6 +142,86 @@ class _FormBrewPageState extends State<FormBrewPage> {
           },
           child: Column(
             children: <Widget>[
+              ExpansionTile(
+                initiallyExpanded: true,
+                backgroundColor: CS.FillColor,
+                // childrenPadding: EdgeInsets.all(8.0),
+                title: Text(AppLocalizations.of(context)!.text('profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                children: <Widget>[
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: RichText(
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
+                                TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: RichText(
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
+                                TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: RichText(
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
+                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(8),
+                          child: RichText(
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
+                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]
+                  )
+                ],
+              ),
               if (widget.model.status == Status.pending) DateTimeField(
                 context: context,
                 datetime: widget.model.inserted_at,
@@ -241,6 +329,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 keyboardType: TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) {
                   widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                  _calculate();
                 },
                 decoration: FormDecoration(
                   icon: const Icon(Icons.waves_outlined),
@@ -262,16 +351,83 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 }
               ),
               Divider(height: 10),
-              TextFormField(
-                initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.ph) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) => widget.model.ph = AppLocalizations.of(context)!.decimal(value),
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.scatter_plot_outlined),
-                  labelText: 'pH',
-                  border: InputBorder.none,
-                  fillColor: CS.FillColor, filled: true
-                ),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.mash_ph) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) => widget.model.mash_ph = AppLocalizations.of(context)!.decimal(value),
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.water_drop_outlined),
+                        labelText: 'pH ${AppLocalizations.of(context)!.text('mash').toLowerCase()}',
+                        border: InputBorder.none,
+                        fillColor: CS.FillColor, filled: true
+                      ),
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.sparge_ph) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) => widget.model.sparge_ph = AppLocalizations.of(context)!.decimal(value),
+                      decoration: FormDecoration(
+                        icon:  RotationTransition(
+                          turns: AlwaysStoppedAnimation(90 / 360),
+                          child: Icon(Icons.air_outlined),
+                        ),
+                        labelText: 'pH ${AppLocalizations.of(context)!.text('sparge').toLowerCase()}',
+                        border: InputBorder.none,
+                        fillColor: CS.FillColor, filled: true
+                      ),
+                    )
+                  ),
+                ]
+              ),
+              Divider(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.og) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.og = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.first_page_outlined),
+                        labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('oiginal_gravity_tooltip'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
+                        border: InputBorder.none,
+                        fillColor: CS.FillColor, filled: true
+                      ),
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
+                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.fg) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.fg = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.last_page_outlined),
+                        labelText: AppLocalizations.of(context)!.text('final_gravity'),
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('final_gravity_tooltip'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
+                        border: InputBorder.none,
+                        fillColor: CS.FillColor, filled: true
+                      ),
+                    )
+                  ),
+                ]
               ),
               Divider(height: 10),
               TextInputField(
@@ -295,7 +451,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
     if (_autogenerate && widget.model.uuid == null) {
       var newDate = DateTime.now();
       List<BrewModel> brews = await Database().getBrews(user: CS.currentUser!.uuid, ordered: true);
-      widget.model.reference = '${newDate.year.toString().substring(2)}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, newPattern: "000")}';
+      widget.model.reference = '${newDate.year.toString()}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, newPattern: "000")}';
       _identifierController.text = widget.model.reference!;
     }
   }
@@ -308,12 +464,20 @@ class _FormBrewPageState extends State<FormBrewPage> {
     _modified = modified ? true : false;
   }
 
+  _calculate() async {
+    await widget.model.calculate();
+    setState(() {
+      widget.model.mash_water = widget.model.mash_water;
+      widget.model.sparge_water = widget.model.sparge_water;
+    });
+  }
+
   _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: Duration(seconds: 10)
-        )
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 10)
+      )
     );
   }
 }

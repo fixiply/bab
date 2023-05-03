@@ -23,7 +23,7 @@ const String PRIVACY_POLICY = 'terms/privacy_policy.md';
 
 const double DEFAULT_YIELD = 75.0;
 const double DEFAULT_BOIL_LOSS = 2.0;
-const double DEFAULT_WORT_SHRINKAGE = 2.0;
+const double DEFAULT_WORT_SHRINKAGE = 1.04;
 
 //User Global
 UserModel? currentUser;

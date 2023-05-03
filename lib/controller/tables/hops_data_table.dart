@@ -134,9 +134,9 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
                       controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
                       onRemove: (DataGridRow row, int rowIndex) {
-                        setState(() {
-                          _data!.then((value) => value.removeAt(rowIndex));
-                        });
+                        // setState(() {
+                        //   _data!.then((value) => value.removeAt(rowIndex));
+                        // });
                         widget.data!.removeAt(rowIndex);
                         widget.onChanged?.call(widget.data!);
                       },
@@ -198,12 +198,10 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
         return HopsPage(showCheckboxColumn: true);
       })).then((values) {
         if (values != null) {
-          setState(() {
-            _data!.then((value) => value.addAll(values));
-          });
           if (widget.data != null) {
-            for(HopModel model in values) {
+            for (HopModel model in values) {
               model.duration = widget.receipt?.boil;
+              widget.data!.add(model);
             }
             widget.onChanged?.call(widget.data!);
           }

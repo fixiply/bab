@@ -190,12 +190,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
           setState(() {
             _data!.then((value) => value.addAll(values));
           });
-          if (widget.data != null) {
-            for(EquipmentModel model in values) {
-              widget.data!.add(Quantity(uuid: model.uuid));
-            }
-            // widget.onChanged?.call(widget.data!);
-          }
+          // widget.onChanged?.call(values);
         }
       });
     } else if (widget.allowEditing == true) {
