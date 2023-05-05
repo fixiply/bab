@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/hop_model.dart';
@@ -86,7 +87,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           title: Text(AppLocalizations.of(context)!.text('stages')),
           elevation: 0,
           foregroundColor: Theme.of(context).primaryColor,
-          backgroundColor: Colors.white
+          backgroundColor: Colors.white,
+          leading: IconButton(
+            icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+            onPressed:() async {
+              Navigator.pop(context);
+            }
+          ),
         ),
         body: FutureBuilder<List<MyStep>>(
           future: _steps,
@@ -253,13 +260,14 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       MyStep(
         index: 1,
         title: Text('Concasser le grain'),
-        content:  Container(
+        content: Container(
           alignment: Alignment.centerLeft,
           child: FutureBuilder<List<FermentableModel>>(
             future: receipt.getFermentables(volume: widget.model.volume),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                return Row(
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: snapshot.data!.map((e) {
                     return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount! * 1000)} de ${AppLocalizations.of(context)!.localizedText(e.name)}.'));
@@ -278,7 +286,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           alignment: Alignment.centerLeft,
           child: Row(
             children: [
-              Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.volume)} d\'eau dans votre cuve')
+              Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water)} d\'eau dans votre cuve')
             ]
           )
         ),

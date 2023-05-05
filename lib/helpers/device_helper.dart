@@ -11,10 +11,7 @@ class DeviceHelper {
   }
 
   static bool isLargeScreen(BuildContext context) {
-    if (isDesktop) {
-      return true;
-    }
-    if (isTablette(context) && MediaQuery.of(context).orientation == Orientation.landscape) {
+    if (isDesktop || isTablette(context)) {
       return true;
     }
     return false;

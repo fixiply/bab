@@ -1,3 +1,4 @@
+import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter/material.dart' hide SelectionChangedCallback;
 
 // Internal package
@@ -20,7 +21,7 @@ class EditSfDataGrid extends SfDataGrid {
     DataGridController? controller,
     bool allowEditing = true,
     bool allowSorting = true,
-    bool showCheckboxColumn = true,
+    bool showCheckboxColumn = false,
     bool? loadMoreRows,
     SelectionMode selectionMode = SelectionMode.multiple,
     ScrollPhysics? verticalScrollPhysics,
@@ -84,10 +85,10 @@ class EditSfDataGrid extends SfDataGrid {
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
+            children: <Widget>[
               Icon(Icons.delete, color: Colors.white, size: 20),
               SizedBox(width: 16.0),
-              Text('DELETE',style: TextStyle(color: Colors.white, fontSize: 15)),
+              Text(AppLocalizations.of(context)!.text('delete').toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 15)),
             ],
           ),
         ),
@@ -103,10 +104,10 @@ class EditSfDataGrid extends SfDataGrid {
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const <Widget>[
+            children: <Widget>[
               Icon(Icons.edit, color: Colors.white, size: 20),
               SizedBox(width: 16.0),
-              Text('EDIT', style: TextStyle(color: Colors.white, fontSize: 15))
+              Text(AppLocalizations.of(context)!.text('edit').toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 15))
             ],
           ),
         ),

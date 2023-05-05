@@ -81,6 +81,7 @@
   "date_mask": "MMM d, yyyy - hh:mm a",
   "day": "Day",
   "days": "Days",
+  "delete": "Delete",
   "delete_item_title": "Delete item?",
   "delete_items_title": "Delete items?",
   "delivery": "Delivery",

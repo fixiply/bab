@@ -29,7 +29,8 @@ class HopsPage extends StatefulWidget {
   bool showQuantity;
   bool loadMore;
   ReceiptModel? receipt;
-  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
+  SelectionMode selectionMode;
+  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   _HopsPageState createState() => new _HopsPageState();
 }
@@ -139,7 +140,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
                     context,
                     allowEditing: widget.allowEditing,
                     showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: SelectionMode.multiple,
+                    selectionMode: widget.selectionMode,
                     source: _dataSource,
                     controller: getDataGridController(),
                     onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {

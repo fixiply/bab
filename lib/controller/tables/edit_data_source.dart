@@ -46,6 +46,13 @@ abstract class EditDataSource extends DataGridSource {
     return null;
   }
 
+  Widget tooltipText(String? text) {
+    if (text != null) {
+      return Tooltip(message: text, child: Text(text, overflow: TextOverflow.ellipsis));
+    }
+    return Container();
+  }
+
   dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     return dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == column.columnName).value;
   }

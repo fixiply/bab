@@ -28,7 +28,8 @@ class MiscPage extends StatefulWidget {
   bool showQuantity;
   bool loadMore;
   ReceiptModel? receipt;
-  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
+  SelectionMode selectionMode;
+  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   _MiscPageState createState() => new _MiscPageState();
 }
@@ -138,7 +139,7 @@ class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<
                     context,
                     allowEditing: widget.allowEditing,
                     showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: SelectionMode.multiple,
+                    selectionMode: widget.selectionMode,
                     source: _dataSource,
                     controller: getDataGridController(),
                     onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {

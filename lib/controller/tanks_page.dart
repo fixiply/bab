@@ -41,6 +41,7 @@ class CustomListItem extends StatelessWidget {
     required this.subtitle,
     this.trailing,
     this.weight,
+    this.onLongPress
   });
 
   final Widget leading;
@@ -48,30 +49,34 @@ class CustomListItem extends StatelessWidget {
   final Widget subtitle;
   final Widget? trailing;
   final double? weight;
+  final GestureLongPressCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       height: weight,
       padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          leading,
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: <Widget>[
-                title,
-                Flexible(
-                  child: subtitle,
-                ),
-              ]
-            )
-          ),
-          trailing ?? Container()
-        ],
+      child: InkWell(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            leading,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  title,
+                  Flexible(
+                    child: subtitle,
+                  ),
+                ]
+              )
+            ),
+            trailing ?? Container()
+          ],
+        ),
+        onLongPress: onLongPress,
       ),
     );
   }
@@ -289,7 +294,10 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
               child: Text(AppLocalizations.of(context)!.text('remove')),
             ),
           ]
-        ) : null
+        ) : null,
+        onLongPress: model.isEditable() ? () {
+          _edit(model);
+        } : null,
       )
     );
   }

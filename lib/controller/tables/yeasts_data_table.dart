@@ -146,10 +146,13 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                       allowSorting: widget.allowSorting,
                       controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
+                      onEdit: (DataGridRow row, int rowIndex) {
+                        _edit(rowIndex);
+                      },
                       onRemove: (DataGridRow row, int rowIndex) {
-                        setState(() {
-                          _data!.then((value) => value.removeAt(rowIndex));
-                        });
+                        // setState(() {
+                        //   _data!.then((value) => value.removeAt(rowIndex));
+                        // });
                         widget.data!.removeAt(rowIndex);
                         widget.onChanged?.call(widget.data!);
                       },
@@ -231,6 +234,20 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
     }
   }
 
+  _edit(int rowIndex) async {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return YeastsPage(showCheckboxColumn: true, selectionMode: SelectionMode.singleDeselect);
+    })).then((values) {
+      if (values != null) {
+        if (widget.data != null) {
+          values.first.amount = widget.data![rowIndex].amount;
+          widget.data![rowIndex] = values.first;
+          widget.onChanged?.call(widget.data!);
+        }
+      }
+    });
+  }
+
   _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -301,42 +318,42 @@ class YeastDataSource extends EditDataSource {
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
-        cells: row.getCells().map<Widget>((e) {
-          String? value = e.value?.toString();
-          var alignment = Alignment.centerLeft;
-          if (e.value is LocalizedText) {
-            value = e.value?.get(AppLocalizations.of(context)!.locale);
-            alignment = Alignment.centerLeft;
-          } else if (e.value is num) {
-            if (e.columnName == 'amount') {
-              value = AppLocalizations.of(context)!.weightFormat(e.value);
-            } else if (e.columnName == 'attenuation') {
-              value = AppLocalizations.of(context)!.percentFormat(e.value);
-            } else if (e.columnName == 'duration') {
-              value = AppLocalizations.of(context)!.durationFormat(e.value);
-            } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
-            alignment = Alignment.centerRight;
-          } else if (e.value is Enum) {
-            alignment = Alignment.center;
-            value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
-          } else if (e.value is DateTime) {
-            alignment = Alignment.centerRight;
-            value = AppLocalizations.of(context)!.datetimeFormat(e.value);
-          } else {
-            if (e.columnName == 'amount') {
-              return Container(
-                  alignment: Alignment.center,
-                  margin: EdgeInsets.all(4),
-                  child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
-              );
-            }
+      cells: row.getCells().map<Widget>((e) {
+        String? value = e.value?.toString();
+        var alignment = Alignment.centerLeft;
+        if (e.value is LocalizedText) {
+          value = e.value?.get(AppLocalizations.of(context)!.locale);
+          alignment = Alignment.centerLeft;
+        } else if (e.value is num) {
+          if (e.columnName == 'amount') {
+            value = AppLocalizations.of(context)!.weightFormat(e.value);
+          } else if (e.columnName == 'attenuation') {
+            value = AppLocalizations.of(context)!.percentFormat(e.value);
+          } else if (e.columnName == 'duration') {
+            value = AppLocalizations.of(context)!.durationFormat(e.value);
+          } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
+          alignment = Alignment.centerRight;
+        } else if (e.value is Enum) {
+          alignment = Alignment.center;
+          value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+        } else if (e.value is DateTime) {
+          alignment = Alignment.centerRight;
+          value = AppLocalizations.of(context)!.datetimeFormat(e.value);
+        } else {
+          if (e.columnName == 'amount') {
+            return Container(
+              alignment: Alignment.center,
+              margin: EdgeInsets.all(4),
+              child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
+            );
           }
-          return Container(
-            alignment: alignment,
-            padding: EdgeInsets.all(8.0),
-            child: Text(value ?? ''),
-          );
-        }).toList()
+        }
+        return Container(
+          alignment: alignment,
+          padding: EdgeInsets.all(8.0),
+          child: tooltipText(value),
+        );
+      }).toList()
     );
   }
 

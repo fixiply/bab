@@ -53,9 +53,9 @@ class BrewModel<T> extends Model {
     this.tank,
     this.fermenter,
     this.volume,
-    this.mash_ph,
+    this.mash_ph = 5.4,
     this.mash_water,
-    this.sparge_ph,
+    this.sparge_ph = 5.2,
     this.sparge_water,
     this.og,
     this.fg,
@@ -198,8 +198,8 @@ class BrewModel<T> extends Model {
       debugPrint('sparge_water $sparge_water');
 
     } else {
-      mash_water = 0;
-      sparge_water = 0;
+      mash_water = null;
+      sparge_water = null;
     }
   }
 }

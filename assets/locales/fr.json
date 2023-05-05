@@ -81,6 +81,7 @@
   "date_mask": "d MMMM, yyyy - HH:mm",
   "day": "Jour",
   "days": "Jours",
+  "delete": "Supprimer",
   "delete_item_title": "Supprimer l'élément ?",
   "delete_items_title": "Supprimer les éléments ?",
   "delivery": "Livraison",

@@ -168,39 +168,131 @@ class _BrewPageState extends State<BrewPage> {
           ],
         ),
         if (widget.model.receipt != null) SliverToBoxAdapter(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: RichText(
-                textAlign: TextAlign.left,
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                    style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
-                  children: [
-                    TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.receipt!.title), style: TextStyle(fontWeight: FontWeight.w600)),
-                    if (widget.model.receipt!.style! != null) TextSpan(text: '  -  ${AppLocalizations.of(context)!.localizedText(widget.model.receipt!.style!.name)}'),
-                  ]
-                )
-              )
-            )
-          ),
-        if (widget.model.tank != null) SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+            padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: RichText(
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
+                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
                 children: [
-                  if (widget.model.tank != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank')} : '),
-                  if (widget.model.tank != null) TextSpan(text: widget.model.tank!.name),
-                  if (widget.model.tank != null && widget.model.volume != null) TextSpan(text: '  -  '),
-                  if (widget.model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
-                  if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume)),
+                  TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.receipt!.title), style: TextStyle(fontWeight: FontWeight.w600)),
+                  if (widget.model.receipt!.style! != null) TextSpan(text: '  -  ${AppLocalizations.of(context)!.localizedText(widget.model.receipt!.style!.name)}'),
                 ]
               )
             )
           )
+        ),
+        SliverToBoxAdapter(
+          child: Container(
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: Text('${AppLocalizations.of(context)!.text('tank')} : ${widget.model.tank!.name ?? '-'}'),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: <TextSpan>[
+                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
+                              if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.volume == null) TextSpan(text: '-'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: <TextSpan>[
+                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
+                              if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.mash_water == null) TextSpan(text: '-'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: <TextSpan>[
+                              TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
+                              if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.mash_water == null) TextSpan(text: '-'),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: <TextSpan>[
+                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
+                              TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: EdgeInsets.all(8),
+                        child: RichText(
+                          textAlign: TextAlign.left,
+                          overflow: TextOverflow.ellipsis,
+                          text: TextSpan(
+                            style: DefaultTextStyle.of(context).style,
+                            children: <TextSpan>[
+                              TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
+                              TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ]
+                )
+              ]
+            )
+          ),
         ),
         SliverList(
           delegate: SliverChildListDelegate([

@@ -160,7 +160,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.mash_water == null) TextSpan(text: '-'),
                               ],
                             ),
                           ),
@@ -176,7 +177,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.sparge_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.sparge_water == null) TextSpan(text: '-')
                               ],
                             ),
                           ),

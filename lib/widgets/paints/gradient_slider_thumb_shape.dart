@@ -14,6 +14,8 @@ class GradientSliderThumbShape implements SliderComponentShape {
     this.elevation = 1.0,
     this.pressedElevation = 6.0,
     this.selectedValue,
+    this.min = 0,
+    this.max = 0,
   });
 
   /// Outer radius of thumb
@@ -32,6 +34,9 @@ class GradientSliderThumbShape implements SliderComponentShape {
   final double pressedElevation;
 
   final double? selectedValue;
+
+  final int min;
+  final int max;
 
   @override
   Size getPreferredSize(bool isEnabled, bool isDiscrete) {
@@ -55,53 +60,40 @@ class GradientSliderThumbShape implements SliderComponentShape {
       }) {
     final Canvas canvas = context.canvas;
 
-    final Paint strokePaint = Paint()
-      ..color = fillColor
-      ..style = PaintingStyle.fill;
-    canvas.drawCircle(center, 12, strokePaint);
+    var number = getValue(value);
+    if (number > 0) {
+      Color color = SRM_COLORS[ColorHelper.toSRM(number)];
+      final Paint strokePaint = Paint()
+        ..color = color
+        ..style = PaintingStyle.fill;
+      canvas.drawCircle(center, 16, strokePaint);
 
-    Path path = Path()
-      ..addOval(Rect.fromCircle(center: center, radius: 12))
-      ..addOval(Rect.fromCircle(center: center, radius: 12 - 1))
-      ..fillType = PathFillType.evenOdd;
+      Path path = Path()
+        ..addOval(Rect.fromCircle(center: center, radius: 16))..addOval(
+            Rect.fromCircle(center: center, radius: 16 - 1))
+        ..fillType = PathFillType.evenOdd;
 
-    canvas.drawPath(path, Paint()..color = ringColor);
+      TextSpan span = new TextSpan(
+          style: new TextStyle(
+              fontSize: 12,
+              color: Colors.white,
+              height: 1),
+          text: number.toString());
+      TextPainter tp = new TextPainter(
+          text: span,
+          textAlign: TextAlign.left,
+          textDirection: TextDirection.ltr);
+      tp.layout();
+      Offset textCenter = Offset(
+          center.dx - (tp.width / 2), center.dy - (tp.height / 2));
 
-    final Tween<double> radiusTween = Tween<double>(
-      begin: _disabledThumbRadius,
-      end: enabledThumbRadius,
-    );
-    final ColorTween colorTween = ColorTween(
-      begin: sliderTheme.disabledThumbColor,
-      end: sliderTheme.thumbColor,
-    );
-    final double radius = radiusTween.evaluate(enableAnimation);
-    final Tween<double> elevationTween = Tween<double>(
-      begin: elevation,
-      end: pressedElevation,
-    );
+      canvas.drawPath(path, Paint()
+        ..color = color);
+      tp.paint(canvas, textCenter);
+    }
+  }
 
-    // Add a stroke of 1dp around the circle if this thumb would overlap
-    // the other thumb.
-    // if (isOnTop ?? false) {
-    //   final Paint strokePaint = Paint()
-    //     ..color = ringColor.withOpacity(0.1)
-    //     ..strokeWidth = 1.0
-    //     ..style = PaintingStyle.stroke;
-    //   canvas.drawCircle(center, radius, strokePaint);
-    // }
-
-    final Color color = colorTween.evaluate(enableAnimation)!;
-
-    final double evaluatedElevation = isDiscrete ? elevationTween.evaluate(activationAnimation) : elevation;
-    final Path shadowPath = Path()
-      ..addArc(Rect.fromCenter(center: center, width: 2 * radius, height: 2 * radius), 0, math.pi * 2);
-    canvas.drawShadow(shadowPath, Colors.black, evaluatedElevation, true);
-
-    canvas.drawCircle(
-      center,
-      radius,
-      Paint()..color = selectedValue != null ? SRM_COLORS[selectedValue!.toInt()] : color,
-    );
+  int getValue(double value) {
+    return (min+(max-min)*value).round();
   }
 }

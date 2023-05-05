@@ -28,7 +28,8 @@ class YeastsPage extends StatefulWidget {
   bool showQuantity;
   bool loadMore;
   ReceiptModel? receipt;
-  YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt}) : super(key: key);
+  SelectionMode selectionMode;
+  YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   _YeastsPageState createState() => new _YeastsPageState();
 }
@@ -138,7 +139,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
                     context,
                     allowEditing: widget.allowEditing,
                     showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: SelectionMode.multiple,
+                    selectionMode: widget.selectionMode,
                     source: _dataSource,
                     controller: getDataGridController(),
                     onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
