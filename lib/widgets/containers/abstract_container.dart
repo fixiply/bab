@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/controller/product_page.dart';
 import 'package:bb/models/product_model.dart';
-import 'package:bb/models/rating_model.dart';
+import 'package:bb/utils/rating.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/custom_image.dart';
@@ -90,9 +90,9 @@ class AbstractContainerState extends State<AbstractContainer> {
     if (list != null && list.length > 0) {
       for(ProductModel product in list) {
         double rating = 0;
-        List<RatingModel>? values = await Database().getRatings(beer: product.uuid);
+        List<Rating>? values = await Database().getRatings(beer: product.uuid);
         if (values != null && values.length > 0) {
-          for (RatingModel model in values) {
+          for (Rating model in values) {
             rating += model.rating!;
           }
           rating = rating / values.length;

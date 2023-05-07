@@ -69,7 +69,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -134,11 +134,11 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
             publish: false,
             filtered: false,
             archived: false,
-            units: true,
+            measures: true,
             onSelected: (value) {
-              if (value is CS.Unit) {
+              if (value is CS.Measure) {
                 setState(() {
-                  AppLocalizations.of(context)!.unit = value;
+                  AppLocalizations.of(context)!.measure = value;
                 });
                 _initialize();
               }
@@ -167,17 +167,23 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                     children: [
                       Expanded(
                         child: CustomSlider(AppLocalizations.of(context)!.text('oiginal_gravity'), widget.model.og ?? 1, 1, 1.2, 0.01,
-                          format: NumberFormat("0.000", AppLocalizations.of(context)!.locale.toString())
+                          onFormatted: (double value) {
+                            return AppLocalizations.of(context)!.gravityFormat(value);
+                          },
                         )
                       ),
                       Expanded(
                         child: CustomSlider(AppLocalizations.of(context)!.text('final_gravity'), widget.model.fg ?? 1, 1, 1.2, 0.01,
-                          format: NumberFormat("0.000", AppLocalizations.of(context)!.locale.toString())
+                          onFormatted: (double value) {
+                            return AppLocalizations.of(context)!.gravityFormat(value);
+                          },
                         )
                       ),
                       Expanded(
                         child: CustomSlider(AppLocalizations.of(context)!.text('abv'), widget.model.abv ?? 0, 0, MAX_ABV, 0.1,
-                            format: NumberFormat("#0.#'%'", AppLocalizations.of(context)!.locale.toString())
+                          onFormatted: (double value) {
+                            return AppLocalizations.of(context)!.numberFormat(value, pattern: "#0.#'%'");
+                          },
                         )
                       )
                     ]
@@ -212,7 +218,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       ),
                       Expanded(
                         child: CustomSlider(AppLocalizations.of(context)!.text('ibu'), widget.model.ibu ?? 0, 0, MAX_IBU, 0.1,
-                          format: NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString())
+                          onFormatted: (double value) {
+                            return AppLocalizations.of(context)!.numberFormat(value);
+                          },
                         )
                       ),
                     ]
@@ -263,7 +271,13 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       context: context,
                       initialValue: widget.model.style,
                       title: AppLocalizations.of(context)!.text('style'),
-                      onChanged: (value) => widget.model.style = value
+                      onChanged: (value) => widget.model.style = value,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
                     ),
                   ),
                   SizedBox(width: 12),
@@ -309,7 +323,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       decoration: FormDecoration(
                         icon: const Icon(Icons.waves_outlined),
                         labelText: AppLocalizations.of(context)!.text('mash_volume'),
-                        suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                        suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                         suffixIcon: Tooltip(
                           message: AppLocalizations.of(context)!.text('final_volume'),
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
@@ -429,7 +443,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       decoration: FormDecoration(
                           icon: const Icon(Icons.device_thermostat_outlined),
                           labelText: AppLocalizations.of(context)!.text('temperature'),
-                          suffixText: AppLocalizations.of(context)!.tempUnit,
+                          suffixText: AppLocalizations.of(context)!.tempMeasure,
                           border: InputBorder.none,
                           fillColor: CS.FillColor, filled: true
                       ),
@@ -469,7 +483,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       decoration: FormDecoration(
                         icon: const Icon(Icons.device_thermostat_outlined),
                         labelText: AppLocalizations.of(context)!.text('temperature'),
-                        suffixText: AppLocalizations.of(context)!.tempUnit,
+                        suffixText: AppLocalizations.of(context)!.tempMeasure,
                         border: InputBorder.none,
                         fillColor: CS.FillColor, filled: true
                       ),
@@ -507,7 +521,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       decoration: FormDecoration(
                           icon: const Icon(Icons.device_thermostat_outlined),
                           labelText: AppLocalizations.of(context)!.text('temperature'),
-                          suffixText: AppLocalizations.of(context)!.tempUnit,
+                          suffixText: AppLocalizations.of(context)!.tempMeasure,
                           border: InputBorder.none,
                           fillColor: CS.FillColor, filled: true
                       ),

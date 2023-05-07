@@ -96,17 +96,17 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
             publish: false,
             filtered: false,
             archived: false,
-            units: true,
+            measures: true,
             onSelected: (value) async {
               if (value == 'import') {
                 ImportHelper.styles(context, () {
                   _fetch();
                 });
-              } else if (value is Unit) {
+              } else if (value is Measure) {
                 _clear();
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
+                // setState(() {
+                //   AppLocalizations.of(context)!.measure = value;
+                // });
               }
             },
             joints: (List<PopupMenuEntry> items) {

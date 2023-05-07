@@ -6,8 +6,10 @@ import 'package:bb/controller/fermentables_page.dart';
 import 'package:bb/controller/hops_page.dart';
 import 'package:bb/controller/misc_page.dart';
 import 'package:bb/controller/yeasts_page.dart';
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 
 // External package
@@ -74,14 +76,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
               publish: false,
               filtered: false,
               archived: false,
-              units: true,
-              onSelected: (value) {
-                if (value is Unit) {
-                  setState(() {
-                    AppLocalizations.of(context)!.unit = value;
-                  });
-                }
-              },
+              measures: true,
             )
           ],
           bottom: PreferredSize(
@@ -92,6 +87,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
             ),
           ),
         ),
+        drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
         body: TabBarView(
           children: [
             FermentablesPage(allowEditing: currentUser != null),

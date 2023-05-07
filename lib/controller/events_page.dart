@@ -31,17 +31,19 @@ class EventsPage extends StatefulWidget {
   _EventsPageState createState() => new _EventsPageState();
 }
 
-class _EventsPageState extends State<EventsPage> {
+class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMixin<EventsPage> {
   late ScrollController? _controller;
   TextEditingController _searchQueryController = TextEditingController();
   Future<List<EventModel>>? _events;
   int _baskets = 0;
 
   // Edition mode
-  bool _editable = false;
   bool _remove = false;
   bool _hidden = false;
   bool _archived = false;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
@@ -152,7 +154,7 @@ class _EventsPageState extends State<EventsPage> {
         ),
       ),
       floatingActionButton: Visibility(
-        visible: _editable && currentUser != null && currentUser!.isAdmin(),
+        visible: currentUser != null && currentUser!.isAdmin(),
         child: FloatingActionButton(
           onPressed: _new,
           backgroundColor: Theme.of(context).primaryColor,
@@ -349,8 +351,6 @@ class _EventsPageState extends State<EventsPage> {
   }
 
   _initialize() async {
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
     final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
     _baskets = basketProvider.size;
     basketProvider.addListener(() {

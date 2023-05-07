@@ -24,11 +24,13 @@ import 'package:bb/models/event_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/utils/edition_notifier.dart';
 
 // External package
 import 'package:easy_sidemenu/easy_sidemenu.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
   final String? payload;
@@ -185,116 +187,116 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                     controller: _page,
                     children: [
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => EventsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => EventsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => ReceiptsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => ReceiptsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => StylesPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => StylesPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => IngredientsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => IngredientsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => EquipmentsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => EquipmentsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => BrewsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => BrewsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => InventoryPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => InventoryPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => CalendarPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => CalendarPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => ToolsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => ToolsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => OrdersPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => OrdersPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => GalleryPage([], close: false),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => GalleryPage([], close: false),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => ProductsPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => ProductsPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => CompaniesPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => CompaniesPage(),
+                          );
+                        }
                       ),
                       Navigator(
-                          onGenerateRoute: (RouteSettings settings) {
-                            return MaterialPageRoute(
-                              fullscreenDialog: true,
-                              builder: (_) => AccountPage(),
-                            );
-                          }
+                        onGenerateRoute: (RouteSettings settings) {
+                          return MaterialPageRoute(
+                            fullscreenDialog: true,
+                            builder: (_) => AccountPage(),
+                          );
+                        }
                       )
                     ]
                 ),
@@ -309,6 +311,13 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   }
 
   _initialize() async {
+    final provider = Provider.of<ValuesNotifier>(context, listen: false);
+    provider.addListener(() {
+      setState(() {
+        AppLocalizations.of(context)!.measure = provider.measure;
+        AppLocalizations.of(context)!.gravity = provider.gravity;
+      });
+    });
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       _version = 'V${packageInfo.version} (${packageInfo.buildNumber})';
@@ -319,22 +328,25 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
     if (orientation == Orientation.portrait) {
       return null;
     }
-    return RichText(
-      textAlign: TextAlign.left,
-      overflow: TextOverflow.ellipsis,
-      text: TextSpan(
-        style: DefaultTextStyle.of(context).style,
-        children: [
-          TextSpan(text: 'Be', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
-          WidgetSpan(
+    return Padding(
+      padding: EdgeInsets.only(top: 24.0),
+      child: RichText(
+        textAlign: TextAlign.left,
+        overflow: TextOverflow.ellipsis,
+        text: TextSpan(
+          style: DefaultTextStyle.of(context).style,
+          children: [
+            TextSpan(text: 'Be', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
+            WidgetSpan(
               child: RotatedBox(
-                  quarterTurns: -1,
-                  child: Text(' And', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.white))
+                quarterTurns: -1,
+                child: Text(' And', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.white))
               )
-          ),
-          TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
-        ],
-      ),
+            ),
+            TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
+          ],
+        ),
+      )
     );
   }
 

@@ -70,14 +70,7 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
               publish: false,
               filtered: false,
               archived: false,
-              units: true,
-              onSelected: (value) {
-                if (value is Unit) {
-                  setState(() {
-                    AppLocalizations.of(context)!.unit = value;
-                  });
-                }
-              },
+              measures: true,
             )
           ],
           bottom: PreferredSize(

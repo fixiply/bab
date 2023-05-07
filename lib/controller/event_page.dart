@@ -44,7 +44,7 @@ class _EventPageState extends State<EventPage> {
           child: Text(widget.model.title!),
         ),
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context);
           }
@@ -92,7 +92,7 @@ class _EventPageState extends State<EventPage> {
             foregroundColor: _dominantColor,
             backgroundColor: Theme.of(context).primaryColor,
             leading: IconButton(
-              icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+              icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
               onPressed:() async {
                 Navigator.pop(context);
               }

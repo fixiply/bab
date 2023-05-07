@@ -22,6 +22,7 @@ class MiscModel<T> extends Model {
   dynamic? name;
   Misc? type;
   Use? use;
+  Unit? unit;
   int? duration;
   double? amount;
   dynamic? notes;
@@ -37,6 +38,7 @@ class MiscModel<T> extends Model {
     this.name,
     this.type = Misc.flavor,
     this.use = Use.mash,
+    this.unit,
     this.duration,
     this.amount,
     this.notes,
@@ -76,6 +78,7 @@ class MiscModel<T> extends Model {
       name: this.name,
       type: this.type,
       use: this.use,
+      unit: this.unit,
       duration: this.duration,
       amount: this.amount,
       notes: this.notes,
@@ -152,6 +155,7 @@ class MiscModel<T> extends Model {
         model.amount = item.amount;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
+        model.unit = Unit.mass;
         values.add(model);
       }
     }
@@ -171,6 +175,7 @@ class MiscModel<T> extends Model {
           model.amount = item.amount;
           model.duration = item.duration;
           model.use = item.use?.index;
+          if (item.unit != null) model.unit = item.unit;
           values.add(Quantity.serialize(model));
         }
         return values;

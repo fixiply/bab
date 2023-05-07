@@ -30,7 +30,6 @@ class StylePage extends StatefulWidget {
 class _StylePageState extends State<StylePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   // Edition mode
-  bool _editable = false;
   bool _expanded = true;
   int _baskets = 0;
 
@@ -51,7 +50,7 @@ class _StylePageState extends State<StylePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context);
           }
@@ -87,14 +86,7 @@ class _StylePageState extends State<StylePage> {
             publish: false,
             filtered: false,
             archived: false,
-            units: true,
-            onSelected: (value) {
-              if (value is Unit) {
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
-              }
-            },
+            measures: true,
           )
         ],
       ),
@@ -331,8 +323,6 @@ class _StylePageState extends State<StylePage> {
         _baskets = basketProvider.size;
       });
     });
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
   }
 
   _edit(StyleModel model) {

@@ -25,6 +25,7 @@ class FermentableModel<T> extends Model {
   String? origin;
   double? amount;
   Method? use;
+  Unit? unit;
   double? efficiency;
   int? ebc;
   dynamic? notes;
@@ -39,6 +40,7 @@ class FermentableModel<T> extends Model {
     this.status = Status.publied,
     this.name,
     this.type = Type.grain,
+    this.unit = Unit.mass,
     this.origin,
     this.amount,
     this.use = Method.mashed,
@@ -88,6 +90,7 @@ class FermentableModel<T> extends Model {
       origin: this.origin,
       amount: this.amount,
       use: this.use,
+      unit: this.unit,
       efficiency: this.efficiency,
       ebc: this.ebc,
       notes: this.notes,
@@ -170,6 +173,7 @@ class FermentableModel<T> extends Model {
       if (model != null) {
         model.amount = item.amount;
         model.use = item.use != null ? Method.values.elementAt(item.use!) : Method.mashed;
+        model.unit = Unit.mass;
         values.add(model);
       }
     }
@@ -188,6 +192,7 @@ class FermentableModel<T> extends Model {
           model.uuid = item.uuid;
           model.amount = item.amount;
           model.use = item.use?.index;
+          if (item.unit != null) model.unit = item.unit;
           values.add(Quantity.serialize(model));
         }
         return values;

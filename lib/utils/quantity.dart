@@ -1,19 +1,19 @@
 // Internal package
-import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:flutter/cupertino.dart';
 
 class Quantity<T> {
   String? uuid;
   double? amount;
   int? duration;
   int? use;
+  Unit? unit;
 
   Quantity({
     this.uuid,
     this.amount,
     this.duration,
     this.use,
+    this.unit = Unit.mass,
   });
 
   void fromMap(Map<String, dynamic> map) {
@@ -21,6 +21,7 @@ class Quantity<T> {
     if (map['amount'] != null) this.amount = map['amount'].toDouble();
     this.duration = map['duration'];
     this.use = map['use'];
+    if (map.containsKey('unit')) this.unit = Unit.values.elementAt(map['unit']);
   }
 
   Map<String, dynamic> toMap() {
@@ -28,7 +29,8 @@ class Quantity<T> {
       'uuid': this.uuid,
       'amount': this.amount,
       'duration': this.duration,
-      'use': this.use
+      'use': this.use,
+      'unit': this.unit!.index,
     };
     return map;
   }
@@ -39,6 +41,7 @@ class Quantity<T> {
       amount: this.amount,
       duration: this.duration,
       use: this.use,
+      unit: this.unit,
     );
   }
 

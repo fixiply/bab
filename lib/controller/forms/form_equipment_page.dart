@@ -53,7 +53,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -96,14 +96,14 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
           CustomMenuButton(
             context: context,
             publish: false,
-            units: true,
+            measures: true,
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is CS.Unit) {
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
+              if (value is CS.Measure) {
+                // setState(() {
+                //   AppLocalizations.of(context)!.measure = value;
+                // });
                 _initialize();
               }
             },
@@ -120,6 +120,8 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
             });
           },
           child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               TextFormField(
                 initialValue: widget.model.name,
@@ -140,6 +142,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   return null;
                 }
               ),
+              Divider(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -155,7 +158,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       decoration: FormDecoration(
                           icon: const Icon(Icons.waves_outlined),
                           labelText: AppLocalizations.of(context)!.text('tank_volume'),
-                          suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                          suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                           border: InputBorder.none,
                           fillColor: FillColor, filled: true
                       ),
@@ -182,7 +185,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       decoration: FormDecoration(
                           icon: const Icon(Icons.waves_outlined),
                           labelText: AppLocalizations.of(context)!.text('mash_volume'),
-                          suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                          suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                           suffixIcon: Tooltip(
                             message: AppLocalizations.of(context)!.text('final_volume'),
                             child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
@@ -201,7 +204,10 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
-              if (widget.equipment == Equipment.tank) Divider(height: 10),
+              if (widget.equipment == Equipment.tank) Padding(
+                  padding: EdgeInsets.only(top: 16.0),
+                  child: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
+              ),
               if (widget.equipment == Equipment.tank) Row(
                 children: [
                   Expanded(
@@ -240,7 +246,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       decoration: FormDecoration(
                         icon: const Icon(Icons.propane_tank_outlined),
                         labelText: AppLocalizations.of(context)!.text('absorption_grains'),
-                        suffixText: '%',
+                        suffixText: 'L/Kg',
                         border: InputBorder.none,
                         fillColor: FillColor, filled: true
                       )
@@ -253,6 +259,24 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                 children: [
                   Expanded(
                     child: TextFormField(
+                      controller:  _lostController,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.propane_tank_outlined),
+                        labelText: AppLocalizations.of(context)!.text('lost_volume'),
+                        suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
+                      )
+                    )
+                  ),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.mash_ratio) ?? '',
                       keyboardType: TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
@@ -260,11 +284,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.propane_tank_outlined),
-                        labelText: AppLocalizations.of(context)!.text('mash_ratio'),
-                        suffixText: 'L/Kg',
-                        border: InputBorder.none,
-                        fillColor: FillColor, filled: true
+                          icon: const Icon(Icons.propane_tank_outlined),
+                          labelText: AppLocalizations.of(context)!.text('mash_ratio'),
+                          suffixText: 'L/Kg',
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -273,6 +297,31 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         }
                         return null;
                       }
+                    )
+                  ),
+                ]
+              ),
+              if (widget.equipment == Equipment.tank) Padding(
+                padding: EdgeInsets.only(top: 16.0),
+                child: Text(AppLocalizations.of(context)!.text('boiling'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
+              ),
+              if (widget.equipment == Equipment.tank) Row(
+                children: [
+                  Expanded(
+                    child: TextFormField(
+                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.boil_loss) ?? '',
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      onChanged: (value) {
+                        widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
+                      },
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.propane_tank_outlined),
+                          labelText: AppLocalizations.of(context)!.text('boil_loss'),
+                          suffixText: 'L/HR',
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                      )
                     )
                   ),
                   SizedBox(width: 12),
@@ -295,45 +344,24 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
-              if (widget.equipment == Equipment.tank) Divider(height: 10),
-              if (widget.equipment == Equipment.tank) Row(
-                  children: [
-                    Expanded(
-                      child: TextFormField(
-                        initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.boil_loss) ?? '',
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        onChanged: (value) {
-                          widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
-                          _calculate();
-                        },
-                        decoration: FormDecoration(
-                            icon: const Icon(Icons.propane_tank_outlined),
-                            labelText: AppLocalizations.of(context)!.text('boil_loss'),
-                            suffixText: 'L/HR',
-                            border: InputBorder.none,
-                            fillColor: FillColor, filled: true
-                        )
-                      )
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: TextFormField(
-                        controller:  _lostController,
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
-                        onChanged: (value) {
-                          widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
-                          _calculate();
-                        },
-                        decoration: FormDecoration(
-                            icon: const Icon(Icons.propane_tank_outlined),
-                            labelText: AppLocalizations.of(context)!.text('lost_volume'),
-                            suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
-                            border: InputBorder.none,
-                            fillColor: FillColor, filled: true
-                        )
-                      )
-                    ),
-                  ]
+              Divider(height: 10),
+              if (widget.equipment == Equipment.tank) SizedBox(
+                width: (MediaQuery.of(context).size.width / 2) - (DeviceHelper.isDesktop ? 170 : 50),
+                child: TextFormField(
+                  initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.head_loss) ?? '',
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    widget.model.head_loss = AppLocalizations.of(context)!.decimal(value);
+                    _calculate();
+                  },
+                  decoration: FormDecoration(
+                    icon: const Icon(Icons.propane_tank_outlined),
+                    labelText: AppLocalizations.of(context)!.text('head_loss'),
+                      suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                    border: InputBorder.none,
+                    fillColor: FillColor, filled: true
+                  )
+                )
               ),
               Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.notes = value,

@@ -29,6 +29,7 @@ class EquipmentModel<T> extends Model {
   double? mash_ratio;
   double? boil_loss;
   double? shrinkage;
+  double? head_loss;
   dynamic? notes;
   ImageModel? image;
 
@@ -51,6 +52,7 @@ class EquipmentModel<T> extends Model {
     this.mash_ratio,
     this.boil_loss = DEFAULT_BOIL_LOSS,
     this.shrinkage = DEFAULT_WORT_SHRINKAGE,
+    this.head_loss,
     this.notes,
     this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -69,6 +71,7 @@ class EquipmentModel<T> extends Model {
     if (map['mash_ratio'] != null) this.mash_ratio = map['mash_ratio'].toDouble();
     if (map['boil_loss'] != null) this.boil_loss = map['boil_loss'].toDouble();
     if (map['shrinkage'] != null) this.shrinkage = map['shrinkage'].toDouble();
+    if (map['head_loss'] != null) this.head_loss = map['head_loss'].toDouble();
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
   }
@@ -88,6 +91,7 @@ class EquipmentModel<T> extends Model {
       'mash_ratio': this.mash_ratio,
       'boil_loss': this.boil_loss,
       'shrinkage': this.shrinkage,
+      'head_loss': this.head_loss,
       'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
     });
@@ -112,6 +116,7 @@ class EquipmentModel<T> extends Model {
       mash_ratio: this.mash_ratio,
       boil_loss: this.boil_loss,
       shrinkage: this.shrinkage,
+      head_loss: this.head_loss,
       notes: this.notes,
       image: this.image,
     );
@@ -132,14 +137,13 @@ class EquipmentModel<T> extends Model {
   /// The `volume` argument is relative to the final volume.
   ///
   /// The `duration` argument is relative to the boil duration in minute.
-  double boil(double volume, {int duration = 60}) {
+  double preboilVolume(double volume, {int duration = 60}) {
     if (volume == null) {
       return 0;
     }
-    double loss_boil = boil_loss ?? DEFAULT_BOIL_LOSS;
-    double head_loss = shrinkage ?? DEFAULT_WORT_SHRINKAGE;
-    debugPrint('boil ($volume + ($loss_boil * ($duration / 60)))) * $head_loss');
-    return (volume + (loss_boil * (duration / 60))) * 1.04;
+    double boil_losses = boil_loss ?? DEFAULT_BOIL_LOSS;
+    double boil_off_rate = head_loss ?? DEFAULT_WORT_SHRINKAGE;
+    return FormulaHelper.preboilVolume(volume, boil_losses, boil_off_rate, duration: duration);
   }
 
   /// Returns the mash water, based on the given conditions.
@@ -157,7 +161,8 @@ class EquipmentModel<T> extends Model {
   ///
   /// The `duration` argument is relative to the boil duration in minute.
   double sparge(double volume, double weight, {int duration = 60}) {
-    return FormulaHelper.spargeWater(weight, boil(volume, duration: duration), mash(weight), absorption: absorption);
+    var preboil = preboilVolume(volume, duration: duration);
+    return FormulaHelper.spargeWater(weight, preboil, mash(weight), absorption: absorption);
   }
 
   static dynamic serialize(dynamic data) {

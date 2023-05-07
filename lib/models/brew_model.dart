@@ -33,6 +33,8 @@ class BrewModel<T> extends Model {
   double? mash_water;
   double? sparge_ph;
   double? sparge_water;
+  double? efficiency;
+  double? abv;
   double? og;
   double? fg;
   int? primaryday;
@@ -57,6 +59,8 @@ class BrewModel<T> extends Model {
     this.mash_water,
     this.sparge_ph = 5.2,
     this.sparge_water,
+    this.efficiency,
+    this.abv,
     this.og,
     this.fg,
     this.primaryday,
@@ -81,6 +85,8 @@ class BrewModel<T> extends Model {
     if (map['mash_water'] != null) this.mash_water = map['mash_water'].toDouble();
     if (map['sparge_ph'] != null) this.sparge_ph = map['sparge_ph'].toDouble();
     if (map['sparge_water'] != null) this.sparge_water = map['sparge_water'].toDouble();
+    if (map['efficiency'] != null) this.efficiency = map['efficiency'].toDouble();
+    if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['og'] != null) this.og = map['og'].toDouble();
     if (map['fg'] != null) this.fg = map['fg'].toDouble();
     this.primaryday = map['primaryday'];
@@ -104,6 +110,8 @@ class BrewModel<T> extends Model {
       'mash_water': this.mash_water,
       'sparge_ph': this.sparge_ph,
       'sparge_water': this.sparge_water,
+      'efficiency': this.efficiency,
+      'abv': this.abv,
       'og': this.og,
       'fg': this.fg,
       'primaryday': this.primaryday,
@@ -132,6 +140,8 @@ class BrewModel<T> extends Model {
       mash_water: this.mash_water,
       sparge_ph: this.sparge_ph,
       sparge_water: this.sparge_water,
+      efficiency: this.efficiency,
+      abv: this.abv,
       og: this.og,
       fg: this.fg,
       primaryday: this.primaryday,
@@ -193,10 +203,7 @@ class BrewModel<T> extends Model {
         }
       }
       mash_water = tank!.mash(weight);
-      debugPrint('mash_water $mash_water');
       sparge_water = tank!.sparge(volume!, weight, duration: receipt!.boil!);
-      debugPrint('sparge_water $sparge_water');
-
     } else {
       mash_water = null;
       sparge_water = null;

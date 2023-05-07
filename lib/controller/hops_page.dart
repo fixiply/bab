@@ -84,7 +84,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
         leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context, selected);
           }

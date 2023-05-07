@@ -2,13 +2,13 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/rating_model.dart';
+import 'package:bb/utils/rating.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatingDialog extends StatefulWidget {
-  RatingModel model;
+  Rating model;
   final String? hintText;
   final int? maxLines;
   RatingDialog(this.model, {this.hintText, this.maxLines});

@@ -39,7 +39,6 @@ class BrewPage extends StatefulWidget {
 
 class _BrewPageState extends State<BrewPage> {
   // Edition mode
-  bool _editable = false;
   bool _expanded = true;
   int _baskets = 0;
 
@@ -58,7 +57,7 @@ class _BrewPageState extends State<BrewPage> {
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
           leading: IconButton(
-            icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }
@@ -113,8 +112,8 @@ class _BrewPageState extends State<BrewPage> {
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
                               if (widget.model.receipt!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.receipt!.ebc)}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                              if (widget.model.receipt!.ibu != null) Text('IBU: ${widget.model.receipt!.localizedIBU(AppLocalizations.of(context)!.locale)}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                              if (widget.model.receipt!.abv != null) Text(widget.model.receipt!.localizedABV(AppLocalizations.of(context)!.locale)!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                              if (widget.model.receipt!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.receipt!.ibu)}', style: TextStyle(fontSize: 18, color: Colors.white)),
+                              if (widget.model.receipt!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.receipt!.abv)!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                             ],
                           ),
                         ),
@@ -156,14 +155,7 @@ class _BrewPageState extends State<BrewPage> {
               publish: false,
               filtered: false,
               archived: false,
-              units: true,
-              onSelected: (value) {
-                if (value is CS.Unit) {
-                  setState(() {
-                    AppLocalizations.of(context)!.unit = value;
-                  });
-                }
-              },
+              measures: true,
             )
           ],
         ),
@@ -194,7 +186,7 @@ class _BrewPageState extends State<BrewPage> {
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.all(8),
-                        child: Text('${AppLocalizations.of(context)!.text('tank')} : ${widget.model.tank!.name ?? '-'}'),
+                        child: Text('${AppLocalizations.of(context)!.text('tank')} : ${widget.model.tank!.name ?? '-'}', overflow: TextOverflow.ellipsis),
                       ),
                     ),
                     Expanded(
@@ -206,7 +198,7 @@ class _BrewPageState extends State<BrewPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
                               if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.volume == null) TextSpan(text: '-'),
                             ],
@@ -227,7 +219,7 @@ class _BrewPageState extends State<BrewPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'mash' : 'mash_water')} : '),
                               if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.mash_water == null) TextSpan(text: '-'),
                             ],
@@ -244,7 +236,7 @@ class _BrewPageState extends State<BrewPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'sparge' : 'sparge_water')} : '),
                               if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.mash_water == null) TextSpan(text: '-'),
                             ],
@@ -265,8 +257,9 @@ class _BrewPageState extends State<BrewPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'efficiency' : 'mash_efficiency')} : '),
+                              if (widget.model.efficiency != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.efficiency == null) TextSpan(text: '-'),
                             ],
                           ),
                         ),
@@ -281,8 +274,9 @@ class _BrewPageState extends State<BrewPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'alcohol' : 'volume_alcohol')} : '),
+                              if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.abv == null) TextSpan(text: '-')
                             ],
                           ),
                         ),
@@ -436,8 +430,6 @@ class _BrewPageState extends State<BrewPage> {
         _baskets = basketProvider.size;
       });
     });
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
   }
 
   _edit(BrewModel model) {

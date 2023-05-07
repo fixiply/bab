@@ -47,7 +47,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -90,14 +90,14 @@ class _FormYeastPageState extends State<FormYeastPage> {
           CustomMenuButton(
             context: context,
             publish: false,
-            units: true,
+            measures: true,
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is Unit) {
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
+              if (value is Measure) {
+                // setState(() {
+                //   AppLocalizations.of(context)!.measure = value;
+                // });
                 _initialize();
               }
             },
@@ -217,7 +217,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             onChanged: (value) => widget.model.tempmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
-                              suffixText: AppLocalizations.of(context)!.tempUnit,
+                              suffixText: AppLocalizations.of(context)!.tempMeasure,
                               border: InputBorder.none,
                               suffixIcon: Tooltip(
                                 message: 'Température minimum',
@@ -236,7 +236,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             onChanged: (value) => widget.model.tempmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
-                              suffixText: AppLocalizations.of(context)!.tempUnit,
+                              suffixText: AppLocalizations.of(context)!.tempMeasure,
                               border: InputBorder.none,
                               suffixIcon: Tooltip(
                                 message:  'Température maximale',

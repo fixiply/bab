@@ -22,6 +22,7 @@ class YeastModel<T> extends Model {
   Fermentation? type;
   Yeast? form;
   double? amount;
+  Unit? unit;
   double? cells;
   double? tempmin;
   double? tempmax;
@@ -43,6 +44,7 @@ class YeastModel<T> extends Model {
     this.type = Fermentation.hight,
     this.form = Yeast.dry,
     this.amount,
+    this.unit,
     this.cells,
     this.tempmin,
     this.tempmax,
@@ -102,6 +104,7 @@ class YeastModel<T> extends Model {
       type: this.type,
       form: this.form,
       amount: this.amount,
+      unit: this.unit,
       cells: this.cells,
       tempmin: this.tempmin,
       tempmax: this.tempmax,
@@ -210,6 +213,7 @@ class YeastModel<T> extends Model {
       YeastModel? model = await Database().getYeast(item.uuid!);
       if (model != null) {
         model.amount = item.amount;
+        model.unit = model.form == Yeast.liquid ? Unit.volume : Unit.mass;
         values.add(model);
       }
     }
@@ -227,6 +231,7 @@ class YeastModel<T> extends Model {
           Quantity model = new Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
+          if (item.unit != null) model.unit = item.unit;
           values.add(Quantity.serialize(model));
         }
         return values;

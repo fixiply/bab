@@ -39,10 +39,9 @@ mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   }
 }
 
-//Enums
-// enum Fermentable with Enums { grain, sugar, extract,  dry_extract, adjunct, fruit, juice, honey;
-//   List<Enum> get enums => [ grain, sugar, extract,  dry_extract, adjunct, fruit, juice, honey ];
-// }
+enum Unit with Enums { mass, volume, fraction;
+  List<Enum> get enums => [ mass, volume, fraction ];
+}
 enum Fermentation with Enums { hight, low, spontaneous;
   List<Enum> get enums => [ hight, low, spontaneous ];
 }
@@ -56,9 +55,11 @@ enum Period { day, week, month, year }
 enum Role with Enums { admin, editor, customer;
   List<Enum> get enums => [ admin, editor, customer ];
 }
+enum Acid { hydrochloric, phosphoric, lactic, sulfuric }
 enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size }
 enum Status { pending, publied, disabled }
-enum Unit { metric, imperial }
+enum Measure { metric, imperial }
+enum Gravity { sg, plato, brix }
 enum Weight { kilo, gram }
 
 //Colors

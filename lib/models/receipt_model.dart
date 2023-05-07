@@ -1,11 +1,11 @@
-import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/helpers/formula_helper.dart';
-import 'package:bb/models/hop_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bb/helpers/color_helper.dart';
+import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/hop_model.dart' as hop;
+import 'package:bb/models/hop_model.dart';
 import 'package:bb/models/image_model.dart';
 import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/model.dart';
@@ -15,8 +15,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/utils/mash.dart';
-import 'package:bb/utils/quantity.dart';
-import 'package:intl/intl.dart';
+import 'package:bb/utils/rating.dart';
 
 class ReceiptModel<T> extends Model {
   Status? status;
@@ -45,6 +44,7 @@ class ReceiptModel<T> extends Model {
   double? tertiarytemp;
   dynamic? notes;
   ImageModel? image;
+  List<Rating>? ratings;
 
   List<FermentableModel>? _fermentables;
   List<hop.HopModel>? _hops;
@@ -82,12 +82,14 @@ class ReceiptModel<T> extends Model {
     this.tertiarytemp,
     this.notes,
     this.image,
+    this.ratings,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     if (cacheFermentables == null) { cacheFermentables = []; }
     if (cacheHops == null) { cacheHops = []; }
     if (cacheMisc == null) { cacheMisc = []; }
     if (cacheYeasts == null) { cacheYeasts = []; }
     if (mash == null) { mash = []; }
+    if (ratings == null) { ratings = []; }
   }
 
   Future fromMap(Map<String, dynamic> map) async {
@@ -118,6 +120,7 @@ class ReceiptModel<T> extends Model {
     if (map['tertiarytemp'] != null) this.tertiarytemp = map['tertiarytemp'].toDouble();
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
+    this.ratings = Rating.deserialize(map['ratings']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -149,6 +152,7 @@ class ReceiptModel<T> extends Model {
       'tertiarytemp': this.tertiarytemp,
       'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
+      'ratings': Rating.serialize(this.ratings),
     });
     return map;
   }
@@ -185,6 +189,7 @@ class ReceiptModel<T> extends Model {
       tertiarytemp: this.tertiarytemp,
       notes: this.notes,
       image: this.image,
+      ratings: this.ratings
     )
       .._fermentables = _fermentables
       .._hops = _hops
@@ -195,6 +200,21 @@ class ReceiptModel<T> extends Model {
   // ignore: hash_and_equals
   bool operator ==(other) {
     return (other is ReceiptModel && other.uuid == uuid);
+  }
+
+  int get notice {
+    return this.ratings != null ? this.ratings!.length : 0;
+  }
+
+  double get rating {
+    double rating = 0;
+    if (ratings != null && ratings!.length > 0) {
+      for(Rating model in ratings!) {
+        rating += model.rating!;
+      }
+      rating = rating / ratings!.length;
+    }
+    return rating;
   }
 
   set fermentables(List<FermentableModel>data) => _fermentables = data;
@@ -248,34 +268,6 @@ class ReceiptModel<T> extends Model {
   @override
   String toString() {
     return 'Receipt: $title, UUID: $uuid';
-  }
-
-  String? localizedOG(Locale? locale) {
-    if (this.og != null) {
-      return NumberFormat("0.000", locale.toString()).format(og);
-    }
-    return '';
-  }
-
-  String? localizedFG(Locale? locale) {
-    if (this.fg != null) {
-      return NumberFormat("0.000", locale.toString()).format(fg);
-    }
-    return '';
-  }
-
-  String? localizedABV(Locale? locale) {
-    if (this.abv != null) {
-      return NumberFormat("#0.#", locale.toString()).format(abv) + '%';
-    }
-    return '';
-  }
-
-  String? localizedIBU(Locale? locale) {
-    if (this.ibu != null) {
-      return NumberFormat("#0.#", locale.toString()).format(ibu);
-    }
-    return '';
   }
 
   resizeFermentales(double? volume) {

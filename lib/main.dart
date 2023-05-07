@@ -35,7 +35,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 String? selectedNotificationPayload;
 
-final EditionNotifier editionNotifier = EditionNotifier();
+final ValuesNotifier editionNotifier = ValuesNotifier();
 final BasketNotifier basketNotifier = BasketNotifier();
 final LocaleNotifier localeNotifier = LocaleNotifier();
 
@@ -87,12 +87,6 @@ class _AppState extends State<MyApp> {
     });
   }
 
-  void onUnitChange(Unit unit) {
-    setState(() {
-      // AppLocalizations.of(context)!.setUnit(unit);
-    });
-  }
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -135,10 +129,9 @@ class _AppState extends State<MyApp> {
   }
 
   _initialize() async {
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    provider.setEdition(prefs.getBool(EDITION_MODE_KEY) ?? false);
-    provider.setEditable(prefs.getBool(EDIT_KEY) ?? false);
+    // SharedPreferences prefs = await SharedPreferences.getInstance();
+    // provider.setEdition(prefs.getBool(EDITION_MODE_KEY) ?? false);
+    // provider.setEditable(prefs.getBool(EDIT_KEY) ?? false);
   }
 
   _authStateChanges() async {

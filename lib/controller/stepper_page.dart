@@ -1,3 +1,4 @@
+import 'package:bb/widgets/containers/ph_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -9,7 +10,7 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/database.dart';
-import 'package:bb/utils/mash.dart';
+import 'package:bb/utils/mash.dart' as Mash;
 import 'package:bb/widgets/circular_timer.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
@@ -89,7 +90,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
           leading: IconButton(
-            icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }
@@ -216,7 +217,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               GaugeAnnotation(
                   angle: 90,
                   positionFactor: 0.35,
-                  widget: Text('Temp.${AppLocalizations.of(context)!.tempUnit}', style: TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
+                  widget: Text('Temp.${AppLocalizations.of(context)!.tempMeasure}', style: TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
               GaugeAnnotation(
                 angle: 90,
                 positionFactor: 0.8,
@@ -281,16 +282,33 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: 2,
-        title: Text('Ajouter l\'eau'),
+        title: Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
         content: Container(
           alignment: Alignment.centerLeft,
-          child: Row(
-            children: [
-              Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water)} d\'eau dans votre cuve')
-            ]
+          child: PHContainer(
+            target: widget.model.mash_ph,
+            volume: widget.model.volume,
           )
         ),
       ),
+      MyStep(
+        index: 3,
+        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(50)}'),
+        content: Container(
+          alignment: Alignment.centerLeft,
+          padding: EdgeInsets.all(8.0),
+          child: SizedBox(
+            width: 140,
+            height: 140,
+            child: _temp,
+          )
+        ),
+      ),
+      MyStep(
+        index: 4,
+        title: Text('Ajouter le grain'),
+        content: Container()
+      )
     ];
     await _mashs(receipt, steps);
     steps.add(MyStep(
@@ -358,55 +376,49 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   _mashs(ReceiptModel receipt, List<MyStep> steps) {
     for(int i = 0 ; i < receipt.mash!.length ; i++) {
-      Mash mash = receipt.mash![i];
-      steps.add(MyStep(
-        index: steps.length,
-        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(mash.temperature)}'),
-        content: Container(
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: 140,
-            height: 140,
-            child: _temp,
-          )
-        ),
-      ));
-      if (i == 0) {
+      if (receipt.mash![i].type == Mash.Type.infusion) {
         steps.add(MyStep(
           index: steps.length,
-          title: Text('Ajouter le grain'),
-          content: Container(),
+          title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)}'),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.all(8.0),
+            child: SizedBox(
+              width: 140,
+              height: 140,
+              child: _temp,
+            )
+          ),
           onStepContinue: (int index) {
             if (!_mashController.isStarted) {
               _mashController.restart(duration: _mash * 60);
             }
           }
         ));
-      }
-      steps.add(MyStep(
-        index: steps.length,
-        title: Text('Empâtage pendant ${_mash} minutes'),
-        content: Container(
-          alignment: Alignment.centerLeft,
-          padding: EdgeInsets.all(8.0),
-          child: CircularTimer(_mashController,
-            duration: _mash * 60,
-            index: steps.length,
-            onChange: (String timeStamp) {
-              debugPrint('Countdown Changed $timeStamp');
-            },
-            onComplete: (int index) {
-              steps[index].completed = true;
+        steps.add(MyStep(
+          index: steps.length,
+          title: Text('Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant ${_mash} minutes'),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            padding: EdgeInsets.all(8.0),
+            child: CircularTimer(_mashController,
+                duration: _mash * 60,
+                index: steps.length,
+                onChange: (String timeStamp) {
+                  debugPrint('Countdown Changed $timeStamp');
+                },
+                onComplete: (int index) {
+                  steps[index].completed = true;
+                }
+            )
+          ),
+          onStepContinue: (int index) {
+            if (!steps[index].completed) {
+              throw 'Le processus n\'est pas terminé.';
             }
-          )
-        ),
-        onStepContinue: (int index) {
-          if (!steps[index].completed) {
-            throw 'Le processus n\'est pas terminé.';
           }
-        }
-      ));
+        ));
+      }
     };
   }
 

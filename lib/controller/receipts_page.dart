@@ -95,15 +95,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
             publish: false,
             filtered: false,
             archived: false,
-            units: true,
-            onSelected: (value) {
-              if (value is Unit) {
-                _clear();
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
-              }
-            },
+            measures: true,
           )
         ]
       ),
@@ -264,9 +256,9 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
                 children: <TextSpan>[
                   if (model.style != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.style!.name), style: TextStyle(fontWeight: FontWeight.bold)),
                   if (model.style != null && (model.ibu != null || model.abv != null)) TextSpan(text: '  -  '),
-                  if (model.ibu != null) TextSpan(text: 'IBU: ${model.localizedIBU(AppLocalizations.of(context)!.locale)}'),
+                  if (model.ibu != null) TextSpan(text: 'IBU: ${AppLocalizations.of(context)!.numberFormat(model.ibu)}'),
                   if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
-                  if (model.abv != null) TextSpan(text: ' ABV: ${model.localizedABV(AppLocalizations.of(context)!.locale)}'),
+                  if (model.abv != null) TextSpan(text: ' ABV: ${AppLocalizations.of(context)!.percentFormat(model.abv)}'),
                 ],
               ),
             ),

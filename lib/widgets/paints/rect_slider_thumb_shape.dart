@@ -5,12 +5,12 @@ import 'package:syncfusion_flutter_sliders/sliders.dart';
 class RectSliderThumbShape extends SfThumbShape {
   final thumbRadius;
   final thumbHeight;
-  final format;
+  final String? Function(double value)? onFormatted;
 
   const RectSliderThumbShape({
     this.thumbRadius = 8,
     this.thumbHeight = 45,
-    this.format,
+    this.onFormatted,
   });
 
   @override
@@ -57,9 +57,6 @@ class RectSliderThumbShape extends SfThumbShape {
   }
 
   String getValue(double value) {
-    if (format != null) {
-      return format.format(value != null ? value: 0);
-    }
-    return value.toString();
+    return onFormatted?.call(value) ?? value.toString();
   }
 }

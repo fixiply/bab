@@ -3,6 +3,7 @@ import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
+import 'package:bb/utils/rating.dart';
 import 'package:bb/utils/term.dart';
 
 enum Product with Enums { article, booking, other;
@@ -24,6 +25,7 @@ class ProductModel<T> extends Model {
   Term? term;
   dynamic? text;
   ImageModel? image;
+  List<Rating>? ratings;
 
   ProductModel({
     String? uuid,
@@ -43,10 +45,12 @@ class ProductModel<T> extends Model {
     this.weekdays,
     this.term,
     this.text,
-    this.image
+    this.image,
+    this.ratings
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     if(weekdays == null) { weekdays = []; }
     if(term == null) { term = Term(); }
+    if (ratings == null) { ratings = []; }
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -65,6 +69,7 @@ class ProductModel<T> extends Model {
     if (map['term'] != null) this.term = Term.deserialize(map['term']);
     this.text = LocalizedText.deserialize(map['text']);
     this.image = ImageModel.fromJson(map['image']);
+    this.ratings = Rating.deserialize(map['ratings']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -83,7 +88,8 @@ class ProductModel<T> extends Model {
       'weekdays': this.weekdays,
       'term': Term.serialize(this.term),
       'text': LocalizedText.serialize(this.text),
-      'image': ImageModel.serialize(this.image)
+      'image': ImageModel.serialize(this.image),
+      'ratings': Rating.serialize(this.ratings),
     });
     return map;
   }
@@ -107,7 +113,8 @@ class ProductModel<T> extends Model {
       weekdays: this.weekdays,
       term: this.term,
       text: this.text,
-      image: this.image
+      image: this.image,
+      ratings: this.ratings
     );
   }
 
@@ -120,19 +127,19 @@ class ProductModel<T> extends Model {
   String toString() {
     return 'Product: $title, UUID: $uuid';
   }
-  //
-  // int notice() {
-  //   return this.ratings != null ? this.ratings!.length : 0;
-  // }
-  //
-  // double rating() {
-  //   double rating = 0;
-  //   if (ratings != null && ratings!.length > 0) {
-  //     for(RatingModel model in ratings!) {
-  //       rating += model.rating!;
-  //     }
-  //     rating = rating / ratings!.length;
-  //   }
-  //   return rating;
-  // }
+
+  int get notice {
+    return this.ratings != null ? this.ratings!.length : 0;
+  }
+
+  double get rating {
+    double rating = 0;
+    if (ratings != null && ratings!.length > 0) {
+      for(Rating model in ratings!) {
+        rating += model.rating!;
+      }
+      rating = rating / ratings!.length;
+    }
+    return rating;
+  }
 }

@@ -78,7 +78,8 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
           future: widget.receipt!.getFermentables(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return FermentablesDataTable(key: _datatableKey,
+              return FermentablesDataTable(
+                key: _datatableKey,
                 data: snapshot.data,
                 title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
                 color: FillColor,

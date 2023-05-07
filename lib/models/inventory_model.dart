@@ -54,7 +54,7 @@ class InventoryModel<T> extends Model {
     map.addAll({
       'status': this.status!.index,
       'type': this.type,
-      'ingredient': this.ingredient != null ? this.ingredient!.uuid : null,
+      'ingredient': this.ingredient != null ? this.ingredient!.creator : null,
       'amount': this.amount,
     });
     return map;

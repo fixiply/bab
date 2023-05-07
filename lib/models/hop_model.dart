@@ -31,6 +31,7 @@ class HopModel<T> extends Model {
   Hop? form;
   Type? type;
   Use? use;
+  Unit? unit;
   int? duration;
   dynamic? notes;
 
@@ -50,6 +51,7 @@ class HopModel<T> extends Model {
     this.form = Hop.pellet,
     this.type = Type.both,
     this.use = Use.boil,
+    this.unit,
     this.duration,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -102,6 +104,7 @@ class HopModel<T> extends Model {
       form: this.form,
       type: this.type,
       use: this.use,
+      unit: this.unit,
       duration: this.duration,
       notes: this.notes,
     );
@@ -194,6 +197,7 @@ class HopModel<T> extends Model {
         model.amount = item.amount;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
+        model.unit = Unit.mass;
         values.add(model);
       }
     }
@@ -213,6 +217,7 @@ class HopModel<T> extends Model {
           model.amount = item.amount;
           model.duration = item.duration;
           model.use = item.use?.index;
+          if (item.unit != null) model.unit = item.unit;
           values.add(Quantity.serialize(model));
         }
         return values;

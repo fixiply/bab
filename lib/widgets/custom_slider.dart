@@ -15,10 +15,11 @@ class CustomSlider extends StatelessWidget {
   double max;
   double interval;
   NumberFormat? format;
+  String? Function(double value)? onFormatted;
 
   bool error = false;
 
-  CustomSlider(this.label, this.value, this.min, this.max, this.interval, {this.format}) {
+  CustomSlider(this.label, this.value, this.min, this.max, this.interval, {this.onFormatted}) {
     if (value < min) {
       error = true;
       value = min;
@@ -48,7 +49,7 @@ class CustomSlider extends StatelessWidget {
             interval: interval,
             min: min,
             max: max,
-            thumbShape: RectSliderThumbShape(format: format),
+            thumbShape: RectSliderThumbShape(onFormatted: onFormatted!),
             minorTicksPerInterval: 1,
             value: value,
             onChanged: (dynamic values) {

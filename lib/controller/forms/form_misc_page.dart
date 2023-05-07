@@ -36,7 +36,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -79,7 +79,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
           CustomMenuButton(
             context: context,
             publish: false,
-            units: false,
+            measures: false,
             filtered: false,
             archived: false,
           )

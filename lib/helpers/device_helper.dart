@@ -17,6 +17,13 @@ class DeviceHelper {
     return false;
   }
 
+  static bool isSmallScreen(BuildContext context) {
+    if (isMobile(context) && MediaQuery.of(context).orientation == Orientation.portrait) {
+      return true;
+    }
+    return false;
+  }
+
   static bool get isDesktop {
     return Foundation.kIsWeb || Foundation.defaultTargetPlatform == TargetPlatform.linux || Foundation.defaultTargetPlatform == TargetPlatform.windows || Foundation.defaultTargetPlatform == TargetPlatform.macOS;
   }

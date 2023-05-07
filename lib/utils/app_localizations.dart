@@ -15,10 +15,11 @@ import 'package:intl/intl.dart';
 
 class AppLocalizations {
   final Locale locale;
-  Unit unit;
+  Measure measure;
+  Gravity gravity;
   static Map<dynamic, dynamic>? _localisedValues;
 
-  AppLocalizations(this.locale, this.unit) {
+  AppLocalizations(this.locale, this.measure, this.gravity) {
     _localisedValues = null;
   }
 
@@ -27,11 +28,12 @@ class AppLocalizations {
   }
 
   static Future<AppLocalizations> load(Locale locale) async {
-    Unit unit = Unit.metric;
+    Measure measure = Measure.metric;
+    Gravity gravity = Gravity.sg;
     if (locale.countryCode == 'US') {
-      unit = Unit.imperial;
+      measure = Measure.imperial;
     }
-    AppLocalizations appTranslations = AppLocalizations(locale, unit);
+    AppLocalizations appTranslations = AppLocalizations(locale, measure, gravity);
     String jsonContent = await rootBundle.loadString("assets/locales/${locale.languageCode}.json");
     _localisedValues = json.decode(jsonContent);
     return appTranslations;
@@ -57,29 +59,29 @@ class AppLocalizations {
     return ':';
   }
 
-  String get liquidUnit {
-    if (unit == Unit.imperial) {
+  String get liquid {
+    if (measure == Measure.imperial) {
       return text('gallons');
     }
     return text('liters');
   }
 
   String get colorUnit {
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       return 'SRM';
     }
     return 'EBC';
   }
 
-  String get tempUnit {
-    if (unit == Unit.imperial) {
+  String get tempMeasure {
+    if (measure == Measure.imperial) {
       return '°F';
     }
     return '°C';
   }
 
   int get maxColor {
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       return 40;
     }
     return 80;
@@ -114,11 +116,11 @@ class AppLocalizations {
   }
 
   /// Returns the formatted decimal.
-  String? numberFormat(number, {String newPattern = "#0.#", String? symbol}) {
+  String? numberFormat(number, {String pattern = "#0.#", String? symbol}) {
     if (number == null) {
       return null;
     }
-    return NumberFormat(newPattern, currentLanguage).format(number) + (symbol ?? '');
+    return NumberFormat(pattern, currentLanguage).format(number) + (symbol ?? '');
   }
 
   /// Returns the formatted currency.
@@ -134,7 +136,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       return NumberFormat("#0.#°F", currentLanguage).format(number);
     }
     return NumberFormat("#0.#°C", currentLanguage).format(number);
@@ -170,7 +172,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       number = FormulaHelper.convertGramToOunce(number);
       var suffix = ' oz';
       if (number >= 10) {
@@ -192,7 +194,7 @@ class AppLocalizations {
   ///
   /// The `weight` argument is relative to the number in grams.
   String? weightSuffix({Weight? weight = Weight.gram}) {
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       if (weight == Weight.gram) {
         return 'oz';
       }
@@ -212,7 +214,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       number = FormulaHelper.convertGramToOunce(number);
       if (weight == Weight.kilo) {
         number = FormulaHelper.convertOunceToLivre(number);
@@ -233,7 +235,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       if (weight == Weight.kilo) {
         number = FormulaHelper.convertLivreToOunce(number);
       }
@@ -253,7 +255,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       return this.numberFormat(FormulaHelper.convertLiterToGallon(number), symbol: (symbol == true ? ' gal' : null));
     }
     return this.numberFormat(number, symbol: (symbol == true ? ' L' : null));
@@ -264,7 +266,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       return FormulaHelper.convertGallonToLiter(number);
     }
     return number;
@@ -277,7 +279,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       return this.numberFormat(ColorHelper.toSRM(number));
     }
     return this.numberFormat(number);
@@ -288,17 +290,30 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (unit == Unit.imperial) {
+    if (measure == Measure.imperial) {
       number = ColorHelper.toSRM(number);
     }
     return number > maxColor ? maxColor : number;
   }
 
   int? fromSRM(number) {
-    if (number != null && unit == Unit.imperial) {
+    if (number != null && measure == Measure.imperial) {
       return ColorHelper.toEBC(number);
     }
     return number;
+  }
+
+  /// Returns the formatted gravity.
+  String? gravityFormat(number) {
+    if (number == null) {
+      return null;
+    }
+    if (gravity == Gravity.plato) {
+      return this.numberFormat(FormulaHelper.convertSGToPlato(number), symbol: '°P');
+    } else if (gravity == Gravity.brix) {
+      return this.numberFormat(FormulaHelper.convertSGToBrix(number), symbol: '°Bx');
+    }
+    return numberFormat(number, pattern: '0.000');
   }
 }
 

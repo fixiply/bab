@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bb/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class FormulaHelper {
@@ -104,6 +105,22 @@ class FormulaHelper {
       return 0;
     }
     return rate * (volume * 1000) * plato(og) / (cells * 1000);
+  }
+
+  /// Returns the mash water, based on the given conditions.
+  ///
+  /// The `volume` argument is relative to the final volume.
+  ///
+  /// The `boil_losses` argument is relative to the boil loss.
+  ///
+  /// The `boil_off_rate` argument is relative to the trub and chiller loss.
+  ///
+  /// The `duration` argument is relative to the boil duration in minute.
+  static double preboilVolume(double? volume, double? boil_losses, double? boil_off_rate, {int duration = 60}) {
+    if (volume == null || boil_losses == null || boil_off_rate == null) {
+      return 0;
+    }
+    return volume + boil_losses + (boil_off_rate * (duration / 60));
   }
 
   /// Returns the mash water, based on the given conditions.
@@ -215,6 +232,65 @@ class FormulaHelper {
       return 0;
     }
     return (number * 9/5) + 32;
+  }
+
+  /// Returns the specific gravity to plato gravity
+  ///
+  /// The `number` argument is relative to the specific gravity.
+  static double convertSGToPlato(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return (-1 * 616.868) + (1111.14 * number) - (630.272 * pow(number,2)) + (135.997 * pow(number,3));
+  }
+
+  /// Returns the plato gravity to specific gravity
+  ///
+  /// The `number` argument is relative to the plato gravity.
+  static double convertPlatoToSG(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return 1 + (number / (258.6 - ( (number / 258.2) * 227.1)));
+  }
+
+  /// Returns the specific gravity to brix
+  ///
+  /// The `number` argument is relative to the specific gravity.
+  static double convertSGToBrix(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return (((182.4601 * number -775.6821) * number + 1262.7794) * number - 669.5622);
+  }
+
+  /// Returns the brix to specific gravity
+  ///
+  /// The `number` argument is relative to the brix.
+  static double convertBrixToSG(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return (number / (258.6 - ((number / 258.2) * 227.1))) + 1;
+  }
+
+  /// Returns the brix to specific gravity
+  ///
+  /// The `number` argument is relative to the brix.
+  static double pH(double? current, double? target, double? volume, Acid? acid, double? concentration) {
+    if (current == null || target == null || volume == null || acid == null || concentration == null) {
+      return 0;
+    }
+    switch(acid) {
+      case Acid.hydrochloric:
+        return (0.02 * volume * (current - target)) / (concentration * 1.25);
+      case Acid.phosphoric:
+        return  (volume * (current - target)) / (10 * (concentration / 100));
+      case Acid.lactic:
+        return concentration * volume * (current - target) / 5.9;
+      case Acid.sulfuric:
+        return concentration * volume * (target - current) / 2;
+    }
   }
 }
 

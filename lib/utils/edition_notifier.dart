@@ -1,16 +1,20 @@
+import 'package:bb/utils/constants.dart';
 import 'package:flutter/foundation.dart';
 
-class EditionNotifier with ChangeNotifier {
-  bool edition = false;
-  bool editable = false;
+class ValuesNotifier with ChangeNotifier {
+  Measure _measure = Measure.metric;
+  Gravity _gravity = Gravity.sg;
 
-  void setEdition(bool value){
-    edition = value;
+  Measure get measure => _measure;
+  Gravity get gravity => _gravity;
+
+  void set measure(Measure value){
+    _measure = value;
     notifyListeners();
   }
 
-  void setEditable(bool value){
-    editable = value;
+  void set gravity(Gravity value){
+    _gravity = value;
     notifyListeners();
   }
 }

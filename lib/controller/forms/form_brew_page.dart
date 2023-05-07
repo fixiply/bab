@@ -53,7 +53,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -117,14 +117,14 @@ class _FormBrewPageState extends State<FormBrewPage> {
           CustomMenuButton(
             context: context,
             publish: false,
-            units: true,
+            measures: true,
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is CS.Unit) {
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
+              if (value is CS.Measure) {
+                // setState(() {
+                //   AppLocalizations.of(context)!.measure = value;
+                // });
                 _initialize();
               }
             },
@@ -306,7 +306,10 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 icon: Icon(Icons.delete_outline),
                 initialValue: widget.model.tank,
                 title: AppLocalizations.of(context)!.text('equipment'),
-                onChanged: (value) => widget.model.tank = value,
+                onChanged: (value) {
+                  widget.model.tank = value;
+                  _calculate();
+                },
                 validator: (value) {
                   if (value == null) {
                     return AppLocalizations.of(context)!.text('validator_field_required');
@@ -336,7 +339,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 decoration: FormDecoration(
                   icon: const Icon(Icons.waves_outlined),
                   labelText: AppLocalizations.of(context)!.text('mash_volume'),
-                  suffixText: AppLocalizations.of(context)!.liquidUnit.toLowerCase(),
+                  suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                   suffixIcon: Tooltip(
                     message: AppLocalizations.of(context)!.text('final_volume'),
                     child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
@@ -453,7 +456,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
     if (_autogenerate && widget.model.uuid == null) {
       var newDate = DateTime.now();
       List<BrewModel> brews = await Database().getBrews(user: CS.currentUser!.uuid, ordered: true);
-      widget.model.reference = '${newDate.year.toString()}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, newPattern: "000")}';
+      widget.model.reference = '${newDate.year.toString()}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, pattern: "000")}';
       _identifierController.text = widget.model.reference!;
     }
   }

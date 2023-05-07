@@ -1,3 +1,4 @@
+import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/mash.dart';
 import 'package:flutter/material.dart';
 
@@ -132,7 +133,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
 
   _add() async {
     setState(() {
-      widget.data!.insert(0, Mash(name: 'Saccharification', duration: widget.receipt!.boil));
+      widget.data!.insert(0, Mash(name: AppLocalizations.of(context)!.text(Bearing.mash_in.toString()), duration: widget.receipt!.boil));
     });
     _dataSource.buildDataGridRows(widget.data!);
     _dataSource.notifyListeners();

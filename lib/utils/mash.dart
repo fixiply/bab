@@ -11,8 +11,8 @@ import 'package:bb/utils/localized_text.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-enum Bearing with Enums { protein, amylolytique, saccharification, mash_out;
-  List<Enum> get enums => [ protein, amylolytique, saccharification, mash_out];
+enum Bearing with Enums { protein, amylolytique, mash_in, mash_out;
+  List<Enum> get enums => [ protein, amylolytique, mash_in, mash_out];
 }
 
 enum Type with Enums { infusion, temperature, decoction;

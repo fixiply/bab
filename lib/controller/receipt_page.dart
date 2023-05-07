@@ -1,3 +1,4 @@
+import 'package:bb/widgets/dialogs/rating_dialog.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -21,9 +22,10 @@ import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
+import 'package:bb/utils/rating.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
+import 'package:bb/widgets/containers/ratings_container.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/custom_slider.dart';
 import 'package:bb/widgets/paints/bezier_clipper.dart';
@@ -34,7 +36,7 @@ import 'package:bb/widgets/paints/gradient_slider_track_shape.dart';
 // External package
 import 'package:badges/badges.dart' as badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:intl/intl.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 
 class ReceiptPage extends StatefulWidget {
@@ -44,10 +46,15 @@ class ReceiptPage extends StatefulWidget {
 }
 
 class _ReceiptPageState extends State<ReceiptPage> {
+  GlobalKey _keyReviews = GlobalKey();
+  final ScrollController _controller = ScrollController();
+
   // Edition mode
-  bool _editable = false;
   bool _expanded = true;
   int _baskets = 0;
+
+  double _rating = 0;
+  int _notices = 0;
 
   @override
   void initState() {
@@ -64,7 +71,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
           leading: IconButton(
-            icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }
@@ -107,7 +114,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                       alignment: Alignment.center,
                       children: [
                         ClipPath(
-                          clipper: CircleClipper(radius: 65), //set our custom wave clipper
+                          clipper: CircleClipper(), //set our custom wave clipper
                           child: Container(
                             color: Theme.of(context).primaryColor,
                           ),
@@ -118,9 +125,50 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              if (widget.model.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.ebc)}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                              if (widget.model.ibu != null) Text('IBU: ${widget.model.localizedIBU(AppLocalizations.of(context)!.locale)}', style: TextStyle(fontSize: 18, color: Colors.white)),
-                              if (widget.model.abv != null) Text(widget.model.localizedABV(AppLocalizations.of(context)!.locale)!, style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                              if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+                              RatingBar.builder(
+                                initialRating: _rating,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemSize: 18,
+                                itemPadding: EdgeInsets.zero,
+                                itemBuilder: (context, _) => Icon(
+                                  Icons.star,
+                                  color: Colors.amber,
+                                ),
+                                tapOnlyMode: true,
+                                ignoreGestures: false,
+                                onRatingUpdate: (rating) async {
+                                  RenderBox box = _keyReviews.currentContext!.findRenderObject() as RenderBox;
+                                  Offset position = box.localToGlobal(Offset.zero); //this is global position
+                                  _controller.animateTo(
+                                    position.dy,
+                                    duration: Duration(seconds: 1),
+                                    curve: Curves.fastOutSlowIn,
+                                  );
+                                  dynamic? rating = await showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return RatingDialog(
+                                            Rating(
+                                              creator: currentUser!.user!.uid,
+                                              name: currentUser!.user!.displayName,
+                                              rating: 0
+                                            ),
+                                            maxLines: 3
+                                        );
+                                      }
+                                  );
+                                  if (rating != null) {
+                                    setState(() {
+                                      widget.model.ratings!.add(rating);
+                                    });
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 3),
+                              Text('${_notices} ${AppLocalizations.of(context)!.text('reviews')}', style: TextStyle(color: Colors.white)),
                             ],
                           ),
                         ),
@@ -161,14 +209,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               publish: false,
               filtered: false,
               archived: false,
-              units: true,
-              onSelected: (value) {
-                if (value is Unit) {
-                  setState(() {
-                    AppLocalizations.of(context)!.unit = value;
-                  });
-                }
-              },
+              measures: true,
             )
           ],
         ),
@@ -182,17 +223,23 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   children: [
                     Expanded(
                       child: CustomSlider(AppLocalizations.of(context)!.text('oiginal_gravity'), widget.model.og ?? 1, 1, 1.2, 0.01,
-                        format: NumberFormat("0.000", AppLocalizations.of(context)!.locale.toString())
+                        onFormatted: (double value) {
+                          return AppLocalizations.of(context)!.gravityFormat(value);
+                        },
                       )
                     ),
                     Expanded(
                       child: CustomSlider(AppLocalizations.of(context)!.text('final_gravity'), widget.model.fg ?? 1, 1, 1.2, 0.01,
-                        format: NumberFormat("0.000", AppLocalizations.of(context)!.locale.toString())
+                        onFormatted: (double value) {
+                          return AppLocalizations.of(context)!.gravityFormat(value);
+                        },
                       )
                     ),
                     Expanded(
                       child: CustomSlider(AppLocalizations.of(context)!.text('abv'), widget.model.abv ?? 0, 0, MAX_ABV, 0.1,
-                        format: NumberFormat("#0.#'%'", AppLocalizations.of(context)!.locale.toString())
+                        onFormatted: (double value) {
+                          return AppLocalizations.of(context)!.numberFormat(value, pattern: "#0.#'%'");
+                        },
                       )
                     )
                   ]
@@ -228,7 +275,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     ),
                     Expanded(
                       child: CustomSlider(AppLocalizations.of(context)!.text('ibu'), widget.model.ibu ?? 0, 0, MAX_IBU, 0.1,
-                          format: NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString())
+                        onFormatted: (double value) {
+                          return AppLocalizations.of(context)!.numberFormat(value);
+                        },
                       )
                     ),
                   ]
@@ -248,7 +297,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     Expanded(
                       child: Padding(
                         padding: EdgeInsets.all(8),
-                        child: Text('${AppLocalizations.of(context)!.text('style')} : ${AppLocalizations.of(context)!.localizedText(widget.model.style!.name) ?? '-'}')
+                        child: Text('${AppLocalizations.of(context)!.text('style')} : ${AppLocalizations.of(context)!.localizedText(widget.model.style!.name) ?? '-'}', overflow: TextOverflow.ellipsis)
                       ),
                     ),
                     Expanded(
@@ -260,7 +309,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('pasting_efficiency')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'efficiency' : 'pasting_efficiency')} : '),
                               TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
@@ -280,7 +329,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
                               TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
@@ -296,7 +345,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text('boiling_time')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'boiling' : 'boiling_time')} : '),
                               TextSpan(text: AppLocalizations.of(context)!.tempFormat(widget.model.boil), style: TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
@@ -346,7 +395,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 )
             ])
           ),
-          ),
+        ),
         SliverList(
           delegate: SliverChildListDelegate([
             FutureBuilder<List<FermentableModel>>(
@@ -424,6 +473,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
           ]
         )),
         SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
+        if (widget.model.ratings!.isNotEmpty) SliverToBoxAdapter(
+          child: RatingsContainer(widget.model)
+         )
         ]
       ),
       floatingActionButton: FloatingActionButton(
@@ -444,8 +496,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
         _baskets = basketProvider.size;
       });
     });
-    final provider = Provider.of<EditionNotifier>(context, listen: false);
-    _editable = provider.editable;
   }
 
   _edit(ReceiptModel model) {

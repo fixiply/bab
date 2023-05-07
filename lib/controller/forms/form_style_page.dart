@@ -49,7 +49,7 @@ class _FormStylePageState extends State<FormStylePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isDesktop ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -92,14 +92,14 @@ class _FormStylePageState extends State<FormStylePage> {
           CustomMenuButton(
             context: context,
             publish: false,
-            units: true,
+            measures: true,
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is Unit) {
-                setState(() {
-                  AppLocalizations.of(context)!.unit = value;
-                });
+              if (value is Measure) {
+                // setState(() {
+                //   AppLocalizations.of(context)!.measure = value;
+                // });
                 _initialize();
               }
             },

@@ -82,14 +82,7 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
               publish: false,
               filtered: false,
               archived: false,
-              units: true,
-              onSelected: (value) {
-                if (value is Unit) {
-                  setState(() {
-                    AppLocalizations.of(context)!.unit = value;
-                  });
-                }
-              },
+              measures: true,
             )
           ],
           bottom: PreferredSize(

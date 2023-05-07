@@ -14,7 +14,7 @@ import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/models/purchase_model.dart';
-import 'package:bb/models/rating_model.dart';
+import 'package:bb/utils/rating.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/user_model.dart';
@@ -72,7 +72,7 @@ class Database {
       return products;
     } else if (o is PurchaseModel) {
       return purchases;
-    } else if (o is RatingModel) {
+    } else if (o is Rating) {
       return ratings;
     } else if (o is ReceiptModel) {
       return receipts;
@@ -404,8 +404,8 @@ class Database {
     return list;
   }
 
-  Future<List<RatingModel>> getRatings({String? beer, bool ordered = false}) async {
-    List<RatingModel> list = [];
+  Future<List<Rating>> getRatings({String? beer, bool ordered = false}) async {
+    List<Rating> list = [];
     Query query = ratings;
     if (beer != null) {
       query = query.where('beer', isEqualTo: beer);
@@ -413,8 +413,8 @@ class Database {
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       result.docs.forEach((doc) {
-        RatingModel model = RatingModel();
-        model.uuid = doc.id;
+        Rating model = Rating();
+        model.creator = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
       });
