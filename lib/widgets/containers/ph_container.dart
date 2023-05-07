@@ -109,7 +109,6 @@ class _PHContainerState extends State<PHContainer> {
             )
           ]
         ),
-
         if (_quantity != null && _quantity! > 0) SizedBox(
           width: 312,
           child: Container(
