@@ -73,12 +73,14 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         showCheckboxColumn: widget.showCheckboxColumn!,
         onChanged: (YeastModel value, int dataRowIndex) {
           var amount = value.amount;
-          /// Calculate if null
-          if (amount == null) {
-            amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, value.cells!, rate: value.pitchingRate(widget.receipt!.og));
-          }
-          if (widget.data != null) {
-            widget.data![dataRowIndex].amount = amount;
+          if (value.form == Yeast.dry) {
+            if (amount == null) {
+              amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, value.cells!,
+                rate: value.pitchingRate(widget.receipt!.og));
+            }
+            if (widget.data != null) {
+              widget.data![dataRowIndex].amount = amount;
+            }
           }
           widget.onChanged?.call(widget.data ?? [ value ]);
         }

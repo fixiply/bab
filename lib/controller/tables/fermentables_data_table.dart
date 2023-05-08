@@ -385,7 +385,7 @@ class FermentableDataSource extends EditDataSource {
       case 'amount':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
+        _data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue, weight: Weight.kilo);
         break;
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =

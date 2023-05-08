@@ -1,4 +1,3 @@
-import 'package:bb/widgets/containers/ph_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -11,14 +10,17 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/mash.dart' as Mash;
+import 'package:bb/utils/notifications.dart';
 import 'package:bb/widgets/circular_timer.dart';
 import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/containers/ph_container.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
 // External package
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
+import 'package:uuid/uuid.dart';
 
 class StepperPage extends StatefulWidget {
   final BrewModel model;
@@ -408,6 +410,11 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   debugPrint('Countdown Changed $timeStamp');
                 },
                 onComplete: (int index) {
+                  Notifications().showNotification(
+                    Uuid().hashCode,
+                    'BeAndBrew',
+                    body: 'Le Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
+                  );
                   steps[index].completed = true;
                 }
             )
@@ -455,12 +462,20 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             ) : CircularTimer(_hopController,
               duration: hops[i].duration! * 60,
               index: steps.length,
+              onComplete: (int index) {
+                // Notifications().showNotification(
+                //     Uuid().hashCode,
+                //     'BeAndBrew',
+                //     body: 'Le Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
+                // );
+                steps[index].completed = true;
+              }
             )
             // child: timer
           ),
           onStepContinue: (int index) {
             _hopController.restart(duration: hops[i].duration! * 60);
-          }
+          },
         ));
         children = [];
       }

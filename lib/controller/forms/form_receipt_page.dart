@@ -272,12 +272,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       initialValue: widget.model.style,
                       title: AppLocalizations.of(context)!.text('style'),
                       onChanged: (value) => widget.model.style = value,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return AppLocalizations.of(context)!.text('validator_field_required');
-                        }
-                        return null;
-                      }
                     ),
                   ),
                   SizedBox(width: 12),

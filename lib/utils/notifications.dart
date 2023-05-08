@@ -41,6 +41,10 @@ class Notifications {
         requestBadgePermission: true,
         requestSoundPermission: true
     );
+    // final MacOSInitializationSettings initializationSettingsMacOS = MacOSInitializationSettings(
+    //     requestAlertPermission: false,
+    //     requestBadgePermission: false,
+    //     requestSoundPermission: false);
     final LinuxInitializationSettings initializationSettingsLinux = LinuxInitializationSettings(
       defaultActionName: 'Open notification',
       defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
@@ -48,6 +52,7 @@ class Notifications {
     final InitializationSettings initializationSettings = InitializationSettings(
       android: initializationSettingsAndroid,
       iOS: initializationSettingsDarwin,
+      macOS: initializationSettingsDarwin,
       linux: initializationSettingsLinux,
     );
 

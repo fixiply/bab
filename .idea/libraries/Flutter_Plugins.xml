@@ -21,7 +21,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/file_picker-5.2.7" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_messaging-14.4.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/firebase_core-2.9.0" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_local_notifications-13.0.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/google_sign_in-6.1.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/shared_preferences_foundation-2.2.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/cloud_firestore_web-3.4.0" />
@@ -51,6 +50,7 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/url_launcher_ios-6.1.4" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/google_sign_in_android-6.1.9" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_native_timezone-2.0.0" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_local_notifications-14.0.0+1" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

@@ -133,7 +133,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
 
   _add() async {
     setState(() {
-      widget.data!.insert(0, Mash(name: AppLocalizations.of(context)!.text(Bearing.mash_in.toString()), duration: widget.receipt!.boil));
+      widget.data!.insert(0, Mash(name: AppLocalizations.of(context)!.text(Bearing.mash_in.toString().toLowerCase()), duration: widget.receipt!.boil));
     });
     _dataSource.buildDataGridRows(widget.data!);
     _dataSource.notifyListeners();

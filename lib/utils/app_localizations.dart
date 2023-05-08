@@ -238,12 +238,13 @@ class AppLocalizations {
     if (measure == Measure.imperial) {
       if (weight == Weight.kilo) {
         number = FormulaHelper.convertLivreToOunce(number);
+        number = number / 1000;
       }
       number =  FormulaHelper.convertOunceToGram(number);
     }
-    if (weight == Weight.kilo) {
-      number = number / 1000;
-    }
+    // if (weight == Weight.kilo) {
+    //   number = number * 1000;
+    // }
     return number;
   }
 
