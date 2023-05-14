@@ -1,3 +1,4 @@
+import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/formula_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -30,84 +31,87 @@ class _PHContainerState extends State<PHContainer> {
       mainAxisSize: MainAxisSize.min,
       children: [
         Text('Ajustement du pH'),
-        Row(
-          children: [
-            SizedBox(
-              width: 150,
-              child: TextFormField(
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  _current = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  labelText: 'pH actuel',
-                  border: InputBorder.none,
-                  fillColor: BlendColor, filled: true
-                )
+        SizedBox(
+          width: DeviceHelper.isLargeScreen(context) ? 320: null,
+          child: Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    _current = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                    _calculate();
+                  },
+                  decoration: FormDecoration(
+                    labelText: 'pH actuel',
+                    border: InputBorder.none,
+                    fillColor: BlendColor, filled: true
+                  )
+                ),
               ),
-            ),
-            SizedBox(width: 12),
-            SizedBox(
-              width: 150,
-              child: TextFormField(
-                initialValue: widget.target?.toString() ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
-                onChanged: (value) {
-                  widget.target = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  labelText: 'pH cible',
-                  border: InputBorder.none,
-                  fillColor: BlendColor, filled: true
+              SizedBox(width: 12),
+              Expanded(
+                child: TextFormField(
+                  initialValue: widget.target?.toString() ?? '',
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (value) {
+                    widget.target = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                    _calculate();
+                  },
+                  decoration: FormDecoration(
+                    labelText: 'pH cible',
+                    border: InputBorder.none,
+                    fillColor: BlendColor, filled: true
+                  )
                 )
               )
-            )
-          ]
+            ]
+          ),
         ),
         SizedBox(height: 6),
-        Row(
-          children: [
-            SizedBox(
-              width: 220,
-              child: DropdownButtonFormField<Acid>(
-                style: TextStyle(overflow: TextOverflow.ellipsis),
-                onChanged: (value) {
-                  _acid = value;
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  labelText: AppLocalizations.of(context)!.text('acids'),
-                  fillColor: BlendColor,
-                  filled: true,
+        SizedBox(
+          width: DeviceHelper.isLargeScreen(context) ? 320: null,
+          child:Row(
+            children: [
+              Expanded(
+                flex: 2,
+                child: DropdownButtonFormField<Acid>(
+                  style: TextStyle(overflow: TextOverflow.ellipsis),
+                  onChanged: (value) {
+                    _acid = value;
+                    _calculate();
+                  },
+                  decoration: FormDecoration(
+                    labelText: AppLocalizations.of(context)!.text('acids'),
+                    fillColor: BlendColor,
+                    filled: true,
+                  ),
+                  items: Acid.values.map((Acid display) {
+                    return DropdownMenuItem<Acid>(
+                        value: display,
+                        child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                  }).toList()
                 ),
-                items: Acid.values.map((Acid display) {
-                  return DropdownMenuItem<Acid>(
-                      value: display,
-                      child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
-                }).toList()
               ),
-            ),
-            SizedBox(width: 12),
-            SizedBox(
-              width: 80,
-              child: TextFormField(
-                initialValue: _concentration?.toString() ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: false),
-                onChanged: (value) {
-                  _concentration = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                  _calculate();
-                },
-                decoration: FormDecoration(
-                  labelText: 'Concentration',
-                  suffixText: '%',
-                  border: InputBorder.none,
-                  fillColor: BlendColor, filled: true
-                ),
+              SizedBox(width: 12),
+              Expanded(
+                child: TextFormField(
+                  initialValue: _concentration?.toString() ?? '',
+                  keyboardType: TextInputType.numberWithOptions(decimal: false),
+                  onChanged: (value) {
+                    _concentration = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                    _calculate();
+                  },
+                  decoration: FormDecoration(
+                    labelText: 'Concentration',
+                    suffixText: '%',
+                    border: InputBorder.none,
+                    fillColor: BlendColor, filled: true
+                  ),
+                )
               )
-            )
-          ]
+            ]
+          )
         ),
         if (_quantity != null && _quantity! > 0) SizedBox(
           width: 312,

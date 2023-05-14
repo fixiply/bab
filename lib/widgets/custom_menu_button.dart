@@ -107,17 +107,17 @@ abstract class _CustomMenuButton extends PopupMenuButton {
             itemBuilder: (_) {
               return [
                 CheckedPopupMenuItem(
-                  child: Text('SG'),
+                  child: Text(AppLocalizations.of(context)!.text('gravity')),
                   value: Gravity.sg,
                   checked: Gravity.sg == AppLocalizations.of(context)!.gravity,
                 ),
                 CheckedPopupMenuItem(
-                  child: Text('Plato'),
+                  child: Text('Plato °P'),
                   value: Gravity.plato,
                   checked: Gravity.plato == AppLocalizations.of(context)!.gravity,
                 ),
                 CheckedPopupMenuItem(
-                  child: Text('Brix'),
+                  child: Text('Brix °Bx'),
                   value: Gravity.brix,
                   checked: Gravity.brix == AppLocalizations.of(context)!.gravity,
                 ),

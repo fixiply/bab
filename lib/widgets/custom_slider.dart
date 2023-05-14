@@ -53,9 +53,6 @@ class CustomSlider extends StatelessWidget {
             minorTicksPerInterval: 1,
             value: value,
             onChanged: (dynamic values) {
-              // setState(() {
-              //   _thumbValue = values as double;
-              // });
             },
           )
         )

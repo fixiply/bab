@@ -130,6 +130,13 @@ class YeastModel<T> extends Model {
     return null;
   }
 
+  double? get temperature {
+    if (this.tempmin != null && this.tempmax != null) {
+      return (this.tempmin! + this.tempmax!) / 2;
+    }
+    return null;
+  }
+
   /// Returns the pitching rate, based on the given conditions.
   ///
   /// The `og` argument is relative to the original gravity 1.xxx.

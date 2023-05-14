@@ -159,15 +159,16 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
                         }
                       },
                       columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null),
+                      tableSummaryRows: FermentableDataSource.summaries(context: context, showQuantity: widget.data != null),
                     );
                   }
                   if (snapshot.hasError) {
                     return ErrorContainer(snapshot.error.toString());
                   }
                   return Center(
-                      child: ImageAnimateRotate(
-                        child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
-                      )
+                    child: ImageAnimateRotate(
+                      child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                    )
                   );
                 }
               ),
@@ -224,8 +225,8 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FermentablesPage(showCheckboxColumn: true, selectionMode: SelectionMode.singleDeselect);
     })).then((values) {
-      if (values != null) {
-        if (widget.data != null) {
+      if (values != null && values!.isNotEmpty) {
+        if (widget.data != null && widget.data!.isNotEmpty) {
           values.first.amount = widget.data![rowIndex].amount;
           values.first.use = widget.data![rowIndex].use;
           widget.data![rowIndex] = values.first;
@@ -326,7 +327,7 @@ class FermentableDataSource extends EditDataSource {
           alignment = Alignment.centerLeft;
         } else if (e.value is num) {
           if (e.columnName == 'amount') {
-            value = AppLocalizations.of(context)!.weightFormat(e.value * 1000);
+            value = AppLocalizations.of(context)!.kiloWeightFormat(e.value);
           } else if (e.columnName == 'efficiency') {
             value = AppLocalizations.of(context)!.percentFormat(e.value);
           } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
@@ -347,11 +348,15 @@ class FermentableDataSource extends EditDataSource {
           }
         }
         if (e.columnName == 'color') {
-          return Container(
-            margin: EdgeInsets.all(4),
-            color: ColorHelper.color(e.value),
-            child: Center(child: Text(value ?? '', style: TextStyle(color: Colors.white, fontSize: 14)))
-          );
+          Color? color = ColorHelper.color(e.value);
+          if (color != null) {
+            return Container(
+              margin: EdgeInsets.all(4),
+              color: color,
+              child: Center(child: Text(value ?? '', style: TextStyle(color: Colors.white, fontSize: 14)))
+            );
+          }
+          return Container();
         }
         if (e.columnName == 'origin') {
           if (value != null) {
@@ -370,6 +375,21 @@ class FermentableDataSource extends EditDataSource {
         );
       }).toList()
     );
+  }
+
+  @override
+  Widget? buildTableSummaryCellWidget(GridTableSummaryRow summaryRow, GridSummaryColumn? summaryColumn, RowColumnIndex rowColumnIndex, String summaryValue) {
+    if (summaryValue.isNotEmpty) {
+      return Container(
+        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.centerRight,
+        child: Text(AppLocalizations.of(context)!.kiloWeightFormat(double.parse(summaryValue)) ?? '0',
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontWeight: FontWeight.w500)
+        ),
+      );
+    }
   }
 
   @override
@@ -501,6 +521,22 @@ class FermentableDataSource extends EditDataSource {
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
+      ),
+    ];
+  }
+
+  static List<GridTableSummaryRow> summaries({required BuildContext context, bool showQuantity = false}) {
+    return <GridTableSummaryRow>[
+      if (showQuantity == true) GridTableSummaryRow(
+        showSummaryInRow: false,
+        columns: <GridSummaryColumn>[
+          const GridSummaryColumn(
+            name: 'amount',
+            columnName: 'amount',
+            summaryType: GridSummaryType.sum
+          ),
+        ],
+        position: GridTableSummaryRowPosition.bottom
       ),
     ];
   }

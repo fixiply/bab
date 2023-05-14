@@ -301,7 +301,7 @@ class TankDataSource extends EditDataSource {
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
             if (e.columnName == 'amount') {
-              value = AppLocalizations.of(context)!.weightFormat(e.value * 1000);
+              value = AppLocalizations.of(context)!.kiloWeightFormat(e.value);
             } else if (e.columnName == 'efficiency') {
               value = AppLocalizations.of(context)!.percentFormat(e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);

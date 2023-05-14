@@ -211,7 +211,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
             Container(
               // color: SRM[model.getSRM()],
               child: Image.asset('assets/images/beer_1.png',
-                color: ColorHelper.color(model.ebc) ?? SRM_COLORS[0],
+                color: ColorHelper.color(model.ebc) ?? Colors.white,
                 colorBlendMode: BlendMode.modulate
               ),
               width: 30,

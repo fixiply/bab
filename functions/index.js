@@ -1,7 +1,12 @@
 'use strict';
 
+const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const nodemailer = require('nodemailer');
+
+admin.initializeApp();
+
+const firestore = admin.firestore();
 
 // Configure the email transport using the default SMTP transport.
 const mailTransport = nodemailer.createTransport({
@@ -48,5 +53,31 @@ exports.sendEmailConfirmation = functions.firestore.document('users/{uid}').onWr
             error
         );
     }
+    return null;
+});
+
+exports.updates = functions.https.onRequest(async (req, res) => {
+    const collection = firestore.collection('yeasts');
+    const snapshot = await collection.get();
+    if (snapshot.empty) {
+        console.log('No matching notifications.');
+        return;
+    }
+    snapshot.forEach(async doc => {
+        const rec = doc.data();
+        if (rec.cells != null) {
+            try {
+                functions.logger.log(`Yeast:`, rec.name);
+                rec.cells = rec.cells / 11.5;
+                await doc.ref.set(rec);
+            }
+            catch (error) {
+                functions.logger.error(
+                    'There was an error update:',
+                    error
+                );
+            }
+        }
+    });
     return null;
 });

@@ -15,6 +15,7 @@ class EditSfDataGrid extends SfDataGrid {
   EditSfDataGrid(BuildContext context, {
     required EditDataSource source,
     required List<GridColumn> columns,
+    List<GridTableSummaryRow>? tableSummaryRows,
     this.onRemove,
     this.onEdit,
     SelectionChangedCallback? onSelectionChanged,
@@ -29,6 +30,7 @@ class EditSfDataGrid extends SfDataGrid {
   }) : super(
     source: source,
     columns: columns,
+    tableSummaryRows: tableSummaryRows ?? <GridTableSummaryRow>[],
     rowHeight: 40.0,
     controller: controller,
     onSelectionChanged: onSelectionChanged,
@@ -41,6 +43,7 @@ class EditSfDataGrid extends SfDataGrid {
     shrinkWrapRows: true,
     showCheckboxColumn: showCheckboxColumn,
     selectionMode: selectionMode,
+    // columnWidthCalculationRange: ColumnWidthCalculationRange.allRows,
     verticalScrollPhysics: verticalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
     horizontalScrollPhysics: horizontalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
     loadMoreViewBuilder: loadMoreRows == true ? (BuildContext context, LoadMoreRows loadMoreRows) {
@@ -114,5 +117,4 @@ class EditSfDataGrid extends SfDataGrid {
       );
     },
   );
-
 }

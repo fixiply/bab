@@ -85,7 +85,7 @@ class _BrewPageState extends State<BrewPage> {
                       Container(
                         padding: EdgeInsets.only(left: 30),
                         child: Image.asset('assets/images/beer_1.png',
-                          color: ColorHelper.color(widget.model.receipt!.ebc) ?? SRM_COLORS[0],
+                          color: ColorHelper.color(widget.model.receipt!.ebc) ?? Colors.white,
                           colorBlendMode: BlendMode.modulate
                         ),
                       ),
@@ -199,7 +199,7 @@ class _BrewPageState extends State<BrewPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
-                              if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.volume == null) TextSpan(text: '-'),
                             ],
                           ),
@@ -220,7 +220,7 @@ class _BrewPageState extends State<BrewPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'mash' : 'mash_water')} : '),
-                              if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.mash_water == null) TextSpan(text: '-'),
                             ],
                           ),
@@ -237,7 +237,7 @@ class _BrewPageState extends State<BrewPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'sparge' : 'sparge_water')} : '),
-                              if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.mash_water == null) TextSpan(text: '-'),
                             ],
                           ),
@@ -293,7 +293,7 @@ class _BrewPageState extends State<BrewPage> {
             FutureBuilder<List<FermentableModel>>(
               future: widget.model.receipt!.getFermentables(volume: widget.model.volume),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: FermentablesDataTable(
@@ -309,7 +309,7 @@ class _BrewPageState extends State<BrewPage> {
             FutureBuilder<List<HopModel>>(
               future: widget.model.receipt!.gethops(volume: widget.model.volume),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: HopsDataTable(
@@ -325,7 +325,7 @@ class _BrewPageState extends State<BrewPage> {
             FutureBuilder<List<YeastModel>>(
               future: widget.model.receipt!.getYeasts(volume: widget.model.volume),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: YeastsDataTable(
@@ -341,7 +341,7 @@ class _BrewPageState extends State<BrewPage> {
             FutureBuilder<List<MiscModel>>(
               future: widget.model.receipt!.getMisc(volume: widget.model.volume),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: MiscDataTable(

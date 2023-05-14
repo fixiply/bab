@@ -577,11 +577,17 @@ class Database {
     return null;
   }
 
-  Future<List<YeastModel>> getYeasts({String? name, String? searchText, bool ordered = false}) async {
+  Future<List<YeastModel>> getYeasts({String? name, String? reference, String? laboratory, String? searchText, bool ordered = false}) async {
     List<YeastModel> list = [];
     Query query = yeasts;
     if (name != null) {
       query = query.where('name', isEqualTo: name);
+    }
+    if (reference != null) {
+      query = query.where('reference', isEqualTo: reference);
+    }
+    if (laboratory != null) {
+      query = query.where('laboratory', isEqualTo: laboratory);
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {

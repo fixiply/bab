@@ -99,7 +99,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                       Container(
                         padding: EdgeInsets.only(left: 30),
                         child: Image.asset('assets/images/beer_1.png',
-                          color: ColorHelper.color(widget.model.ebc) ?? SRM_COLORS[0],
+                          color: ColorHelper.color(widget.model.ebc) ?? Colors.white,
                           colorBlendMode: BlendMode.modulate
                         ),
                       ),
@@ -330,7 +330,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.volumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -401,7 +401,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             FutureBuilder<List<FermentableModel>>(
               future: widget.model.getFermentables(),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: FermentablesDataTable(
@@ -417,7 +417,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             FutureBuilder<List<HopModel>>(
               future: widget.model.gethops(),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: HopsDataTable(
@@ -433,7 +433,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             FutureBuilder<List<YeastModel>>(
               future: widget.model.getYeasts(),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: YeastsDataTable(
@@ -449,7 +449,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             FutureBuilder<List<MiscModel>>(
               future: widget.model.getMisc(),
               builder: (context, snapshot) {
-                if (snapshot.hasData) {
+                if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
                     padding: EdgeInsets.all(8.0),
                     child: MiscDataTable(

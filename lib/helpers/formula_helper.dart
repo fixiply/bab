@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:flutter/material.dart';
 
@@ -76,23 +77,13 @@ class FormulaHelper {
     return 1.65 * pow(0.000125, og) * ((1 - pow(e, -0.04 * duration)) / maximum) * ((alpha * amount * 1000) / volume) * 100;
   }
 
-  /// Returns the plato degree, based on the given conditions.
-  ///
-  /// The `number` argument is relative to the gravity 1.xxx.
-  static double plato(double? number) {
-    if (number == null) {
-      return 0;
-    }
-    return ((number - 1) * 1000) / 4;
-  }
-
   /// Returns the yeast seeding rate, based on the given conditions.
   ///
   /// The `og` argument is relative to the original gravity 1.xxx.
   ///
   /// The `volume` argument is relative to the final volume.
   ///
-  /// The `cells` argument is relative to the cells per gram.
+  /// The `cells` argument is relative to the viable billion cells per gram.
   ///
   /// The `rate` argument is relative to the pitching rate.
   /// Minimum manufacturer's recommendation: 0.35 (ale only, fresh yeast only)
@@ -100,11 +91,34 @@ class FormulaHelper {
   /// Pro Brewer 1.00 (high gravity ale)
   /// Pro Brewer 1.50 (minimum for lager)
   /// Pro Brewer 2.0 (high gravity lager)
-  static double yeast(double? og, double? volume, double cells, {double rate = 0.75}) {
-    if (og == null || volume == null || cells == null) {
+  static double yeast(double? og, double? volume, {Yeast form = Yeast.dry, double cells = 100, double rate = 0.75}) {
+    if (og == null || volume == null) {
       return 0;
     }
-    return rate * (volume * 1000) * plato(og) / (cells * 1000);
+    var bc = billionCells(og, volume, rate: rate);
+    if (form == Yeast.liquid) {
+      return  (bc / cells);
+    }
+    return bc / (cells / 10);
+  }
+
+  /// Returns the billion cells, based on the given conditions.
+  ///
+  /// The `og` argument is relative to the original gravity 1.xxx.
+  ///
+  /// The `volume` argument is relative to the final volume.
+  ///
+  /// The `rate` argument is relative to the pitching rate.
+  /// Minimum manufacturer's recommendation: 0.35 (ale only, fresh yeast only)
+  /// Middle of the road Pro Brewer 0.75 (ale)
+  /// Pro Brewer 1.00 (high gravity ale)
+  /// Pro Brewer 1.50 (minimum for lager)
+  /// Pro Brewer 2.0 (high gravity lager)
+  static int billionCells(double? og, double? volume, {double rate = 0.75}) {
+    if (og == null || volume == null) {
+      return 0;
+    }
+    return ((rate * 1000000)  * (volume * 1000) * convertSGToBrix(og) / 1000000000).round();
   }
 
   /// Returns the mash water, based on the given conditions.

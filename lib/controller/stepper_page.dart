@@ -125,7 +125,15 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                         if (_index > _lastIndex) _lastIndex = _index;
                       });
                     } catch (e) {
-                      _showSnackbar(e.toString());
+                      _showSnackbar(e.toString(), action: SnackBarAction(
+                        label: 'Continue',
+                        onPressed: () {
+                          setState(() {
+                            _index += 1;
+                            if (_index > _lastIndex) _lastIndex = _index;
+                          });
+                        },
+                      ));
                     }
                   }
                 },
@@ -273,7 +281,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: snapshot.data!.map((e) {
-                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount! * 1000)} de ${AppLocalizations.of(context)!.localizedText(e.name)}.'));
+                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.kiloWeightFormat(e.amount)} de ${AppLocalizations.of(context)!.localizedText(e.name)}.'));
                   }).toList()
                 );
               }
@@ -284,7 +292,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: 2,
-        title: Text('Ajoutez ${AppLocalizations.of(context)!.volumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
+        title: Text('Ajoutez ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
         content: Container(
           alignment: Alignment.centerLeft,
           child: PHContainer(
@@ -330,6 +338,11 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           child: _temp,
         )
       ),
+      onStepContinue: (int index) {
+        if (!_mashController.isStarted) {
+          _mashController.restart(duration: _mash * 60);
+        }
+      }
     ));
     await _hops(receipt, steps);
     steps.add(MyStep(
@@ -482,11 +495,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     });
   }
 
-  _showSnackbar(String message) {
+  _showSnackbar(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 10)
+        duration: Duration(seconds: 10),
+        action: action,
       )
     );
   }

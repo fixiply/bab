@@ -259,9 +259,9 @@ class _FermentersPageState extends State<FermentersPage> with AutomaticKeepAlive
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank_volume')}: ${AppLocalizations.of(context)!.volumeFormat(model.volume)}'),
+                  if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.volume)}'),
                   if (model.volume != null || model.mash_volume != null) TextSpan(text: '  -  '),
-                  if (model.mash_volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')}: ${AppLocalizations.of(context)!.volumeFormat(model.mash_volume)}'),
+                  if (model.mash_volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.mash_volume)}'),
                 ],
               ),
             ),

@@ -135,26 +135,34 @@ class _FormYeastPageState extends State<FormYeastPage> {
                 }
               ),
               Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.reference ?? '',
-                onChanged: (value) => widget.model.reference = value,
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.tag),
-                  labelText: AppLocalizations.of(context)!.text('reference'),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                ),
-              ),
-              Divider(height: 10),
-              TextFormField(
-                initialValue: widget.model.laboratory ?? '',
-                onChanged: (value) => widget.model.laboratory = value,
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.biotech_outlined),
-                  labelText: AppLocalizations.of(context)!.text('laboratory'),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
-                ),
+              Row(
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: widget.model.reference ?? '',
+                        onChanged: (value) => widget.model.reference = value,
+                        decoration: FormDecoration(
+                          icon: const Icon(Icons.tag),
+                          labelText: AppLocalizations.of(context)!.text('reference'),
+                          border: InputBorder.none,
+                          fillColor: FillColor, filled: true
+                        ),
+                      ),
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: TextFormField(
+                        initialValue: widget.model.laboratory ?? '',
+                        onChanged: (value) => widget.model.laboratory = value,
+                        decoration: FormDecoration(
+                            icon: const Icon(Icons.biotech_outlined),
+                            labelText: AppLocalizations.of(context)!.text('laboratory'),
+                            border: InputBorder.none,
+                            fillColor: FillColor, filled: true
+                        ),
+                      )
+                    ),
+                  ]
               ),
               Divider(height: 10),
               DropdownButtonFormField<Fermentation>(
@@ -187,8 +195,8 @@ class _FormYeastPageState extends State<FormYeastPage> {
                 onChanged: (value) => widget.model.cells = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Icon(Icons.scatter_plot_outlined),
-                    labelText: AppLocalizations.of(context)!.text('cells'),
-                    suffixText: '%',
+                    labelText: AppLocalizations.of(context)!.text('viable_cells'),
+                    suffixText: AppLocalizations.of(context)!.text('billions').toLowerCase() + '/' + AppLocalizations.of(context)!.text('gram').toLowerCase(),
                     border: InputBorder.none,
                     fillColor: FillColor, filled: true
                 ),
@@ -256,7 +264,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
                     decoration: FormDecoration(
-                      icon: const Text('IBU'),
+                      icon: const Icon(Icons.attribution_outlined),
                     ),
                     child: Row(
                       children: [

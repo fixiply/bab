@@ -226,7 +226,18 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
                   if (model.laboratory != null) TextSpan(text: model.laboratory!, style: TextStyle(fontWeight: FontWeight.bold)),
                   if (model.laboratory != null) TextSpan(text: '  -  '),
                   TextSpan(text: '${AppLocalizations.of(context)!.text('type')}: ${AppLocalizations.of(context)!.text(model.type.toString().toLowerCase())}'),
-                  if (model.attenuation != null) TextSpan(text: '   ${AppLocalizations.of(context)!.text('attenuation')}: ${AppLocalizations.of(context)!.percentFormat(model.attenuation)}'),
+                ],
+              ),
+            ),
+            RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(text: '${AppLocalizations.of(context)!.text('attenuation')}: ${AppLocalizations.of(context)!.percentFormat(model.attenuation)}'),
+                  if (model.temperature != null) TextSpan(text: ' -  ${AppLocalizations.of(context)!.text('temperature')}: ${AppLocalizations.of(context)!.tempFormat(model.temperature)}'),
+                  if (model.cells != null) TextSpan(text: ' -  ${AppLocalizations.of(context)!.text('cells')}: ${AppLocalizations.of(context)!.numberFormat(model.cells)}'),
                 ],
               ),
             ),

@@ -120,8 +120,8 @@ class ColorHelper {
   static Color? color(int? ebc) {
     if (ebc != null) {
       int srm = ColorHelper.toSRM(ebc);
-      if (srm < 0) return SRM_COLORS[0];
-      if (srm < SRM_COLORS.length) return SRM_COLORS[srm];
+      if (srm <= 0) return null;
+      if (srm < SRM_COLORS.length) return SRM_COLORS[srm-1];
       if (srm >= SRM_COLORS.length) return SRM_COLORS[SRM_COLORS.length-1];
     }
     return null;

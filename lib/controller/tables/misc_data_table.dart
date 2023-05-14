@@ -167,15 +167,16 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
                         }
                       },
                       columns: MiscDataSource.columns(context: context, showQuantity: widget.data != null),
+                      // tableSummaryRows: MiscDataSource.summaries(context: context, showQuantity: widget.data != null),
                     );
                   }
                   if (snapshot.hasError) {
                     return ErrorContainer(snapshot.error.toString());
                   }
                   return Center(
-                      child: ImageAnimateRotate(
-                        child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
-                      )
+                    child: ImageAnimateRotate(
+                      child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                    )
                   );
                 }
               ),
@@ -232,8 +233,8 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return MiscPage(showCheckboxColumn: true, selectionMode: SelectionMode.singleDeselect);
     })).then((values) {
-      if (values != null) {
-        if (widget.data != null) {
+      if (values != null && values?.isNotEmpty) {
+        if (widget.data != null && widget.data!.isNotEmpty) {
           values.first.amount = widget.data![rowIndex].amount;
           values.first.use = widget.data![rowIndex].use;
           values.first.duration = widget.data![rowIndex].duration;
@@ -363,6 +364,21 @@ class MiscDataSource extends EditDataSource {
   }
 
   @override
+  Widget? buildTableSummaryCellWidget(GridTableSummaryRow summaryRow, GridSummaryColumn? summaryColumn, RowColumnIndex rowColumnIndex, String summaryValue) {
+    if (summaryValue.isNotEmpty) {
+      return Container(
+        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.centerRight,
+        child: Text(AppLocalizations.of(context)!.weightFormat(double.parse(summaryValue)) ?? '0',
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(fontWeight: FontWeight.w500)
+        ),
+      );
+    }
+  }
+
+  @override
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
     final dynamic oldValue = dataGridRow.getCells()
         .firstWhere((DataGridCell dataGridCell) =>
@@ -460,6 +476,22 @@ class MiscDataSource extends EditDataSource {
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('time'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
+      ),
+    ];
+  }
+
+  static List<GridTableSummaryRow> summaries({required BuildContext context, bool showQuantity = false}) {
+    return <GridTableSummaryRow>[
+      if (showQuantity == true) GridTableSummaryRow(
+          showSummaryInRow: false,
+          columns: <GridSummaryColumn>[
+            const GridSummaryColumn(
+                name: 'amount',
+                columnName: 'amount',
+                summaryType: GridSummaryType.sum
+            ),
+          ],
+          position: GridTableSummaryRowPosition.bottom
       ),
     ];
   }

@@ -73,9 +73,13 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         showCheckboxColumn: widget.showCheckboxColumn!,
         onChanged: (YeastModel value, int dataRowIndex) {
           var amount = value.amount;
-          if (value.form == Yeast.dry) {
+          if (value.form == Yeast.dry || value.form == Yeast.liquid) {
             if (amount == null) {
-              amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, value.cells!,
+              amount = FormulaHelper.yeast(
+                widget.receipt!.og,
+                widget.receipt!.volume,
+                form: value.form!,
+                cells: value.cells!,
                 rate: value.pitchingRate(widget.receipt!.og));
             }
             if (widget.data != null) {
@@ -173,6 +177,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                         }
                       },
                       columns: YeastDataSource.columns(context: context, showQuantity: widget.data != null),
+                      // tableSummaryRows: YeastDataSource.summaries(context: context, showQuantity: widget.data != null),
                     );
                   }
                   if (snapshot.hasError) {
@@ -218,7 +223,13 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         if (values != null) {
           if (widget.data != null) {
             for(YeastModel model in values) {
-              var amount = FormulaHelper.yeast(widget.receipt!.og, widget.receipt!.volume, model.cells!, rate: model.pitchingRate(widget.receipt!.og));
+              var amount = FormulaHelper.yeast(
+                  widget.receipt!.og,
+                  widget.receipt!.volume,
+                  form: model.form!,
+                  cells: model.cells!,
+                  rate: model.pitchingRate(widget.receipt!.og)
+              );
               model.amount = amount.truncateToDouble();
               widget.data!.add(model);
             }
@@ -240,8 +251,8 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return YeastsPage(showCheckboxColumn: true, selectionMode: SelectionMode.singleDeselect);
     })).then((values) {
-      if (values != null) {
-        if (widget.data != null) {
+      if (values != null && values!.isNotEmpty) {
+        if (widget.data != null && widget.data!.isNotEmpty) {
           values.first.amount = widget.data![rowIndex].amount;
           widget.data![rowIndex] = values.first;
           widget.onChanged?.call(widget.data!);
@@ -282,7 +293,9 @@ class YeastDataSource extends EditDataSource {
       DataGridCell<dynamic>(columnName: 'laboratory', value: e.laboratory),
       DataGridCell<Fermentation>(columnName: 'type', value: e.type),
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
-      DataGridCell<double>(columnName: 'attenuation', value: e.attenuation)
+      DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
+      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
+      DataGridCell<double>(columnName: 'cells', value: e.cells)
     ])).toList();
   }
 
@@ -328,7 +341,12 @@ class YeastDataSource extends EditDataSource {
           alignment = Alignment.centerLeft;
         } else if (e.value is num) {
           if (e.columnName == 'amount') {
-            value = AppLocalizations.of(context)!.weightFormat(e.value);
+            var form = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'form').value;
+            if (form == Yeast.liquid) {
+              value = AppLocalizations.of(context)!.volumeFormat(e.value);
+            } else {
+              value = AppLocalizations.of(context)!.weightFormat(e.value);
+            }
           } else if (e.columnName == 'attenuation') {
             value = AppLocalizations.of(context)!.percentFormat(e.value);
           } else if (e.columnName == 'duration') {
@@ -357,6 +375,21 @@ class YeastDataSource extends EditDataSource {
         );
       }).toList()
     );
+  }
+
+  @override
+  Widget? buildTableSummaryCellWidget(GridTableSummaryRow summaryRow, GridSummaryColumn? summaryColumn, RowColumnIndex rowColumnIndex, String summaryValue) {
+    if (summaryValue.isNotEmpty) {
+      return Container(
+        color: Theme.of(context).primaryColor.withOpacity(0.1),
+        padding: const EdgeInsets.all(8.0),
+        alignment: Alignment.centerRight,
+        child: Text(AppLocalizations.of(context)!.weightFormat(double.parse(summaryValue)) ?? '0',
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(fontWeight: FontWeight.w500)
+        ),
+      );
+    }
   }
 
   @override
@@ -474,14 +507,50 @@ class YeastDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          width: 90,
-          columnName: 'attenuation',
-          allowEditing: false,
-          label: Container(
-              padding: EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('attenuation'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        width: 90,
+        columnName: 'attenuation',
+        allowEditing: false,
+        label: Container(
+            padding: EdgeInsets.all(8.0),
+            alignment: Alignment.centerRight,
+            child: Text('Att.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
+      ),
+      GridColumn(
+        width: 90,
+        columnName: 'temperature',
+        allowEditing: false,
+        label: Container(
+            padding: EdgeInsets.all(8.0),
+            alignment: Alignment.centerRight,
+            child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
+      ),
+      GridColumn(
+        width: 90,
+        columnName: 'cells',
+        allowEditing: false,
+        label: Container(
+            padding: EdgeInsets.all(8.0),
+            alignment: Alignment.centerRight,
+            child: Text('\u023B', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
+      ),
+    ];
+  }
+
+  static List<GridTableSummaryRow> summaries({required BuildContext context, bool showQuantity = false}) {
+    return <GridTableSummaryRow>[
+      if (showQuantity == true) GridTableSummaryRow(
+          showSummaryInRow: false,
+          columns: <GridSummaryColumn>[
+            const GridSummaryColumn(
+                name: 'amount',
+                columnName: 'amount',
+                summaryType: GridSummaryType.sum
+            ),
+          ],
+          position: GridTableSummaryRowPosition.bottom
       ),
     ];
   }

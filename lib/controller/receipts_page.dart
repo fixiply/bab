@@ -218,7 +218,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
           children: [
             Container(
               child: Image.asset('assets/images/beer_1.png',
-                color: ColorHelper.color(model.ebc) ?? SRM_COLORS[0],
+                color: ColorHelper.color(model.ebc) ?? Colors.white,
                 colorBlendMode: BlendMode.modulate
               ),
               width: 30,

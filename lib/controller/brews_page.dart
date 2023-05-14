@@ -217,7 +217,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           children: [
             Container(
               child: Image.asset('assets/images/beer_1.png',
-                color: ColorHelper.color(model.receipt!.ebc!) ?? SRM_COLORS[0],
+                color: ColorHelper.color(model.receipt!.ebc!) ?? Colors.white,
                 colorBlendMode: BlendMode.modulate
               ),
               width: 30,
@@ -270,7 +270,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                   if (model.tank != null) TextSpan(text: model.tank!.name, style: TextStyle(fontWeight: FontWeight.bold)),
                   if (model.tank != null && model.volume != null) TextSpan(text: '  -  '),
                   if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
-                  if (model.volume != null) TextSpan(text: AppLocalizations.of(context)!.volumeFormat(model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

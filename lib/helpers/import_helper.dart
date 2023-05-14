@@ -301,7 +301,7 @@ class ImportHelper {
                   name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.text}),
                   reference: element.getElement('F_Y_PRODUCT_ID')!.text,
                   laboratory: element.getElement('F_Y_LAB')!.text,
-                  cells: double.tryParse(element.getElement('F_Y_CELLS')!.text)! / 10,
+                  cells: double.tryParse(element.getElement('F_Y_CELLS')!.text),
                   attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
                   attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
                   tempmin: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text)),
@@ -341,8 +341,11 @@ class ImportHelper {
                   model.type = Fermentation.spontaneous;
                   break;
               }
-              if (type != 2 && type !=3) {
-                Database().add(model, ignoreAuth: true);
+              if (type != 2 && type != 3) {
+                List<yeast.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.reference, laboratory: model.laboratory);
+                if (list.isEmpty) {
+                  Database().add(model, ignoreAuth: true);
+                }
               }
             }
             onImported.call();

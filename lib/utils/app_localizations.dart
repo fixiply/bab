@@ -167,27 +167,34 @@ class AppLocalizations {
 
   /// Returns the formatted weight, based on the given conditions.
   ///
+  /// The `number` argument is relative to the number in kilogram.
+  String? kiloWeightFormat(number, {bool? symbol = true}) {
+    return weightFormat(number * 1000, symbol: symbol);
+  }
+
+  /// Returns the formatted weight, based on the given conditions.
+  ///
   /// The `number` argument is relative to the number in grams.
-  String? weightFormat(number) {
+  String? weightFormat(number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
     if (measure == Measure.imperial) {
       number = FormulaHelper.convertGramToOunce(number);
       var suffix = ' oz';
-      if (number >= 10) {
+      if (symbol == true && number >= 10) {
         number = FormulaHelper.convertOunceToLivre(number);
         suffix = ' lb';
       }
-      return this.numberFormat(number, symbol: suffix);
+      return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
     }
 
     var suffix = ' g';
-    if (number >= 1000) {
+    if (symbol == true && number >= 1000) {
       number = number / 1000;
       suffix = ' kg';
     }
-    return this.numberFormat(number, symbol: suffix);
+    return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
   }
 
   /// Returns the suffix weight, based on the given conditions.
@@ -248,18 +255,39 @@ class AppLocalizations {
     return number;
   }
 
+  /// Returns the formatted volume, based on the given conditions.
+  ///
+  /// The `number` argument is relative to the number in litter.
+  String? litterVolumeFormat(number, {bool? symbol = true}) {
+    if (number == null) {
+      return null;
+    }
+    return volumeFormat(number * 1000, symbol: symbol);
+  }
 
   /// Returns the formatted volume, based on the given conditions.
   ///
-  /// The `number` argument is relative to the number in litters.
+  /// The `number` argument is relative to the number in millimeter.
   String? volumeFormat(number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
     if (measure == Measure.imperial) {
-      return this.numberFormat(FormulaHelper.convertLiterToGallon(number), symbol: (symbol == true ? ' gal' : null));
+      number = FormulaHelper.convertLiterToGallon(number);
+      var suffix = ' oz';
+      if (symbol == true && number >= 1280) {
+        number = number / 128;
+        suffix = ' gal';
+      }
+      return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
     }
-    return this.numberFormat(number, symbol: (symbol == true ? ' L' : null));
+
+    var suffix = ' ml';
+    if (symbol == true && number >= 1000) {
+      number = number / 1000;
+      suffix = ' l';
+    }
+    return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
   }
 
   /// Returns the localized volume to litter, based on the given conditions.
@@ -306,15 +334,23 @@ class AppLocalizations {
 
   /// Returns the formatted gravity.
   String? gravityFormat(number) {
-    if (number == null) {
-      return null;
+    switch(gravity) {
+      case Gravity.sg:
+        if (number == null || number <= 1 || number >= 2) {
+          return '1.xxx';
+        }
+        return NumberFormat('0.000', 'en').format(number);
+      case Gravity.plato:
+        if (number == null) {
+          return null;
+        }
+        return this.numberFormat(FormulaHelper.convertSGToPlato(number), symbol: '°P');
+      case Gravity.brix:
+        if (number == null) {
+          return null;
+        }
+        return this.numberFormat(FormulaHelper.convertSGToBrix(number), symbol: '°Bx');
     }
-    if (gravity == Gravity.plato) {
-      return this.numberFormat(FormulaHelper.convertSGToPlato(number), symbol: '°P');
-    } else if (gravity == Gravity.brix) {
-      return this.numberFormat(FormulaHelper.convertSGToBrix(number), symbol: '°Bx');
-    }
-    return numberFormat(number, pattern: '0.000');
   }
 }
 
