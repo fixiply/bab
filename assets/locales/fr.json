@@ -147,6 +147,7 @@
   "french": "Français",
   "full_name": "Nom Complet",
   "gallons": "Gallons",
+  "give_its_opinion": "Donner un avis",
   "grain": "Grain",
   "grains": "Grains",
   "gram": "Gramme",
@@ -336,6 +337,7 @@
   "style(s)": "%s Style(s)",
   "styles": "Styles",
   "subtitle": "Sous-titre",
+  "summary_reviews": "Résumé des avis",
   "tank": "Cuve",
   "tank_volume": "Volume de la cuve",
   "tanks": "Cuves",
@@ -393,6 +395,7 @@
   "use.secondary": "Secondaire",
   "use.sparge": "Rinçage",
   "user": "Utilisateur",
+  "validate": "Valider",
   "validator_field_required": "Ce champ est requis",
   "validity_date": "AA/MM",
   "version": "Version",
@@ -403,6 +406,7 @@
   "volume": "Volume",
   "volume_alcohol": "Volume d'alcool",
   "weak_password": "Le mot de passe donné est trop faible.",
+  "what_do_you_think": "Qu'en pensez-vous ?",
   "without_saving": "Des modifications sont en cours, voulez-vous vraiment quitter cette page sans enregistrer ?",
   "wort_shrinkage": "Rétrécissement du moût",
   "wrong_password": "Mauvais mot de passe pour cet utilisateur.",
@@ -414,5 +418,6 @@
   "yeasts": "Levures",
   "yield": "Rendement",
   "your_basket": "Votre panier",
+  "your_opinion": "Soyez le premier à donner votre avis",
   "zip_code": "Code postal"
 }

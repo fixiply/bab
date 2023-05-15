@@ -9,9 +9,10 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatingDialog extends StatefulWidget {
   Rating model;
+  final String? title;
   final String? hintText;
   final int? maxLines;
-  RatingDialog(this.model, {this.hintText, this.maxLines});
+  RatingDialog(this.model, {this.title, this.hintText, this.maxLines});
 
   @override
   State<StatefulWidget> createState() {
@@ -21,6 +22,8 @@ class RatingDialog extends StatefulWidget {
 
 class _RatingDialogState extends State<RatingDialog> {
   late TextEditingController _textFieldController;
+
+  bool _modified = false;
 
   @override
   void initState() {
@@ -40,27 +43,37 @@ class _RatingDialogState extends State<RatingDialog> {
 
   Widget build(BuildContext context) {
     return ConfirmDialog(
-      title: 'Qu\'en pensez-vous ?',
+      title: widget.title,
+      ok: AppLocalizations.of(context)!.text('validate'),
+      enabled: _modified,
       content: Container(
-        height: 150,
+        height: 180,
+        width: 400,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Text('Quelle note attribuez-vous ?'),
             RatingBar.builder(
               initialRating: widget.model.rating!,
               direction: Axis.horizontal,
               allowHalfRating: true,
               itemCount: 5,
-              itemSize: 26,
+              itemSize: 36,
               itemPadding: EdgeInsets.zero,
               itemBuilder: (context, _) => Icon(
                 Icons.star,
                 color: Colors.amber,
               ),
               onRatingUpdate: (rating) async {
+                setState(() {
+                  _modified = true;
+                });
                 widget.model.rating = rating;
               },
             ),
             const SizedBox(height: 12),
+            Text('Et donnez votre avis :'),
             TextField(
               maxLines: widget.maxLines,
               controller: _textFieldController,

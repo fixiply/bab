@@ -13,7 +13,8 @@ class ConfirmDialog extends StatefulWidget {
   final void Function()? onCancel;
   final String? ok;
   final String? cancel;
-  ConfirmDialog({this.title, this.scrollable = false, required this.content, this.onOk, this.onCancel, this.ok, this.cancel});
+  final bool? enabled;
+  ConfirmDialog({this.title, this.scrollable = false, required this.content, this.onOk, this.onCancel, this.ok, this.cancel, this.enabled = true});
 
   @override
   State<StatefulWidget> createState() {
@@ -54,7 +55,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
     }
     return AlertDialog(
       scrollable: widget.scrollable,
-      title: widget.title != null ? Text(widget.title!) : null,
+      title: widget.title != null ? Center(child: Text(widget.title!)) : null,
       content: widget.content,
       actions: <Widget>[
         TextButton(
@@ -75,13 +76,13 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16),
           ),
-          onPressed: () {
+          onPressed: widget.enabled == true ? () {
             if (widget.onOk != null) {
               widget.onOk?.call();
               return;
             }
             Navigator.pop(context, true);
-          }
+          } : null
         )
       ],
     );

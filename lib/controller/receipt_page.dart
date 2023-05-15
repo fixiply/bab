@@ -138,33 +138,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                   color: Colors.amber,
                                 ),
                                 tapOnlyMode: true,
-                                ignoreGestures: false,
+                                ignoreGestures: true,
                                 onRatingUpdate: (rating) async {
-                                  RenderBox box = _keyReviews.currentContext!.findRenderObject() as RenderBox;
-                                  Offset position = box.localToGlobal(Offset.zero); //this is global position
-                                  _controller.animateTo(
-                                    position.dy,
-                                    duration: Duration(seconds: 1),
-                                    curve: Curves.fastOutSlowIn,
-                                  );
-                                  dynamic? rating = await showDialog(
-                                      context: context,
-                                      builder: (BuildContext context) {
-                                        return RatingDialog(
-                                            Rating(
-                                              creator: currentUser!.user!.uid,
-                                              name: currentUser!.user!.displayName,
-                                              rating: 0
-                                            ),
-                                            maxLines: 3
-                                        );
-                                      }
-                                  );
-                                  if (rating != null) {
-                                    setState(() {
-                                      widget.model.ratings!.add(rating);
-                                    });
-                                  }
                                 },
                               ),
                               const SizedBox(height: 3),
@@ -473,9 +448,12 @@ class _ReceiptPageState extends State<ReceiptPage> {
           ]
         )),
         SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
-        if (widget.model.ratings!.isNotEmpty) SliverToBoxAdapter(
-          child: RatingsContainer(widget.model)
-         )
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: EdgeInsets.all(8.0),
+              child: RatingsContainer(widget.model)
+             )
+           )
         ]
       ),
       floatingActionButton: FloatingActionButton(

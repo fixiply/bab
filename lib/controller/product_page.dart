@@ -104,33 +104,8 @@ class _ProductPageState extends State<ProductPage> {
                                       color: Colors.amber,
                                     ),
                                     tapOnlyMode: true,
-                                    ignoreGestures: false,
+                                    ignoreGestures: true,
                                     onRatingUpdate: (rating) async {
-                                      RenderBox box = _keyReviews.currentContext!.findRenderObject() as RenderBox;
-                                      Offset position = box.localToGlobal(Offset.zero); //this is global position
-                                      _controller.animateTo(
-                                        position.dy,
-                                        duration: Duration(seconds: 1),
-                                        curve: Curves.fastOutSlowIn,
-                                      );
-                                      dynamic? rating = await showDialog(
-                                          context: context,
-                                          builder: (BuildContext context) {
-                                            return RatingDialog(
-                                                Rating(
-                                                  creator: currentUser!.user!.uid,
-                                                  name: currentUser!.user!.displayName,
-                                                  rating: 0
-                                                ),
-                                                maxLines: 3
-                                            );
-                                          }
-                                      );
-                                      if (rating != null) {
-                                        setState(() {
-                                          widget.model.ratings!.add(rating);
-                                        });
-                                      }
                                     },
                                   ),
                                   const SizedBox(height: 3),
@@ -213,7 +188,7 @@ class _ProductPageState extends State<ProductPage> {
               ]
             )
           ),
-          if (widget.model.ratings!.isNotEmpty) SliverToBoxAdapter(
+          SliverToBoxAdapter(
             child: RatingsContainer(widget.model)
           )
         ]

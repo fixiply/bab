@@ -147,6 +147,7 @@
   "french": "French",
   "full_name": "Full Name",
   "gallons": "Gallons",
+  "give_its_opinion": "Give its opinion",
   "grain": "Grain",
   "grains": "Grains",
   "gram": "Gram",
@@ -336,6 +337,7 @@
   "style(s)": "%s Style(s)",
   "styles": "Styles",
   "subtitle": "Subtitle",
+  "summary_reviews": "Summary of Reviews",
   "tank": "Tank",
   "tank_volume": "Tank volume",
   "tanks": "Tanks",
@@ -393,6 +395,7 @@
   "use.secondary": "Secondary",
   "use.sparge": "Bottling",
   "user": "User",
+  "validate": "Validate",
   "validator_field_required": "This field is required",
   "validity_date": "MM/AA",
   "version": "Version",
@@ -403,6 +406,7 @@
   "volume": "Volume",
   "volume_alcohol": "Volume alcohol",
   "weak_password": "The password provided is too weak.",
+  "what_do_you_think": "What do you think ?",
   "without_saving": "Changes are in progress, do you really want to leave this page without saving?",
   "wort_shrinkage": "Wort shrinkage",
   "wrong_password": "Wrong password for that user.",
@@ -414,5 +418,6 @@
   "yeasts": "Yeasts",
   "yield": "Yield",
   "your_basket": "Your basket",
+  "your_opinion": "Be the first to give your opinion",
   "zip_code": "Zip code"
 }
