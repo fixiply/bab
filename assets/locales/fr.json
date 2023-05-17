@@ -75,7 +75,7 @@
   "cells": "Cellules",
   "cgu_1": "En cliquant sur l'une des réponses ci-après, j'accepte les ",
   "cgu_2": " et je reconnais avoir lu la ",
-  "chatgpt_model": "Invente une recette de bière '%s' avec les ingrédients, proportions et instructions pour un brassin de %s %s",
+  "chatgpt_model": "Invente une recette de bière «%s» avec les ingrédients, proportions et instructions pour un brassin de %s %s",
   "city": "Ville",
   "close": "Fermer",
   "code_editor": "Éditeur de code",

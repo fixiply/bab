@@ -75,7 +75,7 @@
   "cells": "Cells",
   "cgu_1": "By clicking on one of the answers below, I accept the ",
   "cgu_2": " and I acknowledge having read the ",
-  "chatgpt_model": "Invent a beer recipe '%s' with the ingredients, proportions and instructions for a % %s brew",
+  "chatgpt_model": "Invent a beer recipe «%s» with the ingredients, proportions and instructions for a % %s brew",
   "city": "City",
   "close": "Close",
   "code_editor": "Code editor",
