@@ -11,7 +11,6 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
-import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/builders/full_widget_page.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
@@ -271,6 +270,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                 width: double.infinity,
                 child: ImageContainer(
                   model.getImages(),
+                  fit: BoxFit.cover,
                   cache: currentUser != null && currentUser!.isAdmin() == false,
                   emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.scaleDown)
                 )
@@ -364,7 +364,10 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
 
   _fetch() async {
     setState(() {
-      _events = Database().getEvents(searchText: _searchQueryController.value.text);
+      _events = Database().getEvents(
+        searchText: _searchQueryController.value.text,
+        status: currentUser != null && currentUser!.isAdmin() ?  _archived ? Status.disabled : Status.publied : null,
+      );
     });
   }
 

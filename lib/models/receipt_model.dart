@@ -45,6 +45,7 @@ class ReceiptModel<T> extends Model {
   dynamic? notes;
   ImageModel? image;
   List<Rating>? ratings;
+  String? country;
 
   List<FermentableModel>? _fermentables;
   List<hop.HopModel>? _hops;
@@ -83,6 +84,7 @@ class ReceiptModel<T> extends Model {
     this.notes,
     this.image,
     this.ratings,
+    this.country,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     if (cacheFermentables == null) { cacheFermentables = []; }
     if (cacheHops == null) { cacheHops = []; }
@@ -121,6 +123,7 @@ class ReceiptModel<T> extends Model {
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
     this.ratings = Rating.deserialize(map['ratings']);
+    this.country = map['country'];
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -153,6 +156,7 @@ class ReceiptModel<T> extends Model {
       'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
       'ratings': Rating.serialize(this.ratings),
+      'country': this.country
     });
     return map;
   }
@@ -189,7 +193,8 @@ class ReceiptModel<T> extends Model {
       tertiarytemp: this.tertiarytemp,
       notes: this.notes,
       image: this.image,
-      ratings: this.ratings
+      ratings: this.ratings,
+      country: this.country
     )
       .._fermentables = _fermentables
       .._hops = _hops

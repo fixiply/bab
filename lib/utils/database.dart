@@ -211,14 +211,20 @@ class Database {
     return null;
   }
 
-  Future<List<EventModel>> getEvents({String? searchText, bool archived = false, bool all = false, bool ordered = true}) async {
+  Future<List<EventModel>> getEvents({String? searchText, CS.Status? status, bool all = false, bool ordered = false}) async {
     List<EventModel> list = [];
     Query query = events;
     if (all == false) {
-      if (archived == true) {
+      if (status == CS.Status.disabled) {
         query = query.where('status', isEqualTo: CS.Status.disabled.index);
-      } else {
+        query = query.orderBy('updated_at', descending: true);
+      } else if (status == CS.Status.pending) {
         query = query.where('status', isLessThanOrEqualTo: CS.Status.publied.index);
+        query = query.orderBy('status', descending: false);
+        query = query.orderBy('updated_at', descending: true);
+      } else {
+        query = query.where('status', isEqualTo: CS.Status.publied.index);
+        query = query.orderBy('updated_at', descending: true);
       }
     }
     await query.get().then((result) {

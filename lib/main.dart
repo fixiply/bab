@@ -16,10 +16,12 @@ import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/utils/notifications.dart';
 import 'package:bb/widgets/builders/carousel_builder.dart';
+import 'package:bb/widgets/builders/chatgpt_builder.dart';
 import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:bb/widgets/builders/list_builder.dart';
 import 'package:bb/widgets/builders/markdown_builder.dart';
 import 'package:bb/widgets/builders/parallax_builder.dart';
+import 'package:bb/widgets/builders/subscription_builder.dart';
 
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -30,7 +32,6 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 String? selectedNotificationPayload;
@@ -207,10 +208,22 @@ class _AppState extends State<MyApp> {
       ),
     );
     registry.registerCustomBuilder(
-      ImageEditorBuilder.type,
+      ChatGPTBuilder.type,
       JsonWidgetBuilderContainer(
-          builder: ImageEditorBuilder.fromDynamic
+          builder: ChatGPTBuilder.fromDynamic
       ),
     );
+    registry.registerCustomBuilder(
+      SubscriptionBuilder.type,
+      JsonWidgetBuilderContainer(
+          builder: SubscriptionBuilder.fromDynamic
+      ),
+    );
+    // registry.registerCustomBuilder(
+    //   ImageEditorBuilder.type,
+    //   JsonWidgetBuilderContainer(
+    //       builder: ImageEditorBuilder.fromDynamic
+    //   ),
+    // );
   }
 }
