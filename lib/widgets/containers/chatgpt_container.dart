@@ -27,7 +27,6 @@ class ChatGPTContainer extends AbstractContainer {
 
 class _ChatGPTContainerState extends AbstractContainerState {
   late OpenAI openAI;
-  Future<CTResponse?>? _translateFuture;
   final _formKey = GlobalKey<FormState>();
   List<String> messages = [];
   String? _text;
