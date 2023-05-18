@@ -53,8 +53,8 @@ class _RatingsContainerState extends State<RatingsContainer> {
                children: [
                  if (widget.model.ratings.length == 0) TextButton(
                    child: Text(AppLocalizations.of(context)!.text('your_opinion')),
-                   onPressed: () async {
-                      dynamic? rating = await showDialog(
+                   onPressed: currentUser != null ? () async {
+                      dynamic rating = await showDialog(
                           context: context,
                           builder: (BuildContext context) {
                             return RatingDialog(
@@ -73,7 +73,7 @@ class _RatingsContainerState extends State<RatingsContainer> {
                           widget.model.ratings!.add(rating);
                        });
                       }
-                   },
+                   } : null,
                  ),
                  if (widget.model.ratings.length > 0) Row(
                    children: [

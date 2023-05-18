@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/containers/abstract_container.dart';
-import 'package:bb/widgets/form_decoration.dart';
 import 'package:bb/utils/app_localizations.dart';
 
 // External package
@@ -34,11 +34,12 @@ class _ChatGPTContainerState extends AbstractContainerState {
   @override
   void initState() {
     openAI = OpenAI.instance.build(
-      token: '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',
+      token: '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',
       baseOption: HttpSetup(
         receiveTimeout: const Duration(seconds: 20),
         connectTimeout: const Duration(seconds: 20)
-        )
+        ),
+        enableLog: Foundation.kDebugMode
       );
     super.initState();
   }
@@ -139,28 +140,56 @@ class _ChatGPTContainerState extends AbstractContainerState {
 
   _send() {
     try {
+      String prompt = sprintf(AppLocalizations.of(context)!.text('chatgpt_model'),
+        [ _text, _volume, AppLocalizations.of(context)!.liquid.toLowerCase() ]
+      );
+      debugPrint('prompt $prompt');
       final request = CompleteText(
-          prompt: sprintf(AppLocalizations.of(context)!.text('chatgpt_model'),
-              [ _text, _volume, AppLocalizations.of(context)!.liquid ]
-          ),
+          prompt: prompt,
           model: Model.textDavinci3,
-          maxTokens: 200
+          maxTokens: 255
       );
 
       EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
       openAI.onCompletion(request: request).then((value) {
         if (value != null) {
-          debugPrint(value.choices.last.text);
           setState(() {
             messages.add(value.choices.last.text);
           });
         }
         EasyLoading.dismiss();
       }).onError((error, stackTrace) {
+        _showSnackbar(error.toString());
         EasyLoading.dismiss();
       });
     } finally {
       // EasyLoading.dismiss();
     }
+  }
+
+  // _send2() async {
+  //   try {
+  //     EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+  //     final request = EmbedRequest(
+  //         model: EmbedModel.embedTextModel,
+  //         input: 'The food was delicious and the waiter');
+  //
+  //     final response = await openAI.embed.embedding(request);
+  //     setState(() {
+  //       response.data.last.embedding
+  //     });
+  //     EasyLoading.dismiss();
+  //   } finally {
+  //     EasyLoading.dismiss();
+  //   }
+  // }
+
+  _showSnackbar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+            content: Text(message),
+            duration: Duration(seconds: 10)
+        )
+    );
   }
 }
