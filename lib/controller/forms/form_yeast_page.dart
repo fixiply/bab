@@ -167,7 +167,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
               Divider(height: 10),
               DropdownButtonFormField<Fermentation>(
                 value: widget.model.type,
-                style: TextStyle(overflow: TextOverflow.ellipsis),
+                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 decoration: FormDecoration(
                   icon: const Icon(Icons.aspect_ratio),
                   labelText: AppLocalizations.of(context)!.text('fermentation'),

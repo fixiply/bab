@@ -118,7 +118,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
               Divider(height: 10),
               DropdownButtonFormField<Misc>(
                 value: widget.model.type,
-                style: TextStyle(overflow: TextOverflow.ellipsis),
+                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 decoration: FormDecoration(
                   icon: const Icon(Icons.type_specimen_outlined),
                   labelText: AppLocalizations.of(context)!.text('type'),

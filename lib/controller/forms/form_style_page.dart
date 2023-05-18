@@ -177,7 +177,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   Expanded(
                     child: DropdownButtonFormField<Fermentation>(
                       value: widget.model.fermentation,
-                      style: TextStyle(overflow: TextOverflow.ellipsis),
+                      style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.aspect_ratio),
                         labelText: AppLocalizations.of(context)!.text('fermentation'),

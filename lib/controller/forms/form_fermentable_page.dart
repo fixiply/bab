@@ -151,7 +151,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
               Divider(height: 10),
               DropdownButtonFormField<Type>(
                 value: widget.model.type,
-                style: TextStyle(overflow: TextOverflow.ellipsis),
+                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 decoration: FormDecoration(
                   icon: const Icon(Icons.grain),
                   labelText: AppLocalizations.of(context)!.text('fermentation'),

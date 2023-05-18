@@ -65,7 +65,7 @@ class _TextInputFieldState extends FormFieldState<dynamic> {
                 width: 80,
                 child: DropdownButtonFormField<Locale>(
                   value: AppLocalizations.of(context)!.locale,
-                  style: TextStyle(overflow: TextOverflow.ellipsis),
+                  style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                   decoration: FormDecoration(
                     // icon: const Icon(Icons.aspect_ratio),
                     // labelText: AppLocalizations.of(context)!.text('locale'),

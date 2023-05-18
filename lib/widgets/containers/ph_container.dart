@@ -76,7 +76,7 @@ class _PHContainerState extends State<PHContainer> {
               Expanded(
                 flex: 2,
                 child: DropdownButtonFormField<Acid>(
-                  style: TextStyle(overflow: TextOverflow.ellipsis),
+                  style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                   onChanged: (value) {
                     _acid = value;
                     _calculate();

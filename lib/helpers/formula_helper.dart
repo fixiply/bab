@@ -299,7 +299,7 @@ class FormulaHelper {
       case Acid.hydrochloric:
         return (0.02 * volume * (current - target)) / (concentration * 1.25);
       case Acid.phosphoric:
-        return  (volume * (current - target)) / (10 * (concentration / 100));
+        return  (volume * (current - target)) / (100 * (concentration / 100));
       case Acid.lactic:
         return concentration * volume * (current - target) / 5.9;
       case Acid.sulfuric:
