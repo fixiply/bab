@@ -12,7 +12,6 @@ import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/widgets/custom_drawer.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';

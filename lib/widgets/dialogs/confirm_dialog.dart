@@ -13,8 +13,9 @@ class ConfirmDialog extends StatefulWidget {
   final void Function()? onCancel;
   final String? ok;
   final String? cancel;
+  final bool? showCancel;
   final bool? enabled;
-  ConfirmDialog({this.title, this.scrollable = false, required this.content, this.onOk, this.onCancel, this.ok, this.cancel, this.enabled = true});
+  ConfirmDialog({this.title, this.scrollable = false, required this.content, this.onOk, this.onCancel, this.ok, this.cancel, this.showCancel = true, this.enabled = true});
 
   @override
   State<StatefulWidget> createState() {
@@ -29,7 +30,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
         title: widget.title != null ? Text(widget.title!) : null,
         content: widget.content,
         actions: <CupertinoDialogAction>[
-          CupertinoDialogAction(
+          if (widget.showCancel == true) CupertinoDialogAction(
             child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
             onPressed: () {
               if (widget.onCancel != null) {
@@ -58,7 +59,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       title: widget.title != null ? Center(child: Text(widget.title!)) : null,
       content: widget.content,
       actions: <Widget>[
-        TextButton(
+        if (widget.showCancel == true) TextButton(
           child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16),

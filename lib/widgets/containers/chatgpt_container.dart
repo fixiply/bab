@@ -1,3 +1,4 @@
+import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 
@@ -8,6 +9,7 @@ import 'package:bb/utils/app_localizations.dart';
 
 // External package
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:sprintf/sprintf.dart';
 
@@ -34,7 +36,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
   @override
   void initState() {
     openAI = OpenAI.instance.build(
-      token: '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',
+      token: dotenv.env["OPEN_AI_API_KEY"],
       baseOption: HttpSetup(
         receiveTimeout: const Duration(seconds: 20),
         connectTimeout: const Duration(seconds: 20)
@@ -138,7 +140,18 @@ class _ChatGPTContainerState extends AbstractContainerState {
     );
   }
 
-  _send() {
+  _send() async {
+    if (currentUser == null) {
+      await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return ConfirmDialog(
+            content: Text(AppLocalizations.of(context)!.text('logged_in_feature')),
+          );
+        }
+      );
+      return;
+    }
     try {
       String prompt = sprintf(AppLocalizations.of(context)!.text('chatgpt_model'),
         [ _text, _volume, AppLocalizations.of(context)!.liquid.toLowerCase() ]

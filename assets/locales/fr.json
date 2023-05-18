@@ -192,6 +192,7 @@
   "liters": "Litres",
   "loading": "Chargement",
   "locale": "fr_FR",
+  "logged_in_feature": "Vous devez être connecté pour utiliser cette fonctionnalité",
   "login": "Connectez-vous",
   "login_account": "Connectez-vous pour accéder à votre compte",
   "logout": "Déconnexion",

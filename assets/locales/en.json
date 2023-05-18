@@ -192,6 +192,7 @@
   "liters": "Liters",
   "loading": "Loading",
   "locale": "en_EN",
+  "logged_in_feature": "You must be logged in to use this feature",
   "login": "Login",
   "login_account": "Login to access your account",
   "logout": "Logout",

@@ -17,7 +17,6 @@ import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/utils/notifications.dart';
 import 'package:bb/widgets/builders/carousel_builder.dart';
 import 'package:bb/widgets/builders/chatgpt_builder.dart';
-import 'package:bb/widgets/builders/image_editor_builder.dart';
 import 'package:bb/widgets/builders/list_builder.dart';
 import 'package:bb/widgets/builders/markdown_builder.dart';
 import 'package:bb/widgets/builders/parallax_builder.dart';
@@ -28,6 +27,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
@@ -42,6 +42,7 @@ final LocaleNotifier localeNotifier = LocaleNotifier();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
