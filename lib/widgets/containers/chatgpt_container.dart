@@ -172,6 +172,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
         }
         EasyLoading.dismiss();
       }).onError((error, stackTrace) {
+        debugPrint(error.toString());
         _showSnackbar(error.toString());
         EasyLoading.dismiss();
       });
