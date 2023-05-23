@@ -79,8 +79,8 @@
                                             <option name="values">
                                               <map>
                                                 <entry key="color" value="000000" />
-                                                <entry key="imagePath" value="$USER_HOME$/Téléchargements/logo_green.png" />
-                                                <entry key="scalingPercent" value="60" />
+                                                <entry key="imagePath" value="$USER_HOME$/Drive/BeAndBrew/logo_green.png" />
+                                                <entry key="scalingPercent" value="56" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -113,7 +113,7 @@
                                   <option name="values">
                                     <map>
                                       <entry key="backgroundAssetType" value="COLOR" />
-                                      <entry key="backgroundColor" value="ffffff" />
+                                      <entry key="backgroundColor" value="008351" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -131,6 +131,18 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="/tmp/ic_android_black_24dp.xml" />
+                                              </map>
+                                            </option>
+                                          </PersistentState>
+                                        </value>
+                                      </entry>
+                                      <entry key="image">
+                                        <value>
+                                          <PersistentState>
+                                            <option name="values">
+                                              <map>
+                                                <entry key="color" value="000000" />
+                                                <entry key="imagePath" value="$USER_HOME$/Drive/BeAndBrew/logo_green.png" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -158,6 +170,13 @@
                                           </PersistentState>
                                         </value>
                                       </entry>
+                                    </map>
+                                  </option>
+                                  <option name="values">
+                                    <map>
+                                      <entry key="assetType" value="IMAGE" />
+                                      <entry key="backgroundColor" value="008351" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Drive/BeAndBrew/logo_green.png" />
                                     </map>
                                   </option>
                                 </PersistentState>
