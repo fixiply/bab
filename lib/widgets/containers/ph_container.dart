@@ -1,11 +1,12 @@
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/helpers/formula_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/helpers/formula_helper.dart';
+import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/form_decoration.dart';
-import 'package:bb/utils/app_localizations.dart';
 
 class PHContainer extends StatefulWidget {
   double? target;
@@ -38,6 +39,9 @@ class _PHContainerState extends State<PHContainer> {
               Expanded(
                 child: TextFormField(
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                  ],
                   onChanged: (value) {
                     _current = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                     _calculate();
@@ -54,6 +58,9 @@ class _PHContainerState extends State<PHContainer> {
                 child: TextFormField(
                   initialValue: widget.target?.toString() ?? '',
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                  ],
                   onChanged: (value) {
                     widget.target = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                     _calculate();

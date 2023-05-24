@@ -1,4 +1,5 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';import 'package:flutter/services.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -152,6 +153,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                       controller:  _volumeController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
@@ -179,6 +183,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                       controller:  _sizeController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.mash_volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
@@ -215,6 +222,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -240,6 +250,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.absorption) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.absorption = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -262,6 +275,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     child: TextFormField(
                       controller:  _lostController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -280,6 +296,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.mash_ratio) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.mash_ratio = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -312,6 +331,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.boil_loss) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -330,6 +352,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.shrinkage) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.shrinkage = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -351,6 +376,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                 child: TextFormField(
                   initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.head_loss) ?? '',
                   keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                  ],
                   onChanged: (value) {
                     widget.model.head_loss = AppLocalizations.of(context)!.decimal(value);
                     _calculate();

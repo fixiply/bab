@@ -16,7 +16,6 @@ import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/controller/styles_page.dart';
-import 'package:bb/controller/tools_page.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/main.dart';
 import 'package:bb/models/event_model.dart';

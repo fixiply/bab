@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -363,6 +364,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       title: const Text('Prendre la densité initiale'),
       content: TextField(
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: <TextInputFormatter>[
+          FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+        ],
         onChanged: (value) {
           widget.model.og = AppLocalizations.of(context)!.decimal(value);
         },

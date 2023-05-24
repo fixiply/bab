@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -177,6 +178,9 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
               TextFormField(
                 initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                ],
                 onChanged: (value) => widget.model.efficiency = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Icon(Icons.propane_tank_outlined),

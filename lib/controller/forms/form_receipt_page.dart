@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/forms/form_brew_page.dart';
@@ -280,6 +281,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -311,6 +315,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                       controller:  _volumeController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
@@ -432,6 +439,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '',
                       controller: _primarytempController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.primarytemp = AppLocalizations.of(context)!.decimal(value);
                       },
@@ -472,6 +482,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '',
                       controller: _secondarytempController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.secondarytemp = AppLocalizations.of(context)!.decimal(value);
                       },
@@ -510,6 +523,9 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.tertiarytemp) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.tertiarytemp = AppLocalizations.of(context)!.decimal(value);
                       },

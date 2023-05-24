@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -333,6 +334,9 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                 controller:  _volumeController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                ],
                 onChanged: (value) {
                   widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                   _calculate();
@@ -363,6 +367,9 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.mash_ph) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) => widget.model.mash_ph = AppLocalizations.of(context)!.decimal(value),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.water_drop_outlined),
@@ -377,6 +384,9 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.sparge_ph) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) => widget.model.sparge_ph = AppLocalizations.of(context)!.decimal(value),
                       decoration: FormDecoration(
                         icon:  const RotationTransition(
@@ -398,6 +408,9 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.gravityFormat(widget.model.og, symbol: false) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.og = AppLocalizations.of(context)!.decimal(value);
                       },
@@ -419,6 +432,9 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.gravityFormat(widget.model.fg, symbol: false) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                      inputFormatters: <TextInputFormatter>[
+                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                      ],
                       onChanged: (value) {
                         widget.model.fg = AppLocalizations.of(context)!.decimal(value);
                       },

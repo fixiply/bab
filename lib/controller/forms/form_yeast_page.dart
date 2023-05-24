@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -193,6 +194,9 @@ class _FormYeastPageState extends State<FormYeastPage> {
               TextFormField(
                 initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.cells) ?? '',
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                ],
                 onChanged: (value) => widget.model.cells = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Icon(Icons.scatter_plot_outlined),
@@ -223,6 +227,9 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             // initialValue: widget.model.tempmin != null ?  widget.model.tempmin.toString() :  '',
                             controller: _tempminController,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.tempmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -242,6 +249,9 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             // initialValue: widget.model.tempmax != null ?  widget.model.tempmax.toString() :  '',
                             controller: _tempmaxController,
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.tempmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
@@ -273,6 +283,9 @@ class _FormYeastPageState extends State<FormYeastPage> {
                           child: TextFormField(
                             initialValue: widget.model.attmin != null ?  widget.model.attmin.toString() :  '',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.attmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -290,6 +303,9 @@ class _FormYeastPageState extends State<FormYeastPage> {
                           child: TextFormField(
                             initialValue: widget.model.attmax != null ?  widget.model.attmax.toString() :  '',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.attmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',

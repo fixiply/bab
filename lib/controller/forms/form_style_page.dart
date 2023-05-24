@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -210,6 +211,9 @@ class _FormStylePageState extends State<FormStylePage> {
                           child: TextFormField(
                             initialValue: widget.model.ibumin != null ?  widget.model.ibumin.toString() :  '',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.ibumin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -227,6 +231,9 @@ class _FormStylePageState extends State<FormStylePage> {
                           child: TextFormField(
                             initialValue: widget.model.ibumax != null ?  widget.model.ibumax.toString() :  '',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.ibumax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
@@ -257,6 +264,9 @@ class _FormStylePageState extends State<FormStylePage> {
                           child: TextFormField(
                             initialValue: widget.model.abvmin != null ?  widget.model.abvmin.toString() :  '',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.abvmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -276,6 +286,9 @@ class _FormStylePageState extends State<FormStylePage> {
                           child: TextFormField(
                             initialValue: widget.model.abvmax != null ?  widget.model.abvmax.toString() :  '',
                             keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                            inputFormatters: <TextInputFormatter>[
+                              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                            ],
                             onChanged: (value) => widget.model.abvmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',

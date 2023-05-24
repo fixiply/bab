@@ -10,7 +10,6 @@ import 'package:bb/controller/inventory_page.dart';
 import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/equipments_page.dart';
-import 'package:bb/controller/tools_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 

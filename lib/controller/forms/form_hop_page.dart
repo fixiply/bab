@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -138,6 +139,9 @@ class _FormHopPageState extends State<FormHopPage> {
               TextFormField(
                 initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.alpha) ?? '',
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: <TextInputFormatter>[
+                  FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                ],
                 onChanged: (value) => widget.model.alpha = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Text('α ', style: TextStyle(fontSize: 18, color: Colors.black45)),
