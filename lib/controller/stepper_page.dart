@@ -25,7 +25,9 @@ import 'package:uuid/uuid.dart';
 class StepperPage extends StatefulWidget {
   final BrewModel model;
   StepperPage(this.model);
-  _StepperPageState createState() => new _StepperPageState();
+
+  @override
+  _StepperPageState createState() => _StepperPageState();
 }
 
 class MyStep extends Step {
@@ -65,6 +67,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   @override
   bool get wantKeepAlive => true;
 
+  @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -92,7 +95,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
           leading: IconButton(
-            icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }
@@ -159,7 +162,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                             onPressed: controls.onStepCancel,
                             child: Text(
                               AppLocalizations.of(context)!.text('return').toUpperCase(),
-                              style: TextStyle(color: Colors.grey),
+                              style: const TextStyle(color: Colors.grey),
                             ),
                           ),
                         ],
@@ -173,7 +176,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             if (snapshot.hasError) {
               return ErrorContainer(snapshot.error.toString());
             }
-            return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
           }
         )
       )
@@ -227,15 +230,15 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               GaugeAnnotation(
                   angle: 90,
                   positionFactor: 0.35,
-                  widget: Text('Temp.${AppLocalizations.of(context)!.tempMeasure}', style: TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
-              GaugeAnnotation(
+                  widget: Text('Temp.${AppLocalizations.of(context)!.tempMeasure}', style: const TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
+              const GaugeAnnotation(
                 angle: 90,
                 positionFactor: 0.8,
                 widget: Text('  0  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
                 ),
               )
             ],
-            pointers: <GaugePointer>[
+            pointers: const <GaugePointer>[
               NeedlePointer(
                 value: 0,
                 needleStartWidth: 0,
@@ -270,7 +273,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: 1,
-        title: Text('Concasser le grain'),
+        title: const Text('Concasser le grain'),
         content: Container(
           alignment: Alignment.centerLeft,
           child: FutureBuilder<List<FermentableModel>>(
@@ -306,7 +309,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(50)}'),
         content: Container(
           alignment: Alignment.centerLeft,
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: SizedBox(
             width: 140,
             height: 140,
@@ -316,22 +319,22 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: 4,
-        title: Text('Ajouter le grain'),
+        title: const Text('Ajouter le grain'),
         content: Container()
       )
     ];
     await _mashs(receipt, steps);
     steps.add(MyStep(
       index: steps.length,
-      title: Text('Rinçage des drêches'),
+      title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau'),
       content: Container(),
     ));
     steps.add(MyStep(
       index: steps.length,
-      title: Text('Mettre en ébullition votre cuve'),
+      title: const Text('Mettre en ébullition votre cuve'),
       content: Container(
         alignment: Alignment.centerLeft,
-        padding: EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(8.0),
         child: SizedBox(
           width: 140,
           height: 140,
@@ -347,24 +350,25 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     await _hops(receipt, steps);
     steps.add(MyStep(
       index: steps.length,
-      title: Text('Faire un whirlpool'),
+      title: const Text('Faire un whirlpool'),
       content: Container(),
     ));
     steps.add(MyStep(
       index: steps.length,
-      title: Text('Transférer le moût dans le fermenteur'),
+      title: const Text('Transférer le moût dans le fermenteur'),
       content: Container(),
     ));
     steps.add(MyStep(
       index: steps.length,
-      title: Text('Prendre la densité initiale'),
+      title: const Text('Prendre la densité initiale'),
       content: TextField(
-        keyboardType: TextInputType.numberWithOptions(decimal: true),
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
         onChanged: (value) {
-          widget.model.og = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+          widget.model.og = AppLocalizations.of(context)!.decimal(value);
         },
         decoration: FormDecoration(
           icon: const Icon(Icons.first_page_outlined),
+            hintText: CS.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
           labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
           border: InputBorder.none,
           fillColor: CS.FillColor, filled: true
@@ -374,13 +378,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     await receipt.getYeasts(volume: widget.model.volume).then((values) {
       steps.add(MyStep(
         index: steps.length,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure ${AppLocalizations.of(context)!.localizedText(receipt.yeasts!.first.name)}'),
+        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure ${AppLocalizations.of(context)!.localizedText(receipt.yeasts.first.name)}'),
         content: Container(),
       ));
     });
     steps.add(MyStep(
       index: steps.length,
-      title: Text('Fin'),
+      title: const Text('Fin'),
       content: Container(
         alignment: Alignment.centerLeft,
         child: const Text('Votre brassin est prêt.')
@@ -397,7 +401,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)}'),
           content: Container(
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: SizedBox(
               width: 140,
               height: 140,
@@ -412,10 +416,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ));
         steps.add(MyStep(
           index: steps.length,
-          title: Text('Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant ${_mash} minutes'),
+          title: Text('Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant $_mash minutes'),
           content: Container(
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: CircularTimer(_mashController,
                 duration: _mash * 60,
                 index: steps.length,
@@ -424,7 +428,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 },
                 onComplete: (int index) {
                   Notifications().showNotification(
-                    Uuid().hashCode,
+                    const Uuid().hashCode,
                     'BeAndBrew',
                     body: 'Le Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
                   );
@@ -439,13 +443,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           }
         ));
       }
-    };
+    }
   }
 
   _hops(ReceiptModel receipt, List<MyStep> steps) async {
     List<Widget> children = [];
     await receipt.gethops(volume: widget.model.volume).then((values) {
-      List<HopModel> hops = values.where((element) => element.use == Use.boil).toList() ?? [];
+      List<HopModel> hops = values.where((element) => element.use == Use.boil).toList();
       hops.sort((a, b) => a.duration!.compareTo(b.duration!));
       for(int i = 0 ; i < hops.length; i++) {
         String text = '${AppLocalizations.of(context)!.weightFormat(hops[i].amount)} de ${AppLocalizations.of(context)!.localizedText(hops[i].name)}';
@@ -457,7 +461,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         }
         if (children.isNotEmpty) {
           children.add(Text('Ajouter $text'));
-          children.add(SizedBox(height: 12));
+          children.add(const SizedBox(height: 12));
           children.add(CircularTimer(_hopController,
             duration: hops[i].duration! * 60,
             index: steps.length,
@@ -468,7 +472,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           title: Text(children.isNotEmpty ? 'Ajouter les houblons suivants...' : 'Ajouter $text'),
           content: Container(
             alignment: Alignment.centerLeft,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: children.isNotEmpty ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: children,
@@ -499,7 +503,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 10),
+        duration: const Duration(seconds: 10),
         action: action,
       )
     );

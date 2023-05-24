@@ -52,9 +52,13 @@ class TextFormat<T> {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is TextFormat && other.text == text);
   }
+
+  @override
+  int get hashCode => text.hashCode;
 
   @override
   String toString() {
@@ -62,11 +66,11 @@ class TextFormat<T> {
   }
 
   bool get isNotEmpty {
-    return text != null && text!.length > 0;
+    return text != null && text!.isNotEmpty;
   }
 
   bool get isEmpty {
-    return text == null || text!.length == 0;
+    return text == null || text!.isEmpty;
   }
 
   bool get isBold {
@@ -81,11 +85,11 @@ class TextFormat<T> {
     return this.underline != null && this.underline == true;
   }
 
-  static String? getText(dynamic? model) {
+  static String? getText(dynamic model) {
       return model != null && model.isNotEmpty ? model.toString() : null;
   }
 
-  static bool hasText(dynamic? model) {
+  static bool hasText(dynamic model) {
     return model != null && model.isNotEmpty ? true: false;
   }
 
@@ -120,6 +124,7 @@ class TextFormat<T> {
 
   static TextFormat? deserialize(dynamic data) {
     if (data != null) {
+      // ignore: unnecessary_new
       TextFormat model = new TextFormat();
       if (data is Map<String, dynamic>) {
         model.fromMap(data);

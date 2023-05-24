@@ -43,6 +43,10 @@ class EditSfDataGrid extends SfDataGrid {
     shrinkWrapRows: true,
     showCheckboxColumn: showCheckboxColumn,
     selectionMode: selectionMode,
+    onCellTap: (details) {
+      FocusManager.instance.primaryFocus?.unfocus();
+      debugPrint('onCellTap');
+    },
     // columnWidthCalculationRange: ColumnWidthCalculationRange.allRows,
     verticalScrollPhysics: verticalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
     horizontalScrollPhysics: horizontalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
@@ -62,13 +66,13 @@ class EditSfDataGrid extends SfDataGrid {
             return Container(
               height: 60.0,
               width: double.infinity,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 color: Colors.white,
                 border: BorderDirectional(
                 top: BorderSide(width: 1.0, color: Color.fromRGBO(0, 0, 0, 0.26)))
               ),
               alignment: Alignment.center,
-              child: CircularProgressIndicator(
+              child: const CircularProgressIndicator(
                 valueColor: AlwaysStoppedAnimation(PrimaryColor)));
           } else {
             return SizedBox.fromSize(size: Size.zero);
@@ -89,9 +93,9 @@ class EditSfDataGrid extends SfDataGrid {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Icon(Icons.delete, color: Colors.white, size: 20),
-              SizedBox(width: 16.0),
-              Text(AppLocalizations.of(context)!.text('delete').toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 15)),
+              const Icon(Icons.delete, color: Colors.white, size: 20),
+              const SizedBox(width: 16.0),
+              Text(AppLocalizations.of(context)!.text('delete').toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 15)),
             ],
           ),
         ),
@@ -100,7 +104,7 @@ class EditSfDataGrid extends SfDataGrid {
     startSwipeActionsBuilder: (BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
         onTap: () {
-          onEdit?.call(row, rowIndex);
+          // onEdit?.call(row, rowIndex);
         },
         child: Container(
           color: Colors.blueAccent,
@@ -108,9 +112,9 @@ class EditSfDataGrid extends SfDataGrid {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Icon(Icons.edit, color: Colors.white, size: 20),
-              SizedBox(width: 16.0),
-              Text(AppLocalizations.of(context)!.text('edit').toUpperCase(), style: TextStyle(color: Colors.white, fontSize: 15))
+              const Icon(Icons.edit, color: Colors.white, size: 20),
+              const SizedBox(width: 16.0),
+              Text(AppLocalizations.of(context)!.text('edit').toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 15))
             ],
           ),
         ),

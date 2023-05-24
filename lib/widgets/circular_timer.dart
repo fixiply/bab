@@ -21,7 +21,7 @@ class CircularTimer extends CircularCountDownTimer {
     backgroundGradient: null,
     strokeWidth: 5.0,
     strokeCap: StrokeCap.round,
-    textStyle: TextStyle(fontSize: 14.0, color: Colors.white, fontWeight: FontWeight.bold),
+    textStyle: const TextStyle(fontSize: 14.0, color: Colors.white, fontWeight: FontWeight.bold),
     textFormat: CountdownTextFormat.HH_MM_SS,
     isReverse: true,
     isReverseAnimation: false,

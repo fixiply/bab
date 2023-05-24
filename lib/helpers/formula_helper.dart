@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:flutter/material.dart';
 
 class FormulaHelper {
   /// Returns the dry extract, based on the given conditions.
@@ -73,7 +72,7 @@ class FormulaHelper {
     if (amount == null || alpha == null || og == null || duration == null || volume == null) {
       return 0;
     }
-    if (maximum == null) maximum = 4.15;
+    maximum ??= 4.15;
     return 1.65 * pow(0.000125, og) * ((1 - pow(e, -0.04 * duration)) / maximum) * ((alpha * amount * 1000) / volume) * 100;
   }
 

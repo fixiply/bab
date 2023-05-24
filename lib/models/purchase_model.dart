@@ -15,12 +15,14 @@ class PurchaseModel<T> extends Model {
     this.name,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
     this.name = map['name'];
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -32,19 +34,23 @@ class PurchaseModel<T> extends Model {
 
   PurchaseModel copy() {
     return PurchaseModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       name: this.name,
     );
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is PurchaseModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

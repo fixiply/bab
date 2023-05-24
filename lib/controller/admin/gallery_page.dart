@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart' as Foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -31,7 +30,8 @@ class GalleryPage extends StatefulWidget {
   final bool close;
   GalleryPage(this.images, {this.only = false, this.close = true});
 
-  _GalleryPageState createState() => new _GalleryPageState();
+  @override
+  _GalleryPageState createState() => _GalleryPageState();
 }
 
 class AppBarParams {
@@ -49,7 +49,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
   AppBarParams? _appBar;
   List<ImageModel> _selected = [];
   final _picker = ImagePicker();
-  TextEditingController _searchQueryController = TextEditingController();
+  final TextEditingController _searchQueryController = TextEditingController();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
   Future<List<ImageModel>>? _images;
@@ -76,7 +76,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         title: _appBar != null ? _appBar!.title : Text(toBeginningOfSentenceCase(_path)!),
         actions: [
           if (widget.close == true) IconButton(
-            icon:Icon(Icons.close),
+            icon: const Icon(Icons.close),
             tooltip: AppLocalizations.of(context)!.text('close'),
             onPressed:() async {
               Navigator.pop(context, widget.only ? (_selected.isNotEmpty ? _selected.first : null) : _selected);
@@ -90,7 +90,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
               setState(() {
                 _appBar = AppBarParams(
                   leading: IconButton(
-                    icon:Icon(Icons.chevron_left),
+                    icon: const Icon(Icons.chevron_left),
                     onPressed:() async {
                       setState(() {
                         _appBar = null;
@@ -180,37 +180,35 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         elevation: 0.0,
       ),
       drawer: _drawer(),
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<ImageModel>>(
-            future: _images,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.length == 0) {
-                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_image'));
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<ImageModel>>(
+          future: _images,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_image'));
+              }
+              return GridView.builder(
+                controller: _controller,
+                padding: const EdgeInsets.all(4),
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    crossAxisCount: getDeviceAxisCount(),
+                    crossAxisSpacing: 4.0,
+                    mainAxisSpacing: 4.0
+                ),
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                itemBuilder: (context, index) {
+                  ImageModel image = snapshot.data![index];
+                  return item(image);
                 }
-                return GridView.builder(
-                  controller: _controller,
-                  padding: EdgeInsets.all(4),
-                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: getDeviceAxisCount(),
-                      crossAxisSpacing: 4.0,
-                      mainAxisSpacing: 4.0
-                  ),
-                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                  itemBuilder: (context, index) {
-                    ImageModel image = snapshot.data![index];
-                    return item(image);
-                  }
-                );
-              }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+              );
             }
-          )
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          }
         )
       ),
       bottomNavigationBar: _bottomBar(),
@@ -235,12 +233,12 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                     color: Theme.of(context).primaryColor,
                   ),
                   child: Text(AppLocalizations.of(context)!.text('image_gallery'),
-                      style: TextStyle(color: Colors.white, fontSize: 25)
+                      style: const TextStyle(color: Colors.white, fontSize: 25)
                   ),
                 )
             ),
             ListTile(
-              leading: Icon(Icons.edit),
+              leading: const Icon(Icons.edit),
               title: Text(AppLocalizations.of(context)!.text('add_folder')),
               onTap: () async {
                 String? path = await showDialog(
@@ -261,7 +259,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                 }
               },
             ),
-            Divider()
+            const Divider()
           ];
           if (snapshot.data != null) {
             snapshot.data!.sort((a, b) {
@@ -276,14 +274,14 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
             for(String path in snapshot.data!) {
               Icon? icon;
               if (path == 'pictures') {
-                icon = Icon(Icons.photo_library);
+                icon = const Icon(Icons.photo_library);
               } else if (path == 'camera') {
-                icon = Icon(Icons.camera);
+                icon = const Icon(Icons.camera);
               }
               items.add(ListTile(
                 leading: icon,
                 trailing: icon == null ? IconButton(
-                  icon:Icon(Icons.delete),
+                  icon: const Icon(Icons.delete),
                   onPressed: () async {
                     bool confirm = await showDialog(
                         context: context,
@@ -330,7 +328,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
     return  Container(
         margin: EdgeInsets.zero,
         padding: EdgeInsets.zero,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
             color: FillColor
         ),
         child: Row(
@@ -340,21 +338,21 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                 child: TextField(
                   controller: _searchQueryController,
                   decoration: InputDecoration(
-                      icon: Padding(
+                      icon: const Padding(
                           padding: EdgeInsets.only(left: 4.0),
                           child: Icon(Icons.search)
                       ),
                       hintText: AppLocalizations.of(context)!.text('search_hint'),
                       border: InputBorder.none
                   ),
-                  style: TextStyle(fontSize: 16.0),
+                  style: const TextStyle(fontSize: 16.0),
                   onChanged: (query) {
                     _fetch();
                   },
                 )
             ),
-            if (_searchQueryController.text.length > 0) IconButton(
-              icon: Icon(Icons.clear),
+            if (_searchQueryController.text.isNotEmpty) IconButton(
+              icon: const Icon(Icons.clear),
               onPressed: () {
                 _searchQueryController.clear();
                 _fetch();
@@ -410,9 +408,9 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                     future: _isSelected(image),
                     builder: (BuildContext context, AsyncSnapshot snapshot) {
                       if (snapshot.hasData && snapshot.data) {
-                        return Icon(Icons.check_circle, color: PrimaryColor, size: 32);
+                        return const Icon(Icons.check_circle, color: PrimaryColor, size: 32);
                       }
-                      return Icon(Icons.image, color: Colors.red, size: 32);
+                      return const Icon(Icons.image, color: Colors.red, size: 32);
                     }
                   ),
                   onTapDown: (TapDownDetails details) {
@@ -424,7 +422,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                   child: Text(
                     image.name!,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                    style: const TextStyle(fontWeight: FontWeight.bold),
                   )
                 ),
                 subtitle: FutureBuilder<int?>(
@@ -453,7 +451,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton.icon(
-                icon: Icon(Icons.check_circle_outline_outlined),
+                icon: const Icon(Icons.check_circle_outline_outlined),
                 label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('select_all') : ''),
                 onPressed: () async {
                   List<ImageModel>? list = await _images;
@@ -473,7 +471,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             TextButton.icon(
-              icon: Icon(Icons.highlight_off_outlined),
+              icon: const Icon(Icons.highlight_off_outlined),
               label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('deselect') : ''),
               onPressed: () {
                 setState(() {
@@ -483,14 +481,14 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
               }
             ),
             TextButton.icon(
-              icon: Icon(Icons.drive_file_move),
+              icon: const Icon(Icons.drive_file_move),
               label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('move') : ''),
               onPressed: () {
                 _move();
               }
             ),
             TextButton.icon(
-              icon: Icon(Icons.delete),
+              icon: const Icon(Icons.delete),
               label: Text(DeviceHelper.isDesktop ? AppLocalizations.of(context)!.text('remove') : ''),
               onPressed: () {
                 _delete();
@@ -585,8 +583,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
   }
 
   _imgFromGallery() async {
-    // final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
-    final List<XFile>? images = await _picker.pickMultiImage(
+    final List<XFile> images = await _picker.pickMultiImage(
         maxWidth: 640,
         // maxHeight: 480,
         imageQuality: 80
@@ -606,12 +603,12 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         context: context,
         builder: (BuildContext context) {
           return ConfirmDialog(
-            content: new Row(
+            content: const Row(
               children: <Widget>[
                 Expanded(
-                  child: new TextField(
+                  child: TextField(
                     autofocus: true,
-                    decoration: new InputDecoration(
+                    decoration: InputDecoration(
                         labelText: 'Image URL'),
                   ),
                 )
@@ -669,7 +666,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         builder: (BuildContext context) {
           return DropdownDialog(
             title: AppLocalizations.of(context)!.text('move_images'),
-            initialValue: paths.length > 0 ? paths[0] : null,
+            initialValue: paths.isNotEmpty ? paths[0] : null,
             items: paths.map((value) {
               return DropdownMenuItem<String>(
                   value: value,
@@ -768,7 +765,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
   /// Callback when mouse clicked on `Listener` wrapped widget.
   Future<void> _onPointerDown(Offset position, ImageModel image) async {
     // Check if right mouse button clicked
-    final overlay = Overlay.of(context)!.context.findRenderObject() as RenderBox;
+    final overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
     final menuItem = await showMenu<int>(
         context: context,
         items: [
@@ -776,7 +773,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
           PopupMenuItem(child: Text(AppLocalizations.of(context)!.text('view_image')), value: 2),
           // PopupMenuItem(child: Text(AppLocalizations.of(context)!.text('analyze')), value: 3),
         ],
-        position: RelativeRect.fromSize(position & Size(48.0, 48.0), overlay.size));
+        position: RelativeRect.fromSize(position & const Size(48.0, 48.0), overlay.size));
     // Check if menu item clicked
     switch (menuItem) {
       case 1:
@@ -792,7 +789,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(AppLocalizations.of(context)!.text('use(s)')),
-                content: Container(
+                content: SizedBox(
                   // height: 300.0, // Change as per your requirement
                   // width: 300.0, // Change as per your requirement
                   width: double.maxFinite,
@@ -829,7 +826,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

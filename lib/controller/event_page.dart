@@ -18,11 +18,13 @@ class EventPage extends StatefulWidget {
   final EventModel model;
   final bool cache;
   EventPage(this.model, {this.cache = true});
-  _EventPageState createState() => new _EventPageState();
+
+  @override
+  _EventPageState createState() => _EventPageState();
 }
 
 class _EventPageState extends State<EventPage> {
-  Color _dominantColor = Colors.white;
+  final Color _dominantColor = Colors.white;
   int _baskets = 0;
 
   @override
@@ -44,7 +46,7 @@ class _EventPageState extends State<EventPage> {
           child: Text(widget.model.title!),
         ),
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context);
           }
@@ -52,15 +54,15 @@ class _EventPageState extends State<EventPage> {
         actions: <Widget> [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -73,7 +75,7 @@ class _EventPageState extends State<EventPage> {
       body: widget.model.sliver == false ? SingleChildScrollView(
         child: ListView.builder(
           shrinkWrap: true,
-          physics: NeverScrollableScrollPhysics(),
+          physics: const NeverScrollableScrollPhysics(),
           itemCount: widget.model.widgets!.length,
           itemBuilder: (BuildContext context, int index) {
             // return Container();
@@ -92,7 +94,7 @@ class _EventPageState extends State<EventPage> {
             foregroundColor: _dominantColor,
             backgroundColor: Theme.of(context).primaryColor,
             leading: IconButton(
-              icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+              icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
               onPressed:() async {
                 Navigator.pop(context);
               }
@@ -109,7 +111,7 @@ class _EventPageState extends State<EventPage> {
                 StretchMode.fadeTitle,
               ],
               centerTitle: true,
-              titlePadding: EdgeInsetsDirectional.only(
+              titlePadding: const EdgeInsetsDirectional.only(
                 start: 45.0,
                 end: 10.0,
                 bottom: 16.0,
@@ -144,15 +146,15 @@ class _EventPageState extends State<EventPage> {
             actions: <Widget> [
               badge.Badge(
                 position: badge.BadgePosition.topEnd(top: 0, end: 3),
-                animationDuration: Duration(milliseconds: 300),
+                animationDuration: const Duration(milliseconds: 300),
                 animationType: badge.BadgeAnimationType.slide,
                 showBadge: _baskets > 0,
                 badgeContent: _baskets > 0 ? Text(
                   _baskets.toString(),
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ) : null,
                 child: IconButton(
-                  icon: Icon(Icons.shopping_cart_outlined),
+                  icon: const Icon(Icons.shopping_cart_outlined),
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
                       return BasketPage();

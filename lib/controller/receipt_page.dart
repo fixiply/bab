@@ -1,4 +1,3 @@
-import 'package:bb/widgets/dialogs/rating_dialog.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -23,7 +22,7 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/ibu.dart';
-import 'package:bb/utils/rating.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
 import 'package:bb/widgets/containers/ratings_container.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -42,13 +41,12 @@ import 'package:provider/provider.dart';
 class ReceiptPage extends StatefulWidget {
   final ReceiptModel model;
   ReceiptPage(this.model);
-  _ReceiptPageState createState() => new _ReceiptPageState();
+
+  @override
+  _ReceiptPageState createState() => _ReceiptPageState();
 }
 
 class _ReceiptPageState extends State<ReceiptPage> {
-  GlobalKey _keyReviews = GlobalKey();
-  final ScrollController _controller = ScrollController();
-
   // Edition mode
   bool _expanded = true;
   int _baskets = 0;
@@ -62,6 +60,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
     _initialize();
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: CustomScrollView(slivers: <Widget>[
@@ -71,13 +70,13 @@ class _ReceiptPageState extends State<ReceiptPage> {
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
           leading: IconButton(
-            icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }
           ),
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 170, bottom: 15),
+            titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
             title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
             background: Stack(
               children: [
@@ -97,14 +96,14 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   Stack(
                     children: [
                       Container(
-                        padding: EdgeInsets.only(left: 30),
+                        padding: const EdgeInsets.only(left: 30),
                         child: Image.asset('assets/images/beer_1.png',
                           color: ColorHelper.color(widget.model.ebc) ?? Colors.white,
                           colorBlendMode: BlendMode.modulate
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.only(left: 30),
+                        padding: const EdgeInsets.only(left: 30),
                         child: Image.asset('assets/images/beer_2.png'),
                       ),
                     ]
@@ -125,7 +124,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.center,
                             children: [
-                              if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+                              if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
                               RatingBar.builder(
                                 initialRating: _rating,
                                 direction: Axis.horizontal,
@@ -133,7 +132,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                 itemCount: 5,
                                 itemSize: 18,
                                 itemPadding: EdgeInsets.zero,
-                                itemBuilder: (context, _) => Icon(
+                                itemBuilder: (context, _) => const Icon(
                                   Icons.star,
                                   color: Colors.amber,
                                 ),
@@ -143,7 +142,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                                 },
                               ),
                               const SizedBox(height: 3),
-                              Text('${_notices} ${AppLocalizations.of(context)!.text('reviews')}', style: TextStyle(color: Colors.white)),
+                              Text('$_notices ${AppLocalizations.of(context)!.text('reviews')}', style: const TextStyle(color: Colors.white)),
                             ],
                           ),
                         ),
@@ -157,15 +156,15 @@ class _ReceiptPageState extends State<ReceiptPage> {
           actions: <Widget>[
             badge.Badge(
               position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              animationDuration: Duration(milliseconds: 300),
+              animationDuration: const Duration(milliseconds: 300),
               animationType: badge.BadgeAnimationType.slide,
               showBadge: _baskets > 0,
               badgeContent: _baskets > 0 ? Text(
                 _baskets.toString(),
-                style: TextStyle(color: Colors.white),
+                style: const TextStyle(color: Colors.white),
               ) : null,
               child: IconButton(
-                icon: Icon(Icons.shopping_cart_outlined),
+                icon: const Icon(Icons.shopping_cart_outlined),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
                     return BasketPage();
@@ -174,7 +173,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
               ),
             ),
             if (widget.model.isEditable()) IconButton(
-              icon: Icon(Icons.edit_note),
+              icon: const Icon(Icons.edit_note),
               onPressed: () {
                 _edit(widget.model);
               },
@@ -190,7 +189,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         ),
         SliverToBoxAdapter(
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 12.0),
+            padding: const EdgeInsets.symmetric(vertical: 12.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -229,11 +228,11 @@ class _ReceiptPageState extends State<ReceiptPage> {
                           SliderTheme(
                             data: SliderThemeData(
                               trackHeight: 5,
-                              trackShape: GradientRectSliderTrackShape(darkenInactive: false),
+                              trackShape: const GradientRectSliderTrackShape(darkenInactive: false),
                               thumbColor: Theme.of(context).primaryColor,
                               overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
                               thumbShape: GradientSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor, selectedValue: 10, max: AppLocalizations.of(context)!.maxColor),
-                              valueIndicatorShape: PaddleSliderValueIndicatorShape(),
+                              valueIndicatorShape: const PaddleSliderValueIndicatorShape(),
                             ),
                             child: Slider(
                               value: AppLocalizations.of(context)!.color(widget.model.ebc)?.toDouble() ?? 0,
@@ -263,7 +262,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         ),
         SliverToBoxAdapter(
           child: Container(
-            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -271,13 +270,13 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.all(8),
-                        child: Text('${AppLocalizations.of(context)!.text('style')} : ${AppLocalizations.of(context)!.localizedText(widget.model.style!.name) ?? '-'}', overflow: TextOverflow.ellipsis)
+                        padding: const EdgeInsets.all(8),
+                        child: Text('${AppLocalizations.of(context)!.text('style')} : ${AppLocalizations.of(context)!.localizedText(widget.model.style!.name)}', overflow: TextOverflow.ellipsis)
                       ),
                     ),
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: RichText(
                           textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
@@ -285,7 +284,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'efficiency' : 'pasting_efficiency')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -297,7 +296,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   children: [
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: RichText(
                           textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
@@ -305,7 +304,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -313,7 +312,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                     ),
                     Expanded(
                       child: Padding(
-                        padding: EdgeInsets.all(8),
+                        padding: const EdgeInsets.all(8),
                         child: RichText(
                           textAlign: TextAlign.left,
                           overflow: TextOverflow.ellipsis,
@@ -321,7 +320,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'boiling' : 'boiling_time')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.tempFormat(widget.model.boil), style: TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: AppLocalizations.of(context)!.tempFormat(widget.model.boil), style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
@@ -335,7 +334,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
         ),
         if (widget.model.text != null && widget.model.text!.isNotEmpty) SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: ExpansionPanelList(
               elevation: 1,
               expandedHeaderPadding: EdgeInsets.zero,
@@ -351,14 +350,14 @@ class _ReceiptPageState extends State<ReceiptPage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('features'),
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
                       data: AppLocalizations.of(context)!.localizedText(widget.model.text),
                       fitContent: true,
@@ -378,10 +377,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: FermentablesDataTable(
                         data: snapshot.data,
-                        title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        title: Text(AppLocalizations.of(context)!.text('fermentables'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                         allowEditing: false, allowSorting: false, showCheckboxColumn: false
                     ),
                   );
@@ -394,10 +393,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: HopsDataTable(
                         data: snapshot.data,
-                        title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        title: Text(AppLocalizations.of(context)!.text('hops'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                         allowEditing: false, allowSorting: false, showCheckboxColumn: false
                     ),
                   );
@@ -410,10 +409,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: YeastsDataTable(
                         data: snapshot.data,
-                        title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        title: Text(AppLocalizations.of(context)!.text('yeasts'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                         allowEditing: false, allowSorting: false, showCheckboxColumn: false
                     ),
                   );
@@ -426,10 +425,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
-                    padding: EdgeInsets.all(8.0),
+                    padding: const EdgeInsets.all(8.0),
                     child: MiscDataTable(
                         data: snapshot.data,
-                        title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                         allowEditing: false, allowSorting: false, showCheckboxColumn: false
                     ),
                   );
@@ -438,10 +437,10 @@ class _ReceiptPageState extends State<ReceiptPage> {
               }
             ),
             if (widget.model.mash != null && widget.model.mash!.isNotEmpty) Padding(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               child: MashDataTable(
                 data: widget.model.mash,
-                title: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                title: Text(AppLocalizations.of(context)!.text('mash'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             )
@@ -450,17 +449,16 @@ class _ReceiptPageState extends State<ReceiptPage> {
         SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
         SliverToBoxAdapter(
           child: Padding(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
               child: RatingsContainer(widget.model)
              )
            )
         ]
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AnimatedActionButton(
+        title: AppLocalizations.of(context)!.text('new_brew'),
+        icon: const Icon(Icons.add),
         onPressed: _new,
-        backgroundColor: Theme.of(context).primaryColor,
-        tooltip: AppLocalizations.of(context)!.text('new_brew'),
-        child: const Icon(Icons.add)
       )
     );
   }

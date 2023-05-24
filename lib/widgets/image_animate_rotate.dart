@@ -15,7 +15,7 @@ class _ImageAnimateRotateState extends State<ImageAnimateRotate> with SingleTick
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this, duration: Duration(seconds: 2))..repeat();
+    _controller = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
   }
 
   @override

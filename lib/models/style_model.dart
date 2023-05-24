@@ -2,20 +2,19 @@
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
-import 'package:flutter/material.dart';
 
 class StyleModel<T> extends Model {
   Status? status;
   Fermentation? fermentation;
-  dynamic? name;
+  dynamic name;
   String? number;
-  dynamic? category;
-  dynamic? overallimpression;
-  dynamic? aroma;
-  dynamic? appareance;
-  dynamic? flavor;
-  dynamic? mouthfeel;
-  dynamic? comments;
+  dynamic category;
+  dynamic overallimpression;
+  dynamic aroma;
+  dynamic appareance;
+  dynamic flavor;
+  dynamic mouthfeel;
+  dynamic comments;
   double? ogmin;
   double? ogmax;
   double? fgmin;
@@ -55,6 +54,7 @@ class StyleModel<T> extends Model {
     this.ebcmax
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -80,6 +80,7 @@ class StyleModel<T> extends Model {
     this.ebcmax = map['ebcmax'];
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -110,10 +111,10 @@ class StyleModel<T> extends Model {
 
   StyleModel copy() {
     return StyleModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       fermentation: this.fermentation,
       name: this.name,
@@ -139,9 +140,13 @@ class StyleModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is StyleModel && other.uuid == uuid || other is String && other == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

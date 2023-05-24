@@ -1,6 +1,5 @@
-import 'package:flutter/cupertino.dart';
+import 'package:bb/controller/test_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/account_page.dart';
@@ -35,7 +34,9 @@ import 'package:provider/provider.dart';
 class HomePage extends StatefulWidget {
   final String? payload;
   HomePage({Key? key, this.payload}) : super(key: key);
-  _HomeState createState() => new _HomeState();
+
+  @override
+  _HomeState createState() => _HomeState();
 }
 
 class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
@@ -83,7 +84,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                   showToggle: true,
                   controller: _sideMenu,
                   title: _title(orientation),
-                  footer: Text(_version ?? '', style: TextStyle(color: Colors.white)),
+                  footer: Text(_version ?? '', style: const TextStyle(color: Colors.white)),
                   style: SideMenuStyle(
                     displayMode: orientation == Orientation.landscape ? SideMenuDisplayMode.auto : SideMenuDisplayMode.compact,
                     compactSideMenuWidth: 60,
@@ -91,93 +92,93 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                     selectedIconColor: Colors.white,
                     unselectedIconColor: Colors.white,
                     toggleColor: Colors.white,
-                    selectedTitleTextStyle: TextStyle(color: Colors.white),
-                    unselectedTitleTextStyle: TextStyle(color: Colors.white),
+                    selectedTitleTextStyle: const TextStyle(color: Colors.white),
+                    unselectedTitleTextStyle: const TextStyle(color: Colors.white),
                   ),
                   // List of SideMenuItem to show them on SideMenu
                   items: [
                     SideMenuItem(
                       priority: 0,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.home_outlined),
+                      icon: const Icon(Icons.home_outlined),
                       title: AppLocalizations.of(context)!.text('home')
                     ),
                     SideMenuItem(
                       priority: 1,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.sports_bar_outlined),
+                      icon: const Icon(Icons.sports_bar_outlined),
                       title: AppLocalizations.of(context)!.text('receipts'),
                     ),
                     SideMenuItem(
                       priority: 2,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.style_outlined),
+                      icon: const Icon(Icons.style_outlined),
                       title: AppLocalizations.of(context)!.text('beer_styles'),
                     ),
                     SideMenuItem(
                       priority: 3,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.science_outlined),
+                      icon: const Icon(Icons.science_outlined),
                       title: AppLocalizations.of(context)!.text('ingredients'),
                     ),
                     if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
                       priority: 4,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.delete_outline),
+                      icon: const Icon(Icons.delete_outline),
                       title: AppLocalizations.of(context)!.text('equipments'),
                     ),
                     if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
                       priority: 5,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.outdoor_grill_outlined),
+                      icon: const Icon(Icons.outdoor_grill_outlined),
                       title: AppLocalizations.of(context)!.text('brews'),
                     ),
                     if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
                       priority: 6,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.inventory_outlined),
+                      icon: const Icon(Icons.inventory_outlined),
                       title: AppLocalizations.of(context)!.text('inventory'),
                     ),
                     if (currentUser != null) SideMenuItem(
                       priority: 7,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.calendar_month_outlined),
+                      icon: const Icon(Icons.calendar_month_outlined),
                       title: AppLocalizations.of(context)!.text('calendar'),
                     ),
                     if (currentUser != null) SideMenuItem(
                       priority: 8,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.build_outlined),
+                      icon: const Icon(Icons.build_outlined),
                       title: AppLocalizations.of(context)!.text('tools'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                       priority: 9,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.local_offer_outlined),
+                      icon: const Icon(Icons.local_offer_outlined),
                       title: AppLocalizations.of(context)!.text('orders'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                       priority: 10,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.photo_library_outlined),
+                      icon: const Icon(Icons.photo_library_outlined),
                       title: AppLocalizations.of(context)!.text('image_gallery'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                       priority: 11,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.article_outlined),
+                      icon: const Icon(Icons.article_outlined),
                       title: AppLocalizations.of(context)!.text('products'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
                       priority: 12,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.groups_outlined),
+                      icon: const Icon(Icons.groups_outlined),
                       title: AppLocalizations.of(context)!.text('companies'),
                     ),
                     SideMenuItem(
                       priority: 13,
                       onTap: (page, _) => _sideMenu.changePage(page),
-                      icon: Icon(Icons.person_outline),
+                      icon: const Icon(Icons.person_outline),
                       title: AppLocalizations.of(context)!.text('my_account'),
                     ),
                   ],
@@ -185,6 +186,9 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                 Expanded(
                   child: PageView(
                     controller: _page,
+                    onPageChanged: (index) {
+                      _sideMenu.changePage(index);
+                    },
                     children: [
                       Navigator(
                         onGenerateRoute: (RouteSettings settings) {
@@ -254,7 +258,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
-                            builder: (_) => ToolsPage(),
+                            builder: (_) => TestPage(),
                           );
                         }
                       ),
@@ -329,21 +333,21 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       return null;
     }
     return Padding(
-      padding: EdgeInsets.only(top: 24.0),
+      padding: const EdgeInsets.only(top: 24.0),
       child: RichText(
         textAlign: TextAlign.left,
         overflow: TextOverflow.ellipsis,
         text: TextSpan(
           style: DefaultTextStyle.of(context).style,
           children: [
-            TextSpan(text: 'Be', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
-            WidgetSpan(
+            const TextSpan(text: 'Be', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
+            const WidgetSpan(
               child: RotatedBox(
                 quarterTurns: -1,
                 child: Text(' And', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.white))
               )
             ),
-            TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
+            const TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
           ],
         ),
       )
@@ -353,23 +357,23 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   List<BottomNavigationBarItem> _generateItems() {
     return [
       BottomNavigationBarItem(
-        icon: ImageIcon(AssetImage('assets/images/logo.png')),
+        icon: const ImageIcon(AssetImage('assets/images/logo.png')),
         label: AppLocalizations.of(context)!.text('home'),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.sports_bar_outlined),
+        icon: const Icon(Icons.sports_bar_outlined),
         label: AppLocalizations.of(context)!.text('receipts'),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.style_outlined),
+        icon: const Icon(Icons.style_outlined),
         label: AppLocalizations.of(context)!.text('styles'),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.science_outlined),
+        icon: const Icon(Icons.science_outlined),
         label: AppLocalizations.of(context)!.text('ingredients'),
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.person_outline),
+        icon: const Icon(Icons.person_outline),
         label: AppLocalizations.of(context)!.text('my_account'),
       ),
     ];
@@ -391,22 +395,18 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
 
   void _configureFirebaseMessaging() {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      if (message != null) {
-        RemoteNotification? notification = message.notification;
-        if (notification != null) {
-          String? payload = message.data['id'];
-          _payload(payload);
-        }
+      RemoteNotification? notification = message.notification;
+      if (notification != null) {
+        String? payload = message.data['id'];
+        _payload(payload);
       }
     });
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      if (message != null) {
-        RemoteNotification? notification = message.notification;
-        if (notification != null) {
-          String? payload = message.data['id'];
-          _payload(payload);
-        }
+      RemoteNotification? notification = message.notification;
+      if (notification != null) {
+        String? payload = message.data['id'];
+        _payload(payload);
       }
     });
   }

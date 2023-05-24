@@ -24,6 +24,7 @@ class ConfirmDialog extends StatefulWidget {
 }
 
 class _ConfirmDialogState extends State<ConfirmDialog> {
+  @override
   Widget build(BuildContext context) {
     if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(

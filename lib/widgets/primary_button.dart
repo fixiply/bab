@@ -9,7 +9,7 @@ class CustomPrimaryButton extends StatelessWidget {
   final GestureTapCallback? onTap;
 
   CustomPrimaryButton({this.buttonColor, required this.textValue, this.textColor, this.decoration, this.onTap}) {
-    if(decoration == null) decoration = BoxDecoration(
+    decoration ??= BoxDecoration(
       color: buttonColor ?? PrimaryColor,
       borderRadius: BorderRadius.circular(4.0),
     );
@@ -38,6 +38,5 @@ class CustomPrimaryButton extends StatelessWidget {
         ),
       ),
     );
-    ;
   }
 }

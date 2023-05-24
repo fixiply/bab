@@ -19,13 +19,13 @@ extension Ex on double {
 
 class MiscModel<T> extends Model {
   Status? status;
-  dynamic? name;
+  dynamic name;
   Misc? type;
   Use? use;
   Unit? unit;
   int? duration;
   double? amount;
-  dynamic? notes;
+  dynamic notes;
 
   MiscModel({
     String? uuid,
@@ -44,6 +44,7 @@ class MiscModel<T> extends Model {
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -54,6 +55,7 @@ class MiscModel<T> extends Model {
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -70,10 +72,10 @@ class MiscModel<T> extends Model {
 
   MiscModel copy() {
     return MiscModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       name: this.name,
       type: this.type,
@@ -86,9 +88,13 @@ class MiscModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is MiscModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -139,7 +145,7 @@ class MiscModel<T> extends Model {
           values.addAll(deserialize(value));
         }
       } else {
-        MiscModel model = new MiscModel();
+        MiscModel model = MiscModel();
         model.fromMap(data);
         values.add(model);
       }
@@ -170,7 +176,7 @@ class MiscModel<T> extends Model {
       if (data is List) {
         List<dynamic> values = [];
         for(final item in data) {
-          Quantity model = new Quantity();
+          Quantity model = Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
           model.duration = item.duration;

@@ -13,6 +13,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 class ReceiptField extends FormField<ReceiptModel> {
   final String? title;
   final void Function(ReceiptModel? value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
   ReceiptField({Key? key, required BuildContext context, ReceiptModel? initialValue, this.title, this.onChanged, this.validator}) : super(
@@ -51,8 +52,8 @@ class _BeerStyleFieldState extends FormFieldState<ReceiptModel> {
   Widget build(BuildContext context) {
     return InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        icon: Icon(Icons.sports_bar_outlined),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        icon: const Icon(Icons.sports_bar_outlined),
         fillColor: FillColor,
         filled: true,
       ),
@@ -68,7 +69,7 @@ class _BeerStyleFieldState extends FormFieldState<ReceiptModel> {
               asyncItems: (String filter) async {
                 return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.title).contains(filter)).toList();
               },
-              popupProps: PopupProps.menu(
+              popupProps: const PopupProps.menu(
                 showSelectedItems: true,
                 showSearchBox: true,
               ),

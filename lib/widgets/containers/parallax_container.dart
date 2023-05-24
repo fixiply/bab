@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/product_page.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/containers/abstract_container.dart';
 import 'package:bb/widgets/custom_image.dart';
 
@@ -19,7 +18,8 @@ class ParallaxContainer extends AbstractContainer {
       product: product
   );
 
-  _ParallaxContainerState createState() => new _ParallaxContainerState();
+  @override
+  _ParallaxContainerState createState() => _ParallaxContainerState();
 }
 
 class _ParallaxContainerState extends AbstractContainerState {
@@ -59,7 +59,7 @@ class _ParallaxContainerState extends AbstractContainerState {
                               Expanded(
                                 child: Column(
                                   children: [
-                                    if (rating > 0) Text(rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black)),
+                                    if (rating > 0) Text(rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black)),
                                     RatingBar.builder(
                                       initialRating: rating,
                                       direction: Axis.horizontal,
@@ -67,14 +67,14 @@ class _ParallaxContainerState extends AbstractContainerState {
                                       itemCount: 5,
                                       itemSize: 16,
                                       itemPadding: EdgeInsets.zero,
-                                      itemBuilder: (context, _) => Icon(
+                                      itemBuilder: (context, _) => const Icon(
                                         Icons.star,
                                         color: Colors.amber,
                                       ),
                                       ignoreGestures: true,
                                       onRatingUpdate: (rating) async {},
                                     ),
-                                    Text('${notice} ${AppLocalizations.of(context)!.text('reviews')}')
+                                    Text('$notice ${AppLocalizations.of(context)!.text('reviews')}')
                                   ],
                                 )
                               )
@@ -82,8 +82,8 @@ class _ParallaxContainerState extends AbstractContainerState {
                           )
                         ),
                         const SizedBox(height: 12),
-                        Text(model.title!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                        if (model.subtitle != null) Text(model.subtitle!, style: TextStyle(fontSize: 14)),
+                        Text(model.title!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+                        if (model.subtitle != null) Text(model.subtitle!, style: const TextStyle(fontSize: 14)),
                         const SizedBox(height: 4),
                         button(model)
                       ],
@@ -92,7 +92,7 @@ class _ParallaxContainerState extends AbstractContainerState {
                 }),
             );
           }
-          return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
         }
       )
     );

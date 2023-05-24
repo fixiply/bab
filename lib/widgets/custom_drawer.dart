@@ -1,3 +1,4 @@
+import 'package:bb/controller/test_page.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -32,7 +33,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('equipments'),
-              style: TextStyle(fontSize: 18)
+            style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -44,7 +45,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('brews'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -56,7 +57,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('inventory'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -68,20 +69,20 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('tools'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return ToolsPage();
+              return TestPage();
             })).then((value) {
               Navigator.pop(context);
             });
           },
         ),
-        if (currentUser != null) Divider(height: 10),
+        if (currentUser != null) const Divider(height: 10),
         if (currentUser != null) ListTile(
           title: Text(AppLocalizations.of(context)!.text('calendar'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -93,7 +94,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('orders'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -105,7 +106,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('image_gallery'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -117,7 +118,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('products'),
-            style: TextStyle(fontSize: 18)
+            style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -129,7 +130,7 @@ class CustomDrawer<Object> extends Drawer {
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
           title: Text(AppLocalizations.of(context)!.text('companies'),
-              style: TextStyle(fontSize: 18)
+              style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {

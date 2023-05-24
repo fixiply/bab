@@ -21,7 +21,7 @@ abstract class _CustomMenuButton extends PopupMenuButton {
   _CustomMenuButton({Key? key, required BuildContext context, bool publish = false, bool filtered = false, bool archived = false, bool measures = false, PopupMenuItemSelected? onSelected, this.joints}) : super(
     key: key,
     padding: EdgeInsets.zero,
-    icon: Icon(Icons.more_vert),
+    icon: const Icon(Icons.more_vert),
     tooltip: MaterialLocalizations.of(context).showMenuTooltip,
     onSelected: (value) async {
       if (value == Menu.settings) {
@@ -39,15 +39,13 @@ abstract class _CustomMenuButton extends PopupMenuButton {
           value: Menu.settings,
           child: Text(AppLocalizations.of(context)!.text('alert_settings'))
         ),
-        if (!DeviceHelper.isDesktop) PopupMenuDivider(height: 5),
+        if (!DeviceHelper.isDesktop) const PopupMenuDivider(height: 5),
         PopupMenuItem(
           child: PopupMenuButton(
             padding: EdgeInsets.zero,
             child: Text(AppLocalizations.of(context)!.text('languages')),
             onSelected: (value) async {
-              if (value is Locale) {
-                Provider.of<LocaleNotifier>(context, listen: false).set(value);
-              }
+              Provider.of<LocaleNotifier>(context, listen: false).set(value);
             },
             itemBuilder: (_) {
               return [
@@ -65,17 +63,15 @@ abstract class _CustomMenuButton extends PopupMenuButton {
             },
           ),
         ),
-        if (measures) PopupMenuDivider(height: 5),
+        if (measures) const PopupMenuDivider(height: 5),
         if (measures) PopupMenuItem(
           child: PopupMenuButton(
             padding: EdgeInsets.zero,
             child: Text(AppLocalizations.of(context)!.text('measuring_systems')),
             onSelected: (value) async {
-              if (value is Measure) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.measure = value;
-                onSelected?.call(value);
-              }
+              final provider = Provider.of<ValuesNotifier>(context, listen: false);
+              provider.measure = value;
+              onSelected?.call(value);
             },
             itemBuilder: (_) {
               return [
@@ -93,16 +89,14 @@ abstract class _CustomMenuButton extends PopupMenuButton {
             },
           ),
         ),
-        if (measures) PopupMenuDivider(height: 5),
+        if (measures) const PopupMenuDivider(height: 5),
         if (measures) PopupMenuItem(
           child: PopupMenuButton(
             child: Text(AppLocalizations.of(context)!.text('gravity_units')),
             onSelected: (value) async {
-              if (value is Gravity) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.gravity = value;
-                onSelected?.call(value);
-              }
+              final provider = Provider.of<ValuesNotifier>(context, listen: false);
+              provider.gravity = value;
+              onSelected?.call(value);
             },
             itemBuilder: (_) {
               return [
@@ -112,12 +106,12 @@ abstract class _CustomMenuButton extends PopupMenuButton {
                   checked: Gravity.sg == AppLocalizations.of(context)!.gravity,
                 ),
                 CheckedPopupMenuItem(
-                  child: Text('Plato °P'),
+                  child: const Text('Plato °P'),
                   value: Gravity.plato,
                   checked: Gravity.plato == AppLocalizations.of(context)!.gravity,
                 ),
                 CheckedPopupMenuItem(
-                  child: Text('Brix °Bx'),
+                  child: const Text('Brix °Bx'),
                   value: Gravity.brix,
                   checked: Gravity.brix == AppLocalizations.of(context)!.gravity,
                 ),
@@ -125,12 +119,12 @@ abstract class _CustomMenuButton extends PopupMenuButton {
             },
           ),
         ),
-        if (publish) PopupMenuDivider(height: 5),
+        if (publish) const PopupMenuDivider(height: 5),
         if (publish) PopupMenuItem(
           child: Text(AppLocalizations.of(context)!.text('publish_everything')),
           value: Menu.publish,
         ),
-        if (filtered) PopupMenuDivider(height: 5),
+        if (filtered) const PopupMenuDivider(height: 5),
         if (filtered) PopupMenuItem(
           enabled: false,
           value: null,

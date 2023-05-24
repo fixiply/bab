@@ -11,7 +11,8 @@ import 'package:bb/utils/constants.dart';
 import 'package:uuid/uuid.dart';
 
 class PaymentsPage extends StatefulWidget {
-  _PaymentsPageState createState() => new _PaymentsPageState();
+  @override
+  _PaymentsPageState createState() => _PaymentsPageState();
 }
 
 class _PaymentsPageState extends State<PaymentsPage> {
@@ -51,7 +52,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
         controller: _controller,
         children: [
           Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Text(AppLocalizations.of(context)!.text('registered_cards'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
           ),
           for(PaymentModel payment in payments) ListTileTheme(
@@ -59,7 +60,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
             child: ListTile(
               contentPadding: EdgeInsets.zero,
               title: Container(
-                padding:  EdgeInsets.all(12),
+                padding:  const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -83,7 +84,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
             )
           ),
           TextButton.icon(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             label: Text(AppLocalizations.of(context)!.text('add_card').toUpperCase(), textAlign: TextAlign.left),
             style: TextButton.styleFrom(
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -102,7 +103,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
     })).then((value) {
       if (value != null) {
         setState(() {
-          newModel.uuid = Uuid().v4();
+          newModel.uuid = const Uuid().v4();
           currentUser!.payments!.add(newModel);
           Database().update(currentUser).then((value) async {
             _showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
@@ -134,7 +135,7 @@ class _PaymentsPageState extends State<PaymentsPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

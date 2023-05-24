@@ -18,7 +18,7 @@ class Model<T> {
     this.isEdited = false,
     this.isSelected = false
   }) {
-    if(inserted_at == null) { inserted_at = DateTime.now(); }
+    inserted_at ??= DateTime.now();
   }
 
   void fromMap(Map<String, dynamic> map) {

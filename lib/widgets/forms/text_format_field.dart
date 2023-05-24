@@ -9,9 +9,11 @@ import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class TextFormatField extends FormField<TextFormat> {
+  @override
   final TextFormat? initialValue;
   InputDecoration? decoration;
   final void Function(TextFormat? value)? onChanged;
+  @override
   final FormFieldValidator<TextFormat>? validator;
 
   TextFormatField({Key? key, required BuildContext context, this.initialValue, this.decoration, this.onChanged, this.validator}) : super(
@@ -27,8 +29,6 @@ class TextFormatField extends FormField<TextFormat> {
 }
 
 class _TextFormatFieldState extends FormFieldState<TextFormat> {
-  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-
   @override
   TextFormatField get widget => super.widget as TextFormatField;
 
@@ -52,7 +52,7 @@ class _TextFormatFieldState extends FormFieldState<TextFormat> {
         decoration: widget.decoration!
       ),
       trailing: IconButton(
-        icon:Icon(Icons.text_format),
+        icon:const Icon(Icons.text_format),
         onPressed: () async {
           _showDialog(widget.initialValue);
         }
@@ -70,7 +70,7 @@ class _TextFormatFieldState extends FormFieldState<TextFormat> {
           builder: (context, setState) {
             return ConfirmDialog(
               title: AppLocalizations.of(context)!.text('text_style'),
-              content: Container(
+              content: SizedBox(
                 height: 150,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -79,7 +79,7 @@ class _TextFormatFieldState extends FormFieldState<TextFormat> {
                     Row(
                       children: [
                         Text('${AppLocalizations.of(context)!.text('size')} :'),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         DropdownButton<double>(
                           value: text!.size,
                           onChanged: (double? value) {
@@ -99,9 +99,9 @@ class _TextFormatFieldState extends FormFieldState<TextFormat> {
                     ),
                     ToggleButtons(
                       children: <Widget>[
-                        Icon(Icons.format_bold),
-                        Icon(Icons.format_italic),
-                        Icon(Icons.format_underline),
+                        const Icon(Icons.format_bold),
+                        const Icon(Icons.format_italic),
+                        const Icon(Icons.format_underline),
                       ],
                       onPressed: (int index) {
                         setState(() {
@@ -113,7 +113,7 @@ class _TextFormatFieldState extends FormFieldState<TextFormat> {
                     Row(
                       children: [
                         Text('${AppLocalizations.of(context)!.text('color')} :'),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         ElevatedButton(
                           style: ElevatedButton.styleFrom(padding: EdgeInsets.zero, backgroundColor: Color(text.color!)),
                           onPressed: () async {

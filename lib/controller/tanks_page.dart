@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/forms/form_equipment_page.dart';
@@ -12,6 +11,7 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/custom_image.dart';
@@ -31,7 +31,8 @@ class TanksPage extends StatefulWidget {
   ReceiptModel? receipt;
   TanksPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.receipt}) : super(key: key);
 
-  _TanksPageState createState() => new _TanksPageState();
+  @override
+  _TanksPageState createState() => _TanksPageState();
 }
 
 class CustomListItem extends StatelessWidget {
@@ -55,7 +56,7 @@ class CustomListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: weight,
-      padding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: InkWell(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,7 +131,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
         leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context, selected);
           }
@@ -164,72 +165,69 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
           ),
         ],
       ),
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<EquipmentModel>>(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.length == 0) {
-                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<EquipmentModel>>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+              }
+              if (_showList || widget.showCheckboxColumn == true) {
+                if (widget.loadMore) {
+                  _dataSource.data = snapshot.data!;
+                  _dataSource.handleLoadMoreRows();
+                } else {
+                  _dataSource.buildDataGridRows(snapshot.data!);
                 }
-                if (_showList || widget.showCheckboxColumn == true) {
-                  if (widget.loadMore) {
-                    _dataSource.data = snapshot.data!;
-                    _dataSource.handleLoadMoreRows();
-                  } else {
-                    _dataSource.buildDataGridRows(snapshot.data!);
-                  }
-                  _dataSource.notifyListeners();
-                  return EditSfDataGrid(
-                    context,
-                    allowEditing: widget.allowEditing,
-                    showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: SelectionMode.multiple,
-                    source: _dataSource,
-                    controller: getDataGridController(),
-                    onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                      setState(() {
-                        for(var row in addedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.add(snapshot.data![index]);
-                        }
-                        for(var row in removedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.remove(snapshot.data![index]);
-                        }
-                      });
-                    },
-                    columns: TankDataSource.columns(context: context, showQuantity: false),
-                  );
-                }
-                return ListView.builder(
-                  controller: _controller,
-                  shrinkWrap: true,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                  itemBuilder: (context, index) {
-                    EquipmentModel model = snapshot.data![index];
-                    return _item(model);
-                  }
+                _dataSource.notifyListeners();
+                return EditSfDataGrid(
+                  context,
+                  allowEditing: widget.allowEditing,
+                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  selectionMode: SelectionMode.multiple,
+                  source: _dataSource,
+                  controller: getDataGridController(),
+                  onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+                    setState(() {
+                      for(var row in addedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.add(snapshot.data![index]);
+                      }
+                      for(var row in removedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.remove(snapshot.data![index]);
+                      }
+                    });
+                  },
+                  columns: TankDataSource.columns(context: context, showQuantity: false),
                 );
               }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+              return ListView.builder(
+                controller: _controller,
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                itemBuilder: (context, index) {
+                  EquipmentModel model = snapshot.data![index];
+                  return _item(model);
+                }
+              );
             }
-          )
-        ),
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          }
+        )
       ),
       floatingActionButton: Visibility(
         visible: currentUser != null,
-        child: FloatingActionButton(
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new'),
+          icon: const Icon(Icons.add),
           onPressed: _new,
-          backgroundColor: Theme.of(context).primaryColor,
-          tooltip: AppLocalizations.of(context)!.text('new'),
-          child: const Icon(Icons.add)
         )
       )
     );
@@ -249,11 +247,11 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
 
   Widget _item(EquipmentModel model) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: CustomListItem(
         weight: 100,
         leading: CustomImage.network(model.image!.url, height: 100, width: 70, emptyImage: Image.asset('assets/images/logo.jpg', fit: BoxFit.fill)),
-        title: Text(AppLocalizations.of(context)!.localizedText(model.name), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        title: Text(AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,7 +263,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
                   if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.volume)}'),
-                  if (model.volume != null || model.mash_volume != null) TextSpan(text: '  -  '),
+                  if (model.volume != null || model.mash_volume != null) const TextSpan(text: '  -  '),
                   if (model.mash_volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.mash_volume)}'),
                 ],
               ),
@@ -275,7 +273,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
           ],
         ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) {
             if (value == 'edit') {
@@ -373,7 +371,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

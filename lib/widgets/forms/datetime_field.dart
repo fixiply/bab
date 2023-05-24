@@ -9,6 +9,7 @@ class DateTimeField extends FormField<DateTime?> {
   InputDecoration? decoration;
   bool? hour;
   final void Function(DateTime? value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
   DateTimeField({Key? key, required BuildContext context, this.datetime, this.decoration, this.onChanged, this.hour = true, AutovalidateMode? autovalidateMode, this.validator}) : super(
@@ -48,8 +49,8 @@ class _DateTimeFieldState extends FormFieldState<DateTime?> {
       controller: TextEditingController()..text = format(widget.initialValue) ?? '',
       readOnly: true,
       decoration: widget.decoration ?? FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
-        icon: Icon(Icons.date_range)
+        contentPadding: const EdgeInsets.all(0.0),
+        icon: const Icon(Icons.date_range)
       ),
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(

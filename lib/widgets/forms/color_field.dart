@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/form_decoration.dart';
 
 // External package
 import 'package:flex_color_picker/flex_color_picker.dart';
 
 class ColorField extends FormField<String> {
   final void Function(String? value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
   ColorField({Key? key, required BuildContext context, String? initialValue, this.onChanged, this.validator}) : super(
@@ -25,8 +24,6 @@ class ColorField extends FormField<String> {
 }
 
 class _BeerStyleFieldState extends FormFieldState<String> {
-  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-
   @override
   ColorField get widget => super.widget as ColorField;
 

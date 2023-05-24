@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'dart:ui';
 
 class LocalizedText<T> implements Comparable<LocalizedText> {
@@ -7,7 +6,7 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
   LocalizedText({
     this.map,
   }){
-    if (map == null) map = {};
+    map ??= {};
   }
 
   LocalizedText copy() {
@@ -16,11 +15,7 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     );
   }
 
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return (other is LocalizedText && other.map == map);
-  }
-
+  @override
   int compareTo(other) {
     return toString().compareTo(other.toString());
   }
@@ -73,7 +68,7 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     return data;
   }
 
-  static dynamic? deserialize(dynamic data) {
+  static dynamic deserialize(dynamic data) {
     if (data is Map<String, dynamic>) {
       return LocalizedText(map: data);
     } else {
@@ -81,11 +76,11 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     }
   }
 
-  static dynamic? init(Locale? locale, String? value) {
+  static dynamic init(Locale? locale, String? value) {
 
   }
 
-  static String text(Locale? locale, dynamic? value) {
+  static String text(Locale? locale, dynamic value) {
     if (value is LocalizedText) {
       return value.get(locale) ?? '';
     }
@@ -100,8 +95,8 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     return String.fromCharCode(firstChar) + String.fromCharCode(secondChar);
   }
 
-  static String? country(String value) {
-    if (value != null && value.trim().length > 0) {
+  static String? country(String? value) {
+    if (value != null && value.trim().isNotEmpty) {
       if (value.toUpperCase().contains('U.S.'.toUpperCase()) || value.toUpperCase().contains('US - YCH Hops'.toUpperCase()))
         return 'US';
       if (value.toUpperCase().contains('United Kingdom'.toUpperCase()))
@@ -142,5 +137,6 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
         return 'CA';
       return value.toUpperCase();
     }
+    return null;
   }
 }

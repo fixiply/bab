@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -23,7 +22,9 @@ import 'package:bb/widgets/modal_bottom_sheet.dart';
 class FormProductPage extends StatefulWidget {
   final ProductModel model;
   FormProductPage(this.model);
-  _FormProductPageState createState() => new _FormProductPageState();
+
+  @override
+  _FormProductPageState createState() => _FormProductPageState();
 }
 
 class _FormProductPageState extends State<FormProductPage> {
@@ -51,7 +52,7 @@ class _FormProductPageState extends State<FormProductPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -122,7 +123,7 @@ class _FormProductPageState extends State<FormProductPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -153,7 +154,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               if (widget.model.product == Product.article) FutureBuilder<List<ReceiptModel>>(
                 future: _receipts,
                 builder: (context, snapshot) {
@@ -161,7 +162,7 @@ class _FormProductPageState extends State<FormProductPage> {
                     return DropdownButtonFormField<String>(
                         value: widget.model.receipt,
                         decoration: FormDecoration(
-                          icon: Icon(Icons.receipt_outlined),
+                          icon: const Icon(Icons.receipt_outlined),
                           labelText: AppLocalizations.of(context)!.text('receipt'),
                         ),
                         items: snapshot.data!.map((ReceiptModel model) {
@@ -184,7 +185,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   return Container();
                 }
               ),
-              if (widget.model.product == Product.article) Divider(height: 10),
+              if (widget.model.product == Product.article) const Divider(height: 10),
               FutureBuilder<List<CompanyModel>>(
                 future: _companies,
                 builder: (context, snapshot) {
@@ -192,7 +193,7 @@ class _FormProductPageState extends State<FormProductPage> {
                     return DropdownButtonFormField<String>(
                       value: widget.model.company,
                       decoration: FormDecoration(
-                        icon: Icon(Icons.store_outlined),
+                        icon: const Icon(Icons.store_outlined),
                         labelText: AppLocalizations.of(context)!.text('company'),
                       ),
                       items: snapshot.data!.map((CompanyModel model) {
@@ -215,7 +216,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   return Container();
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               LocalizedTextField(
                 context: context,
                 initialValue: widget.model.title,
@@ -235,7 +236,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               LocalizedTextField(
                 context: context,
                 initialValue: widget.model.subtitle,
@@ -255,9 +256,9 @@ class _FormProductPageState extends State<FormProductPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
-                initialValue: widget.model.price != null ? widget.model.price.toString() : null,
+                initialValue: widget.model.price?.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => setState(() {
                   widget.model.price = double.tryParse(value);
@@ -275,9 +276,9 @@ class _FormProductPageState extends State<FormProductPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
-                initialValue: widget.model.pack != null ? widget.model.pack.toString() : null,
+                initialValue: widget.model.pack?.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => setState(() {
                   widget.model.pack = int.tryParse(value);
@@ -289,7 +290,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   fillColor: FillColor, filled: true
                 ),
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
@@ -301,7 +302,7 @@ class _FormProductPageState extends State<FormProductPage> {
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.min != null ?  widget.model.min.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: false),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: false),
                             onChanged: (value) => widget.model.min = int.parse(value),
                             decoration: FormDecoration(
                                 labelText: 'min',
@@ -315,11 +316,11 @@ class _FormProductPageState extends State<FormProductPage> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.max != null ?  widget.model.max.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: false),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: false),
                             onChanged: (value) => widget.model.max = int.parse(value),
                             decoration: FormDecoration(
                                 labelText: 'max',
@@ -338,7 +339,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   );
                 }
               ),
-              if (widget.model.product == Product.booking) Divider(height: 10),
+              if (widget.model.product == Product.booking) const Divider(height: 10),
               if (widget.model.product == Product.booking) WeekdaysField(
                 context: context,
                 value: widget.model.weekdays!,
@@ -353,7 +354,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   widget.model.term = value;
                 }),
               ),
-              if (widget.model.product == Product.booking) Divider(height: 10),
+              if (widget.model.product == Product.booking) const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.text,
@@ -364,7 +365,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   widget.model.text = text.size() > 0 ? text : value;
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               ImageField(
                 context: context,
                 image: widget.model.image,
@@ -385,7 +386,7 @@ class _FormProductPageState extends State<FormProductPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

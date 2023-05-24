@@ -28,9 +28,9 @@ class ImageModel<T> {
     this.rect,
     this.reference,
   }) {
-    if (left == null) left = TextFormat();
-    if (right == null) right = TextFormat();
-    if (bottom == null) bottom = TextFormat();
+    left ??= TextFormat();
+    right ??= TextFormat();
+    bottom ??= TextFormat();
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -95,21 +95,22 @@ class ImageModel<T> {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is ImageModel && other.name == name);
   }
+
+  @override
+  int get hashCode => name.hashCode;
 
   static dynamic fromJson(dynamic data) {
     if (data != null) {
       if (data is String) {
         return ImageModel(data);
       } else if (data is Map<String, dynamic>) {
-        String url = data['url'];
-        if (url != null) {
-          ImageModel model = new ImageModel(data['url']);
-          model.fromMap(data);
-          return model;
-        }
+        ImageModel model = ImageModel(data['url']);
+        model.fromMap(data);
+        return model;
       }
     }
     return null;

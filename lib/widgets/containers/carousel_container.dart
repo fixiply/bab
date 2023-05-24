@@ -2,7 +2,6 @@ import 'package:bb/widgets/containers/abstract_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/constants.dart';
 import 'package:bb/controller/product_page.dart';
 import 'package:bb/models/product_model.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -20,7 +19,8 @@ class CarouselContainer extends AbstractContainer {
       product: product
   );
 
-  _CarouselContainerState createState() => new _CarouselContainerState();
+  @override
+  _CarouselContainerState createState() => _CarouselContainerState();
 }
 
 
@@ -34,7 +34,7 @@ class _CarouselContainerState extends AbstractContainerState {
         future: products,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data!.length == 0) {
+            if (snapshot.data!.isEmpty) {
               return Container();
             }
             return CarouselSlider(
@@ -63,7 +63,7 @@ class _CarouselContainerState extends AbstractContainerState {
                             Expanded(
                               child: Column(
                                 children: [
-                                  if (rating > 0) Text(rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black)),
+                                  if (rating > 0) Text(rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.black)),
                                   RatingBar.builder(
                                     initialRating: rating,
                                     direction: Axis.horizontal,
@@ -71,14 +71,14 @@ class _CarouselContainerState extends AbstractContainerState {
                                     itemCount: 5,
                                     itemSize: 16,
                                     itemPadding: EdgeInsets.zero,
-                                    itemBuilder: (context, _) => Icon(
+                                    itemBuilder: (context, _) => const Icon(
                                       Icons.star,
                                       color: Colors.amber,
                                     ),
                                     ignoreGestures: true,
                                     onRatingUpdate: (rating) async {},
                                   ),
-                                  Text('${notice} ${AppLocalizations.of(context)!.text('reviews')}')
+                                  Text('$notice ${AppLocalizations.of(context)!.text('reviews')}')
                                 ],
                               )
                             )
@@ -86,13 +86,13 @@ class _CarouselContainerState extends AbstractContainerState {
                         )
                       ),
                       const SizedBox(height: 12),
-                      Text(model.title!, style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                      if (model.subtitle != null) Text(model.subtitle!, style: TextStyle(fontSize: 14)),
+                      Text(model.title!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+                      if (model.subtitle != null) Text(model.subtitle!, style: const TextStyle(fontSize: 14)),
                       const SizedBox(height: 4),
                       SizedBox(
                         width: 100,
                         child: TextButton(
-                          child: Text('${model.price!.toStringAsPrecision(3)} €', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                          child: Text('${model.price!.toStringAsPrecision(3)} €', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                           style: TextButton.styleFrom(
                             backgroundColor: Theme.of(context).primaryColor,
                             shape: RoundedRectangleBorder(
@@ -110,7 +110,7 @@ class _CarouselContainerState extends AbstractContainerState {
               }).toList(),
             );
           }
-          return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
         }
       )
     );

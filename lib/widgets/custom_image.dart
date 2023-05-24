@@ -42,9 +42,9 @@ class CustomImage extends ExtendedImage {
           }
           break;
         case LoadState.failed:
-          return emptyImage ?? null;
-          break;
+          return emptyImage;
       }
+      return null;
     },
   );
 }

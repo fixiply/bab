@@ -41,13 +41,13 @@ class _ImageCropPageState extends State<ImageCropPage> {
       appBar: AppBar(
           titleSpacing: 0.0,
           title: Text(AppLocalizations.of(context)!.text('image_editor')),
-          iconTheme: new IconThemeData(color: Theme.of(context).primaryColor),
+          iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
           titleTextStyle: Theme.of(context).textTheme.headline6,
           backgroundColor: Colors.transparent,
           bottomOpacity: 0.0,
           elevation: 0.0,
           leading: IconButton(
-              icon:Icon(Icons.chevron_left),
+              icon: const Icon(Icons.chevron_left),
               onPressed:() async {
                 Navigator.pop(context, false);
               }
@@ -102,7 +102,7 @@ class _ImageCropPageState extends State<ImageCropPage> {
               initEditorConfigHandler: (ExtendedImageState? state) {
                 return EditorConfig(
                   maxScale: 8.0,
-                  cropRectPadding: EdgeInsets.all(20.0),
+                  cropRectPadding: const EdgeInsets.all(20.0),
                   hitTestSize: 20.0,
                   cropLayerPainter: _cropLayerPainter!,
                   initCropRectType: InitCropRectType.imageRect,

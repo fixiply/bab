@@ -13,9 +13,10 @@ import 'package:provider/provider.dart';
 class TextInputField extends FormField<dynamic> {
   final String title;
   final void Function(Locale? locale, String? value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
-  TextInputField({Key? key, required BuildContext context, dynamic? initialValue, required this.title, this.onChanged, this.validator}) : super(
+  TextInputField({Key? key, required BuildContext context, dynamic initialValue, required this.title, this.onChanged, this.validator}) : super(
       key: key,
       initialValue: initialValue,
       builder: (FormFieldState<dynamic> field) {
@@ -57,11 +58,11 @@ class _TextInputFieldState extends FormFieldState<dynamic> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          padding: EdgeInsets.symmetric(vertical: 8),
+          padding: const EdgeInsets.symmetric(vertical: 8),
           child: Row(
             children: [
-              Expanded(child: Text(widget.title, style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))),
-              Container(
+              Expanded(child: Text(widget.title, style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))),
+              SizedBox(
                 width: 80,
                 child: DropdownButtonFormField<Locale>(
                   value: AppLocalizations.of(context)!.locale,
@@ -76,7 +77,7 @@ class _TextInputFieldState extends FormFieldState<dynamic> {
                     return DropdownMenuItem<Locale>(
                       value: locale,
                       child: Text(LocalizedText.emoji(locale.countryCode!),
-                        style: TextStyle( fontSize: 20, fontFamily: 'Emoji'),
+                        style: const TextStyle( fontSize: 20, fontFamily: 'Emoji'),
                       )
                     );
                   }).toList(),
@@ -108,6 +109,6 @@ class _TextInputFieldState extends FormFieldState<dynamic> {
   }
 
   _initialize() async {
-    _textController.text = AppLocalizations.of(context)!.localizedText(widget.initialValue, locale: _locale) ?? '';
+    _textController.text = AppLocalizations.of(context)!.localizedText(widget.initialValue, locale: _locale);
   }
 }

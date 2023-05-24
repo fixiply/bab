@@ -23,7 +23,8 @@ import 'package:provider/provider.dart';
 import '../models/model.dart';
 
 class CalendarPage extends StatefulWidget {
-  _CalendarPageState createState() => new _CalendarPageState();
+  @override
+  _CalendarPageState createState() => _CalendarPageState();
 }
 
 class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
@@ -68,15 +69,15 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         actions: [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -92,113 +93,112 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
           )
         ],
       ),
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<Model>>(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.length == 0) {
-                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
-                }
-                return Column(
-                  children: [
-                    TableCalendar(
-                      focusedDay: _focusedDay,
-                      firstDay: DateTime.utc(2010, 10, 16),
-                      lastDay: DateTime.utc(2030, 3, 14),
-                      startingDayOfWeek: StartingDayOfWeek.monday,
-                      locale: AppLocalizations.of(context)!.text('locale'),
-                      selectedDayPredicate: (day) {
-                        return isSameDay(_selectedDay, day);
-                      },
-                      rangeStartDay: _rangeStart,
-                      rangeEndDay: _rangeEnd,
-                      onDaySelected: (selected, focused) {
-                        if (!isSameDay(_selectedDay, selected)) {
-                          setState(() {
-                            _selectedDay = selected;
-                            _focusedDay = focused;
-                          });
-                        }
-                        _selectedEvents.value = _getEventsForDay(snapshot.data!, selected);
-                      },
-                      onRangeSelected: (DateTime? start, DateTime? end, DateTime focusedDay) {
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<Model>>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+              }
+              return Column(
+                children: [
+                  TableCalendar(
+                    focusedDay: _focusedDay,
+                    firstDay: DateTime.utc(2010, 10, 16),
+                    lastDay: DateTime.utc(2030, 3, 14),
+                    startingDayOfWeek: StartingDayOfWeek.monday,
+                    locale: AppLocalizations.of(context)!.text('locale'),
+                    selectedDayPredicate: (day) {
+                      return isSameDay(_selectedDay, day);
+                    },
+                    rangeStartDay: _rangeStart,
+                    rangeEndDay: _rangeEnd,
+                    onDaySelected: (selected, focused) {
+                      if (!isSameDay(_selectedDay, selected)) {
                         setState(() {
-                          _selectedDay = null;
-                          _focusedDay = focusedDay;
-                          _rangeStart = start;
-                          _rangeEnd = end;
+                          _selectedDay = selected;
+                          _focusedDay = focused;
                         });
+                      }
+                      _selectedEvents.value = _getEventsForDay(snapshot.data!, selected);
+                    },
+                    onRangeSelected: (DateTime? start, DateTime? end, DateTime focusedDay) {
+                      setState(() {
+                        _selectedDay = null;
+                        _focusedDay = focusedDay;
+                        _rangeStart = start;
+                        _rangeEnd = end;
+                      });
 
-                        // `start` or `end` could be null
-                        if (start != null && end != null) {
-                          _selectedEvents.value = _getEventsForRange(snapshot.data!, start, end);
-                        } else if (start != null) {
-                          _selectedEvents.value = _getEventsForDay(snapshot.data!, start);
-                        } else if (end != null) {
-                          _selectedEvents.value = _getEventsForDay(snapshot.data!, end);
-                        }
-                      },
-                      eventLoader: (DateTime day) {
-                        return _getEventsForDay(snapshot.data!, day);
-                      },
-                      calendarBuilders: CalendarBuilders(
-                        markerBuilder: (BuildContext context, date, events) {
-                          if (events.length > 0) {
-                            return Align(
-                                alignment: Alignment.bottomRight,
-                                child: Container(
-                                  width: 20,
-                                  padding: EdgeInsets.all(4.0),
-                                  decoration: BoxDecoration(
-                                      color: Colors.redAccent,
-                                      shape: BoxShape.rectangle
-                                  ),
-                                  child: Text(events.length.toString(),
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(fontSize: 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white)),
-                                )
-                            );
-                          }
-                        },
-                        selectedBuilder: (context, day, focusedDay) {
-                          return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: CS.PrimaryColor);
-                        },
-                        todayBuilder: (context, day, focusedDay) {
-                          return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: CS.TextGrey);
-                        }
-                      ),
-                    ),
-                    const SizedBox(height: 8.0),
-                    Expanded(
-                      child: ValueListenableBuilder<List<ListTile>>(
-                        valueListenable: _selectedEvents,
-                        builder: (context, value, _) {
-                          return ListView.builder(
-                            itemCount: value.length,
-                            itemBuilder: (context, index) {
-                              return Card(
-                                margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                                child: value[index],
-                              );
-                            },
+                      // `start` or `end` could be null
+                      if (start != null && end != null) {
+                        _selectedEvents.value = _getEventsForRange(snapshot.data!, start, end);
+                      } else if (start != null) {
+                        _selectedEvents.value = _getEventsForDay(snapshot.data!, start);
+                      } else if (end != null) {
+                        _selectedEvents.value = _getEventsForDay(snapshot.data!, end);
+                      }
+                    },
+                    eventLoader: (DateTime day) {
+                      return _getEventsForDay(snapshot.data!, day);
+                    },
+                    calendarBuilders: CalendarBuilders(
+                      markerBuilder: (BuildContext context, date, events) {
+                        if (events.isNotEmpty) {
+                          return Align(
+                              alignment: Alignment.bottomRight,
+                              child: Container(
+                                width: 20,
+                                padding: const EdgeInsets.all(4.0),
+                                decoration: const BoxDecoration(
+                                    color: Colors.redAccent,
+                                    shape: BoxShape.rectangle
+                                ),
+                                child: Text(events.length.toString(),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white)),
+                              )
                           );
                         }
-                      )
+                        return null;
+                      },
+                      selectedBuilder: (context, day, focusedDay) {
+                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: CS.PrimaryColor);
+                      },
+                      todayBuilder: (context, day, focusedDay) {
+                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: CS.TextGrey);
+                      }
+                    ),
+                  ),
+                  const SizedBox(height: 8.0),
+                  Expanded(
+                    child: ValueListenableBuilder<List<ListTile>>(
+                      valueListenable: _selectedEvents,
+                      builder: (context, value, _) {
+                        return ListView.builder(
+                          itemCount: value.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              child: value[index],
+                            );
+                          },
+                        );
+                      }
                     )
-                  ]
-                );
-              }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+                  )
+                ]
+              );
             }
-          )
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          }
         )
       )
     );
@@ -237,7 +237,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
     return brews.map((e) {
       Color color = CS.SecondaryColor;
       String title = '';
-      String subtitle = '';
+      String? subtitle;
       Widget? leading;
       Widget? trailing;
       GestureTapCallback? onTap;
@@ -253,7 +253,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         } else if (e.tertiaryDate() == DateHelper.toDate(day)) {
           subtitle = 'Début de la fermentation à ${AppLocalizations.of(context)!.tempFormat(e.receipt!.tertiaryday)}.';
         }
-        trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: TextStyle(color: Colors.white));
+        trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: const TextStyle(color: Colors.white));
         onTap = () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return BrewPage(e);
@@ -263,8 +263,8 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
       return ListTile(
         tileColor: color,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
-        title: Text(title, style: TextStyle(color: Colors.white)),
-        subtitle: subtitle != null ? Text(subtitle, style: TextStyle(color: Colors.white)) : null,
+        title: Text(title, style: const TextStyle(color: Colors.white)),
+        subtitle: subtitle != null ? Text(subtitle, style: const TextStyle(color: Colors.white)) : null,
         leading: leading,
         trailing: trailing,
         onTap: onTap
@@ -288,7 +288,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

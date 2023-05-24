@@ -48,11 +48,11 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
   Widget build(BuildContext context) {
     return InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
+        contentPadding: const EdgeInsets.all(0.0),
         icon: _icon()
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: _container(),
       )
     );
@@ -61,13 +61,13 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
   Icon _icon() {
     switch(widget.ingredient) {
       case Ingredient.fermentable:
-        return Icon(Icons.grain_outlined);
+        return const Icon(Icons.grain_outlined);
       case Ingredient.hops:
-        return Icon(Icons.grass_outlined);
+        return const Icon(Icons.grass_outlined);
       case Ingredient.yeast:
-        return Icon(Icons.bubble_chart_outlined);
+        return const Icon(Icons.bubble_chart_outlined);
       case Ingredient.misc:
-        return Icon(Icons.eco_outlined);
+        return const Icon(Icons.eco_outlined);
     }
   }
 
@@ -80,8 +80,8 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
             if (snapshot.hasData) {
               return FermentablesDataTable(
                 key: _datatableKey,
-                data: snapshot.data,
-                title: Text(AppLocalizations.of(context)!.text('fermentables'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                data:  snapshot.data,
+                title: Text(AppLocalizations.of(context)!.text('fermentables'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
                 color: FillColor,
                 allowEditing: true,
                 allowAdding: true,
@@ -102,7 +102,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
             if (snapshot.hasData) {
               return MiscDataTable(key: _datatableKey,
                 data: snapshot.data,
-                title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                title: Text(AppLocalizations.of(context)!.text('miscellaneous'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
                 color: FillColor,
                 allowEditing: true,
                 allowAdding: true,
@@ -123,7 +123,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
             if (snapshot.hasData) {
               return YeastsDataTable(key: _datatableKey,
                 data: snapshot.data,
-                title: Text(AppLocalizations.of(context)!.text('yeasts'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                title: Text(AppLocalizations.of(context)!.text('yeasts'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
                 color: FillColor,
                 allowEditing: true,
                 allowAdding: true,
@@ -144,7 +144,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
             if (snapshot.hasData) {
               return HopsDataTable(key: _datatableKey,
                 data: snapshot.data,
-                title: Text(AppLocalizations.of(context)!.text('hops'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+                title: Text(AppLocalizations.of(context)!.text('hops'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
                 color: FillColor,
                 allowEditing: true,
                 allowAdding: true,

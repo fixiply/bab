@@ -19,6 +19,7 @@ class BasketModel<T> extends Model {
     this.quantity,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -27,6 +28,7 @@ class BasketModel<T> extends Model {
     this.quantity = map['quantity'];
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -40,10 +42,10 @@ class BasketModel<T> extends Model {
 
   BasketModel copy() {
     return BasketModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       product: this.product,
       price: this.price,
@@ -52,9 +54,13 @@ class BasketModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is BasketModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

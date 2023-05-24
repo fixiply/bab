@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/models/payment_model.dart';
@@ -10,7 +9,9 @@ import 'package:bb/widgets/form_decoration.dart';
 class FormPaymentPage extends StatefulWidget {
   final PaymentModel model;
   FormPaymentPage(this.model);
-  _FormPaymentPageState createState() => new _FormPaymentPageState();
+
+  @override
+  _FormPaymentPageState createState() => _FormPaymentPageState();
 }
 
 class _FormPaymentPageState extends State<FormPaymentPage> {
@@ -36,7 +37,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
               children: <Widget>[
                 Container(
                   color: FillColor,
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(AppLocalizations.of(context)!.text('payment_information'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
@@ -51,7 +52,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('name'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -61,9 +62,9 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
-                  initialValue: widget.model.number != null ? widget.model.number.toString() : null,
+                  initialValue: widget.model.number.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => setState(() {
                     widget.model.number = int.tryParse(value);
@@ -71,7 +72,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                     labelText: AppLocalizations.of(context)!.text('card_number'),
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.all(8)
+                    contentPadding: const EdgeInsets.all(8)
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -80,7 +81,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
                   initialValue: widget.model.date,
                   textCapitalization: TextCapitalization.sentences,
@@ -90,7 +91,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('validity_date'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -100,9 +101,9 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
-                  initialValue: widget.model.security != null ? widget.model.security.toString() : null,
+                  initialValue: widget.model.security?.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => setState(() {
                     widget.model.security = int.tryParse(value);
@@ -110,7 +111,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('security_code'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -121,7 +122,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                 ),
                 Container(
                   color: FillColor,
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(AppLocalizations.of(context)!.text('billing_address'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
@@ -136,7 +137,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('address'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -146,9 +147,9 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
-                  initialValue: widget.model.zip != null ? widget.model.zip.toString() : null,
+                  initialValue: widget.model.zip?.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => setState(() {
                     widget.model.zip = int.tryParse(value);
@@ -156,7 +157,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('zip_code'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -165,7 +166,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
                   initialValue: widget.model.city,
                   textCapitalization: TextCapitalization.sentences,
@@ -175,7 +176,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('city'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -186,7 +187,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                   }
                 ),
                 if (widget.model.uuid != null) TextButton.icon(
-                  icon: Icon(Icons.delete_outline),
+                  icon: const Icon(Icons.delete_outline),
                   label: Text(AppLocalizations.of(context)!.text('remove_card')),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.red,
@@ -199,9 +200,9 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
                 if (widget.model.uuid != null) const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: TextButton.icon(
-                    icon: Icon(Icons.save),
+                    icon: const Icon(Icons.save),
                     label: Text(AppLocalizations.of(context)!.text('save').toUpperCase()),
                     style: TextButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
@@ -226,7 +227,7 @@ class _FormPaymentPageState extends State<FormPaymentPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

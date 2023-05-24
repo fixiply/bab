@@ -10,7 +10,6 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/ibu.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/paints/gradient_range_slider_thumb_shape.dart';
@@ -24,7 +23,9 @@ import 'package:provider/provider.dart';
 class StylePage extends StatefulWidget {
   final StyleModel model;
   StylePage(this.model);
-  _StylePageState createState() => new _StylePageState();
+
+  @override
+  _StylePageState createState() => _StylePageState();
 }
 
 class _StylePageState extends State<StylePage> {
@@ -50,7 +51,7 @@ class _StylePageState extends State<StylePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context);
           }
@@ -58,15 +59,15 @@ class _StylePageState extends State<StylePage> {
         actions: <Widget>[
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -76,7 +77,7 @@ class _StylePageState extends State<StylePage> {
           ),
           if (widget.model.isEditable() )
             IconButton(
-              icon: Icon(Icons.edit_note),
+              icon: const Icon(Icons.edit_note),
               onPressed: () {
                 _edit(widget.model);
               },
@@ -91,18 +92,18 @@ class _StylePageState extends State<StylePage> {
         ],
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),
+        padding: const EdgeInsets.fromLTRB(0.0, 8.0, 0.0, 8.0),
         child: Column(
           children: [
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(AppLocalizations.of(context)!.text('ibu'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 30, child: Text((widget.model.ibumin ?? 0).round().toString(), style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text((widget.model.ibumin ?? 0).round().toString(), style: const TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
@@ -113,7 +114,7 @@ class _StylePageState extends State<StylePage> {
                             overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
                             rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                             showValueIndicator: ShowValueIndicator.always,
-                            valueIndicatorTextStyle: TextStyle(fontSize: 12)
+                            valueIndicatorTextStyle: const TextStyle(fontSize: 12)
                           ),
                           child: RangeSlider(
                             min: 0,
@@ -125,13 +126,13 @@ class _StylePageState extends State<StylePage> {
                           )
                         )
                       ),
-                      SizedBox(width: 30, child: Text((widget.model.ibumax ?? MAX_IBU).round().toString(), style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text((widget.model.ibumax ?? MAX_IBU).round().toString(), style: const TextStyle(fontSize: 12))),
                     ]
                   ),
                   Text(AppLocalizations.of(context)!.text('abv'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 30, child: Text('${ widget.model.abvmin != null ?  widget.model.abvmin!.toStringAsPrecision(2) : 0}%', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text('${ widget.model.abvmin != null ?  widget.model.abvmin!.toStringAsPrecision(2) : 0}%', softWrap: false, style: const TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
@@ -153,13 +154,13 @@ class _StylePageState extends State<StylePage> {
                           )
                         )
                       ),
-                      SizedBox(width: 30, child: Text('${(widget.model.abvmax ?? MAX_ABV).toStringAsPrecision(2)}%', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text('${(widget.model.abvmax ?? MAX_ABV).toStringAsPrecision(2)}%', softWrap: false, style: const TextStyle(fontSize: 12))),
                     ]
                   ),
                   Text('${AppLocalizations.of(context)!.colorUnit} - ${AppLocalizations.of(context)!.text('color')}', style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
                   Row(
                     children: [
-                      SizedBox(width: 30, child: Text(AppLocalizations.of(context)!.colorFormat(widget.model.ebcmin ?? 0) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text(AppLocalizations.of(context)!.colorFormat(widget.model.ebcmin ?? 0) ?? '', softWrap: false, style: const TextStyle(fontSize: 12))),
                       Expanded(
                         child: SliderTheme(
                           data: SliderThemeData(
@@ -181,7 +182,7 @@ class _StylePageState extends State<StylePage> {
                           )
                         )
                       ),
-                      SizedBox(width: 30, child: Text(AppLocalizations.of(context)!.colorFormat(widget.model.ebcmax ?? AppLocalizations.of(context)!.maxColor) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
+                      SizedBox(width: 30, child: Text(AppLocalizations.of(context)!.colorFormat(widget.model.ebcmax ?? AppLocalizations.of(context)!.maxColor) ?? '', softWrap: false, style: const TextStyle(fontSize: 12))),
                     ]
                   )
                 ]
@@ -202,14 +203,14 @@ class _StylePageState extends State<StylePage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('overall_impression'),
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
                       data: AppLocalizations.of(context)!.localizedText(widget.model.overallimpression),
                       softLineBreak: true,
@@ -224,14 +225,14 @@ class _StylePageState extends State<StylePage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('aroma'),
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
                       data: AppLocalizations.of(context)!.localizedText(widget.model.aroma),
                       softLineBreak: true,
@@ -246,14 +247,14 @@ class _StylePageState extends State<StylePage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('flavor'),
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
                       data: AppLocalizations.of(context)!.localizedText(widget.model.flavor),
                       softLineBreak: true,
@@ -268,14 +269,14 @@ class _StylePageState extends State<StylePage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('mouthfeel'),
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
                       data: AppLocalizations.of(context)!.localizedText(widget.model.mouthfeel),
                       softLineBreak: true,
@@ -290,14 +291,14 @@ class _StylePageState extends State<StylePage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
                       title: Text(AppLocalizations.of(context)!.text('comments'),
-                          style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
                     alignment: Alignment.centerLeft,
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
                       data: AppLocalizations.of(context)!.localizedText(widget.model.comments),
                       softLineBreak: true,
@@ -335,7 +336,7 @@ class _StylePageState extends State<StylePage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
         )
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -21,7 +20,9 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 class FormFermentablePage extends StatefulWidget {
   final FermentableModel model;
   FormFermentablePage(this.model);
-  _FormFermentablePageState createState() => new _FormFermentablePageState();
+
+  @override
+  _FormFermentablePageState createState() => _FormFermentablePageState();
 }
 
 class _FormFermentablePageState extends State<FormFermentablePage> {
@@ -49,7 +50,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -104,7 +105,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -133,7 +134,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.origin ?? '',
                 maxLength: 2,
@@ -148,7 +149,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
                     fillColor: FillColor, filled: true
                 ),
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               DropdownButtonFormField<Type>(
                 value: widget.model.type,
                 style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
@@ -172,10 +173,10 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) => widget.model.efficiency = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Icon(Icons.propane_tank_outlined),
@@ -192,14 +193,14 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.ebc) ?? '',
                 controller: _ebcController,
-                keyboardType: TextInputType.numberWithOptions(decimal: false),
+                keyboardType: const TextInputType.numberWithOptions(decimal: false),
                 onChanged: (value) => widget.model.ebc = AppLocalizations.of(context)!.fromSRM(int.parse(value)),
                 decoration: FormDecoration(
-                  icon: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Colors.black45)),
+                  icon: Text(AppLocalizations.of(context)!.colorUnit, style: const TextStyle(color: Colors.black45)),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true
                 ),
@@ -211,7 +212,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.notes,
@@ -239,7 +240,7 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

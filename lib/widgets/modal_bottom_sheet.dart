@@ -25,12 +25,12 @@ class ModalBottomSheet {
           appBar: AppBar(
             titleSpacing: 15,
             centerTitle: true,
-            iconTheme: new IconThemeData(color: Theme.of(context).primaryColor),
+            iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
             backgroundColor: Colors.transparent,
             bottomOpacity: 0.0,
             elevation: 0.0,
             leading: IconButton(
-              icon:Icon(Icons.clear),
+              icon:const Icon(Icons.clear),
               onPressed:() async {
                 Navigator.pop(context);
               }
@@ -39,7 +39,7 @@ class ModalBottomSheet {
                 style: TextStyle(color: Theme.of(context).primaryColor)
             ),
           ),
-          body: Container(
+          body: SizedBox(
             height: 200,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
@@ -49,10 +49,10 @@ class ModalBottomSheet {
                   readOnly: true,
                   decoration: FormDecoration(
                     prefixIcon: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text('ID :', style: TextStyle(fontSize: 16.0)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: const Text('ID :', style: TextStyle(fontSize: 16.0)),
                     ),
-                    prefixIconConstraints: BoxConstraints(
+                    prefixIconConstraints: const BoxConstraints(
                         minWidth: 0, minHeight:0
                     ),
                   ),
@@ -62,10 +62,10 @@ class ModalBottomSheet {
                   readOnly: true,
                   decoration: FormDecoration(
                     prefixIcon: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(AppLocalizations.of(context)!.text('create') + ' :', style: TextStyle(fontSize: 16.0)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text('${AppLocalizations.of(context)!.text('create')} :', style: const TextStyle(fontSize: 16.0)),
                     ),
-                    prefixIconConstraints: BoxConstraints(
+                    prefixIconConstraints: const BoxConstraints(
                         minWidth: 0, minHeight:0
                     ),
                   ),
@@ -75,10 +75,10 @@ class ModalBottomSheet {
                   readOnly: true,
                   decoration: FormDecoration(
                     prefixIcon: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(AppLocalizations.of(context)!.text('updated') + ' :', style: TextStyle(fontSize: 16.0)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text('${AppLocalizations.of(context)!.text('updated')} :', style: const TextStyle(fontSize: 16.0)),
                     ),
-                    prefixIconConstraints: BoxConstraints(
+                    prefixIconConstraints: const BoxConstraints(
                         minWidth: 0, minHeight:0
                     ),
                   ),
@@ -88,10 +88,10 @@ class ModalBottomSheet {
                   readOnly: true,
                   decoration: FormDecoration(
                     prefixIcon: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 10.0),
-                      child: Text(AppLocalizations.of(context)!.text('creator') + ' :', style: TextStyle(fontSize: 16.0)),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                      child: Text('${AppLocalizations.of(context)!.text('creator')} :', style: const TextStyle(fontSize: 16.0)),
                     ),
-                    prefixIconConstraints: BoxConstraints(
+                    prefixIconConstraints: const BoxConstraints(
                         minWidth: 0, minHeight:0
                     ),
                   ),
@@ -119,7 +119,7 @@ class ModalBottomSheet {
           builder: (context, setState) {
           return Container(
               height: 200,
-              padding: EdgeInsets.all(12),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
@@ -133,16 +133,16 @@ class ModalBottomSheet {
                               quantity -= product.pack ?? 1;
                             });
                           } : null,
-                          child: Icon(Icons.remove, color: Colors.black),
+                          child: const Icon(Icons.remove, color: Colors.black),
                           style: ElevatedButton.styleFrom(
-                            shape: CircleBorder(),
-                            padding: EdgeInsets.all(12),
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(12),
                             backgroundColor: Colors.white, // <-- Button color
                           ),
                         ),
                         const SizedBox(width: 10),
-                        Text('$quantity '+ AppLocalizations.of(context)!.text('bottle(s)'),
-                            style: TextStyle(fontSize: 18)),
+                        Text('$quantity ${AppLocalizations.of(context)!.text('bottle(s)')}',
+                            style: const TextStyle(fontSize: 18)),
                         const SizedBox(width: 10),
                         ElevatedButton(
                           onPressed: quantity < (product.max ?? 1) ? () {
@@ -150,10 +150,10 @@ class ModalBottomSheet {
                               quantity += product.pack ?? 1;
                             });
                           } : null,
-                          child: Icon(Icons.add, color: Colors.black),
+                          child: const Icon(Icons.add, color: Colors.black),
                           style: ElevatedButton.styleFrom(
-                            shape: CircleBorder(),
-                            padding: EdgeInsets.all(12),
+                            shape: const CircleBorder(),
+                            padding: const EdgeInsets.all(12),
                             backgroundColor: Colors.white, // <-- Button color
                           ),
                         )
@@ -166,7 +166,7 @@ class ModalBottomSheet {
                     children: [
                       TextButton(
                         child: Text(AppLocalizations.of(context)!.text('cancel'),
-                            style: TextStyle(color: Colors.red)),
+                            style: const TextStyle(color: Colors.red)),
                         style: TextButton.styleFrom(backgroundColor: Colors.transparent),
                         onPressed: () async {
                           Navigator.pop(context);
@@ -216,7 +216,7 @@ class ModalBottomSheet {
             builder: (context, setState) {
               return Container(
                 height: MediaQuery.of(context).size.height * 0.8,
-                padding: EdgeInsets.all(12),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
@@ -224,7 +224,7 @@ class ModalBottomSheet {
                       child: TableCalendar(
                         focusedDay: focusedDay,
                         firstDay: DateTime.now(),
-                        lastDay: DateTime.now().add(Duration(days: 90)),
+                        lastDay: DateTime.now().add(const Duration(days: 90)),
                         startingDayOfWeek: StartingDayOfWeek.monday,
                         locale: AppLocalizations.of(context)!.text('locale'),
                         selectedDayPredicate: (day) {
@@ -249,6 +249,7 @@ class ModalBottomSheet {
                                 }
                               }
                             }
+                            return null;
                           },
                           selectedBuilder: (context, day, focusedDay) {
                             return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: PrimaryColor);
@@ -265,7 +266,7 @@ class ModalBottomSheet {
                       children: [
                         TextButton(
                           child: Text(AppLocalizations.of(context)!.text('cancel'),
-                          style: TextStyle(color: Colors.red)),
+                          style: const TextStyle(color: Colors.red)),
                           style: TextButton.styleFrom(backgroundColor: Colors.transparent),
                           onPressed: () async {
                             Navigator.pop(context);

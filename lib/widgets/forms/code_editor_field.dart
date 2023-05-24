@@ -9,9 +9,11 @@ import 'package:bb/widgets/form_decoration.dart';
 // External package
 
 class CodeEditorField extends FormField<String> {
+  @override
   String? initialValue;
   String? title;
   final void Function(String? value)? onChanged;
+  @override
   final FormFieldValidator<String>? validator;
 
   CodeEditorField({Key? key, required BuildContext context, this.initialValue, this.title, this.onChanged, this.validator}) : super(
@@ -40,18 +42,18 @@ class _CodeEditorFieldState extends FormFieldState<String> {
   Widget build(BuildContext context) {
     return InputDecorator(
         decoration: FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
-        icon: Icon(Icons.code)
+        contentPadding: const EdgeInsets.all(0.0),
+        icon: const Icon(Icons.code)
       ),
       child: ListTile(
         contentPadding: EdgeInsets.zero,
         title: Text(
           widget.initialValue != null ? json.encode(widget.initialValue!) : widget.title ?? AppLocalizations.of(context)!.text('code_editor'),
           maxLines: 1,
-          style: TextStyle(overflow: TextOverflow.ellipsis)
+          style: const TextStyle(overflow: TextOverflow.ellipsis)
         ),
         trailing: IconButton(
-          icon:Icon(Icons.chevron_right),
+          icon:const Icon(Icons.chevron_right),
           onPressed: () async {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return CodeEditorPage(initialValue: widget.initialValue);

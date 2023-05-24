@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -20,7 +19,9 @@ import 'package:markdown_editable_textinput/markdown_text_input.dart';
 class FormIngredientPage extends StatefulWidget {
   final FermentableModel model;
   FormIngredientPage(this.model);
-  _FormIngredientPageState createState() => new _FormIngredientPageState();
+
+  @override
+  _FormIngredientPageState createState() => _FormIngredientPageState();
 }
 
 class _FormIngredientPageState extends State<FormIngredientPage> {
@@ -43,7 +44,7 @@ class _FormIngredientPageState extends State<FormIngredientPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -114,7 +115,7 @@ class _FormIngredientPageState extends State<FormIngredientPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -145,7 +146,7 @@ class _FormIngredientPageState extends State<FormIngredientPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               MarkdownTextInput((String value) => setState(() {
                   widget.model.notes = value;
                 }),
@@ -169,7 +170,7 @@ class _FormIngredientPageState extends State<FormIngredientPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

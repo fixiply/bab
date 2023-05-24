@@ -1,6 +1,5 @@
 // Internal package
 import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/utils/constants.dart';
 
 class PaymentModel<T> {
   String? uuid;
@@ -26,7 +25,7 @@ class PaymentModel<T> {
     this.zip,
     this.city,
   }) {
-    if(inserted_at == null) { inserted_at = DateTime.now(); }
+    inserted_at ??= DateTime.now();
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -76,9 +75,13 @@ class PaymentModel<T> {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is PaymentModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -109,7 +112,7 @@ class PaymentModel<T> {
           values.addAll(deserialize(value));
         }
       } else {
-        PaymentModel model = new PaymentModel();
+        PaymentModel model = PaymentModel();
         model.fromMap(data);
         values.add(model);
       }

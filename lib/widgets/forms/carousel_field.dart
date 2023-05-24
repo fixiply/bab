@@ -24,11 +24,11 @@ class CarouselField extends FormField<List<ImageModel>> {
         children: <Widget>[
           InputDecorator(
             decoration: FormDecoration(
-              contentPadding: EdgeInsets.all(0.0),
-              icon: Icon(Icons.image)
+              contentPadding: const EdgeInsets.all(0.0),
+              icon: const Icon(Icons.image)
             ),
             child: ListTile(
-                contentPadding: EdgeInsets.all(0.0),
+                contentPadding: const EdgeInsets.all(0.0),
                 title: Text(AppLocalizations.of(context)!.text('images')),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -36,14 +36,14 @@ class CarouselField extends FormField<List<ImageModel>> {
                     if (crop) Tooltip(
                       message: AppLocalizations.of(context)!.text('crop'),
                       child: IconButton(
-                        icon:Icon(Icons.crop),
+                        icon:const Icon(Icons.crop),
                         onPressed: () async {
                           state._showEditor();
                         }
                       )
                     ),
                     IconButton(
-                      icon:Icon(Icons.chevron_right),
+                      icon:const Icon(Icons.chevron_right),
                       onPressed: () async {
                         state._showPicker();
                       }

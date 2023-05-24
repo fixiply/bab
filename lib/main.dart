@@ -47,7 +47,7 @@ Future<void> main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
   Notifications().initialize();
-  FirebaseFirestore.instance.settings = Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
+  FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
 
   runApp(
     MultiProvider(
@@ -72,7 +72,7 @@ class _AppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    _newLocaleDelegate = TranslationsDelegate(newLocale: null);
+    _newLocaleDelegate = const TranslationsDelegate(newLocale: null);
     _initialize();
     _authStateChanges();
     _subscribe();
@@ -99,7 +99,7 @@ class _AppState extends State<MyApp> {
       primaryColor: PrimaryColor,
       primaryColorLight: PrimaryColorLight,
       primaryColorDark: PrimaryColorDark,
-      bottomAppBarTheme: BottomAppBarTheme(color: PrimaryColor),
+      bottomAppBarTheme: const BottomAppBarTheme(color: PrimaryColor),
     );
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
@@ -124,9 +124,9 @@ class _AppState extends State<MyApp> {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      supportedLocales: [
-        const Locale('en', 'US'), // English
-        const Locale('fr', 'FR') // French
+      supportedLocales: const [
+        Locale('en', 'US'), // English
+        Locale('fr', 'FR') // French
       ]
     );
   }
@@ -186,37 +186,37 @@ class _AppState extends State<MyApp> {
     var registry = JsonWidgetRegistry.instance;
     registry.registerCustomBuilder(
       CarouselBuilder.type,
-      JsonWidgetBuilderContainer(
+      const JsonWidgetBuilderContainer(
         builder: CarouselBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
       ParallaxBuilder.type,
-      JsonWidgetBuilderContainer(
+      const JsonWidgetBuilderContainer(
           builder: ParallaxBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
       ListBuilder.type,
-      JsonWidgetBuilderContainer(
+      const JsonWidgetBuilderContainer(
           builder: ListBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
       MarkdownBuilder.type,
-      JsonWidgetBuilderContainer(
+      const JsonWidgetBuilderContainer(
           builder: MarkdownBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
       ChatGPTBuilder.type,
-      JsonWidgetBuilderContainer(
+      const JsonWidgetBuilderContainer(
           builder: ChatGPTBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
       SubscriptionBuilder.type,
-      JsonWidgetBuilderContainer(
+      const JsonWidgetBuilderContainer(
           builder: SubscriptionBuilder.fromDynamic
       ),
     );

@@ -10,11 +10,14 @@ import 'package:bb/widgets/form_decoration.dart';
 // External package
 
 class LocalizedTextField extends FormField<dynamic> {
-  dynamic? initialValue;
+  @override
+  dynamic initialValue;
   InputDecoration? decoration;
   TextCapitalization? textCapitalization;
+  @override
   AutovalidateMode autovalidateMode;
-  final void Function(dynamic? value)? onChanged;
+  final void Function(dynamic value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
   LocalizedTextField({Key? key, required BuildContext context, this.initialValue, this.decoration, this.textCapitalization, required this.autovalidateMode, this.onChanged, this.validator}) : super(
@@ -30,13 +33,11 @@ class LocalizedTextField extends FormField<dynamic> {
 }
 
 class _LocalizedTextFieldState extends FormFieldState<dynamic> {
-  final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-
   @override
   LocalizedTextField get widget => super.widget as LocalizedTextField;
 
   @override
-  void didChange(dynamic? value) {
+  void didChange(dynamic value) {
     widget.onChanged?.call(value);
     super.didChange(value);
   }
@@ -48,7 +49,7 @@ class _LocalizedTextFieldState extends FormFieldState<dynamic> {
     return ExpansionTile(
       tilePadding: EdgeInsets.zero,
       title: TextFormField(
-        initialValue: widget.initialValue != null ? widget.initialValue.toString() : null,
+        initialValue: widget.initialValue?.toString(),
         textCapitalization: widget.textCapitalization ?? TextCapitalization.sentences,
         onChanged: (value) => setState(() {
           LocalizedText text =  widget.initialValue is LocalizedText ? widget.initialValue : LocalizedText();
@@ -65,7 +66,7 @@ class _LocalizedTextFieldState extends FormFieldState<dynamic> {
           dense: true,
           contentPadding: EdgeInsets.zero,
           leading: Text(LocalizedText.emoji(locale.countryCode!),
-            style: TextStyle( fontSize: 20, fontFamily: 'Emoji'),
+            style: const TextStyle( fontSize: 20, fontFamily: 'Emoji'),
           ),
           title: TextFormField(
             initialValue: widget.initialValue is LocalizedText ? widget.initialValue.get(locale)  : null,

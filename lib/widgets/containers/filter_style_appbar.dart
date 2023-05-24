@@ -41,11 +41,12 @@ class FilterStyleAppBar extends StatefulWidget {
     this.onCategoryChanged,
     this.onReset,
   }) : super(key: key) {
-    if (selectedFermentations == null) selectedFermentations = [];
-    if (srm_values == null) srm_values = RangeValues(cu.start ?? 0, cu.end ?? SRM_COLORS.length.toDouble());
+    selectedFermentations ??= [];
+    srm_values ??= RangeValues(cu.start ?? 0, cu.end ?? SRM_COLORS.length.toDouble());
   }
 
-  _FilterStyleAppBarState createState() => new _FilterStyleAppBarState();
+  @override
+  _FilterStyleAppBarState createState() => _FilterStyleAppBarState();
 }
 
 class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTickerProviderStateMixin {
@@ -55,7 +56,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
   @override
   void initState() {
     super.initState();
-    _tabController = new TabController(
+    _tabController = TabController(
       length: 4,
       vsync: this,
     );
@@ -83,7 +84,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
         flexibleSpace: FlexibleSpaceBar(
           background: TabBarView(
             controller: _tabController,
-            physics: NeverScrollableScrollPhysics(),
+            physics: const NeverScrollableScrollPhysics(),
             children: [
               _flavor(),
               _color(),
@@ -95,32 +96,26 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
         bottom: PreferredSize(
           preferredSize: const Size(double.infinity, kToolbarHeight),
           child: Container(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(4.0),
             alignment: Alignment.centerRight,
-            child: InkWell(
-              onTap: changed ? () {
+            child:  FilledButton.tonal(
+              style: FilledButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2)),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  const Icon(Icons.clear, size: 12),
+                  const SizedBox(width: 8),
+                  Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13)),
+                ],
+              ),
+              onPressed: changed ? () {
                 setState(() {
                   changed = false;
                 });
                 widget.onReset?.call();
-              } : null,
-              child: Container(
-                padding: EdgeInsets.symmetric(vertical: 6, horizontal: 8),
-                decoration: ShapeDecoration(
-                  color: Theme.of(context).primaryColor.withOpacity(0.2),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0) ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: <Widget>[
-                    Icon(Icons.clear, size: 12),
-                    SizedBox(width: 8),
-                    Flexible(child: Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13))),
-                  ],
-                ),
-              ),
-            )
+              } : null
+            ),
           )
         )
     );
@@ -128,14 +123,14 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
 
   Widget _flavor() {
     return Container(
-      padding: EdgeInsets.only(left: 12, right: 12, top: 30),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 30),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(AppLocalizations.of(context)!.text('ibu'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 30, child: Text((widget.ibu.start ?? widget.ibu.min).round().toString(), style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text((widget.ibu.start ?? widget.ibu.min).round().toString(), style: const TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
@@ -146,7 +141,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                       overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
                       rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
                       showValueIndicator: ShowValueIndicator.always,
-                      valueIndicatorTextStyle: TextStyle(fontSize: 12)
+                      valueIndicatorTextStyle: const TextStyle(fontSize: 12)
                   ),
                   child: RangeSlider(
                     min: widget.ibu.min,
@@ -164,13 +159,13 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   )
                 )
               ),
-              SizedBox(width: 30, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: const TextStyle(fontSize: 12))),
             ]
           ),
           Text(AppLocalizations.of(context)!.text('abv'), style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 30, child: Text('${(widget.abv.start ?? widget.abv.min).toStringAsPrecision(2)}%', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text('${(widget.abv.start ?? widget.abv.min).toStringAsPrecision(2)}%', softWrap: false, style: const TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
@@ -198,7 +193,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   )
                 )
               ),
-              SizedBox(width: 30, child: Text('${(widget.abv.end ?? widget.abv.max).toStringAsPrecision(2)}%', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 30, child: Text('${(widget.abv.end ?? widget.abv.max).toStringAsPrecision(2)}%', softWrap: false, style: const TextStyle(fontSize: 12))),
             ]
           ),
         ]
@@ -208,14 +203,14 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
 
   Widget _color() {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text('${AppLocalizations.of(context)!.colorUnit} - ${AppLocalizations.of(context)!.text('color')}', style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 12.0)),
           Row(
             children: [
-              SizedBox(width: 20, child: Text(AppLocalizations.of(context)!.numberFormat(widget.cu.start ?? 0) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 20, child: Text(AppLocalizations.of(context)!.numberFormat(widget.cu.start ?? 0) ?? '', softWrap: false, style: const TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
                   data: SliderThemeData(
@@ -241,7 +236,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                   )
                 )
               ),
-              SizedBox(width: 20, child: Text(AppLocalizations.of(context)!.numberFormat(widget.cu.end ?? AppLocalizations.of(context)!.maxColor) ?? '', softWrap: false, style: TextStyle(fontSize: 12))),
+              SizedBox(width: 20, child: Text(AppLocalizations.of(context)!.numberFormat(widget.cu.end ?? AppLocalizations.of(context)!.maxColor) ?? '', softWrap: false, style: const TextStyle(fontSize: 12))),
             ]
           )
         ]
@@ -251,7 +246,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
 
   Widget _fermentation() {
     return Container(
-      padding: EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
       child: Wrap(
         spacing: 2.0,
         runSpacing: 4.0,
@@ -262,13 +257,13 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
             padding: EdgeInsets.zero,
             label: Text(
               AppLocalizations.of(context)!.text(e.toString().toLowerCase()),
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12.0,
               ),
             ),
             selectedColor: BlendColor,
             backgroundColor: FillColor,
-            shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
+            shape: const StadiumBorder(side: BorderSide(color: Colors.black12)),
             onSelected: (value) {
               setState(() {
                 changed = true;
@@ -284,7 +279,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
   Widget _styles() {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
+      padding: const EdgeInsets.only(left: 12, right: 12, top: 52, bottom: 33),
       child: Wrap(
         spacing: 2.0,
         runSpacing: 4.0,
@@ -295,13 +290,13 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
             padding: EdgeInsets.zero,
             label: Text(
               e.localizedName(AppLocalizations.of(context)!.locale) ?? '',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 12.0,
               ),
             ),
             selectedColor: BlendColor,
             backgroundColor: FillColor,
-            shape: StadiumBorder(side: BorderSide(color: Colors.black12)),
+            shape: const StadiumBorder(side: BorderSide(color: Colors.black12)),
             onSelected: (value) {
               setState(() {
                 changed = true;

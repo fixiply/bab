@@ -11,7 +11,8 @@ import 'package:bb/utils/constants.dart';
 import 'package:uuid/uuid.dart';
 
 class AddressPage extends StatefulWidget {
-  _AddressPageState createState() => new _AddressPageState();
+  @override
+  _AddressPageState createState() => _AddressPageState();
 }
 
 class _AddressPageState extends State<AddressPage> {
@@ -51,7 +52,7 @@ class _AddressPageState extends State<AddressPage> {
         controller: _controller,
         children: [
           Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Text(AppLocalizations.of(context)!.text('registered_addresses'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
           ),
           for(Adress address in addresses) ListTileTheme(
@@ -59,7 +60,7 @@ class _AddressPageState extends State<AddressPage> {
             child: ListTile(
               contentPadding: EdgeInsets.zero,
               title: Container(
-                padding:  EdgeInsets.all(12),
+                padding:  const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -84,7 +85,7 @@ class _AddressPageState extends State<AddressPage> {
             ),
           ),
           TextButton.icon(
-            icon: Icon(Icons.add),
+            icon: const Icon(Icons.add),
             label: Text(AppLocalizations.of(context)!.text('add_address').toUpperCase()),
             style: TextButton.styleFrom(
               textStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -103,7 +104,7 @@ class _AddressPageState extends State<AddressPage> {
     })).then((value) {
       if (value != null) {
         setState(() {
-          newModel.uuid = Uuid().v4();
+          newModel.uuid = const Uuid().v4();
           currentUser!.addresses!.add(newModel);
           Database().update(currentUser).then((value) async {
             _showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
@@ -135,7 +136,7 @@ class _AddressPageState extends State<AddressPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

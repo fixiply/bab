@@ -104,7 +104,7 @@ class Database {
     }
     catch (e, s) {
       debugPrint(s.toString());
-      throw e;
+      rethrow;
     }
     return d.uuid;
   }
@@ -123,7 +123,7 @@ class Database {
     }
     catch (e, s) {
       debugPrint(s.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -145,8 +145,9 @@ class Database {
     }
     catch (e, s) {
       debugPrint(s.toString());
-      throw e;
+      rethrow;
     }
+    return null;
   }
 
   Future<void> publishAll() async {
@@ -158,7 +159,7 @@ class Database {
   Future<void> publish(CollectionReference collection, {bool push = false}) async {
     Query query = collection.where('status', isEqualTo: Status.pending.index);
     await query.get().then((result) async {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         bool canBeUpdated = true;
         Map<String, dynamic> map = doc.data() as Map<String, dynamic>;
         if (_auth.currentUser != null) {
@@ -168,7 +169,7 @@ class Database {
         if (canBeUpdated) {
           collection.doc(doc.id).update({'status': CS.Status.publied.index});
         }
-      });
+      }
     });
   }
 
@@ -185,7 +186,7 @@ class Database {
     }
     catch (e, s) {
       debugPrint(s.toString());
-      throw e;
+      rethrow;
     }
   }
 
@@ -228,9 +229,9 @@ class Database {
       }
     }
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String title = doc['title'].toString();
           String text = doc['text'].toString();
@@ -245,7 +246,7 @@ class Database {
           model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.title!.toLowerCase().compareTo(b.title!.toLowerCase()));
@@ -277,7 +278,7 @@ class Database {
     await query.get().then((result) async {
       for(QueryDocumentSnapshot doc in result.docs) {
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String title = doc['title'].toString();
           String text = doc['text'].toString();
@@ -292,7 +293,7 @@ class Database {
           await model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      };
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.title!.toString().toLowerCase().compareTo(b.title!.toString().toLowerCase()));
@@ -317,12 +318,12 @@ class Database {
     Query query = companies;
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         CompanyModel model = CompanyModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.name!.toLowerCase().compareTo(b.name!.toLowerCase()));
@@ -352,9 +353,9 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         bool canBeAdded = true;
-        if (fermentations != null && fermentations.length > 0) {
+        if (fermentations != null && fermentations.isNotEmpty) {
           CS.Fermentation fermentation = CS.Fermentation.values.elementAt(doc['fermentation']);
           canBeAdded = fermentations.contains(fermentation);
         }
@@ -364,7 +365,7 @@ class Database {
           model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.name!.compareTo(b.name!));
@@ -397,12 +398,12 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         ProductModel model = ProductModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.title!.toLowerCase().compareTo(b.title!.toLowerCase()));
@@ -418,12 +419,12 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         Rating model = Rating();
         model.creator = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
-      });
+      }
     });
     return list;
   }
@@ -436,12 +437,12 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         PurchaseModel model = PurchaseModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
-      });
+      }
     });
     return list;
   }
@@ -465,9 +466,9 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String name = doc['name'].toString();
           if (name.toLowerCase().contains(searchText.toLowerCase())) {
@@ -480,7 +481,7 @@ class Database {
           model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
@@ -507,9 +508,9 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String name = doc['name'].toString();
           if (name.toLowerCase().contains(searchText.toLowerCase())) {
@@ -522,7 +523,7 @@ class Database {
           model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
@@ -549,9 +550,9 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String name = doc['name'].toString();
           if (name.toLowerCase().contains(searchText.toLowerCase())) {
@@ -564,7 +565,7 @@ class Database {
           model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
@@ -597,10 +598,10 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         Map<String, dynamic>? map = doc.data() as Map<String, dynamic>;
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String name = doc['name'].toString();
           String reference = map['product'] ?? '';
@@ -617,7 +618,7 @@ class Database {
           model.fromMap(map);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
@@ -644,12 +645,12 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         InventoryModel model = InventoryModel();
         model.uuid = doc.id;
         model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
-      });
+      }
     });
     if (ordered == true) {
       // list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
@@ -681,7 +682,7 @@ class Database {
         model.uuid = doc.id;
         await model.fromMap(doc.data() as Map<String, dynamic>);
         list.add(model);
-      };
+      }
     });
     if (ordered == true) {
       list.sort((a, b) => a.inserted_at!.toString().toLowerCase().compareTo(b.inserted_at!.toString().toLowerCase()));
@@ -708,10 +709,10 @@ class Database {
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
-      result.docs.forEach((doc) {
+      for (var doc in result.docs) {
         Map<String, dynamic>? map = doc.data() as Map<String, dynamic>;
         bool canBeAdded = true;
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           canBeAdded = false;
           String name = map['name'] ?? '';
           if (name.toLowerCase().contains(searchText.toLowerCase())) {
@@ -724,7 +725,7 @@ class Database {
           model.fromMap(map);
           list.add(model);
         }
-      });
+      }
     });
     if (ordered == true) {
       // list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));

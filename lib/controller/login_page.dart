@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart' as Foundation;
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -10,14 +9,15 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/widgets/dialogs/markdown_dialog.dart';
 import 'package:bb/widgets/primary_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 
 // External package
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
-  LoginPage({Key? key}) : super(key: key);
-  _LoginPageState createState() => new _LoginPageState();
+  const LoginPage({Key? key}) : super(key: key);
+
+  @override
+  _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
@@ -50,14 +50,14 @@ class _LoginPageState extends State<LoginPage> {
         foregroundColor: Colors.black,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon:Icon(Icons.close),
+          icon:const Icon(Icons.close),
           onPressed:() async {
             Navigator.pop(context);
           }
         )
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+        padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -67,7 +67,7 @@ class _LoginPageState extends State<LoginPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Expanded(
-                    child: Text(AppLocalizations.of(context)!.text('to_connect'), style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
+                    child: Text(AppLocalizations.of(context)!.text('to_connect'), style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
                   ),
                   InkWell(
                     hoverColor: Colors.white,
@@ -91,21 +91,21 @@ class _LoginPageState extends State<LoginPage> {
                   )
                 ]
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(AppLocalizations.of(context)!.text('email_address'), style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.text('email_address'), style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
               TextFormField(
                 controller: _emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: const OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                   ),
                   isDense: true,
-                  contentPadding: EdgeInsets.all(12),
+                  contentPadding: const EdgeInsets.all(12),
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
@@ -115,10 +115,10 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 }
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(AppLocalizations.of(context)!.text('password'), style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.text('password'), style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
               RawKeyboardListener(
                 autofocus: true,
@@ -132,12 +132,12 @@ class _LoginPageState extends State<LoginPage> {
                   controller: _passwordController,
                   obscureText: !passwordVisible,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                     ),
                     isDense: true,
-                    contentPadding: EdgeInsets.all(12),
+                    contentPadding: const EdgeInsets.all(12),
                     suffixIcon: IconButton(
                       color: TextGrey,
                       icon: Icon(passwordVisible
@@ -160,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                   }
                 ),
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               Align(
                 alignment: Alignment.centerLeft,
                 child: InkWell(
@@ -171,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
                 child:Text.rich(
@@ -186,7 +186,7 @@ class _LoginPageState extends State<LoginPage> {
                             showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return MarkdownDialog(filename: TERMS_CONDITIONS);
+                                  return const MarkdownDialog(filename: TERMS_CONDITIONS);
                                 }
                             );
                           }
@@ -202,7 +202,7 @@ class _LoginPageState extends State<LoginPage> {
                               showDialog(
                                   context: context,
                                   builder: (context) {
-                                    return MarkdownDialog(filename: PRIVACY_POLICY);
+                                    return const MarkdownDialog(filename: PRIVACY_POLICY);
                                   }
                               );
                             }
@@ -213,7 +213,7 @@ class _LoginPageState extends State<LoginPage> {
                   )
                 ),
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               CustomPrimaryButton(
                 textValue: AppLocalizations.of(context)!.text('to_connect'),
                 onTap: () async {
@@ -243,22 +243,20 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      if (credential != null) {
-        if (!credential.user!.emailVerified) {
-          _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
-            action: SnackBarAction(
-              textColor: Colors.white,
-              label: AppLocalizations.of(context)!.text('resend'),
-              onPressed: () {
-                credential.user!.sendEmailVerification();
-              }
-            ),
-          );
-        } else {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
-          Navigator.pop(context);
-        }
+      if (!credential.user!.emailVerified) {
+        _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
+          action: SnackBarAction(
+            textColor: Colors.white,
+            label: AppLocalizations.of(context)!.text('resend'),
+            onPressed: () {
+              credential.user!.sendEmailVerification();
+            }
+          ),
+        );
+      } else {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
+        Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
@@ -273,7 +271,7 @@ class _LoginPageState extends State<LoginPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10),
+          duration: const Duration(seconds: 10),
           action: action
         )
     );

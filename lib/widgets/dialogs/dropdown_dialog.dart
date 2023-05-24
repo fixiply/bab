@@ -8,7 +8,7 @@ import 'package:bb/utils/app_localizations.dart';
 class DropdownDialog extends StatefulWidget {
   final String title;
   final List<DropdownMenuItem<dynamic>>? items;
-  final dynamic? initialValue;
+  final dynamic initialValue;
   final String? hintText;
   DropdownDialog({required this.title, required this.items, this.initialValue, this.hintText});
 
@@ -19,8 +19,9 @@ class DropdownDialog extends StatefulWidget {
 }
 
 class _DropdownDialogState extends State<DropdownDialog> {
-  dynamic? _value;
+  dynamic _value;
 
+  @override
   Widget build(BuildContext context) {
     if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(

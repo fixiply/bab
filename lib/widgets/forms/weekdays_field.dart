@@ -51,7 +51,7 @@ class _WeekdaysFieldState extends FormFieldState<List<dynamic>> {
         ChoiceChip(
           label: Text(labels[i]),
           selectedColor: PointerColor,
-          labelStyle: TextStyle(color:  Colors.white),
+          labelStyle: const TextStyle(color:  Colors.white),
           selected: widget.initialValue!.contains(values[i]),
           onSelected: (bool selected) {
             setState(() {
@@ -67,11 +67,11 @@ class _WeekdaysFieldState extends FormFieldState<List<dynamic>> {
     }
     return  InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
-        icon: Icon(Icons.calendar_view_day)
+        contentPadding: const EdgeInsets.all(0.0),
+        icon: const Icon(Icons.calendar_view_day)
       ),
       child: Container(
-        padding: EdgeInsets.only(top: 4, bottom: 16),
+        padding: const EdgeInsets.only(top: 4, bottom: 16),
         child: Wrap(
           children: widgets,
         )

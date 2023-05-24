@@ -30,14 +30,14 @@ class _PHContainerState extends State<PHContainer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text('Ajustement du pH'),
+        const Text('Ajustement du pH'),
         SizedBox(
           width: DeviceHelper.isLargeScreen(context) ? 320: null,
           child: Row(
             children: [
               Expanded(
                 child: TextFormField(
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   onChanged: (value) {
                     _current = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                     _calculate();
@@ -49,11 +49,11 @@ class _PHContainerState extends State<PHContainer> {
                   )
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: TextFormField(
                   initialValue: widget.target?.toString() ?? '',
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   onChanged: (value) {
                     widget.target = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                     _calculate();
@@ -68,7 +68,7 @@ class _PHContainerState extends State<PHContainer> {
             ]
           ),
         ),
-        SizedBox(height: 6),
+        const SizedBox(height: 6),
         SizedBox(
           width: DeviceHelper.isLargeScreen(context) ? 320: null,
           child:Row(
@@ -93,11 +93,11 @@ class _PHContainerState extends State<PHContainer> {
                   }).toList()
                 ),
               ),
-              SizedBox(width: 12),
+              const SizedBox(width: 12),
               Expanded(
                 child: TextFormField(
                   initialValue: _concentration?.toString() ?? '',
-                  keyboardType: TextInputType.numberWithOptions(decimal: false),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: false),
                   onChanged: (value) {
                     _concentration = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                     _calculate();
@@ -117,8 +117,8 @@ class _PHContainerState extends State<PHContainer> {
           width: 312,
           child: Container(
             alignment: Alignment.center,
-            padding: EdgeInsets.only(top: 10.0),
-            child: Text('Quantité d\'acide : ${AppLocalizations.of(context)!.numberFormat(_quantity)} ml', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Text('Quantité d\'acide : ${AppLocalizations.of(context)!.numberFormat(_quantity)} ml', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
           )
         ),
       ]

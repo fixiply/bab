@@ -27,20 +27,20 @@ class SearchText extends StatelessWidget {
               controller: controller,
               decoration: InputDecoration(
                   icon: Padding(
-                    padding: EdgeInsets.only(left: 4.0),
+                    padding: const EdgeInsets.only(left: 4.0),
                     child: Icon(Icons.search, color: Theme.of(context).primaryColor)
                   ),
                   hintText: AppLocalizations.of(context)!.text('search_hint'),
                   hintStyle: TextStyle(color: Theme.of(context).primaryColor),
                   border: InputBorder.none
               ),
-              style: TextStyle(fontSize: 16.0),
+              style: const TextStyle(fontSize: 16.0),
               onChanged: (query) {
                 onChanged.call();
               },
             )
           ),
-          if (controller.text.length > 0) IconButton(
+          if (controller.text.isNotEmpty) IconButton(
             icon: Icon(Icons.clear, color: Theme.of(context).primaryColor),
             onPressed: () {
               controller.clear();

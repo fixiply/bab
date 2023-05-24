@@ -1,7 +1,5 @@
 // Internal package
 import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:flutter/cupertino.dart';
 
 class Adress<T> {
   String? uuid;
@@ -25,7 +23,7 @@ class Adress<T> {
     this.information,
     this.phone,
   }) {
-    if(inserted_at == null) { inserted_at = DateTime.now(); }
+    inserted_at ??= DateTime.now();
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -72,9 +70,13 @@ class Adress<T> {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is Adress && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -105,7 +107,7 @@ class Adress<T> {
           values.addAll(deserialize(value));
         }
       } else {
-        Adress model = new Adress();
+        Adress model = Adress();
         model.fromMap(data);
         values.add(model);
       }

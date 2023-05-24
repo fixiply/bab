@@ -37,13 +37,13 @@ class RectSliderThumbShape extends SfThumbShape {
         ..color = themeData.activeTrackColor! //Thumb Background Color
         ..style = PaintingStyle.fill;
 
-      TextSpan span = new TextSpan(
-          style: new TextStyle(
+      TextSpan span = TextSpan(
+          style: const TextStyle(
               fontSize: 12,
               color: Colors.white,
               height: 1),
-          text: '${getValue(currentValue)}');
-      TextPainter tp = new TextPainter(
+          text: getValue(currentValue));
+      TextPainter tp = TextPainter(
           text: span,
           textAlign: TextAlign.left,
           textDirection: TextDirection.ltr);

@@ -1,11 +1,8 @@
-import 'package:bb/helpers/formula_helper.dart';
-import 'package:bb/models/fermentable_model.dart';
-import 'package:flutter/material.dart';
-
 // Internal package
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/models/equipment_model.dart';
+import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/constants.dart';
@@ -40,7 +37,7 @@ class BrewModel<T> extends Model {
   int? primaryday;
   int? secondaryday;
   int? tertiaryday;
-  dynamic? notes;
+  dynamic notes;
 
   BrewModel({
     String? uuid,
@@ -68,9 +65,10 @@ class BrewModel<T> extends Model {
     this.tertiaryday,
     this.notes
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (color == null) { color = ColorHelper.random(); }
+    color ??= ColorHelper.random();
   }
 
+  @override
   Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
     this.color = map['color'];
@@ -95,6 +93,7 @@ class BrewModel<T> extends Model {
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -124,10 +123,10 @@ class BrewModel<T> extends Model {
 
   BrewModel copy() {
     return BrewModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       color: this.color,
       status: this.status,
       started_at: this.started_at,
@@ -152,9 +151,13 @@ class BrewModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is BrewModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

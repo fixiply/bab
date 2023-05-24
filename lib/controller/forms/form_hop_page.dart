@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -20,8 +19,10 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 class FormHopPage extends StatefulWidget {
   final HopModel model;
-  FormHopPage(this.model);
-  _FormHopPageState createState() => new _FormHopPageState();
+  const FormHopPage(this.model);
+
+  @override
+  _FormHopPageState createState() => _FormHopPageState();
 }
 
 class _FormHopPageState extends State<FormHopPage> {
@@ -39,7 +40,7 @@ class _FormHopPageState extends State<FormHopPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -89,7 +90,7 @@ class _FormHopPageState extends State<FormHopPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -118,7 +119,7 @@ class _FormHopPageState extends State<FormHopPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.origin ?? '',
                 maxLength: 2,
@@ -133,10 +134,10 @@ class _FormHopPageState extends State<FormHopPage> {
                     fillColor: FillColor, filled: true
                 ),
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.alpha) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) => widget.model.alpha = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Text('α ', style: TextStyle(fontSize: 18, color: Colors.black45)),
@@ -153,10 +154,10 @@ class _FormHopPageState extends State<FormHopPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.beta) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) => widget.model.beta = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Text('β ', style: TextStyle(fontSize: 18, color: Colors.black45)),
@@ -166,7 +167,7 @@ class _FormHopPageState extends State<FormHopPage> {
                     fillColor: FillColor, filled: true
                 ),
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               DropdownButtonFormField<Hop>(
                   value: widget.model.form,
                   style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
@@ -190,7 +191,7 @@ class _FormHopPageState extends State<FormHopPage> {
                     return null;
                   }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               DropdownButtonFormField<Type>(
                 value: widget.model.type,
                   style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
@@ -214,7 +215,7 @@ class _FormHopPageState extends State<FormHopPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.notes,
@@ -236,7 +237,7 @@ class _FormHopPageState extends State<FormHopPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

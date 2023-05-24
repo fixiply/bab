@@ -16,6 +16,7 @@ class EquipmentField extends FormField<EquipmentModel> {
   final String? title;
   final Equipment type;
   final void Function(EquipmentModel? value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
   EquipmentField({Key? key, required BuildContext context, EquipmentModel? initialValue, this.icon, this.title, required this.type, this.onChanged, this.validator}) : super(
@@ -54,8 +55,8 @@ class _EquipmentFieldState extends FormFieldState<EquipmentModel> {
   Widget build(BuildContext context) {
     return InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        icon: widget.icon ?? Icon(Icons.delete_outline),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        icon: widget.icon ?? const Icon(Icons.delete_outline),
         fillColor: FillColor,
         filled: true,
       ),
@@ -71,7 +72,7 @@ class _EquipmentFieldState extends FormFieldState<EquipmentModel> {
                 asyncItems: (String filter) async {
                   return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
                 },
-                popupProps: PopupProps.menu(
+                popupProps: const PopupProps.menu(
                   showSelectedItems: true,
                   showSearchBox: true,
                 ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/brew_page.dart';
@@ -14,6 +13,7 @@ import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
@@ -30,7 +30,8 @@ class BrewsPage extends StatefulWidget {
   bool loadMore;
   BrewsPage({Key? key, this.allowEditing = false, this.loadMore = false}) : super(key: key);
 
-  _BrewsPageState createState() => new _BrewsPageState();
+  @override
+  _BrewsPageState createState() => _BrewsPageState();
 }
 
 class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixin<BrewsPage> {
@@ -40,7 +41,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
   final TextEditingController _searchQueryController = TextEditingController();
   ScrollController? _controller;
   Future<List<BrewModel>>? _data;
-  List<BrewModel> _selected = [];
+  final List<BrewModel> _selected = [];
   bool _showList = false;
 
   List<BrewModel> get selected => _selected;
@@ -105,92 +106,83 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
             ),
           ],
         ),
-        body: Container(
-          child: RefreshIndicator(
-            onRefresh: () => _fetch(),
-            child: FutureBuilder<List<BrewModel>>(
-              future: _data,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.data!.length == 0) {
-                    return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+        body: RefreshIndicator(
+          onRefresh: () => _fetch(),
+          child: FutureBuilder<List<BrewModel>>(
+            future: _data,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                if (snapshot.data!.isEmpty) {
+                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+                }
+                if (_showList) {
+                  if (widget.loadMore) {
+                    _dataSource.data = snapshot.data!;
+                    _dataSource.handleLoadMoreRows();
+                  } else {
+                    _dataSource.buildDataGridRows(snapshot.data!);
                   }
-                  if (_showList) {
-                    if (widget.loadMore) {
-                      _dataSource.data = snapshot.data!;
-                      _dataSource.handleLoadMoreRows();
-                    } else {
-                      _dataSource.buildDataGridRows(snapshot.data!);
-                    }
-                    _dataSource.notifyListeners();
-                    return EditSfDataGrid(
-                      context,
-                      allowEditing: widget.allowEditing,
-                      showCheckboxColumn: widget.allowEditing,
-                      selectionMode: SelectionMode.multiple,
-                      source: _dataSource,
-                      controller: getDataGridController(),
-                      onEdit: (DataGridRow row, int rowIndex) {
-                        _data!.then((value) async {
-                          BrewModel model = value.elementAt(rowIndex);
-                          if (model != null) {
-                            _edit(model);
-                          }
-                        });
-                      },
-                      onRemove: (DataGridRow row, int rowIndex) {
-                        _data!.then((value) async {
-                          BrewModel model = value.elementAt(rowIndex);
-                          if (model != null) {
-                            if (await DeleteDialog.model(
-                                context, model, forced: true)) {
-                              _fetch();
-                            }
-                          }
-                        });
-                      },
-                      onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                        setState(() {
-                          for(var row in addedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.add(snapshot.data![index]);
-                          }
-                          for(var row in removedRows) {
-                            final index = _dataSource.rows.indexOf(row);
-                            _selected.remove(snapshot.data![index]);
-                          }
-                        });
-                      },
-                      columns: BrewDataSource.columns(
-                          context: context, showQuantity: false),
-                    );
-                  }
-                  return ListView.builder(
-                      controller: _controller,
-                      shrinkWrap: true,
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                      itemBuilder: (context, index) {
-                        BrewModel model = snapshot.data![index];
-                        return _item(model);
-                      }
+                  _dataSource.notifyListeners();
+                  return EditSfDataGrid(
+                    context,
+                    allowEditing: widget.allowEditing,
+                    showCheckboxColumn: widget.allowEditing,
+                    selectionMode: SelectionMode.multiple,
+                    source: _dataSource,
+                    controller: getDataGridController(),
+                    onEdit: (DataGridRow row, int rowIndex) {
+                      _data!.then((value) async {
+                        _edit(value.elementAt(rowIndex));
+                      });
+                    },
+                    onRemove: (DataGridRow row, int rowIndex) {
+                      _data!.then((value) async {
+                        if (await DeleteDialog.model(
+                            context, value.elementAt(rowIndex), forced: true)) {
+                          _fetch();
+                        }
+                      });
+                    },
+                    onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+                      setState(() {
+                        for(var row in addedRows) {
+                          final index = _dataSource.rows.indexOf(row);
+                          _selected.add(snapshot.data![index]);
+                        }
+                        for(var row in removedRows) {
+                          final index = _dataSource.rows.indexOf(row);
+                          _selected.remove(snapshot.data![index]);
+                        }
+                      });
+                    },
+                    columns: BrewDataSource.columns(
+                        context: context, showQuantity: false),
                   );
                 }
-                if (snapshot.hasError) {
-                  return ErrorContainer(snapshot.error.toString());
-                }
-                return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+                return ListView.builder(
+                    controller: _controller,
+                    shrinkWrap: true,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                    itemBuilder: (context, index) {
+                      BrewModel model = snapshot.data![index];
+                      return _item(model);
+                    }
+                );
               }
-            )
-          ),
+              if (snapshot.hasError) {
+                return ErrorContainer(snapshot.error.toString());
+              }
+              return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+            }
+          )
         ),
         floatingActionButton: Visibility(
           visible: currentUser != null,
-          child: FloatingActionButton(
-              onPressed: _new,
-              backgroundColor: Theme.of(context).primaryColor,
-              tooltip: AppLocalizations.of(context)!.text('new'),
-              child: const Icon(Icons.add)
+          child: AnimatedActionButton(
+            title: AppLocalizations.of(context)!.text('new_brew'),
+            icon: const Icon(Icons.add),
+            onPressed: _new,
           )
         )
     );
@@ -210,12 +202,12 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
 
   Widget _item(BrewModel model) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         leading: model.receipt != null && model.receipt!.ebc != null && model.receipt!.ebc! >= 0 ? Stack(
           children: [
-            Container(
+            SizedBox(
               child: Image.asset('assets/images/beer_1.png',
                 color: ColorHelper.color(model.receipt!.ebc!) ?? Colors.white,
                 colorBlendMode: BlendMode.modulate
@@ -223,24 +215,21 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
               width: 30,
               height: 50,
             ),
-            Container(
+            SizedBox(
               // color: SRM[model.getSRM()],
               child: Image.asset('assets/images/beer_2.png'),
               width: 30,
               height: 50,
             ),
           ]
-        ) : Container(
-          width: 30,
-          height: 50,
-        ),
+        ) : const SizedBox(width: 30, height: 50),
         title: RichText(
           textAlign: TextAlign.left,
           overflow: TextOverflow.ellipsis,
           text: TextSpan(
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
-              TextSpan(text: '#${model.reference}', style: TextStyle(fontWeight: FontWeight.bold)),
+              TextSpan(text: '#${model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
               TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(model.started())}'),
             ],
           ),
@@ -256,7 +245,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
                   if (model.receipt != null) TextSpan(text: '${AppLocalizations.of(context)!.text('receipt')} : '),
-                  if (model.receipt != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.receipt!.title), style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.receipt != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.receipt!.title), style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -267,10 +256,10 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
                   if (model.tank != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank')} : '),
-                  if (model.tank != null) TextSpan(text: model.tank!.name, style: TextStyle(fontWeight: FontWeight.bold)),
-                  if (model.tank != null && model.volume != null) TextSpan(text: '  -  '),
+                  if (model.tank != null) TextSpan(text: model.tank!.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.tank != null && model.volume != null) const TextSpan(text: '  -  '),
                   if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
-                  if (model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(model.volume), style: TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),
@@ -281,7 +270,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: Icon(Icons.play_circle_outline, color: Colors.redAccent),
+              icon: const Icon(Icons.play_circle_outline, color: Colors.redAccent),
               onPressed: () {
                 Navigator.push(context,
                     MaterialPageRoute(builder: (BuildContext context) {
@@ -291,7 +280,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
               },
             ),
             PopupMenuButton<String>(
-              icon: Icon(Icons.more_vert),
+              icon: const Icon(Icons.more_vert),
               tooltip: AppLocalizations.of(context)!.text('options'),
               onSelected: (value) async {
                 if (value == 'edit') {
@@ -398,7 +387,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

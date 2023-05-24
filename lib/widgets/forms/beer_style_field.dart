@@ -13,6 +13,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 class BeerStyleField extends FormField<StyleModel> {
   final String? title;
   final void Function(StyleModel? value)? onChanged;
+  @override
   final FormFieldValidator<dynamic>? validator;
 
   BeerStyleField({Key? key, required BuildContext context, StyleModel? initialValue, this.title, this.onChanged, this.validator}) : super(
@@ -51,8 +52,8 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
   Widget build(BuildContext context) {
     return InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-        icon: Icon(Icons.how_to_reg),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+        icon: const Icon(Icons.how_to_reg),
         fillColor: FillColor,
         filled: true,
       ),
@@ -68,7 +69,7 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
               asyncItems: (String filter) async {
                 return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
               },
-              popupProps: PopupProps.menu(
+              popupProps: const PopupProps.menu(
                 showSelectedItems: true,
                 showSearchBox: true,
               ),

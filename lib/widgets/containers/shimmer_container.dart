@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/constants.dart';
 
 class ShimmerContainer extends StatefulWidget {
   final int crossAxisCount;
@@ -46,32 +45,28 @@ class _ShimmerContainerState extends State<ShimmerContainer> with TickerProvider
       for (var i = 0; i < (height / 168).round() * widget.crossAxisCount; i++) {
         children.add(_buildEmpty());
       }
-      return Container(
-        child: GridView(
-          physics: const NeverScrollableScrollPhysics(),
-          children: children,
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: widget.crossAxisCount,
-            crossAxisSpacing: 4.0,
-            mainAxisSpacing: 4.0
-          ),
-        )
+      return GridView(
+        physics: const NeverScrollableScrollPhysics(),
+        children: children,
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: widget.crossAxisCount,
+          crossAxisSpacing: 4.0,
+          mainAxisSpacing: 4.0
+        ),
       );
     }
     for (var i = 0; i < (height / 246).round(); i++) {
       children.add(_buildEmpty());
     }
-    return Container(
-      child: ListView(
-        physics: const NeverScrollableScrollPhysics(),
-        children: children,
-      )
+    return ListView(
+      physics: const NeverScrollableScrollPhysics(),
+      children: children,
     );
   }
 
   _buildEmpty() {
     return Container(
-      padding: EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         mainAxisAlignment: MainAxisAlignment.start,

@@ -11,13 +11,11 @@ import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
-import 'package:bb/utils/quantity.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
 import 'package:bb/widgets/search_text.dart';
 
 // External package
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -51,7 +49,9 @@ class FermentablesDataTable extends StatefulWidget {
     this.selectionMode = SelectionMode.multiple,
     this.receipt,
     this.onChanged}) : super(key: key);
-  FermentablesDataTableState createState() => new FermentablesDataTableState();
+
+  @override
+  FermentablesDataTableState createState() => FermentablesDataTableState();
 }
 
 class FermentablesDataTableState extends State<FermentablesDataTable> with AutomaticKeepAliveClientMixin {
@@ -67,6 +67,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
   @override
   bool get wantKeepAlive => true;
 
+  @override
   void initState() {
     super.initState();
     _dataSource = FermentableDataSource(context,
@@ -80,6 +81,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
         widget.onChanged?.call(widget.data ?? [value]);
       }
     );
+    _dataSource.buildDataGridRows(widget.data!);
     if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'amount', sortDirection: DataGridSortDirection.descending));
     _fetch();
   }
@@ -88,7 +90,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
   Widget build(BuildContext context) {
     return Container(
       color: widget.color,
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,82 +102,83 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
                 _searchQueryController,
                 () {  _fetch(); }
               ) : Container())),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               if(widget.allowEditing == true) TextButton(
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
                 style: TextButton.styleFrom(
                   backgroundColor: FillColor,
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                 ),
                 onPressed: _add,
               ),
             ],
           ),
           Flexible(
-            child: SfDataGridTheme(
-              data: SfDataGridThemeData(),
-              child: FutureBuilder<List<FermentableModel>>(
-                future: _data,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (widget.loadMore) {
-                      _dataSource.data = snapshot.data!;
-                      _dataSource.handleLoadMoreRows();
-                    } else {
-                      _dataSource.buildDataGridRows(snapshot.data!);
-                    }
-                    _dataSource.notifyListeners();
-                    return EditSfDataGrid(
-                      context,
-                      showCheckboxColumn: widget.showCheckboxColumn!,
-                      selectionMode: widget.selectionMode!,
-                      source: _dataSource,
-                      allowEditing: widget.allowEditing,
-                      allowSorting: widget.allowSorting,
-                      controller: getDataGridController(),
-                      verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-                      onEdit: (DataGridRow row, int rowIndex) {
-                        _edit(rowIndex);
-                      },
-                      onRemove: (DataGridRow row, int rowIndex) {
-                        // setState(() {
-                        //   _data!.then((value) => value.removeAt(rowIndex));
-                        // });
-                        widget.data!.removeAt(rowIndex);
-                        widget.onChanged?.call(widget.data!);
-                      },
-                      onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                        if (widget.showCheckboxColumn == true) {
-                          setState(() {
-                            for(var row in addedRows) {
-                              final index = _dataSource.rows.indexOf(row);
-                              _selected.add(snapshot.data![index]);
-                            }
-                            for(var row in removedRows) {
-                              final index = _dataSource.rows.indexOf(row);
-                              _selected.remove(snapshot.data![index]);
-                            }
-                          });
-                        }
-                      },
-                      columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null),
-                      tableSummaryRows: FermentableDataSource.summaries(context: context, showQuantity: widget.data != null),
-                    );
-                  }
-                  if (snapshot.hasError) {
-                    return ErrorContainer(snapshot.error.toString());
-                  }
-                  return Center(
-                    child: ImageAnimateRotate(
-                      child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
-                    )
-                  );
+            child: widget.data == null ? FutureBuilder<List<FermentableModel>>(
+              future: _data,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return _dataGrid(snapshot.data!);
                 }
-              ),
-            )
+                if (snapshot.hasError) {
+                  return ErrorContainer(snapshot.error.toString());
+                }
+                return Center(
+                  child: ImageAnimateRotate(
+                    child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                  )
+                );
+              }
+            ) : _dataGrid(widget.data!)
           )
         ]
       )
+    );
+  }
+
+  SfDataGrid _dataGrid(List<FermentableModel> data) {
+    if (widget.loadMore) {
+      _dataSource.data = data;
+      _dataSource.handleLoadMoreRows();
+    } else {
+      _dataSource.buildDataGridRows(data);
+    }
+    // _dataSource.notifyListeners();
+    return EditSfDataGrid(
+      context,
+      showCheckboxColumn: widget.showCheckboxColumn!,
+      selectionMode: widget.selectionMode!,
+      source: _dataSource,
+      allowEditing: widget.allowEditing,
+      allowSorting: widget.allowSorting,
+      controller: getDataGridController(),
+      verticalScrollPhysics: const NeverScrollableScrollPhysics(),
+      onEdit: (DataGridRow row, int rowIndex) {
+        _edit(rowIndex);
+      },
+      onRemove: (DataGridRow row, int rowIndex) {
+        // setState(() {
+        //   _data!.then((value) => value.removeAt(rowIndex));
+        // });
+        widget.data!.removeAt(rowIndex);
+        widget.onChanged?.call(widget.data!);
+      },
+      onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+        if (widget.showCheckboxColumn == true) {
+          setState(() {
+            for(var row in addedRows) {
+              final index = _dataSource.rows.indexOf(row);
+              _selected.add(data[index]);
+            }
+            for(var row in removedRows) {
+              final index = _dataSource.rows.indexOf(row);
+              _selected.remove(data[index]);
+            }
+          });
+        }
+      },
+      columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null),
+      tableSummaryRows: FermentableDataSource.summaries(context: context, showQuantity: widget.data != null),
     );
   }
 
@@ -192,9 +195,11 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
   }
 
   _fetch() async {
-    setState(() {
-      _data = widget.data != null ? Future<List<FermentableModel>>.value(widget.data) : Database().getFermentables(searchText: _searchQueryController.value.text, ordered: true);
-    });
+    if (widget.data == null) {
+      setState(() {
+        _data = Database().getFermentables(searchText: _searchQueryController.value.text, ordered: true);
+      });
+    }
   }
 
   _add() async {
@@ -240,7 +245,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
         )
     );
   }
@@ -278,7 +283,7 @@ class FermentableDataSource extends EditDataSource {
 
   @override
   Future<void> handleLoadMoreRows() async {
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 5));
     _addMoreRows(20);
     notifyListeners();
   }
@@ -288,7 +293,8 @@ class FermentableDataSource extends EditDataSource {
     dataGridRows.addAll(getDataRows(data: list));
   }
 
-  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+  @override
+  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     var value = super.getValue(dataGridRow, rowColumnIndex, column);
     if (value != null && column.columnName == 'amount') {
       double? weight = AppLocalizations.of(context)!.weight(value * 1000, weight: Weight.kilo);
@@ -342,7 +348,7 @@ class FermentableDataSource extends EditDataSource {
           if (e.columnName == 'amount') {
             return Container(
               alignment: Alignment.center,
-              margin: EdgeInsets.all(4),
+              margin: const EdgeInsets.all(4),
               child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
             );
           }
@@ -351,9 +357,9 @@ class FermentableDataSource extends EditDataSource {
           Color? color = ColorHelper.color(e.value);
           if (color != null) {
             return Container(
-              margin: EdgeInsets.all(4),
+              margin: const EdgeInsets.all(4),
               color: color,
-              child: Center(child: Text(value ?? '', style: TextStyle(color: Colors.white, fontSize: 14)))
+              child: Center(child: Text(value ?? '', style: const TextStyle(color: Colors.white, fontSize: 14)))
             );
           }
           return Container();
@@ -361,16 +367,16 @@ class FermentableDataSource extends EditDataSource {
         if (e.columnName == 'origin') {
           if (value != null) {
             return Container(
-              margin: EdgeInsets.all(4),
+              margin: const EdgeInsets.all(4),
               child: Center(child: Text(LocalizedText.emoji(value),
-                  style: TextStyle(fontSize: 16, fontFamily: 'Emoji')))
+                  style: const TextStyle(fontSize: 16, fontFamily: 'Emoji')))
             );
           }
         }
         return Container(
           color: color,
           alignment: alignment,
-          padding: EdgeInsets.all(8.0),
+          padding: const EdgeInsets.all(8.0),
           child: tooltipText(value),
         );
       }).toList()
@@ -390,6 +396,7 @@ class FermentableDataSource extends EditDataSource {
         ),
       );
     }
+    return null;
   }
 
   @override
@@ -445,6 +452,7 @@ class FermentableDataSource extends EditDataSource {
     updateDataSource();
   }
 
+  @override
   void updateDataSource() {
     notifyListeners();
   }
@@ -460,7 +468,7 @@ class FermentableDataSource extends EditDataSource {
           width: 90,
           columnName: 'amount',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -469,7 +477,7 @@ class FermentableDataSource extends EditDataSource {
           columnName: 'name',
           allowEditing: showQuantity == false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
               child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -480,7 +488,7 @@ class FermentableDataSource extends EditDataSource {
           allowEditing: showQuantity == false,
           allowSorting: false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
               child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -489,7 +497,7 @@ class FermentableDataSource extends EditDataSource {
           columnName: 'type',
           allowEditing: showQuantity == false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -497,7 +505,7 @@ class FermentableDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
           columnName: 'method',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.text('method'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -507,7 +515,7 @@ class FermentableDataSource extends EditDataSource {
           columnName: 'efficiency',
           allowEditing: showQuantity == false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('yield'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -517,7 +525,7 @@ class FermentableDataSource extends EditDataSource {
           columnName: 'color',
           allowEditing: showQuantity == false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )

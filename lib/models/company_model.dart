@@ -3,7 +3,6 @@ import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/utils/constants.dart';
-import 'package:flutter/material.dart';
 
 class CompanyModel<T> extends Model {
   Status? status;
@@ -22,16 +21,18 @@ class CompanyModel<T> extends Model {
     this.image,
   });
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.inserted_at = DateHelper.parse(map['inserted_at']);
-    this.updated_at = DateHelper.parse(map['updated_at']);
+    inserted_at = DateHelper.parse(map['inserted_at']);
+    updated_at = DateHelper.parse(map['updated_at']);
     this.name = map['name'];
     this.text = map['text'];
     this.image = ImageModel.fromJson(map['image']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -45,10 +46,10 @@ class CompanyModel<T> extends Model {
 
   CompanyModel copy() {
     return CompanyModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       name: this.name,
       text: this.text,
@@ -57,9 +58,13 @@ class CompanyModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is CompanyModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

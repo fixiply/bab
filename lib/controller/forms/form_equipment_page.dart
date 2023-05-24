@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -23,7 +22,9 @@ class FormEquipmentPage extends StatefulWidget {
   final Equipment? equipment;
   final String? title;
   FormEquipmentPage(this.model, this.equipment, {this.title});
-  _FormEquipmentPageState createState() => new _FormEquipmentPageState();
+
+  @override
+  _FormEquipmentPageState createState() => _FormEquipmentPageState();
 }
 
 class _FormEquipmentPageState extends State<FormEquipmentPage> {
@@ -53,7 +54,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -111,7 +112,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -142,7 +143,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -150,7 +151,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       // key: UniqueKey(),
                       // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                       controller:  _volumeController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
@@ -171,13 +172,13 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       }
                     )
                   ),
-                  if (widget.equipment == Equipment.tank) SizedBox(width: 12),
+                  if (widget.equipment == Equipment.tank) const SizedBox(width: 12),
                   if (widget.equipment == Equipment.tank) Expanded(
                     child: TextFormField(
                     // key: UniqueKey(),
                     // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                       controller:  _sizeController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.mash_volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
@@ -205,15 +206,15 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                 ]
               ),
               if (widget.equipment == Equipment.tank) Padding(
-                  padding: EdgeInsets.only(top: 16.0),
-                  child: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
+                  padding: const EdgeInsets.only(top: 16.0),
+                  child: Text(AppLocalizations.of(context)!.text('mash'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
               ),
               if (widget.equipment == Equipment.tank) Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -234,11 +235,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       }
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.absorption) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.absorption = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -254,13 +255,13 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
-              if (widget.equipment == Equipment.tank) Divider(height: 10),
+              if (widget.equipment == Equipment.tank) const Divider(height: 10),
               if (widget.equipment == Equipment.tank) Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       controller:  _lostController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -274,11 +275,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       )
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.mash_ratio) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.mash_ratio = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -302,15 +303,15 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                 ]
               ),
               if (widget.equipment == Equipment.tank) Padding(
-                padding: EdgeInsets.only(top: 16.0),
-                child: Text(AppLocalizations.of(context)!.text('boiling'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
+                padding: const EdgeInsets.only(top: 16.0),
+                child: Text(AppLocalizations.of(context)!.text('boiling'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
               ),
               if (widget.equipment == Equipment.tank) Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.boil_loss) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -324,11 +325,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       )
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.shrinkage) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.shrinkage = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -344,12 +345,12 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               if (widget.equipment == Equipment.tank) SizedBox(
                 width: (MediaQuery.of(context).size.width / 2) - (DeviceHelper.isDesktop ? 170 : 50),
                 child: TextFormField(
                   initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.head_loss) ?? '',
-                  keyboardType: TextInputType.numberWithOptions(decimal: true),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
                   onChanged: (value) {
                     widget.model.head_loss = AppLocalizations.of(context)!.decimal(value);
                     _calculate();
@@ -363,7 +364,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   )
                 )
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.notes = value,
                 AppLocalizations.of(context)!.localizedText(widget.model.notes),
                 label: AppLocalizations.of(context)!.text('notes'),
@@ -374,7 +375,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               ImageField(
                 context: context,
                 image: widget.model.image,
@@ -405,7 +406,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

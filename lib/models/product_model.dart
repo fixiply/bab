@@ -15,15 +15,15 @@ class ProductModel<T> extends Model {
   Product? product;
   String? company;
   String? receipt;
-  dynamic? title;
-  dynamic? subtitle;
+  dynamic title;
+  dynamic subtitle;
   double? price;
   int? pack;
   int? max;
   int? min;
   List<dynamic>? weekdays;
   Term? term;
-  dynamic? text;
+  dynamic text;
   ImageModel? image;
   List<Rating>? ratings;
 
@@ -48,11 +48,12 @@ class ProductModel<T> extends Model {
     this.image,
     this.ratings
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if(weekdays == null) { weekdays = []; }
-    if(term == null) { term = Term(); }
-    if (ratings == null) { ratings = []; }
+    weekdays ??= [];
+    term ??= Term();
+    ratings ??= [];
   }
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -72,6 +73,7 @@ class ProductModel<T> extends Model {
     this.ratings = Rating.deserialize(map['ratings']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -96,10 +98,10 @@ class ProductModel<T> extends Model {
 
   ProductModel copy() {
     return ProductModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       product: this.product,
       company: this.company,
@@ -119,9 +121,13 @@ class ProductModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is ProductModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -134,7 +140,7 @@ class ProductModel<T> extends Model {
 
   double get rating {
     double rating = 0;
-    if (ratings != null && ratings!.length > 0) {
+    if (ratings != null && ratings!.isNotEmpty) {
       for(Rating model in ratings!) {
         rating += model.rating!;
       }

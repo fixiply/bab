@@ -46,6 +46,7 @@ class Quantity<T> {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is Quantity && other.uuid == uuid || other is String && other == uuid);
   }
@@ -81,7 +82,7 @@ class Quantity<T> {
           values.addAll(deserialize(value));
         }
       } else {
-        Quantity model = new Quantity();
+        Quantity model = Quantity();
         model.fromMap(data);
         values.add(model);
       }

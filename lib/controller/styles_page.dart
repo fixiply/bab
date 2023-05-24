@@ -15,6 +15,7 @@ import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/filter_style_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
@@ -26,14 +27,15 @@ import 'package:bb/widgets/search_text.dart';
 // External package
 import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class StylesPage extends StatefulWidget {
   StylesPage({Key? key}) : super(key: key);
-  _StylesPageState createState() => new _StylesPageState();
+
+  @override
+  _StylesPageState createState() => _StylesPageState();
 }
 
 class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMixin<StylesPage> {
@@ -75,15 +77,15 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
         actions: <Widget> [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -111,7 +113,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
             },
             joints: (List<PopupMenuEntry> items) {
               if (currentUser != null && currentUser!.isAdmin()) {
-                items.add(PopupMenuDivider(height: 5));
+                items.add(const PopupMenuDivider(height: 5));
                 items.add(PopupMenuItem(
                   value: 'import',
                   child: Text('${AppLocalizations.of(context)!.text('import')} BJCP'),
@@ -122,102 +124,99 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
         ]
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<StyleModel>>(
-            future: _styles,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return CustomScrollView(
-                  slivers: [
-                    FilterStyleAppBar(
-                      cu: _cu,
-                      ibu: _ibu,
-                      abv: _abv,
-                      selectedFermentations: _selectedFermentations,
-                      categories: _categories,
-                      selectedCategories: _selectedCategories,
-                      onColorChanged: (start, end) {
-                        setState(() {
-                          _cu.start = start;
-                          _cu.end = end;
-                        });
-                        _fetch();
-                      },
-                      onIBUChanged: (start, end) {
-                        setState(() {
-                          _ibu.start = start;
-                          _ibu.end = end;
-                        });
-                        _fetch();
-                      },
-                      onAlcoholChanged: (start, end) {
-                        setState(() {
-                          _abv.start = start;
-                          _abv.end = end;
-                        });
-                        _fetch();
-                      },
-                      onFermentationChanged: (value) {
-                        setState(() {
-                          if (_selectedFermentations.contains(value)) {
-                            _selectedFermentations.remove(value);
-                          } else {
-                            _selectedFermentations.add(value);
-                          }
-                        });
-                        _fetch();
-                      },
-                      onCategoryChanged: (value) {
-                        setState(() {
-                          if (_selectedCategories.contains(value)) {
-                            _selectedCategories.remove(value);
-                          } else {
-                            _selectedCategories.add(value);
-                          }
-                        });
-                        _fetch();
-                      },
-                      onReset: () => _clear()
-                    ),
-                    SliverToBoxAdapter(
-                      child: Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 6.0),
-                        child: Center(
-                            child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'styles': 'style')}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                        )
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<StyleModel>>(
+          future: _styles,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return CustomScrollView(
+                slivers: [
+                  FilterStyleAppBar(
+                    cu: _cu,
+                    ibu: _ibu,
+                    abv: _abv,
+                    selectedFermentations: _selectedFermentations,
+                    categories: _categories,
+                    selectedCategories: _selectedCategories,
+                    onColorChanged: (start, end) {
+                      setState(() {
+                        _cu.start = start;
+                        _cu.end = end;
+                      });
+                      _fetch();
+                    },
+                    onIBUChanged: (start, end) {
+                      setState(() {
+                        _ibu.start = start;
+                        _ibu.end = end;
+                      });
+                      _fetch();
+                    },
+                    onAlcoholChanged: (start, end) {
+                      setState(() {
+                        _abv.start = start;
+                        _abv.end = end;
+                      });
+                      _fetch();
+                    },
+                    onFermentationChanged: (value) {
+                      setState(() {
+                        if (_selectedFermentations.contains(value)) {
+                          _selectedFermentations.remove(value);
+                        } else {
+                          _selectedFermentations.add(value);
+                        }
+                      });
+                      _fetch();
+                    },
+                    onCategoryChanged: (value) {
+                      setState(() {
+                        if (_selectedCategories.contains(value)) {
+                          _selectedCategories.remove(value);
+                        } else {
+                          _selectedCategories.add(value);
+                        }
+                      });
+                      _fetch();
+                    },
+                    onReset: () => _clear()
+                  ),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Center(
+                          child: Text(snapshot.data!.isEmpty ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'styles': 'style')}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
                       )
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                        StyleModel model = snapshot.data![index];
-                        return _item(model);
-                      }, childCount: snapshot.data!.length)
                     )
-                  ]
-                );
-              }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(
-                  child: ImageAnimateRotate(
-                    child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                      StyleModel model = snapshot.data![index];
+                      return _item(model);
+                    }, childCount: snapshot.data!.length)
                   )
+                ]
               );
             }
-          ),
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return Center(
+                child: ImageAnimateRotate(
+                  child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                )
+            );
+          }
         ),
       ),
       floatingActionButton: Visibility(
         visible: currentUser != null && currentUser!.isAdmin(),
-        child: FloatingActionButton(
-            onPressed: _new,
-            backgroundColor: Theme.of(context).primaryColor,
-            tooltip: AppLocalizations.of(context)!.text('new'),
-            child: const Icon(Icons.add)
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new'),
+          icon: const Icon(Icons.add),
+          onPressed: _new,
         )
       )
     );
@@ -225,17 +224,17 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
 
   Widget _item(StyleModel model) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         title: RichText(
           textAlign: TextAlign.left,
           overflow: TextOverflow.ellipsis,
           text: TextSpan(
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
-              TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              TextSpan(text: '  ${model.number}' ?? ''),
+              TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              TextSpan(text: '  ${model.number}'),
             ],
           ),
         ),
@@ -250,10 +249,10 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.category != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.category), style: TextStyle(fontWeight: FontWeight.bold)),
-                  if (model.ibumin != null || model.ibumax != null || model.abvmin != null || model.abvmax != null) TextSpan(text: '  -  '),
+                  if (model.category != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.category), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.ibumin != null || model.ibumax != null || model.abvmin != null || model.abvmax != null) const TextSpan(text: '  -  '),
                   _between('IBU', model.ibumin, model.ibumax),
-                  if (model.ibumin != null || model.ibumax != null || model.abvmin != null || model.abvmax != null) TextSpan(text: '   '),
+                  if (model.ibumin != null || model.ibumax != null || model.abvmin != null || model.abvmax != null) const TextSpan(text: '   '),
                   _between('ABV', model.abvmin, model.abvmax, trailing: '%'),
                 ],
               ),
@@ -262,7 +261,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
           ]
         ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) async {
             if (value == 'edit') {
@@ -308,7 +307,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
         ]
       );
     }
-    return TextSpan();
+    return const TextSpan();
   }
 
   Widget _text(String text) {
@@ -365,7 +364,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
     String? search =  _searchQueryController.text;
     for (StyleModel model in list) {
       _setFilter(model);
-      if (search != null && search.length > 0) {
+      if (search.isNotEmpty) {
         if (!(AppLocalizations.of(context)!.localizedText(model.name).toLowerCase().contains(search.toLowerCase())) &&
           !(AppLocalizations.of(context)!.localizedText(model.category).toLowerCase().contains(search.toLowerCase()))) {
           continue;
@@ -381,13 +380,13 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
         if (!_selectedFermentations.contains(model.fermentation)) {
           continue;
         }
-      };
+      }
       if (_selectedCategories.isNotEmpty) {
         var result = _selectedCategories.where((element) => element.styles!.contains(model));
         if (result.isEmpty) {
           continue;
         }
-      };
+      }
       values.add(model);
     }
     return values;
@@ -419,7 +418,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

@@ -1,6 +1,7 @@
-import 'dart:math' as math;
-import 'package:bb/helpers/color_helper.dart';
 import 'package:flutter/material.dart';
+
+// Internal package
+import 'package:bb/helpers/color_helper.dart';
 
 class GradientSliderThumbShape implements SliderComponentShape {
 
@@ -73,13 +74,13 @@ class GradientSliderThumbShape implements SliderComponentShape {
             Rect.fromCircle(center: center, radius: 16 - 1))
         ..fillType = PathFillType.evenOdd;
 
-      TextSpan span = new TextSpan(
-          style: new TextStyle(
+      TextSpan span = TextSpan(
+          style: const TextStyle(
               fontSize: 12,
               color: Colors.white,
               height: 1),
           text: number.toString());
-      TextPainter tp = new TextPainter(
+      TextPainter tp = TextPainter(
           text: span,
           textAlign: TextAlign.left,
           textDirection: TextDirection.ltr);

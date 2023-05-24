@@ -1,10 +1,9 @@
-import 'dart:io';
 import 'dart:typed_data';
-import 'package:bb/utils/constants.dart';
-import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:flutter/material.dart';
 
 // External package
 import 'package:image_picker/image_picker.dart';
@@ -72,7 +71,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      physics: NeverScrollableScrollPhysics(),
+      physics: const NeverScrollableScrollPhysics(),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -82,7 +81,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
-                  icon: Icon(Icons.text_fields_outlined),
+                  icon: const Icon(Icons.text_fields_outlined),
                   label: Text(AppLocalizations.of(context)!.text('text')),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
@@ -102,7 +101,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
-                  icon: Icon(Icons.image),
+                  icon: const Icon(Icons.image),
                   label: Text(AppLocalizations.of(context)!.text('image')),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
@@ -125,7 +124,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: TextButton.icon(
-                  icon: Icon(Icons.palette),
+                  icon: const Icon(Icons.palette),
                   label: Text(AppLocalizations.of(context)!.text('drawing')),
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.black,
@@ -148,7 +147,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
           ),
           Container(
             color: FillColor,
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Stack(
               children: [
                 AspectRatio(
@@ -157,7 +156,7 @@ class _ImageEditorContainerState extends State<ImageEditorContainer> {
                 ),
                 LayoutBuilder(
                   builder: (BuildContext context, BoxConstraints constraints) {
-                    return Container(
+                    return SizedBox(
                       height: constraints.maxWidth,
                       width: constraints.maxWidth,
                       child: StackBoard(

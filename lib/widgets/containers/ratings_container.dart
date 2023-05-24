@@ -21,7 +21,6 @@ class RatingsContainer extends StatefulWidget {
 
 class _RatingsContainerState extends State<RatingsContainer> {
   GlobalKey _keyReviews = GlobalKey();
-  final ScrollController _controller = ScrollController();
   bool _reviews = true;
 
   @override
@@ -41,12 +40,12 @@ class _RatingsContainerState extends State<RatingsContainer> {
              return ListTile(
                key: _keyReviews,
                dense: true,
-               contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-               title: Text(AppLocalizations.of(context)!.text('summary_reviews'), style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+               contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+               title: Text(AppLocalizations.of(context)!.text('summary_reviews'), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
              );
            },
            body: Container(
-             padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+             padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
              child: Column(
                mainAxisAlignment: MainAxisAlignment.start,
                crossAxisAlignment: CrossAxisAlignment.start,
@@ -77,8 +76,8 @@ class _RatingsContainerState extends State<RatingsContainer> {
                  ),
                  if (widget.model.ratings.length > 0) Row(
                    children: [
-                     Text(widget.model.rating.toStringAsPrecision(2), style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
-                     Padding(padding: EdgeInsets.only(left: 12),
+                     Text(widget.model.rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold)),
+                     Padding(padding: const EdgeInsets.only(left: 12),
                          child: Column(
                            children: [
                              RatingBar.builder(
@@ -88,7 +87,7 @@ class _RatingsContainerState extends State<RatingsContainer> {
                                itemCount: 5,
                                itemSize: 18,
                                itemPadding: EdgeInsets.zero,
-                               itemBuilder: (context, _) => Icon(
+                               itemBuilder: (context, _) => const Icon(
                                  Icons.star,
                                  color: Colors.amber,
                                ),
@@ -104,10 +103,10 @@ class _RatingsContainerState extends State<RatingsContainer> {
                  ),
                  ListView(
                    shrinkWrap: true,
-                   physics: NeverScrollableScrollPhysics(),
+                   physics: const NeverScrollableScrollPhysics(),
                    children: [
                      for(Rating model in widget.model.ratings) Container(
-                         padding: EdgeInsets.all(8),
+                         padding: const EdgeInsets.all(8),
                          child: Column(
                              mainAxisAlignment: MainAxisAlignment.start,
                              crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,9 +116,9 @@ class _RatingsContainerState extends State<RatingsContainer> {
                                  contentPadding : EdgeInsets.zero,
                                  leading: CircleAvatar(
                                    backgroundColor: Colors.black12,
-                                   child: Text(model.name != null ? model.name![0] : '', style: TextStyle(color: Colors.black)),
+                                   child: Text(model.name != null ? model.name![0] : '', style: const TextStyle(color: Colors.black)),
                                  ),
-                                 title: Text(model.name ?? '?', style: TextStyle(fontWeight: FontWeight.bold)),
+                                 title: Text(model.name ?? '?', style: const TextStyle(fontWeight: FontWeight.bold)),
                                  subtitle: Row(
                                    children: [
                                      RatingBar.builder(
@@ -129,7 +128,7 @@ class _RatingsContainerState extends State<RatingsContainer> {
                                        itemCount: 5,
                                        itemSize: 18,
                                        itemPadding: EdgeInsets.zero,
-                                       itemBuilder: (context, _) => Icon(
+                                       itemBuilder: (context, _) => const Icon(
                                          Icons.star,
                                          color: Colors.amber,
                                        ),
@@ -137,7 +136,7 @@ class _RatingsContainerState extends State<RatingsContainer> {
                                        onRatingUpdate: (rating) async {
                                        },
                                      ),
-                                     Text(' - ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                     const Text(' - ', style: TextStyle(fontWeight: FontWeight.bold)),
                                      Text('${AppLocalizations.of(context)!.text('the')} ${DateHelper.formatShortDate(context, model.inserted_at)}'),
                                    ],
                                  ),
@@ -148,11 +147,11 @@ class _RatingsContainerState extends State<RatingsContainer> {
                      )
                    ]
                  ),
-                 if (widget.model.ratings.length > 0) SizedBox(height: 8),
+                 if (widget.model.ratings.length > 0) const SizedBox(height: 8),
                  if (widget.model.ratings.length > 0) TextButton(
                    child: Text(AppLocalizations.of(context)!.text('give_its_opinion')),
                    onPressed: () async {
-                     dynamic? rating = await showDialog(
+                     dynamic rating = await showDialog(
                          context: context,
                          builder: (BuildContext context) {
                            return RatingDialog(

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 // Internal package
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/formula_helper.dart';
@@ -19,8 +17,8 @@ import 'package:bb/utils/rating.dart';
 
 class ReceiptModel<T> extends Model {
   Status? status;
-  dynamic? title;
-  dynamic? text;
+  dynamic title;
+  dynamic text;
   bool? shared;
   StyleModel? style;
   double? volume;
@@ -42,7 +40,7 @@ class ReceiptModel<T> extends Model {
   double? secondarytemp;
   int? tertiaryday;
   double? tertiarytemp;
-  dynamic? notes;
+  dynamic notes;
   ImageModel? image;
   List<Rating>? ratings;
   String? country;
@@ -86,14 +84,15 @@ class ReceiptModel<T> extends Model {
     this.ratings,
     this.country,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (cacheFermentables == null) { cacheFermentables = []; }
-    if (cacheHops == null) { cacheHops = []; }
-    if (cacheMisc == null) { cacheMisc = []; }
-    if (cacheYeasts == null) { cacheYeasts = []; }
-    if (mash == null) { mash = []; }
-    if (ratings == null) { ratings = []; }
+    cacheFermentables ??= [];
+    cacheHops ??= [];
+    cacheMisc ??= [];
+    cacheYeasts ??= [];
+    mash ??= [];
+    ratings ??= [];
   }
 
+  @override
   Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -126,6 +125,7 @@ class ReceiptModel<T> extends Model {
     this.country = map['country'];
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -163,10 +163,10 @@ class ReceiptModel<T> extends Model {
 
   ReceiptModel copy() {
     return ReceiptModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       title: this.title,
       text: this.text,
@@ -203,9 +203,13 @@ class ReceiptModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is ReceiptModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   int get notice {
     return this.ratings != null ? this.ratings!.length : 0;
@@ -213,7 +217,7 @@ class ReceiptModel<T> extends Model {
 
   double get rating {
     double rating = 0;
-    if (ratings != null && ratings!.length > 0) {
+    if (ratings != null && ratings!.isNotEmpty) {
       for(Rating model in ratings!) {
         rating += model.rating!;
       }
@@ -276,8 +280,9 @@ class ReceiptModel<T> extends Model {
   }
 
   resizeFermentales(double? volume) {
-    if (volume == null || volume == this.volume)
+    if (volume == null || volume == this.volume) {
       return;
+    }
     for(FermentableModel item in fermentables) {
       item.amount = (item.amount! * (volume / this.volume!)).abs();
     }
@@ -285,8 +290,9 @@ class ReceiptModel<T> extends Model {
   }
 
   resizeHops(double? volume) {
-    if (volume == null || volume == this.volume)
+    if (volume == null || volume == this.volume) {
       return;
+    }
     for(HopModel item in hops) {
       item.amount = (item.amount! * (volume / this.volume!)).abs();
     }
@@ -294,16 +300,18 @@ class ReceiptModel<T> extends Model {
   }
 
   resizeYeasts(double? volume) {
-    if (volume == null || volume == this.volume)
+    if (volume == null || volume == this.volume) {
       return;
+    }
     var percent = (volume - this.volume!) / this.volume!;
 
     calculate(volume: volume);
   }
 
   resizeMisc(double? volume) {
-    if (volume == null || volume == this.volume)
+    if (volume == null || volume == this.volume) {
       return;
+    }
     var percent = (volume - this.volume!) / this.volume!;
 
     calculate(volume: volume);

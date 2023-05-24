@@ -1278,34 +1278,34 @@ packages:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_core
-      sha256: "3659bd6b4774ff95ce22b624be932f009c20913a99baf8898166ba2d36b73156"
+      sha256: b2ad1c93239b094d6de1b4679c1835b1bc4332e6c6548bd2da44bd2594e6cdc5
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.39"
+    version: "21.2.5"
   syncfusion_flutter_datagrid:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_datagrid
-      sha256: "2ee350c0ac187432c6958abb3a0e70231790ad2fd7841bf8c167539006fde1b0"
+      sha256: a76124ad7ca3712d7f0c885aab838e8657126e33d0b76bbbe5b12e1c9978c55b
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.38"
+    version: "21.2.5"
   syncfusion_flutter_gauges:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_gauges
-      sha256: "45a8057baf91b08a4fd65527e2faaa22b74ab4f1b9651dcd7e55578d5eff5b1d"
+      sha256: "126a6ee4a6513bba1df3370b1b607c0e8e22cb922fef300a8f809f54f59c6e54"
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.39"
+    version: "21.2.5"
   syncfusion_flutter_sliders:
     dependency: "direct main"
     description:
       name: syncfusion_flutter_sliders
-      sha256: d177e0c365701c49c3a953495afa42c6847a16bec837e871056f8ca41a37b284
+      sha256: "5d24cccdbe7a0d51c9e4f66539c43cc4e7673093a1e153e93bd74de5529136ca"
       url: "https://pub.dev"
     source: hosted
-    version: "21.1.38"
+    version: "21.2.5"
   table_calendar:
     dependency: "direct main"
     description:

@@ -5,21 +5,21 @@ import 'package:bb/models/style_model.dart';
 import 'package:bb/utils/localized_text.dart';
 
 class Category {
-  dynamic? name;
+  dynamic name;
   List<StyleModel>? styles;
 
   Category({
     this.name,
     this.styles,
   }) {
-    if (styles == null) { styles = []; }
+    styles ??= [];
   }
 
   String? localizedName(Locale? locale) {
-    if (this.name is LocalizedText) {
-      return this.name.get(locale);
+    if (name is LocalizedText) {
+      return name.get(locale);
     }
-    return this.name;
+    return name;
   }
 
   static void populate(List<Category> categories, List<StyleModel> styles, Locale locale) {

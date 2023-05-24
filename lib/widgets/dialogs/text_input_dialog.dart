@@ -27,6 +27,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
     _textFieldController = TextEditingController(text: widget.initialValue ?? '');
   }
 
+  @override
   Widget build(BuildContext context) {
     if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(
@@ -38,7 +39,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
           textInputAction: TextInputAction.newline,
           decoration: InputDecoration(
             hintText: widget.hintText,
-            border: OutlineInputBorder(),
+            border: const OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
                 borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
             ),
@@ -70,7 +71,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
         textInputAction: TextInputAction.newline,
         decoration: InputDecoration(
           hintText: widget.hintText,
-          border: OutlineInputBorder(),
+          border: const OutlineInputBorder(),
           focusedBorder: OutlineInputBorder(
             borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
           ),

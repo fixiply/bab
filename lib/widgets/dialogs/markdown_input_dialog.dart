@@ -24,6 +24,7 @@ class MarkdownInputDialog extends StatefulWidget {
 class _MarkdownInputDialogState extends State<MarkdownInputDialog> {
   TextEditingController _textFieldController = TextEditingController();
 
+  @override
   Widget build(BuildContext context) {
     if (DeviceHelper.isIOS) {
       return CupertinoAlertDialog(

@@ -10,7 +10,8 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 
 class PurchasesPage extends StatefulWidget {
-  _PurchasesPageState createState() => new _PurchasesPageState();
+  @override
+  _PurchasesPageState createState() => _PurchasesPageState();
 }
 
 class _PurchasesPageState extends State<PurchasesPage> {
@@ -40,7 +41,7 @@ class _PurchasesPageState extends State<PurchasesPage> {
         future: _purchases,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            if (snapshot.data!.length == 0) {
+            if (snapshot.data!.isEmpty) {
               return EmptyContainer(
                 image: Icon(Icons.local_offer_outlined, size: 80, color: Theme.of(context).primaryColor),
                 message: AppLocalizations.of(context)!.text('no_purchase')
@@ -52,7 +53,7 @@ class _PurchasesPageState extends State<PurchasesPage> {
               itemCount: snapshot.hasData ? snapshot.data!.length : 0,
               itemBuilder: (context, index) {
                 PurchaseModel model = snapshot.data![index];
-                return ListTile(
+                return const ListTile(
                 );
               }
             );
@@ -80,7 +81,7 @@ class _PurchasesPageState extends State<PurchasesPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

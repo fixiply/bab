@@ -35,13 +35,14 @@ class EventModel<T> extends Model {
     this.widgets,
     this.images,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    if (top_left == null) top_left = TextFormat();
-    if (top_right == null) top_right = TextFormat();
-    if (bottom_left == null) bottom_left = TextFormat();
-    if (widgets == null) { widgets = []; }
-    if (images == null) { images = []; }
+    top_left ??= TextFormat();
+    top_right ??= TextFormat();
+    bottom_left ??= TextFormat();
+    widgets ??= [];
+    images ??= [];
   }
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -57,6 +58,7 @@ class EventModel<T> extends Model {
     this.images = ImageModel.deserialize(map['images']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -77,10 +79,10 @@ class EventModel<T> extends Model {
 
   EventModel copy() {
     return EventModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       axis: this.axis,
       sliver: this.sliver,
@@ -96,9 +98,13 @@ class EventModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is EventModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

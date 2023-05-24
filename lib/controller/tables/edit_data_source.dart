@@ -12,19 +12,26 @@ import 'package:intl/intl.dart';
 // External package
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+class NoKeyboardEditableTextFocusNode extends FocusNode {
+  @override
+  bool consumeKeyboardToken() {
+    // prevents keyboard from showing on first focus
+    return false;
+  }
+}
+
 abstract class EditDataSource extends DataGridSource {
   dynamic newCellValue;
   BuildContext context;
+  GlobalKey? formKey;
   bool showCheckboxColumn;
   bool showQuantity;
-  EditDataSource(this.context, {this.showCheckboxColumn = false, this.showQuantity = false});
+  EditDataSource(this.context, {this.formKey, this.showCheckboxColumn = false, this.showQuantity = false});
 
   List<DataGridRow> dataGridRows = [];
 
   @override
   List<DataGridRow> get rows => dataGridRows;
-
-  TextEditingController editingController = TextEditingController();
 
   bool isNumericType(String columnName) {
     return false;
@@ -53,7 +60,7 @@ abstract class EditDataSource extends DataGridSource {
     return Container();
   }
 
-  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     return dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == column.columnName).value;
   }
 
@@ -71,43 +78,51 @@ abstract class EditDataSource extends DataGridSource {
 
   Widget textFieldWidget(String displayText, GridColumn column, CellSubmit submitCell) {
     RegExp regExp = isNumericType(column.columnName) ? RegExp('[0-9.,]') : RegExp('[a-zA-Z ]');
-    return Container(
-      padding: const EdgeInsets.all(8.0),
-      alignment: isNumericType(column.columnName) ? Alignment.centerRight : Alignment.centerLeft,
-      child: TextField(
-        autofocus: true,
-        controller: editingController..text = displayText,
-        textAlign: isNumericType(column.columnName) ? TextAlign.right : TextAlign.left,
-        decoration: InputDecoration(
-          contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 16.0),
-          suffixText: suffixText(column.columnName)
-        ),
-        keyboardType: isNumericType(column.columnName) ? TextInputType.number : TextInputType.text,
-        inputFormatters: <TextInputFormatter>[
-          FilteringTextInputFormatter.allow(regExp)
-        ],
-        onChanged: (String value) {
-          if (value.isNotEmpty) {
-            if (isNumericType(column.columnName)) {
-              try {
-                newCellValue = NumberFormat.decimalPattern(AppLocalizations.of(context)!.locale.toString()).parse(value);
-              } catch(e) {
-                newCellValue = double.tryParse(value);
+    return Form(
+      key: formKey,
+      child: Container(
+        padding: const EdgeInsets.all(8.0),
+        alignment: isNumericType(column.columnName) ? Alignment.centerRight : Alignment.centerLeft,
+        child: TextField(
+          autofocus: true,
+          autocorrect: false,
+          // focusNode: NoKeyboardEditableTextFocusNode(),
+          controller: TextEditingController()..text = displayText,
+          textAlign: isNumericType(column.columnName) ? TextAlign.right : TextAlign.left,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 16.0),
+            suffixText: suffixText(column.columnName)
+          ),
+          keyboardType: isNumericType(column.columnName) ? TextInputType.number : TextInputType.text,
+          inputFormatters: <TextInputFormatter>[
+            FilteringTextInputFormatter.allow(regExp)
+          ],
+          onTap: () {
+            SystemChannels.textInput.invokeMethod('TextInput.show');
+          },
+          onChanged: (String value) {
+            if (value.isNotEmpty) {
+              if (isNumericType(column.columnName)) {
+                try {
+                  newCellValue = NumberFormat.decimalPattern(AppLocalizations.of(context)!.locale.toString()).parse(value);
+                } catch(e) {
+                  newCellValue = double.tryParse(value);
+                }
+              } else {
+                newCellValue = value;
               }
             } else {
-              newCellValue = value;
+              newCellValue = null;
             }
-          } else {
-            newCellValue = null;
-          }
-        },
-        onSubmitted: (String value) {
-          // In Mobile Platform.
-          // Call [CellSubmit] callback to fire the canSubmitCell and
-          // onCellSubmit to commit the new value in single place.
-          submitCell();
-        },
-      ),
+          },
+          onSubmitted: (String value) {
+            // In Mobile Platform.
+            // Call [CellSubmit] callback to fire the canSubmitCell and
+            // onCellSubmit to commit the new value in single place.
+            submitCell();
+          },
+        ),
+      )
     );
   }
 
@@ -157,7 +172,7 @@ abstract class EditDataSource extends DataGridSource {
           }).toList();
           matches.retainWhere((s) => s.toLowerCase().contains(pattern.toLowerCase()));
           return Future.delayed(
-            Duration(seconds: 1), () => matches,
+            const Duration(seconds: 1), () => matches,
           );
         },
         onSuggestionSelected: (String value) {
@@ -176,6 +191,7 @@ abstract class EditDataSource extends DataGridSource {
         return cell;
       }
     }
+    return null;
   }
 
   void updateDataSource() {

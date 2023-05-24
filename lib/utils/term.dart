@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 // Internal package
 import 'package:bb/utils/constants.dart';
 
@@ -60,7 +58,7 @@ class Term<T> {
 
   static Term? deserialize(dynamic data) {
     if (data != null) {
-      Term model = new Term();
+      Term model = Term();
       if (data is Map<String, dynamic>) {
         model.fromMap(data);
       }

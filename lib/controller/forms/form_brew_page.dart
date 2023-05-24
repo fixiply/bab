@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -23,7 +22,9 @@ import 'package:bb/widgets/forms/text_input_field.dart';
 class FormBrewPage extends StatefulWidget {
   final BrewModel model;
   FormBrewPage(this.model);
-  _FormBrewPageState createState() => new _FormBrewPageState();
+
+  @override
+  _FormBrewPageState createState() => _FormBrewPageState();
 }
 
 class _FormBrewPageState extends State<FormBrewPage> {
@@ -53,7 +54,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -132,7 +133,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -152,7 +153,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: RichText(
                             textAlign: TextAlign.left,
                             overflow: TextOverflow.ellipsis,
@@ -160,8 +161,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
-                                if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.mash_water == null) TextSpan(text: '-'),
+                                if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.mash_water == null) const TextSpan(text: '-'),
                               ],
                             ),
                           ),
@@ -169,7 +170,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: RichText(
                             textAlign: TextAlign.left,
                             overflow: TextOverflow.ellipsis,
@@ -177,8 +178,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
-                                if (widget.model.sparge_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.sparge_water == null) TextSpan(text: '-')
+                                if (widget.model.sparge_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.sparge_water == null) const TextSpan(text: '-')
                               ],
                             ),
                           ),
@@ -190,7 +191,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: RichText(
                             textAlign: TextAlign.left,
                             overflow: TextOverflow.ellipsis,
@@ -198,7 +199,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -206,7 +207,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
                           child: RichText(
                             textAlign: TextAlign.left,
                             overflow: TextOverflow.ellipsis,
@@ -214,7 +215,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -242,7 +243,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   ColorField(
@@ -252,7 +253,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       widget.model.color = value;
                     })
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       // initialValue: widget.model.identifier,
@@ -276,7 +277,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       }
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   SizedBox(
                     width: 140,
                     child: SwitchField(
@@ -292,18 +293,18 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   )
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               ReceiptField(
                 context: context,
                 initialValue: widget.model.receipt,
                 title: AppLocalizations.of(context)!.text('receipt'),
                 onChanged: (value) => widget.model.receipt = value
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               EquipmentField(
                 context: context,
                 type: Equipment.tank,
-                icon: Icon(Icons.delete_outline),
+                icon: const Icon(Icons.delete_outline),
                 initialValue: widget.model.tank,
                 title: AppLocalizations.of(context)!.text('equipment'),
                 onChanged: (value) {
@@ -317,21 +318,21 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               EquipmentField(
                 context: context,
                 type: Equipment.fermenter,
-                icon: Icon(Icons.propane_tank_outlined),
+                icon: const Icon(Icons.propane_tank_outlined),
                 initialValue: widget.model.fermenter,
                 title: AppLocalizations.of(context)!.text('fermenter'),
                 onChanged: (value) => widget.model.fermenter = value
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 // key: UniqueKey(),
                 // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                 controller:  _volumeController,
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) {
                   widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                   _calculate();
@@ -355,13 +356,13 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.mash_ph) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) => widget.model.mash_ph = AppLocalizations.of(context)!.decimal(value),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.water_drop_outlined),
@@ -371,14 +372,14 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ),
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.sparge_ph) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) => widget.model.sparge_ph = AppLocalizations.of(context)!.decimal(value),
                       decoration: FormDecoration(
-                        icon:  RotationTransition(
+                        icon:  const RotationTransition(
                           turns: AlwaysStoppedAnimation(90 / 360),
                           child: Icon(Icons.air_outlined),
                         ),
@@ -390,19 +391,20 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
-                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.og) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      initialValue: AppLocalizations.of(context)!.gravityFormat(widget.model.og, symbol: false) ?? '',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
-                        widget.model.og = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                        widget.model.og = AppLocalizations.of(context)!.decimal(value);
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.first_page_outlined),
                         labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
+                        hintText: CS.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
                         suffixIcon: Tooltip(
                           message: AppLocalizations.of(context)!.text('oiginal_gravity_tooltip'),
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
@@ -412,17 +414,18 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ),
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
-                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.fg) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      initialValue: AppLocalizations.of(context)!.gravityFormat(widget.model.fg, symbol: false) ?? '',
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
-                        widget.model.fg = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+                        widget.model.fg = AppLocalizations.of(context)!.decimal(value);
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.last_page_outlined),
                         labelText: AppLocalizations.of(context)!.text('final_gravity'),
+                        hintText: CS.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
                         suffixIcon: Tooltip(
                           message: AppLocalizations.of(context)!.text('final_gravity_tooltip'),
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
@@ -434,7 +437,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.notes,
@@ -481,7 +484,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
-        duration: Duration(seconds: 10)
+        duration: const Duration(seconds: 10)
       )
     );
   }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -20,7 +19,9 @@ import 'package:markdown_editable_textinput/markdown_text_input.dart';
 class FormCompanyPage extends StatefulWidget {
   final CompanyModel model;
   FormCompanyPage(this.model);
-  _FormCompanyPageState createState() => new _FormCompanyPageState();
+
+  @override
+  _FormCompanyPageState createState() => _FormCompanyPageState();
 }
 
 class _FormCompanyPageState extends State<FormCompanyPage> {
@@ -38,7 +39,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -109,7 +110,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -119,7 +120,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
           },
           child: Column(
             children: <Widget>[
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.name,
                 textCapitalization: TextCapitalization.sentences,
@@ -140,7 +141,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               MarkdownTextInput(
                 (String value) => setState(() {
                   widget.model.text = value;
@@ -154,7 +155,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               ImageField(
                 context: context,
                 image: widget.model.image,
@@ -175,7 +176,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

@@ -4,7 +4,6 @@ import 'package:bb/models/image_model.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/localized_text.dart';
-import 'package:flutter/material.dart';
 
 // External package
 
@@ -30,7 +29,7 @@ class EquipmentModel<T> extends Model {
   double? boil_loss;
   double? shrinkage;
   double? head_loss;
-  dynamic? notes;
+  dynamic notes;
   ImageModel? image;
 
   EquipmentModel({
@@ -57,6 +56,7 @@ class EquipmentModel<T> extends Model {
     this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -76,6 +76,7 @@ class EquipmentModel<T> extends Model {
     this.image = ImageModel.fromJson(map['image']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -100,10 +101,10 @@ class EquipmentModel<T> extends Model {
 
   EquipmentModel copy() {
     return EquipmentModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       reference: this.reference,
       name: this.name,
@@ -123,9 +124,13 @@ class EquipmentModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is EquipmentModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -137,7 +142,7 @@ class EquipmentModel<T> extends Model {
   /// The `volume` argument is relative to the final volume.
   ///
   /// The `duration` argument is relative to the boil duration in minute.
-  double preboilVolume(double volume, {int duration = 60}) {
+  double preboilVolume(double? volume, {int duration = 60}) {
     if (volume == null) {
       return 0;
     }
@@ -189,7 +194,7 @@ class EquipmentModel<T> extends Model {
           values.addAll(deserialize(value));
         }
       } else {
-        EquipmentModel model = new EquipmentModel();
+        EquipmentModel model = EquipmentModel();
         model.fromMap(data);
         values.add(model);
       }

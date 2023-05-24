@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/tables/edit_data_source.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 
 // External package
@@ -44,7 +43,7 @@ class BrewDataSource extends EditDataSource {
 
   @override
   Future<void> handleLoadMoreRows() async {
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 5));
     _addMoreRows(20);
     notifyListeners();
   }
@@ -86,7 +85,7 @@ class BrewDataSource extends EditDataSource {
           }
           return Container(
             alignment: alignment,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(value ?? ''),
           );
         }).toList()
@@ -134,6 +133,7 @@ class BrewDataSource extends EditDataSource {
     updateDataSource();
   }
 
+  @override
   void updateDataSource() {
     notifyListeners();
   }
@@ -150,7 +150,7 @@ class BrewDataSource extends EditDataSource {
           columnName: 'reference',
           allowEditing: false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('reference'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -159,7 +159,7 @@ class BrewDataSource extends EditDataSource {
           columnName: 'inserted_at',
           allowEditing: false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('date'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -168,7 +168,7 @@ class BrewDataSource extends EditDataSource {
           columnName: 'receipt',
           allowEditing: false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
               child: Text(AppLocalizations.of(context)!.text('receipt'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -177,7 +177,7 @@ class BrewDataSource extends EditDataSource {
           columnName: 'tank',
           allowEditing: false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
               child: Text(AppLocalizations.of(context)!.text('tank'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -186,7 +186,7 @@ class BrewDataSource extends EditDataSource {
           columnName: 'fermenter',
           allowEditing: false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.text('fermenter'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -195,7 +195,7 @@ class BrewDataSource extends EditDataSource {
           columnName: 'status',
           allowEditing: true,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.text('status'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )

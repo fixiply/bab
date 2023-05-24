@@ -1,10 +1,10 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/basket_page.dart';
 import 'package:bb/controller/forms/form_receipt_page.dart';
 import 'package:bb/controller/receipt_page.dart';
+import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/style_model.dart';
@@ -12,10 +12,10 @@ import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/category.dart';
-import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/filter_receipt_appbar.dart';
 import 'package:bb/widgets/custom_drawer.dart';
@@ -33,7 +33,9 @@ import 'package:provider/provider.dart';
 
 class ReceiptsPage extends StatefulWidget {
   ReceiptsPage({Key? key}) : super(key: key);
-  _ReceiptsPageState createState() => new _ReceiptsPageState();
+
+  @override
+  _ReceiptsPageState createState() => _ReceiptsPageState();
 }
 
 class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClientMixin<ReceiptsPage> {
@@ -74,15 +76,15 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         actions: <Widget> [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -100,123 +102,126 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         ]
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<ReceiptModel>>(
-            future: _receipts,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return CustomScrollView(
-                  slivers: [
-                    FilterReceiptAppBar(
-                      ibu: _ibu,
-                      abv: _abv,
-                      cu: _cu,
-                      my_receips: _my_receips,
-                      selectedFermentations: _selectedFermentations,
-                      categories: _categories,
-                      selectedCategories: _selectedCategories,
-                      onColorChanged: (start, end) {
-                        setState(() {
-                          _cu.start = start;
-                          _cu.end = end;
-                        });
-                        _fetch();
-                      },
-                      onMyChanged: (value) {
-                        setState(() {
-                          _my_receips = value;
-                        });
-                        _fetch();
-                      },
-                      onIBUChanged: (start, end) {
-                        setState(() {
-                          _ibu.start = start;
-                          _ibu.end = end;
-                        });
-                        _fetch();
-                      },
-                      onAlcoholChanged: (start, end) {
-                        setState(() {
-                          _abv.start = start;
-                          _abv.end = end;
-                        });
-                        _fetch();
-                      },
-                      onFermentationChanged: (value) {
-                        setState(() {
-                          if (_selectedFermentations.contains(value)) {
-                            _selectedFermentations.remove(value);
-                            _selectedCategories.clear();
-                          } else {
-                            _selectedFermentations.add(value);
-                          }
-                        });
-                        _fetch();
-                      },
-                      onCategoryChanged: (value) {
-                        setState(() {
-                          if (_selectedCategories.contains(value)) {
-                            _selectedCategories.remove(value);
-                          } else {
-                            _selectedCategories.add(value);
-                          }
-                        });
-                        _fetch();
-                      },
-                      onReset: () => _clear()
-                    ),
-                    SliverToBoxAdapter(
-                      child: Container(
-                        color: Colors.white,
-                        padding: EdgeInsets.symmetric(vertical: 6.0),
-                        child: Center(
-                          child: Text(snapshot.data!.length == 0 ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'receipts': 'receipt')}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-                        )
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<ReceiptModel>>(
+          future: _receipts,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return CustomScrollView(
+                slivers: [
+                  FilterReceiptAppBar(
+                    ibu: _ibu,
+                    abv: _abv,
+                    cu: _cu,
+                    my_receips: _my_receips,
+                    selectedFermentations: _selectedFermentations,
+                    categories: _categories,
+                    selectedCategories: _selectedCategories,
+                    onColorChanged: (start, end) {
+                      setState(() {
+                        _cu.start = start;
+                        _cu.end = end;
+                      });
+                      _fetch();
+                    },
+                    onMyChanged: (value) {
+                      setState(() {
+                        _my_receips = value;
+                      });
+                      _fetch();
+                    },
+                    onIBUChanged: (start, end) {
+                      setState(() {
+                        _ibu.start = start;
+                        _ibu.end = end;
+                      });
+                      _fetch();
+                    },
+                    onAlcoholChanged: (start, end) {
+                      setState(() {
+                        _abv.start = start;
+                        _abv.end = end;
+                      });
+                      _fetch();
+                    },
+                    onFermentationChanged: (value) {
+                      setState(() {
+                        if (_selectedFermentations.contains(value)) {
+                          _selectedFermentations.remove(value);
+                          _selectedCategories.clear();
+                        } else {
+                          _selectedFermentations.add(value);
+                        }
+                      });
+                      _fetch();
+                    },
+                    onCategoryChanged: (value) {
+                      setState(() {
+                        if (_selectedCategories.contains(value)) {
+                          _selectedCategories.remove(value);
+                        } else {
+                          _selectedCategories.add(value);
+                        }
+                      });
+                      _fetch();
+                    },
+                    onReset: () => _clear()
+                  ),
+                  SliverToBoxAdapter(
+                    child: Container(
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 6.0),
+                      child: Center(
+                        child: Text(snapshot.data!.isEmpty ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'receipts': 'receipt')}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
                       )
-                    ),
-                    SliverList(
-                      delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                        ReceiptModel model = snapshot.data![index];
-                        return _item(model);
-                      }, childCount: snapshot.data!.length)
                     )
-                  ]
-                );
-              }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(
-                child: ImageAnimateRotate(
-                  child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
-                )
+                  ),
+                  SliverList(
+                    delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
+                      ReceiptModel model = snapshot.data![index];
+                      return _item(model);
+                    }, childCount: snapshot.data!.length)
+                  )
+                ]
               );
             }
-          ),
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return Center(
+              child: ImageAnimateRotate(
+                child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+              )
+            );
+          }
         ),
       ),
       floatingActionButton: Visibility(
         visible: currentUser != null,
-        child: FloatingActionButton(
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new_recipe'),
+          icon: const Icon(Icons.add),
           onPressed: _new,
-          backgroundColor: Theme.of(context).primaryColor,
-          tooltip: AppLocalizations.of(context)!.text('new_recipe'),
-          child: const Icon(Icons.add)
         )
+        // child: FloatingActionButton(
+        //   onPressed: _new,
+        //   backgroundColor: Theme.of(context).primaryColor,
+        //   tooltip: AppLocalizations.of(context)!.text('new_recipe'),
+        //   child: const Icon(Icons.add)
+        // )
       )
     );
   }
 
   Widget _item(ReceiptModel model) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         leading: model.ebc != null && model.ebc! >= 0 ? Stack(
           children: [
-            Container(
+            SizedBox(
               child: Image.asset('assets/images/beer_1.png',
                 color: ColorHelper.color(model.ebc) ?? Colors.white,
                 colorBlendMode: BlendMode.modulate
@@ -224,23 +229,20 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
               width: 30,
               height: 50,
             ),
-            Container(
+            SizedBox(
               // color: SRM[model.getSRM()],
               child: Image.asset('assets/images/beer_2.png'),
               width: 30,
               height: 50,
             ),
           ]
-        ) : Container(
-          width: 30,
-          height: 50,
-        ),
+        ) : const SizedBox(width: 30, height: 50),
         title: FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
           child: Text(
             AppLocalizations.of(context)!.localizedText(model.title),
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             textAlign: TextAlign.left,
           ),
         ),
@@ -254,10 +256,10 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.style != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.style!.name), style: TextStyle(fontWeight: FontWeight.bold)),
-                  if (model.style != null && (model.ibu != null || model.abv != null)) TextSpan(text: '  -  '),
+                  if (model.style != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.style!.name), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.style != null && (model.ibu != null || model.abv != null)) const TextSpan(text: '  -  '),
                   if (model.ibu != null) TextSpan(text: 'IBU: ${AppLocalizations.of(context)!.numberFormat(model.ibu)}'),
-                  if (model.ibu != null && model.abv != null) TextSpan(text: '   '),
+                  if (model.ibu != null && model.abv != null) const TextSpan(text: '   '),
                   if (model.abv != null) TextSpan(text: ' ABV: ${AppLocalizations.of(context)!.percentFormat(model.abv)}'),
                 ],
               ),
@@ -266,7 +268,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
           ],
         ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) async {
             if (value == 'edit') {
@@ -332,7 +334,9 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
 
   _initialize() async {
     FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-      _fetch();
+      if (mounted) {
+        _fetch();
+      }
     });
     final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
     _baskets = basketProvider.size;
@@ -359,7 +363,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     String? search =  _searchQueryController.text;
     for (ReceiptModel model in list) {
       _setFilter(model);
-      if (search != null && search.length > 0) {
+      if (search.isNotEmpty) {
         if (!(AppLocalizations.of(context)!.localizedText(model.title).toLowerCase().contains(search.toLowerCase()))) {
           continue;
         }
@@ -374,13 +378,13 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         if (!_styles.contains(model.style)) {
           continue;
         }
-      };
+      }
       if (_selectedCategories.isNotEmpty) {
         var result = _selectedCategories.where((element) => element.styles!.contains(model.style));
         if (result.isEmpty) {
           continue;
         }
-      };
+      }
       values.add(model);
     }
     return values;

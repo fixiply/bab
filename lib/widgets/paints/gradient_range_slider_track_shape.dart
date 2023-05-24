@@ -9,7 +9,7 @@ class GradientRangeSliderTrackShape extends RangeSliderTrackShape {
     this.gradient,
     this.darkenInactive = true,
   }) {
-    if (gradient == null) gradient = LinearGradient(
+    gradient ??= const LinearGradient(
       colors: SRM_COLORS,
     );
   }

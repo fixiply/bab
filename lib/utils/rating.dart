@@ -7,7 +7,7 @@ class Rating<T> {
   DateTime? inserted_at;
   String? name;
   double? rating;
-  dynamic? comment;
+  dynamic comment;
 
   Rating({
     this.creator,
@@ -16,7 +16,7 @@ class Rating<T> {
     this.rating,
     this.comment,
   }) {
-    if(inserted_at == null) { inserted_at = DateTime.now(); }
+    inserted_at ??= DateTime.now();
   }
 
   void fromMap(Map<String, dynamic> map) {
@@ -48,11 +48,6 @@ class Rating<T> {
     );
   }
 
-  // ignore: hash_and_equals
-  bool operator ==(other) {
-    return (other is Rating && other.creator == creator);
-  }
-
   @override
   String toString() {
     return 'Rating: $creator';
@@ -82,7 +77,7 @@ class Rating<T> {
           values.addAll(deserialize(value));
         }
       } else {
-        Rating model = new Rating();
+        Rating model = Rating();
         model.fromMap(data);
         values.add(model);
       }

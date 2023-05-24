@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -41,19 +40,20 @@ class _RatingDialogState extends State<RatingDialog> {
     super.dispose();
   }
 
+  @override
   Widget build(BuildContext context) {
     return ConfirmDialog(
       title: widget.title,
       ok: AppLocalizations.of(context)!.text('validate'),
       enabled: _modified,
-      content: Container(
+      content: SizedBox(
         height: 180,
         width: 400,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Quelle note attribuez-vous ?'),
+            const Text('Quelle note attribuez-vous ?'),
             RatingBar.builder(
               initialRating: widget.model.rating!,
               direction: Axis.horizontal,
@@ -61,7 +61,7 @@ class _RatingDialogState extends State<RatingDialog> {
               itemCount: 5,
               itemSize: 36,
               itemPadding: EdgeInsets.zero,
-              itemBuilder: (context, _) => Icon(
+              itemBuilder: (context, _) => const Icon(
                 Icons.star,
                 color: Colors.amber,
               ),
@@ -73,7 +73,7 @@ class _RatingDialogState extends State<RatingDialog> {
               },
             ),
             const SizedBox(height: 12),
-            Text('Et donnez votre avis :'),
+            const Text('Et donnez votre avis :'),
             TextField(
               maxLines: widget.maxLines,
               controller: _textFieldController,
@@ -81,7 +81,7 @@ class _RatingDialogState extends State<RatingDialog> {
               textInputAction: TextInputAction.newline,
               decoration: InputDecoration(
                 hintText: widget.hintText,
-                border: OutlineInputBorder(),
+                border: const OutlineInputBorder(),
                 focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                 ),

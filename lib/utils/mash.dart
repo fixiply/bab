@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -21,7 +20,7 @@ enum Type with Enums { infusion, temperature, decoction;
 
 class Mash<T> {
   String? uuid;
-  dynamic? name;
+  dynamic name;
   Type? type;
   double? temperature;
   int? duration;
@@ -92,7 +91,7 @@ class Mash<T> {
           values.addAll(deserialize(value));
         }
       } else {
-        Mash model = new Mash();
+        Mash model = Mash();
         model.fromMap(data);
         values.add(model);
       }
@@ -110,7 +109,7 @@ class Mash<T> {
       GridColumn(
           columnName: 'name',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
               child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -118,7 +117,7 @@ class Mash<T> {
       GridColumn(
           columnName: 'type',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -127,7 +126,7 @@ class Mash<T> {
         width: 90,
         columnName: 'temperature',
         label: Container(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
             child: Text(AppLocalizations.of(context)!.text('temperature'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
@@ -136,7 +135,7 @@ class Mash<T> {
         width: 90,
         columnName: 'duration',
         label: Container(
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
@@ -164,6 +163,7 @@ class MashDataSource extends EditDataSource {
     ])).toList();
   }
 
+  @override
   Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
     if (column.columnName == 'name') {
       return super.typeHeadWidget(Bearing.protein, submitCell);
@@ -209,7 +209,7 @@ class MashDataSource extends EditDataSource {
           return Container(
             color: color,
             alignment: alignment,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(value ?? ''),
           );
         }).toList()
@@ -254,6 +254,7 @@ class MashDataSource extends EditDataSource {
     updateDataSource();
   }
 
+  @override
   void updateDataSource() {
     notifyListeners();
   }

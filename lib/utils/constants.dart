@@ -31,11 +31,12 @@ UserModel? currentUser;
 mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   List<Enum> get enums;
   String getLabel(BuildContext context) {
-    return AppLocalizations.of(context)!.text(this.toString().toLowerCase());
+    return AppLocalizations.of(context)!.text(toString().toLowerCase());
   }
 
+  @override
   int compareTo(other) {
-    return this.index.compareTo(other.index);
+    return index.compareTo(other.index);
   }
 }
 
@@ -63,18 +64,18 @@ enum Gravity { sg, plato, brix }
 enum Weight { kilo, gram }
 
 //Colors
-const Color PrimaryColor = const Color(0xFF008351);
-const Color PrimaryColorLight = const Color(0xff4ab47e);
-const Color PrimaryColorDark = const Color(0xff005528);
-const Color SecondaryColor = const Color(0xFF66bb6a);
-const Color SecondaryColorLight = const Color(0xFF98ee99);
-const Color SecondaryColorDark = const Color(0xFF66bb6a);
-const Color FillColor = const Color(0xFFf3f3f4);
-const Color BlendColor = const Color(0x12000000);
+const Color PrimaryColor = Color(0xFF008351);
+const Color PrimaryColorLight = Color(0xff4ab47e);
+const Color PrimaryColorDark = Color(0xff005528);
+const Color SecondaryColor = Color(0xFF66bb6a);
+const Color SecondaryColorLight = Color(0xFF98ee99);
+const Color SecondaryColorDark = Color(0xFF66bb6a);
+const Color FillColor = Color(0xFFf3f3f4);
+const Color BlendColor = Color(0x12000000);
 const Color TextGrey = Color(0xff94959b);
 const Color TextWhiteGrey = Color(0xfff1f1f5);
 const Color AccentColor = Colors.blue;
-const Color PointerColor = const Color(0xFFff5722);
+const Color PointerColor = Color(0xFFff5722);
 
 const ShimmerGradient = LinearGradient(
   colors: [
@@ -88,27 +89,27 @@ const ShimmerGradient = LinearGradient(
   tileMode: TileMode.clamp,
 );
 
-TextStyle heading2 = TextStyle(
+TextStyle heading2 = const TextStyle(
   fontSize: 22,
   fontWeight: FontWeight.w700,
 );
 
-TextStyle heading5 = TextStyle(
+TextStyle heading5 = const TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w600,
 );
 
-TextStyle heading6 = TextStyle(
+TextStyle heading6 = const TextStyle(
   fontSize: 14,
   fontWeight: FontWeight.w600,
 );
 
-TextStyle regular14pt = TextStyle(
+TextStyle regular14pt = const TextStyle(
   fontSize: 14,
   fontWeight: FontWeight.w400,
 );
 
-TextStyle regular16pt = TextStyle(
+TextStyle regular16pt = const TextStyle(
   fontSize: 16,
   fontWeight: FontWeight.w400,
 );

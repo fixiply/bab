@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/utils/adress.dart';
@@ -10,7 +9,9 @@ import 'package:bb/widgets/form_decoration.dart';
 class FormAddressPage extends StatefulWidget {
   final Adress model;
   FormAddressPage(this.model);
-  _FormAddressPageState createState() => new _FormAddressPageState();
+
+  @override
+  _FormAddressPageState createState() => _FormAddressPageState();
 }
 
 class _FormAddressPageState extends State<FormAddressPage> {
@@ -36,7 +37,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
               children: <Widget>[
                 Container(
                   color: FillColor,
-                  padding: EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(AppLocalizations.of(context)!.text('new_address'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
@@ -52,7 +53,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   decoration: FormDecoration(
                     labelText: AppLocalizations.of(context)!.text('name'),
                     border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -62,7 +63,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
                   initialValue: widget.model.address,
                   textCapitalization: TextCapitalization.sentences,
@@ -72,7 +73,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('address'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -82,9 +83,9 @@ class _FormAddressPageState extends State<FormAddressPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
-                  initialValue: widget.model.zip != null ? widget.model.zip.toString() : null,
+                  initialValue: widget.model.zip?.toString(),
                   keyboardType: TextInputType.number,
                   onChanged: (value) => setState(() {
                     widget.model.zip = int.tryParse(value);
@@ -92,7 +93,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('zip_code'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -101,7 +102,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
                   initialValue: widget.model.city,
                   textCapitalization: TextCapitalization.sentences,
@@ -111,7 +112,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('city'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -121,7 +122,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                     return null;
                   }
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
                   initialValue: widget.model.information,
                   textCapitalization: TextCapitalization.sentences,
@@ -131,10 +132,10 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('additional_address'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   )
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 TextFormField(
                   initialValue: widget.model.phone,
                   textCapitalization: TextCapitalization.sentences,
@@ -144,7 +145,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   decoration: FormDecoration(
                       labelText: AppLocalizations.of(context)!.text('phone'),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(8)
+                      contentPadding: const EdgeInsets.all(8)
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -155,7 +156,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
                   }
                 ),
                 if (widget.model.uuid != null) TextButton.icon(
-                  icon: Icon(Icons.delete_outline),
+                  icon: const Icon(Icons.delete_outline),
                   label: Text(AppLocalizations.of(context)!.text('remove_address')),
                   style: TextButton.styleFrom(
                     textStyle: const TextStyle(fontWeight: FontWeight.bold),
@@ -166,9 +167,9 @@ class _FormAddressPageState extends State<FormAddressPage> {
                 if (widget.model.uuid != null) const SizedBox(height: 20),
                 Container(
                   width: double.infinity,
-                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: TextButton.icon(
-                    icon: Icon(Icons.save),
+                    icon: const Icon(Icons.save),
                     label: Text(AppLocalizations.of(context)!.text('save').toUpperCase()),
                     style: TextButton.styleFrom(
                       backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
@@ -193,7 +194,7 @@ class _FormAddressPageState extends State<FormAddressPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

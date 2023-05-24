@@ -5,7 +5,6 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 
 // External package
-import 'package:flutter_highlight/flutter_highlight.dart';
 import 'package:highlight/languages/dart.dart';
 import 'package:code_text_field/code_text_field.dart';
 
@@ -16,7 +15,8 @@ class CodeEditorPage extends StatefulWidget {
   final int? maxLines;
   CodeEditorPage({this.initialValue, this.title, this.hintText, this.maxLines});
 
-  _CodeEditorPageState createState() => new _CodeEditorPageState();
+  @override
+  _CodeEditorPageState createState() => _CodeEditorPageState();
 }
 
 class _CodeEditorPageState extends State<CodeEditorPage> {
@@ -49,7 +49,7 @@ class _CodeEditorPageState extends State<CodeEditorPage> {
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
           leading: IconButton(
-            icon:Icon(Icons.chevron_left),
+            icon: const Icon(Icons.chevron_left),
             onPressed:() async {
               Navigator.pop(context, false);
             }
@@ -60,7 +60,7 @@ class _CodeEditorPageState extends State<CodeEditorPage> {
               tooltip: AppLocalizations.of(context)!.text('save'),
               icon: const Icon(Icons.save),
               onPressed: () async {
-                final value = await _textFieldController.value.text;
+                final value = _textFieldController.value.text;
                 Navigator.pop(context, value);
               }
             ),
@@ -85,7 +85,7 @@ class _CodeEditorPageState extends State<CodeEditorPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
       )
     );
   }

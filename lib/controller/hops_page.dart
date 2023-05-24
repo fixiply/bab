@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/forms/form_hop_page.dart';
@@ -13,6 +12,7 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
@@ -30,9 +30,10 @@ class HopsPage extends StatefulWidget {
   bool loadMore;
   ReceiptModel? receipt;
   SelectionMode selectionMode;
-  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
+  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode: SelectionMode.multiple}) : super(key: key);
 
-  _HopsPageState createState() => new _HopsPageState();
+  @override
+  _HopsPageState createState() => _HopsPageState();
 }
 
 class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<HopsPage> {
@@ -84,7 +85,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
         leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context, selected);
           }
@@ -118,71 +119,68 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
           ),
         ],
       ),
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<HopModel>>(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.length == 0) {
-                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<HopModel>>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+              }
+              if (_showList || widget.showCheckboxColumn == true) {
+                if (widget.loadMore) {
+                  _dataSource.data = snapshot.data!;
+                  _dataSource.handleLoadMoreRows();
+                } else {
+                  _dataSource.buildDataGridRows(snapshot.data!);
                 }
-                if (_showList || widget.showCheckboxColumn == true) {
-                  if (widget.loadMore) {
-                    _dataSource.data = snapshot.data!;
-                    _dataSource.handleLoadMoreRows();
-                  } else {
-                    _dataSource.buildDataGridRows(snapshot.data!);
-                  }
-                  _dataSource.notifyListeners();
-                  return EditSfDataGrid(
-                    context,
-                    allowEditing: widget.allowEditing,
-                    showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: widget.selectionMode,
-                    source: _dataSource,
-                    controller: getDataGridController(),
-                    onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                      setState(() {
-                        for(var row in addedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.add(snapshot.data![index]);
-                        }
-                        for(var row in removedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.remove(snapshot.data![index]);
-                        }
-                      });
-                    },
-                    columns: HopDataSource.columns(context: context, showQuantity: false),
-                  );
-                }
-                return ListView.builder(
-                  controller: _controller,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                  itemBuilder: (context, index) {
-                    HopModel model = snapshot.data![index];
-                    return _item(model);
-                  }
+                _dataSource.notifyListeners();
+                return EditSfDataGrid(
+                  context,
+                  allowEditing: widget.allowEditing,
+                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  selectionMode: widget.selectionMode,
+                  source: _dataSource,
+                  controller: getDataGridController(),
+                  onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+                    setState(() {
+                      for(var row in addedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.add(snapshot.data![index]);
+                      }
+                      for(var row in removedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.remove(snapshot.data![index]);
+                      }
+                    });
+                  },
+                  columns: HopDataSource.columns(context: context, showQuantity: false),
                 );
               }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+              return ListView.builder(
+                controller: _controller,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                itemBuilder: (context, index) {
+                  HopModel model = snapshot.data![index];
+                  return _item(model);
+                }
+              );
             }
-          )
-        ),
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          }
+        )
       ),
-        floatingActionButton: Visibility(
-          visible: currentUser != null,
-          child: FloatingActionButton(
-            onPressed: _new,
-            backgroundColor: Theme.of(context).primaryColor,
-            tooltip: AppLocalizations.of(context)!.text('new'),
-            child: const Icon(Icons.add)
+      floatingActionButton: Visibility(
+        visible: currentUser != null,
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new'),
+          icon: const Icon(Icons.add),
+          onPressed: _new,
         )
       )
     );
@@ -202,16 +200,16 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
 
   Widget _item(HopModel model) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         title: RichText(
           text: TextSpan(
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
-              TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               if (model.origin != null) TextSpan(text: '  ${LocalizedText.emoji(model.origin!)}',
-                  style: TextStyle(fontSize: 16, fontFamily: 'Emoji' )
+                  style: const TextStyle(fontSize: 16, fontFamily: 'Emoji' )
               ),
             ],
           ),
@@ -226,10 +224,10 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  TextSpan(text: AppLocalizations.of(context)!.text(model.type.toString().toLowerCase()), style: TextStyle(fontWeight: FontWeight.bold)),
-                  if (model.alpha != null || model.beta != null) TextSpan(text: '  -  '),
+                  TextSpan(text: AppLocalizations.of(context)!.text(model.type.toString().toLowerCase()), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.alpha != null || model.beta != null) const TextSpan(text: '  -  '),
                   if (model.alpha != null) TextSpan(text: '${AppLocalizations.of(context)!.text('alpha')}: ${AppLocalizations.of(context)!.percentFormat(model.alpha)}'),
-                  if (model.alpha != null && model.beta != null) TextSpan(text: '   '),
+                  if (model.alpha != null && model.beta != null) const TextSpan(text: '   '),
                   if (model.beta != null) TextSpan(text: '${AppLocalizations.of(context)!.text('beta')}: ${AppLocalizations.of(context)!.percentFormat(model.beta)}'),
                 ],
               ),
@@ -244,7 +242,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
           ],
         ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) {
             if (value == 'edit') {
@@ -320,7 +318,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

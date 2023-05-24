@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -18,7 +17,9 @@ import 'package:bb/widgets/custom_menu_button.dart';
 class FormMiscPage extends StatefulWidget {
   final MiscModel model;
   FormMiscPage(this.model);
-  _FormMiscPageState createState() => new _FormMiscPageState();
+
+  @override
+  _FormMiscPageState createState() => _FormMiscPageState();
 }
 
 class _FormMiscPageState extends State<FormMiscPage> {
@@ -36,7 +37,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -86,7 +87,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -115,7 +116,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               DropdownButtonFormField<Misc>(
                 value: widget.model.type,
                 style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
@@ -139,7 +140,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.notes,
@@ -161,7 +162,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

@@ -3,53 +3,53 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 const List<Color> SRM_COLORS = [
-  const Color(0xFFFFE699),
-  const Color(0xFFFFD878),
-  const Color(0xFFFFCA5A),
-  const Color(0xFFFFBF42),
-  const Color(0xFFFBB123),
-  const Color(0xFFF8A600),
-  const Color(0xFFF39C00),
-  const Color(0xFFEA8F00),
-  const Color(0xFFE58500),
-  const Color(0xFFDE7C00),
-  const Color(0xFFD77200),
-  const Color(0xFFCF6900),
-  const Color(0xFFCB6200),
-  const Color(0xFFC35900),
-  const Color(0xFFBB5100),
-  const Color(0xFFB54C00),
-  const Color(0xFFB04500),
-  const Color(0xFFA63E00),
-  const Color(0xFFA13700),
-  const Color(0xFF9B3200),
-  const Color(0xFF952D00),
-  const Color(0xFF8E2900),
-  const Color(0xFF882300),
-  const Color(0xFF821E00),
-  const Color(0xFF7B1A00),
-  const Color(0xFF771900),
-  const Color(0xFF701400),
-  const Color(0xFF6A0E00),
-  const Color(0xFF660D00),
-  const Color(0xFF5E0B00),
-  const Color(0xFF5A0A02),
-  const Color(0xFF600903),
-  const Color(0xFF520907),
-  const Color(0xFF4C0505),
-  const Color(0xFF470606),
-  const Color(0xFF440607),
-  const Color(0xFF3F0708),
-  const Color(0xFF3B0607),
-  const Color(0xFF3A070B),
-  const Color(0xFF36080A),
+  Color(0xFFFFE699),
+  Color(0xFFFFD878),
+  Color(0xFFFFCA5A),
+  Color(0xFFFFBF42),
+  Color(0xFFFBB123),
+  Color(0xFFF8A600),
+  Color(0xFFF39C00),
+  Color(0xFFEA8F00),
+  Color(0xFFE58500),
+  Color(0xFFDE7C00),
+  Color(0xFFD77200),
+  Color(0xFFCF6900),
+  Color(0xFFCB6200),
+  Color(0xFFC35900),
+  Color(0xFFBB5100),
+  Color(0xFFB54C00),
+  Color(0xFFB04500),
+  Color(0xFFA63E00),
+  Color(0xFFA13700),
+  Color(0xFF9B3200),
+  Color(0xFF952D00),
+  Color(0xFF8E2900),
+  Color(0xFF882300),
+  Color(0xFF821E00),
+  Color(0xFF7B1A00),
+  Color(0xFF771900),
+  Color(0xFF701400),
+  Color(0xFF6A0E00),
+  Color(0xFF660D00),
+  Color(0xFF5E0B00),
+  Color(0xFF5A0A02),
+  Color(0xFF600903),
+  Color(0xFF520907),
+  Color(0xFF4C0505),
+  Color(0xFF470606),
+  Color(0xFF440607),
+  Color(0xFF3F0708),
+  Color(0xFF3B0607),
+  Color(0xFF3A070B),
+  Color(0xFF36080A),
 ];
 
 extension ColorExtension on String {
   toColor() {
-    var hexColor = this.replaceAll("#", "");
+    var hexColor = replaceAll("#", "");
     if (hexColor.length == 6) {
-      hexColor = "FF" + hexColor;
+      hexColor = "FF$hexColor";
     }
     if (hexColor.length == 8) {
       return Color(int.parse("0x$hexColor"));
@@ -131,14 +131,14 @@ class ColorHelper {
     return Color(Random().nextInt(0xffffffff)).toHex();
   }
 
-  static Color? fromHex(String value) {
+  static Color? fromHex(String? value) {
     if (value == null) {
       return null;
     }
     return value.toColor();
   }
 
-  static String? toHex(Color color) {
+  static String? toHex(Color? color) {
     if (color == null) {
       return null;
     }

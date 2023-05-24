@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/forms/form_brew_page.dart';
@@ -15,6 +14,7 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart' as CS;
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
 import 'package:bb/widgets/custom_slider.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
@@ -30,14 +30,15 @@ import 'package:bb/widgets/paints/gradient_slider_thumb_shape.dart';
 import 'package:bb/widgets/paints/gradient_slider_track_shape.dart';
 
 // External package
-import 'package:intl/intl.dart';
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 
 class FormReceiptPage extends StatefulWidget {
   final ReceiptModel model;
   FormReceiptPage(this.model);
-  _FormReceiptPageState createState() => new _FormReceiptPageState();
+
+  @override
+  _FormReceiptPageState createState() => _FormReceiptPageState();
 }
 
 class _FormReceiptPageState extends State<FormReceiptPage> {
@@ -69,7 +70,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -147,7 +148,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -198,7 +199,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                             SliderTheme(
                               data: SliderThemeData(
                                 trackHeight: 5,
-                                trackShape: GradientRectSliderTrackShape(darkenInactive: false),
+                                trackShape: const GradientRectSliderTrackShape(darkenInactive: false),
                                 thumbColor: Theme.of(context).primaryColor,
                                 overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
                                 thumbShape: GradientSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: CS.FillColor, selectedValue: 10, max: AppLocalizations.of(context)!.maxColor),
@@ -250,7 +251,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       }
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   SizedBox(
                     width: 140,
                     child: SwitchField(
@@ -263,7 +264,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   )
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -274,11 +275,11 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       onChanged: (value) => widget.model.style = value,
                     ),
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.efficiency) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
                         _calculate();
@@ -301,7 +302,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -309,7 +310,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       // key: UniqueKey(),
                       // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
                       controller:  _volumeController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
                         _calculate();
@@ -334,11 +335,11 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       }
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.boil) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
                       onChanged: (value) {
                         widget.model.boil = int.parse(value);
                         _calculate();
@@ -361,7 +362,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               IngredientsField(
                 context: context,
                 ingredient: CS.Ingredient.fermentable,
@@ -371,7 +372,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   _calculate();
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               IngredientsField(
                 context: context,
                 ingredient: CS.Ingredient.hops,
@@ -381,7 +382,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   _calculate();
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               IngredientsField(
                 context: context,
                 ingredient: CS.Ingredient.yeast,
@@ -391,28 +392,28 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   _calculate();
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               IngredientsField(
                 context: context,
                 ingredient: CS.Ingredient.misc,
                 receipt: widget.model,
                 onChanged: (values) => widget.model.miscellaneous = values as List<MiscModel>
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               MashField(
                 context: context,
                 data: widget.model.mash,
                 receipt: widget.model,
                 onChanged: (values) => widget.model.mash = values,
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '',
                       controller: _primarydayController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
                       onChanged: (value) {
                         widget.model.primaryday = int.parse(value);
                       },
@@ -425,12 +426,12 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       ),
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '',
                       controller: _primarytempController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.primarytemp = AppLocalizations.of(context)!.decimal(value);
                       },
@@ -445,14 +446,14 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '',
                       controller: _secondarydayController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
                       onChanged: (value) {
                         widget.model.secondaryday = int.parse(value);
                       },
@@ -465,12 +466,12 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       ),
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '',
                       controller: _secondarytempController,
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.secondarytemp = AppLocalizations.of(context)!.decimal(value);
                       },
@@ -485,13 +486,13 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.tertiaryday) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: false),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
                       onChanged: (value) {
                         widget.model.tertiaryday = int.parse(value);
                       },
@@ -504,11 +505,11 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       ),
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.tertiarytemp) ?? '',
-                      keyboardType: TextInputType.numberWithOptions(decimal: true),
+                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
                       onChanged: (value) {
                         widget.model.tertiarytemp = AppLocalizations.of(context)!.decimal(value);
                       },
@@ -523,7 +524,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.text = value,
                 AppLocalizations.of(context)!.localizedText(widget.model.text),
                 label: AppLocalizations.of(context)!.text('notes'),
@@ -534,7 +535,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               ImageField(
                 context: context,
                 image: widget.model.image,
@@ -548,11 +549,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
       ),
       floatingActionButton: Visibility(
         visible: widget.model.uuid != null && _modified == false,
-        child:  FloatingActionButton(
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new_brew'),
+          icon: const Icon(Icons.add),
           onPressed: _new,
-          backgroundColor: Theme.of(context).primaryColor,
-          tooltip: AppLocalizations.of(context)!.text('new_brew'),
-          child: const Icon(Icons.add)
         )
       )
     );
@@ -590,7 +590,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
       )
     );
   }

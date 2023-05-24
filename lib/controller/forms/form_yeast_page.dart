@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -18,7 +17,9 @@ import 'package:bb/widgets/custom_menu_button.dart';
 class FormYeastPage extends StatefulWidget {
   final YeastModel model;
   FormYeastPage(this.model);
-  _FormYeastPageState createState() => new _FormYeastPageState();
+
+  @override
+  _FormYeastPageState createState() => _FormYeastPageState();
 }
 
 class _FormYeastPageState extends State<FormYeastPage> {
@@ -47,7 +48,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -105,7 +106,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -134,7 +135,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                   children: [
                     Expanded(
@@ -149,7 +150,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                         ),
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: TextFormField(
                         initialValue: widget.model.laboratory ?? '',
@@ -164,7 +165,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                     ),
                   ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               DropdownButtonFormField<Fermentation>(
                 value: widget.model.type,
                 style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
@@ -188,15 +189,15 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.cells) ?? '',
-                keyboardType: TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 onChanged: (value) => widget.model.cells = AppLocalizations.of(context)!.decimal(value),
                 decoration: FormDecoration(
                     icon: const Icon(Icons.scatter_plot_outlined),
                     labelText: AppLocalizations.of(context)!.text('viable_cells'),
-                    suffixText: AppLocalizations.of(context)!.text('billions').toLowerCase() + '/' + AppLocalizations.of(context)!.text('gram').toLowerCase(),
+                    suffixText: '${AppLocalizations.of(context)!.text('billions').toLowerCase()}/${AppLocalizations.of(context)!.text('gram').toLowerCase()}',
                     border: InputBorder.none,
                     fillColor: FillColor, filled: true
                 ),
@@ -208,7 +209,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   return null;
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
@@ -221,7 +222,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                           child: TextFormField(
                             // initialValue: widget.model.tempmin != null ?  widget.model.tempmin.toString() :  '',
                             controller: _tempminController,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.tempmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -235,12 +236,12 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             ),
                           )
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             // initialValue: widget.model.tempmax != null ?  widget.model.tempmax.toString() :  '',
                             controller: _tempmaxController,
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.tempmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
@@ -259,7 +260,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   );
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
@@ -271,7 +272,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.attmin != null ?  widget.model.attmin.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.attmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -284,11 +285,11 @@ class _FormYeastPageState extends State<FormYeastPage> {
                             ),
                           )
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.attmax != null ?  widget.model.attmax.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.attmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
@@ -306,7 +307,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   );
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.notes,
@@ -335,7 +336,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

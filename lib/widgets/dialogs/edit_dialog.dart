@@ -1,14 +1,12 @@
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/model.dart';
 import 'package:bb/utils/app_localizations.dart';
+import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 
 class EditDialog extends StatefulWidget {
@@ -49,12 +47,12 @@ class _EditDialogState extends State<EditDialog> {
     widget.model.toMap().forEach((key, value) {
       if (key != 'uuid' && key != 'inserted_at' && key != 'updated_at' && key != 'creator' && key != 'status') {
         rows.add(_row(key, value));
-      };
+      }
     });
     return rows;
   }
 
-  Widget _row(String columnName, dynamic? value) {
+  Widget _row(String columnName, dynamic value) {
     return Row(
       children: <Widget>[
         Container(
@@ -69,7 +67,7 @@ class _EditDialogState extends State<EditDialog> {
     );
   }
 
-  Widget _widget(String columnName, dynamic? value) {
+  Widget _widget(String columnName, dynamic value) {
     List<Enums>? enums = widget.model.isEnumType(columnName);
     if (enums != null) {
       return DropdownButton<Enum>(

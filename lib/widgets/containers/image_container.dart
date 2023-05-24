@@ -56,9 +56,6 @@ class _ImageContainerState extends State<ImageContainer> {
     }
     if (images.isNotEmpty) {
       if (images.length == 1) {
-        if (images.first == null) {
-          return widget.emptyImage ?? Container();
-        }
         Widget? image = _image(images.first);
         return image ?? Container();
       }
@@ -69,7 +66,7 @@ class _ImageContainerState extends State<ImageContainer> {
         child: CarouselSlider(
           options: CarouselOptions(
             autoPlay: true,
-            autoPlayInterval: Duration(seconds: 6),
+            autoPlayInterval: const Duration(seconds: 6),
             height: MediaQuery.of(context).size.height,
             viewportFraction: 1.0,
             enlargeCenterPage: true,
@@ -85,9 +82,6 @@ class _ImageContainerState extends State<ImageContainer> {
   Widget? _image(ImageModel value) {
     List<Widget> stacks = [];
     CustomImage? image = CustomImage.network(value.url, fit: widget.fit, rect: value.rect, emptyImage: widget.emptyImage, cache: widget.cache);
-    if (image == null) {
-      return null;
-    }
     if (TextFormat.hasText(value.left)) {
       stacks.add(Positioned(
         top: 8.0,
@@ -111,7 +105,7 @@ class _ImageContainerState extends State<ImageContainer> {
         child: Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3.0)),
           child: Padding(
-            padding: EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(5.0),
             child: Text(
               value.right!.text!,
               style: TextStyle(
@@ -133,7 +127,7 @@ class _ImageContainerState extends State<ImageContainer> {
         child: Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3.0)),
           child: Padding(
-            padding: EdgeInsets.all(5.0),
+            padding: const EdgeInsets.all(5.0),
             child: Text(
               value.bottom!.text!,
               style: TextStyle(
@@ -156,7 +150,7 @@ class _ImageContainerState extends State<ImageContainer> {
       width: widget.width,
       color: widget.color,
       child: ClipRRect(
-        borderRadius: widget.round! ? BorderRadius.only(
+        borderRadius: widget.round! ? const BorderRadius.only(
           topLeft: Radius.circular(6),
           topRight: Radius.circular(6),
         ) : BorderRadius.circular(0.0),
@@ -167,7 +161,7 @@ class _ImageContainerState extends State<ImageContainer> {
 
   List<Widget> _items(List<ImageModel> values) {
     List<Widget> items = <Widget>[];
-    if (values.length > 0) {
+    if (values.isNotEmpty) {
       for (ImageModel value in values) {
         Widget? image = _image(value);
         if (image != null) {

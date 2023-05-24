@@ -10,7 +10,7 @@ class Payment {
   Image? image;
   List<TargetPlatform>? platform;
   Payment(this.payment, {this.image, this.platform}) {
-    if (platform == null) platform = [];
+    platform ??= [];
   }
 
   static Payment credit_card = Payment(Payments.credit_card);
@@ -26,9 +26,9 @@ class Payment {
       case TargetPlatform.android:
         return [credit_card, paypal, google_pay];
       case TargetPlatform.iOS:
-        return [credit_card, paypal, apple_pay];;
+        return [credit_card, paypal, apple_pay];
       case TargetPlatform.macOS:
-        return [credit_card, paypal, apple_pay];;
+        return [credit_card, paypal, apple_pay];
       case TargetPlatform.windows:
         return [credit_card, paypal];
       case TargetPlatform.linux:

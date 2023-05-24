@@ -1,16 +1,12 @@
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:flutter/material.dart';
-
 // Internal package
 import 'package:bb/models/model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/database.dart';
 
 class InventoryModel<T> extends Model {
   Status? status;
   Ingredient? type;
-  dynamic? ingredient;
+  dynamic ingredient;
   double? amount;
 
   InventoryModel({
@@ -26,10 +22,11 @@ class InventoryModel<T> extends Model {
     this.amount,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
+  @override
   void fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.type = Ingredient.values.elementAt(map['type']);
+    if (map.containsKey('type')) this.type = Ingredient.values.elementAt(map['type']);
     if (this.type != null) {
       switch (this.type) {
         case Ingredient.fermentable :
@@ -44,11 +41,14 @@ class InventoryModel<T> extends Model {
         case Ingredient.misc :
           this.ingredient = await Database().getMisc(map['ingredient']);
           break;
+        default:
+          break;
       }
     }
     if (map['amount'] != null) this.amount = map['amount'].toDouble();
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -62,10 +62,10 @@ class InventoryModel<T> extends Model {
 
   InventoryModel copy() {
     return InventoryModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       type: this.type,
       ingredient: this.ingredient,
@@ -74,9 +74,13 @@ class InventoryModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is InventoryModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -107,7 +111,7 @@ class InventoryModel<T> extends Model {
           values.addAll(deserialize(value));
         }
       } else {
-        InventoryModel model = new InventoryModel();
+        InventoryModel model = InventoryModel();
         model.fromMap(data);
         values.add(model);
       }

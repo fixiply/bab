@@ -8,7 +8,6 @@ import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/constants.dart';
 
 // External package
-import 'package:flutter/services.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
@@ -34,7 +33,9 @@ class MashDataTable extends StatefulWidget {
     this.selectionMode = SelectionMode.multiple,
     this.receipt,
     this.onChanged}) : super(key: key);
-  MashDataTableState createState() => new MashDataTableState();
+
+  @override
+  MashDataTableState createState() => MashDataTableState();
 }
 
 class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveClientMixin {
@@ -48,6 +49,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
   @override
   bool get wantKeepAlive => true;
 
+  @override
   void initState() {
     super.initState();
     _dataSource = MashDataSource(context,
@@ -64,7 +66,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
   Widget build(BuildContext context) {
     return Container(
       color: widget.color,
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,12 +75,12 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Expanded(child: widget.title ?? Container()),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               if(widget.allowEditing == true) TextButton(
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
                 style: TextButton.styleFrom(
                   backgroundColor: FillColor,
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                 ),
                 onPressed: _add,
               ),
@@ -152,7 +154,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
         )
     );
   }

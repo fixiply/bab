@@ -13,7 +13,8 @@ import 'package:badges/badges.dart' as badge;
 import 'package:provider/provider.dart';
 
 class OrdersPage extends StatefulWidget {
-  _OrdersPageState createState() => new _OrdersPageState();
+  @override
+  _OrdersPageState createState() => _OrdersPageState();
 }
 
 class _OrdersPageState extends State<OrdersPage> with AutomaticKeepAliveClientMixin<OrdersPage> {
@@ -42,15 +43,15 @@ class _OrdersPageState extends State<OrdersPage> with AutomaticKeepAliveClientMi
         actions: [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -85,7 +86,7 @@ class _OrdersPageState extends State<OrdersPage> with AutomaticKeepAliveClientMi
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

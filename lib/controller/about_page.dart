@@ -8,7 +8,8 @@ import 'package:bb/utils/constants.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 class AboutPage extends StatefulWidget {
-  _AboutPageState createState() => new _AboutPageState();
+  @override
+  _AboutPageState createState() => _AboutPageState();
 }
 
 class _AboutPageState extends State<AboutPage> {
@@ -38,7 +39,7 @@ class _AboutPageState extends State<AboutPage> {
         controller: _controller,
         children: [
           Padding(
-            padding: EdgeInsets.all(12),
+            padding: const EdgeInsets.all(12),
             child: Text(AppLocalizations.of(context)!.text('about_this_app'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
           ),
           ListTileTheme(
@@ -46,7 +47,7 @@ class _AboutPageState extends State<AboutPage> {
             child: ListTile(
               contentPadding: EdgeInsets.zero,
               title: Container(
-                padding:  EdgeInsets.all(12),
+                padding:  const EdgeInsets.all(12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -74,7 +75,7 @@ class _AboutPageState extends State<AboutPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

@@ -16,7 +16,6 @@ import 'package:bb/widgets/image_animate_rotate.dart';
 import 'package:bb/widgets/search_text.dart';
 
 // External package
-import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
@@ -44,7 +43,9 @@ class TanksDataTable extends StatefulWidget {
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.multiple}) : super(key: key);
-  TanksDataTableState createState() => new TanksDataTableState();
+
+  @override
+  TanksDataTableState createState() => TanksDataTableState();
 }
 
 class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveClientMixin {
@@ -60,6 +61,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
   @override
   bool get wantKeepAlive => true;
 
+  @override
   void initState() {
     super.initState();
     _dataSource = TankDataSource(context,
@@ -76,7 +78,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
   Widget build(BuildContext context) {
     return Container(
       color: widget.color,
-      padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -88,12 +90,12 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
                 _searchQueryController,
                 () {  _fetch(); }
               ) : Container())),
-              SizedBox(width: 4),
+              const SizedBox(width: 4),
               if(widget.allowEditing == true) TextButton(
-                child: Icon(Icons.add),
+                child: const Icon(Icons.add),
                 style: TextButton.styleFrom(
                   backgroundColor: FillColor,
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                 ),
                 onPressed: _add,
               ),
@@ -215,7 +217,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
         )
     );
   }
@@ -252,7 +254,7 @@ class TankDataSource extends EditDataSource {
 
   @override
   Future<void> handleLoadMoreRows() async {
-    await Future.delayed(Duration(seconds: 5));
+    await Future.delayed(const Duration(seconds: 5));
     _addMoreRows(20);
     notifyListeners();
   }
@@ -262,7 +264,8 @@ class TankDataSource extends EditDataSource {
     dataGridRows.addAll(getDataRows(data: list));
   }
 
-  dynamic? getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
+  @override
+  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     var value = super.getValue(dataGridRow, rowColumnIndex, column);
     if (value != null && column.columnName == 'amount') {
       double? weight = AppLocalizations.of(context)!.weight(value * 1000, weight: Weight.kilo);
@@ -316,31 +319,31 @@ class TankDataSource extends EditDataSource {
             if (e.columnName == 'amount') {
               return Container(
                   alignment: Alignment.center,
-                  margin: EdgeInsets.all(4),
+                  margin: const EdgeInsets.all(4),
                   child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
               );
             }
           }
           if (e.columnName == 'color') {
             return Container(
-                margin: EdgeInsets.all(4),
+                margin: const EdgeInsets.all(4),
                 color: ColorHelper.color(e.value),
-                child: Center(child: Text(value ?? '', style: TextStyle(color: Colors.white, fontSize: 14)))
+                child: Center(child: Text(value ?? '', style: const TextStyle(color: Colors.white, fontSize: 14)))
             );
           }
           if (e.columnName == 'origin') {
             if (value != null) {
               return Container(
-                  margin: EdgeInsets.all(4),
+                  margin: const EdgeInsets.all(4),
                   child: Center(child: Text(LocalizedText.emoji(value),
-                      style: TextStyle(fontSize: 16, fontFamily: 'Emoji')))
+                      style: const TextStyle(fontSize: 16, fontFamily: 'Emoji')))
               );
             }
           }
           return Container(
             color: color,
             alignment: alignment,
-            padding: EdgeInsets.all(8.0),
+            padding: const EdgeInsets.all(8.0),
             child: Text(value ?? ''),
           );
         }).toList()
@@ -392,6 +395,7 @@ class TankDataSource extends EditDataSource {
     updateDataSource();
   }
 
+  @override
   void updateDataSource() {
     notifyListeners();
   }
@@ -407,7 +411,7 @@ class TankDataSource extends EditDataSource {
           columnName: 'name',
           allowEditing: showQuantity == false,
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
               child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -416,7 +420,7 @@ class TankDataSource extends EditDataSource {
           width: 90,
           columnName: 'volume',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('tank_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -425,7 +429,7 @@ class TankDataSource extends EditDataSource {
           width: 90,
           columnName: 'size',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('mash_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -434,7 +438,7 @@ class TankDataSource extends EditDataSource {
           width: 90,
           columnName: 'efficiency',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('mash_efficiency'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -443,7 +447,7 @@ class TankDataSource extends EditDataSource {
           width: 90,
           columnName: 'absorption',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('absorption'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
@@ -452,7 +456,7 @@ class TankDataSource extends EditDataSource {
           width: 90,
           columnName: 'lost_volume',
           label: Container(
-              padding: EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('lost_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )

@@ -41,14 +41,14 @@ class _MashFieldState extends FormFieldState<List<Mash>> {
   Widget build(BuildContext context) {
     return InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
-        icon: Icon(Icons.water_drop_outlined)
+        contentPadding: const EdgeInsets.all(0.0),
+        icon: const Icon(Icons.water_drop_outlined)
       ),
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 8.0),
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: MashDataTable(key: _datatableKey,
           data: widget.initialValue,
-          title: Text(AppLocalizations.of(context)!.text('mash'), style: TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
+          title: Text(AppLocalizations.of(context)!.text('mash'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0)),
           allowEditing: true,
           color: FillColor,
           showCheckboxColumn: false,

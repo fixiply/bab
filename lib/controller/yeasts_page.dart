@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/forms/form_yeast_page.dart';
@@ -12,6 +11,7 @@ import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/dialogs/delete_dialog.dart';
@@ -31,7 +31,8 @@ class YeastsPage extends StatefulWidget {
   SelectionMode selectionMode;
   YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
-  _YeastsPageState createState() => new _YeastsPageState();
+  @override
+  _YeastsPageState createState() => _YeastsPageState();
 }
 
 class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMixin<YeastsPage> {
@@ -83,7 +84,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
         leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.pop(context, selected);
           }
@@ -117,71 +118,68 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
           ),
         ],
       ),
-      body: Container(
-        child: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<YeastModel>>(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.length == 0) {
-                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<YeastModel>>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+              }
+              if (_showList || widget.showCheckboxColumn == true) {
+                if (widget.loadMore) {
+                  _dataSource.data = snapshot.data!;
+                  _dataSource.handleLoadMoreRows();
+                } else {
+                  _dataSource.buildDataGridRows(snapshot.data!);
                 }
-                if (_showList || widget.showCheckboxColumn == true) {
-                  if (widget.loadMore) {
-                    _dataSource.data = snapshot.data!;
-                    _dataSource.handleLoadMoreRows();
-                  } else {
-                    _dataSource.buildDataGridRows(snapshot.data!);
-                  }
-                  _dataSource.notifyListeners();
-                  return EditSfDataGrid(
-                    context,
-                    allowEditing: widget.allowEditing,
-                    showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
-                    selectionMode: widget.selectionMode,
-                    source: _dataSource,
-                    controller: getDataGridController(),
-                    onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                      setState(() {
-                        for(var row in addedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.add(snapshot.data![index]);
-                        }
-                        for(var row in removedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.remove(snapshot.data![index]);
-                        }
-                      });
-                    },
-                    columns: YeastDataSource.columns(context: context, showQuantity: false),
-                  );
-                }
-                return ListView.builder(
-                  controller: _controller,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                  itemBuilder: (context, index) {
-                    YeastModel model = snapshot.data![index];
-                    return _item(model);
-                  }
+                _dataSource.notifyListeners();
+                return EditSfDataGrid(
+                  context,
+                  allowEditing: widget.allowEditing,
+                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  selectionMode: widget.selectionMode,
+                  source: _dataSource,
+                  controller: getDataGridController(),
+                  onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+                    setState(() {
+                      for(var row in addedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.add(snapshot.data![index]);
+                      }
+                      for(var row in removedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.remove(snapshot.data![index]);
+                      }
+                    });
+                  },
+                  columns: YeastDataSource.columns(context: context, showQuantity: false),
                 );
               }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+              return ListView.builder(
+                controller: _controller,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                itemBuilder: (context, index) {
+                  YeastModel model = snapshot.data![index];
+                  return _item(model);
+                }
+              );
             }
-          )
-        ),
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          }
+        )
       ),
       floatingActionButton: Visibility(
         visible: currentUser != null,
-        child: FloatingActionButton(
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new'),
+          icon: const Icon(Icons.add),
           onPressed: _new,
-          backgroundColor: Theme.of(context).primaryColor,
-          tooltip: AppLocalizations.of(context)!.text('new'),
-          child: const Icon(Icons.add)
         )
       )
     );
@@ -201,14 +199,14 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
 
   Widget _item(YeastModel model) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+      margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
-        contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+        contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
         title: RichText(
           text: TextSpan(
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
-              TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name),  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name),  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               if (model.reference != null) TextSpan(text: '  ${model.reference}'),
             ],
           ),
@@ -223,8 +221,8 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.laboratory != null) TextSpan(text: model.laboratory!, style: TextStyle(fontWeight: FontWeight.bold)),
-                  if (model.laboratory != null) TextSpan(text: '  -  '),
+                  if (model.laboratory != null) TextSpan(text: model.laboratory!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.laboratory != null) const TextSpan(text: '  -  '),
                   TextSpan(text: '${AppLocalizations.of(context)!.text('type')}: ${AppLocalizations.of(context)!.text(model.type.toString().toLowerCase())}'),
                 ],
               ),
@@ -251,7 +249,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
           ],
         ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
-          icon: Icon(Icons.more_vert),
+          icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) {
             if (value == 'edit') {
@@ -328,7 +326,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

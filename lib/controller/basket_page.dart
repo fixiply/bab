@@ -23,7 +23,8 @@ import 'package:sprintf/sprintf.dart';
 
 
 class BasketPage extends StatefulWidget {
-  _BasketPageState createState() => new _BasketPageState();
+  @override
+  _BasketPageState createState() => _BasketPageState();
 }
 
 class _BasketPageState extends State<BasketPage> {
@@ -31,8 +32,8 @@ class _BasketPageState extends State<BasketPage> {
   ScrollController? _controller;
   List<StyleModel>? _styles;
 
-  double _tax = 0;
-  double _delivery = 0;
+  final double _tax = 0;
+  final double _delivery = 0;
   bool _populate = false;
   Payments _payment = Payments.credit_card;
 
@@ -90,9 +91,9 @@ class _BasketPageState extends State<BasketPage> {
                     return _item(model, index);
                   },
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   child: Text(AppLocalizations.of(context)!.text('delivery_addresses'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
                 ),
                 for(Adress address in addresses!) ListTileTheme(
@@ -105,7 +106,7 @@ class _BasketPageState extends State<BasketPage> {
                       children: [
                         Expanded(
                           child: Container(
-                            padding:  EdgeInsets.all(12),
+                            padding:  const EdgeInsets.all(12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -133,9 +134,9 @@ class _BasketPageState extends State<BasketPage> {
                     },
                   ),
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   child: Text(AppLocalizations.of(context)!.text('payment_method'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
                 ),
                 for(Payment payment in Payment.currentPlatform) ListTileTheme(
@@ -148,7 +149,7 @@ class _BasketPageState extends State<BasketPage> {
                       children: [
                         Expanded(
                           child: Container(
-                            padding:  EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(12),
                             child: Text(AppLocalizations.of(context)!.text(payment.payment.toString().toLowerCase()))
                           )
                         ),
@@ -172,41 +173,41 @@ class _BasketPageState extends State<BasketPage> {
                     },
                   ),
                 ),
-                Divider(height: 10),
+                const Divider(height: 10),
                 Padding(
-                  padding: EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(12),
                   child: Text(AppLocalizations.of(context)!.text('order_summary'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold))
                 ),
                 Container(
                   color : Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(AppLocalizations.of(context)!.text('delivery'), style: TextStyle(fontSize: 16)),
-                      _delivery > 0 ? Text('${_delivery.toStringAsPrecision(3)} €', style: TextStyle(fontSize: 16)) : Text(AppLocalizations.of(context)!.text('free'), style: TextStyle(fontSize: 15, color: Theme.of(context).primaryColor))
+                      Text(AppLocalizations.of(context)!.text('delivery'), style: const TextStyle(fontSize: 16)),
+                      _delivery > 0 ? Text('${_delivery.toStringAsPrecision(3)} €', style: const TextStyle(fontSize: 16)) : Text(AppLocalizations.of(context)!.text('free'), style: TextStyle(fontSize: 15, color: Theme.of(context).primaryColor))
                     ],
                   )
                 ),
                 Container(
                   color : Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(AppLocalizations.of(context)!.text('tax'), style: TextStyle(fontSize: 16)),
-                      _tax > 0 ? Text('${_tax.toStringAsPrecision(3)} €', style: TextStyle(fontSize: 16)) : Text(AppLocalizations.of(context)!.text('included'), style: TextStyle(fontSize: 15, color: Theme.of(context).primaryColor))
+                      Text(AppLocalizations.of(context)!.text('tax'), style: const TextStyle(fontSize: 16)),
+                      _tax > 0 ? Text('${_tax.toStringAsPrecision(3)} €', style: const TextStyle(fontSize: 16)) : Text(AppLocalizations.of(context)!.text('included'), style: TextStyle(fontSize: 15, color: Theme.of(context).primaryColor))
                     ],
                   )
                 ),
                 Container(
                   color : Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 2, horizontal: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 12),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(AppLocalizations.of(context)!.text('total_price'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                      snapshot.total > 0 ? Text('${snapshot.total.toStringAsPrecision(3)} €', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)) : Text(AppLocalizations.of(context)!.text('free'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor))
+                      Text(AppLocalizations.of(context)!.text('total_price'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      snapshot.total > 0 ? Text('${snapshot.total.toStringAsPrecision(3)} €', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)) : Text(AppLocalizations.of(context)!.text('free'), style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor))
                     ],
                   )
                 )
@@ -217,7 +218,7 @@ class _BasketPageState extends State<BasketPage> {
       ),
       bottomNavigationBar: _populate ? Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: TextButton(
           child: Text(sprintf(AppLocalizations.of(context)!.text('continue_with'), [AppLocalizations.of(context)!.text(_payment.toString().toLowerCase())])),
           style:  TextButton.styleFrom(
@@ -243,14 +244,14 @@ class _BasketPageState extends State<BasketPage> {
           }
           return ListTile(
             tileColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+            contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
             leading: image,
             title: FittedBox(
               fit: BoxFit.scaleDown,
               alignment: Alignment.centerLeft,
               child: Text(
                 snapshot1.data.name,
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 textAlign: TextAlign.left,
               ),
             ),
@@ -267,14 +268,14 @@ class _BasketPageState extends State<BasketPage> {
                         text: TextSpan(
                           style: DefaultTextStyle.of(context).style,
                           children: <TextSpan>[
-                            TextSpan(text: _style(snapshot2.data.style), style: TextStyle(fontWeight: FontWeight.bold)),
-                            TextSpan(text: ' - '),
+                            TextSpan(text: _style(snapshot2.data.style), style: const TextStyle(fontWeight: FontWeight.bold)),
+                            const TextSpan(text: ' - '),
                             TextSpan(
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
-                                TextSpan(text: ' IBU: '),
+                                const TextSpan(text: ' IBU: '),
                                 TextSpan(text: snapshot2.data.localizedIBU(AppLocalizations.of(context)!.locale) ),
-                                TextSpan(text: '    ' + snapshot2.data.localizedABV(AppLocalizations.of(context)!.locale) + '%'),
+                                TextSpan(text: '    ${snapshot2.data.localizedABV(AppLocalizations.of(context)!.locale)}%')
                               ]
                             )
                           ],
@@ -305,15 +306,15 @@ class _BasketPageState extends State<BasketPage> {
                       text: TextSpan(
                         style: DefaultTextStyle.of(context).style,
                         children: <TextSpan>[
-                          TextSpan(text: '×', style: TextStyle(fontSize: 16)),
-                          TextSpan(text: model.quantity!.toString(), style: TextStyle(fontSize: 16)),
+                          const TextSpan(text: '×', style: TextStyle(fontSize: 16)),
+                          TextSpan(text: model.quantity!.toString(), style: const TextStyle(fontSize: 16)),
                         ]
                       )
                     )
                   )
                 ),
                 PopupMenuButton<String>(
-                  icon: Icon(Icons.more_vert),
+                  icon: const Icon(Icons.more_vert),
                   tooltip: AppLocalizations.of(context)!.text('options'),
                   onSelected: (value) {
                     if (value == 'modify') {
@@ -375,7 +376,7 @@ class _BasketPageState extends State<BasketPage> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
       )
     );
   }

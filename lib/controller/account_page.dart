@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -24,7 +23,8 @@ import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
   AccountPage({Key? key}) : super(key: key);
-  _AccountPageState createState() => new _AccountPageState();
+  @override
+  _AccountPageState createState() => _AccountPageState();
 }
 
 class _AccountPageState extends State<AccountPage> {
@@ -49,15 +49,15 @@ class _AccountPageState extends State<AccountPage> {
         actions: [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: Duration(milliseconds: 300),
+            animationDuration: const Duration(milliseconds: 300),
             animationType: badge.BadgeAnimationType.slide,
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
-              style: TextStyle(color: Colors.white),
+              style: const TextStyle(color: Colors.white),
             ) : null,
             child: IconButton(
-              icon: Icon(Icons.shopping_cart_outlined),
+              icon: const Icon(Icons.shopping_cart_outlined),
               onPressed: () {
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return BasketPage();
@@ -75,7 +75,7 @@ class _AccountPageState extends State<AccountPage> {
       ),
       drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
+        padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start ,
@@ -90,7 +90,7 @@ class _AccountPageState extends State<AccountPage> {
                 child: Text(AppLocalizations.of(context)!.text('login'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return LoginPage();
+                    return const LoginPage();
                   }));
                 },
                 style: TextButton.styleFrom(shape: RoundedRectangleBorder(
@@ -100,7 +100,7 @@ class _AccountPageState extends State<AccountPage> {
               ),
             ),
             if (currentUser == null) const SizedBox(height: 40),
-            Text(AppLocalizations.of(context)!.text('my_settings'), style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text(AppLocalizations.of(context)!.text('my_settings'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             Container(
               color: Colors.white,
               padding: EdgeInsets.zero,
@@ -110,7 +110,7 @@ class _AccountPageState extends State<AccountPage> {
                 children: <Widget> [
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.local_offer_outlined),
+                    leading: const Icon(Icons.local_offer_outlined),
                     title: Text(AppLocalizations.of(context)!.text('my_purchases')),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -120,7 +120,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.credit_card),
+                    leading: const Icon(Icons.credit_card),
                     title: Text(AppLocalizations.of(context)!.text('payment_methods')),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -130,7 +130,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.local_shipping_outlined),
+                    leading: const Icon(Icons.local_shipping_outlined),
                     title: Text(AppLocalizations.of(context)!.text('delivery_addresses')),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -140,12 +140,12 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.help_outline),
+                    leading: const Icon(Icons.help_outline),
                     title: Text(AppLocalizations.of(context)!.text('customer_support')),
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.notifications),
+                    leading: const Icon(Icons.notifications),
                     title: Text(AppLocalizations.of(context)!.text('alert_settings')),
                     onTap: () {
                       AppSettings.openNotificationSettings();
@@ -153,7 +153,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.info_outline),
+                    leading: const Icon(Icons.info_outline),
                     title: Text(AppLocalizations.of(context)!.text('about')),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -163,7 +163,7 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: Icon(Icons.cancel),
+                    leading: const Icon(Icons.cancel),
                     title: Text(AppLocalizations.of(context)!.text('logout')),
                     subtitle: Text(currentUser!.user!.email!),
                     onTap: () async {

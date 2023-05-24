@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bb/models/inventory_model.dart';
-import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/containers/error_container.dart';
@@ -16,14 +14,14 @@ class InventoryDataTable extends StatefulWidget {
   final Ingredient ingredient;
   bool edit;
   InventoryDataTable({Key? key, required this.ingredient, this.edit = true}) : super(key: key);
-  _InventoryDataTableState createState() => new _InventoryDataTableState();
+
+  @override
+  _InventoryDataTableState createState() => _InventoryDataTableState();
 }
 
 class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticKeepAliveClientMixin {
   TextEditingController _searchQueryController = TextEditingController();
   double dataRowHeight = 30;
-  int _currentSortColumn = 0;
-  bool _isAscending = true;
   List<InventoryModel> _selected = [];
   Future<List<InventoryModel>>? _data;
 
@@ -32,6 +30,7 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
   @override
   bool get wantKeepAlive => true;
 
+  @override
   void initState() {
     super.initState();
     _fetch();
@@ -39,7 +38,6 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
 
   @override
   Widget build(BuildContext context) {
-    final Locale locale = AppLocalizations.of(context)!.locale;
     return Container(
       color: Colors.white,
       child: FutureBuilder<List<InventoryModel>>(
@@ -50,27 +48,27 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
                   child:  Row(
                     children: [
                       Expanded(child: SearchText(
                         _searchQueryController,
                         () {  _fetch(); }
                       )),
-                      SizedBox(width: 4),
+                      const SizedBox(width: 4),
                       if (widget.edit) TextButton(
-                        child: Icon(Icons.add),
+                        child: const Icon(Icons.add),
                         style: TextButton.styleFrom(
                           backgroundColor: FillColor,
-                          shape: CircleBorder(),
+                          shape: const CircleBorder(),
                         ),
                         onPressed: add,
                       ),
                       if(_selected.isNotEmpty) TextButton(
-                        child: Icon(Icons.delete_outline),
+                        child: const Icon(Icons.delete_outline),
                         style: TextButton.styleFrom(
                           backgroundColor: FillColor,
-                          shape: CircleBorder(),
+                          shape: const CircleBorder(),
                         ),
                         onPressed: () {
 
@@ -79,7 +77,7 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
                     ],
                   )
                 ),
-                Expanded(
+                const Expanded(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.vertical,
                       child: SingleChildScrollView(
@@ -219,7 +217,7 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(message),
-          duration: Duration(seconds: 10)
+          duration: const Duration(seconds: 10)
         )
     );
   }

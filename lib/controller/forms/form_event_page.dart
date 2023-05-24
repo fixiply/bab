@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -22,7 +21,9 @@ import 'package:bb/widgets/modal_bottom_sheet.dart';
 class FormEventPage extends StatefulWidget {
   final EventModel model;
   FormEventPage(this.model);
-  _FormEventPageState createState() => new _FormEventPageState();
+
+  @override
+  _FormEventPageState createState() => _FormEventPageState();
 }
 
 class _FormEventPageState extends State<FormEventPage> {
@@ -40,7 +41,7 @@ class _FormEventPageState extends State<FormEventPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -112,7 +113,7 @@ class _FormEventPageState extends State<FormEventPage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -137,17 +138,17 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.axis = value;
                 })
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               SwitchField(
                 context: context,
                 value: widget.model.sliver!,
-                icon: Icon(Icons.expand),
+                icon: const Icon(Icons.expand),
                 hintText: AppLocalizations.of(context)!.text('show_sliver'),
                 onChanged: (value) => setState(() {
                   widget.model.sliver = value;
                 })
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormatField(
                 context: context,
                 initialValue: widget.model.top_left,
@@ -155,13 +156,13 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.top_left = text;
                 }),
                 decoration: FormDecoration(
-                  icon: Icon(Icons.border_left),
+                  icon: const Icon(Icons.border_left),
                   labelText: AppLocalizations.of(context)!.text('top_left'),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true
                 )
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormatField(
                 context: context,
                 initialValue: widget.model.top_right,
@@ -169,13 +170,13 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.top_right = text;
                 }),
                 decoration: FormDecoration(
-                  icon: Icon(Icons.border_right),
+                  icon: const Icon(Icons.border_right),
                   labelText: AppLocalizations.of(context)!.text('top_right'),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true
                 )
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormatField(
                 context: context,
                 initialValue: widget.model.bottom_left,
@@ -189,7 +190,7 @@ class _FormEventPageState extends State<FormEventPage> {
                   fillColor: FillColor, filled: true
                 )
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.title,
                 textCapitalization: TextCapitalization.sentences,
@@ -210,7 +211,7 @@ class _FormEventPageState extends State<FormEventPage> {
                 //   return null;
                 // }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextFormField(
                 initialValue: widget.model.subtitle,
                 textCapitalization: TextCapitalization.sentences,
@@ -224,7 +225,7 @@ class _FormEventPageState extends State<FormEventPage> {
                   fillColor: FillColor, filled: true
                 )
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               CodeEditorField(
                 context: context,
                 initialValue: widget.model.page,
@@ -233,7 +234,7 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.page = text;
                 }),
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               WidgetsField(
                 context: context,
                 widgets: widget.model.widgets,
@@ -241,7 +242,7 @@ class _FormEventPageState extends State<FormEventPage> {
                   widget.model.widgets = values;
                 }),
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               CarouselField(
                 context: context,
                 images: widget.model.images,
@@ -261,7 +262,7 @@ class _FormEventPageState extends State<FormEventPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

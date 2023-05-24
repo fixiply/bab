@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
@@ -20,7 +19,9 @@ import 'package:bb/widgets/forms/text_input_field.dart';
 class FormStylePage extends StatefulWidget {
   final StyleModel model;
   FormStylePage(this.model);
-  _FormStylePageState createState() => new _FormStylePageState();
+
+  @override
+  _FormStylePageState createState() => _FormStylePageState();
 }
 
 class _FormStylePageState extends State<FormStylePage> {
@@ -49,7 +50,7 @@ class _FormStylePageState extends State<FormStylePage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             bool confirm = _modified ? await showDialog(
               context: context,
@@ -107,7 +108,7 @@ class _FormStylePageState extends State<FormStylePage> {
         ]
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Form(
           key: _formKey,
           onChanged: () {
@@ -140,7 +141,7 @@ class _FormStylePageState extends State<FormStylePage> {
                       }
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   SizedBox(
                     width: 140,
                     child: TextFormField(
@@ -155,7 +156,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   )
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -173,7 +174,7 @@ class _FormStylePageState extends State<FormStylePage> {
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                     )
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: DropdownButtonFormField<Fermentation>(
                       value: widget.model.fermentation,
@@ -196,7 +197,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   ),
                 ]
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
@@ -208,7 +209,7 @@ class _FormStylePageState extends State<FormStylePage> {
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.ibumin != null ?  widget.model.ibumin.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.ibumin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -221,11 +222,11 @@ class _FormStylePageState extends State<FormStylePage> {
                             ),
                           )
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.ibumax != null ?  widget.model.ibumax.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.ibumax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
@@ -243,7 +244,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   );
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
@@ -255,7 +256,7 @@ class _FormStylePageState extends State<FormStylePage> {
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.abvmin != null ?  widget.model.abvmin.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.abvmin = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'min',
@@ -270,11 +271,11 @@ class _FormStylePageState extends State<FormStylePage> {
                             ),
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: TextFormField(
                             initialValue: widget.model.abvmax != null ?  widget.model.abvmax.toString() :  '',
-                            keyboardType: TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(decimal: true),
                             onChanged: (value) => widget.model.abvmax = AppLocalizations.of(context)!.decimal(value),
                             decoration: FormDecoration(
                               labelText: 'max',
@@ -294,7 +295,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   );
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               FormField(
                 builder: (FormFieldState<int> state) {
                   return InputDecorator(
@@ -308,7 +309,7 @@ class _FormStylePageState extends State<FormStylePage> {
                               // key: UniqueKey(),
                               // initialValue: widget.model.ebcmin != null ?  widget.model.ebcmin.toString() :  '',
                               controller:  _ebcminController,
-                              keyboardType: TextInputType.numberWithOptions(decimal: false),
+                              keyboardType: const TextInputType.numberWithOptions(decimal: false),
                               onChanged: (value) => widget.model.ebcmin = AppLocalizations.of(context)!.fromSRM(int.parse(value)),
                               decoration: FormDecoration(
                                   labelText: 'min',
@@ -322,13 +323,13 @@ class _FormStylePageState extends State<FormStylePage> {
                               ),
                             ),
                           ),
-                          SizedBox(width: 12),
+                          const SizedBox(width: 12),
                           Expanded(
                             child: TextFormField(
                               // key: UniqueKey(),
                               // initialValue: widget.model.ebcmax != null ?  widget.model.ebcmax.toString() :  '',
                               controller:  _ebcmaxController,
-                              keyboardType: TextInputType.numberWithOptions(decimal: false),
+                              keyboardType: const TextInputType.numberWithOptions(decimal: false),
                               onChanged: (value) => widget.model.ebcmax = AppLocalizations.of(context)!.fromSRM(int.parse(value)),
                               decoration: FormDecoration(
                                 labelText: 'max',
@@ -347,7 +348,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   );
                 }
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.overallimpression,
@@ -358,7 +359,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   widget.model.overallimpression = text.size() > 0 ? text : value;
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.aroma,
@@ -369,7 +370,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   widget.model.aroma = text.size() > 0 ? text : value;
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.flavor,
@@ -380,7 +381,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   widget.model.flavor = text.size() > 0 ? text : value;
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.mouthfeel,
@@ -391,7 +392,7 @@ class _FormStylePageState extends State<FormStylePage> {
                   widget.model.mouthfeel = text.size() > 0 ? text : null;
                 },
               ),
-              Divider(height: 10),
+              const Divider(height: 10),
               TextInputField(
                 context: context,
                 initialValue: widget.model.comments,
@@ -420,7 +421,7 @@ class _FormStylePageState extends State<FormStylePage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

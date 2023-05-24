@@ -81,8 +81,8 @@ class ImportHelper {
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Unsupported operation" + e.toString()),
-            duration: Duration(seconds: 10)
+            content: Text("Unsupported operation $e"),
+            duration: const Duration(seconds: 10)
         )
       );
     } catch (ex) {
@@ -90,7 +90,7 @@ class ImportHelper {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(ex.toString()),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
       );
     }
@@ -106,66 +106,64 @@ class ImportHelper {
         try {
           EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
 
-          final XmlDocument document;
+          final XmlDocument? document;
           if(DeviceHelper.isDesktop) {
             document = XmlDocument.parse(utf8.decode(result.files.single.bytes!));
           } else {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          if (document != null) {
-            final fermentables = document.findAllElements('Grain');
-            for (XmlElement element in fermentables) {
-              final model = fermentable.FermentableModel(
-                  name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.text}),
-                  origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.text),
-                  efficiency: double.tryParse(element.getElement('F_G_YIELD')!.text)
-              );
-              final color = element.getElement('F_G_COLOR');
-              if (color != null && color.text.isNotEmpty) {
-                model.ebc = ColorHelper.toEBC(double.tryParse(color.text)!.toInt());
-              }
-              final desc = element.getElement('F_G_NOTES');
-              if (desc != null && desc.text.isNotEmpty) {
-                String text = desc.text.replaceAll(RegExp(r'\n'), '');
-                text = desc.text.replaceAll(RegExp(r'\r'), '');
-                text = desc.text.replaceAll('  ', '');
-                model.notes = LocalizedText(map: { 'en': text.trim()});
-              }
-              int type = int.parse(element.getElement('F_G_TYPE')!.text);
-              switch (type) {
-                case 0:
-                  model.type = fermentable.Type.grain;
-                  break;
-                case 1:
-                  model.type = fermentable.Type.extract;
-                  break;
-                case 2:
-                  model.type = fermentable.Type.sugar;
-                  break;
-                case 3:
-                  model.type = fermentable.Type.adjunct;
-                  break;
-                case 4:
-                  model.type = fermentable.Type.dry_extract;
-                  break;
-                case 5:
-                  model.type = fermentable.Type.fruit;
-                  break;
-                case 6:
-                  model.type = fermentable.Type.juice;
-                  break;
-                case 7:
-                  model.type = fermentable.Type.honey;
-                  break;
-              }
-              List<fermentable.FermentableModel> list = await Database().getFermentables(name: model.name.toString());
-              if (list.isEmpty) {
-                Database().add(model, ignoreAuth: true);
-              }
+          final fermentables = document.findAllElements('Grain');
+          for (XmlElement element in fermentables) {
+            final model = fermentable.FermentableModel(
+                name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.text}),
+                origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.text),
+                efficiency: double.tryParse(element.getElement('F_G_YIELD')!.text)
+            );
+            final color = element.getElement('F_G_COLOR');
+            if (color != null && color.text.isNotEmpty) {
+              model.ebc = ColorHelper.toEBC(double.tryParse(color.text)!.toInt());
             }
-            onImported.call();
+            final desc = element.getElement('F_G_NOTES');
+            if (desc != null && desc.text.isNotEmpty) {
+              String text = desc.text.replaceAll(RegExp(r'\n'), '');
+              text = desc.text.replaceAll(RegExp(r'\r'), '');
+              text = desc.text.replaceAll('  ', '');
+              model.notes = LocalizedText(map: { 'en': text.trim()});
+            }
+            int type = int.parse(element.getElement('F_G_TYPE')!.text);
+            switch (type) {
+              case 0:
+                model.type = fermentable.Type.grain;
+                break;
+              case 1:
+                model.type = fermentable.Type.extract;
+                break;
+              case 2:
+                model.type = fermentable.Type.sugar;
+                break;
+              case 3:
+                model.type = fermentable.Type.adjunct;
+                break;
+              case 4:
+                model.type = fermentable.Type.dry_extract;
+                break;
+              case 5:
+                model.type = fermentable.Type.fruit;
+                break;
+              case 6:
+                model.type = fermentable.Type.juice;
+                break;
+              case 7:
+                model.type = fermentable.Type.honey;
+                break;
+            }
+            List<fermentable.FermentableModel> list = await Database().getFermentables(name: model.name.toString());
+            if (list.isEmpty) {
+              Database().add(model, ignoreAuth: true);
+            }
           }
+          onImported.call();
         } finally {
           EasyLoading.dismiss();
         }
@@ -173,8 +171,8 @@ class ImportHelper {
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text("Unsupported operation" + e.toString()),
-            duration: Duration(seconds: 10)
+            content: Text("Unsupported operation $e"),
+            duration: const Duration(seconds: 10)
         )
       );
     } catch (ex) {
@@ -182,7 +180,7 @@ class ImportHelper {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(ex.toString()),
-              duration: Duration(seconds: 10)
+              duration: const Duration(seconds: 10)
           )
       );
     }
@@ -205,56 +203,54 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          if (document != null) {
-            final hops = document.findAllElements('Hops');
-            for(XmlElement element in hops) {
-              final model = hop.HopModel(
-                name: LocalizedText( map: { 'en': element.getElement('F_H_NAME')!.text}),
-                alpha: double.tryParse(element.getElement('F_H_ALPHA')!.text),
-                beta: double.tryParse(element.getElement('F_H_BETA')!.text),
-                origin: LocalizedText.country(element.getElement('F_H_ORIGIN')!.text),
-              );
-              final desc = element.getElement('F_H_NOTES');
-              if (desc != null && desc.text.isNotEmpty) {
-                String text = desc.text.replaceAll(RegExp(r'\n'), '');
-                text = desc.text.replaceAll(RegExp(r'\r'), '');
-                text = desc.text.replaceAll('  ', '');
-                model.notes = LocalizedText(map: { 'en': text.trim()});
-              }
-              int form = int.parse(element.getElement('F_H_FORM')!.text);
-              switch (form) {
-                case 2:
-                  model.form = hop.Hop.leaf;
-                  break;
-                case 0:
-                  model.form = hop.Hop.pellet;
-                  break;
-                case 1:
-                  model.form = hop.Hop.plug;
-                  break;
-                default:
-                  model.form = hop.Hop.other;
-                  break;
-              }
-              int type = int.parse(element.getElement('F_H_TYPE')!.text);
-              switch (type) {
-                case 1:
-                  model.type = hop.Type.aroma;
-                  break;
-                case 0:
-                  model.type = hop.Type.bittering;
-                  break;
-                case 2:
-                  model.type = hop.Type.both;
-                  break;
-              }
-              List<hop.HopModel> list = await Database().getHops(name: model.name.toString());
-              if (list.isEmpty) {
-                Database().add(model, ignoreAuth: true);
-              }
+          final hops = document.findAllElements('Hops');
+          for(XmlElement element in hops) {
+            final model = hop.HopModel(
+              name: LocalizedText( map: { 'en': element.getElement('F_H_NAME')!.text}),
+              alpha: double.tryParse(element.getElement('F_H_ALPHA')!.text),
+              beta: double.tryParse(element.getElement('F_H_BETA')!.text),
+              origin: LocalizedText.country(element.getElement('F_H_ORIGIN')!.text),
+            );
+            final desc = element.getElement('F_H_NOTES');
+            if (desc != null && desc.text.isNotEmpty) {
+              String text = desc.text.replaceAll(RegExp(r'\n'), '');
+              text = desc.text.replaceAll(RegExp(r'\r'), '');
+              text = desc.text.replaceAll('  ', '');
+              model.notes = LocalizedText(map: { 'en': text.trim()});
             }
-            onImported.call();
+            int form = int.parse(element.getElement('F_H_FORM')!.text);
+            switch (form) {
+              case 2:
+                model.form = hop.Hop.leaf;
+                break;
+              case 0:
+                model.form = hop.Hop.pellet;
+                break;
+              case 1:
+                model.form = hop.Hop.plug;
+                break;
+              default:
+                model.form = hop.Hop.other;
+                break;
+            }
+            int type = int.parse(element.getElement('F_H_TYPE')!.text);
+            switch (type) {
+              case 1:
+                model.type = hop.Type.aroma;
+                break;
+              case 0:
+                model.type = hop.Type.bittering;
+                break;
+              case 2:
+                model.type = hop.Type.both;
+                break;
+            }
+            List<hop.HopModel> list = await Database().getHops(name: model.name.toString());
+            if (list.isEmpty) {
+              Database().add(model, ignoreAuth: true);
+            }
           }
+          onImported.call();
         } finally {
           EasyLoading.dismiss();
         }
@@ -262,8 +258,8 @@ class ImportHelper {
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Unsupported operation" + e.toString()),
-              duration: Duration(seconds: 10)
+              content: Text("Unsupported operation$e"),
+              duration: const Duration(seconds: 10)
           )
       );
     } catch (ex) {
@@ -271,7 +267,7 @@ class ImportHelper {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(ex.toString()),
-              duration: Duration(seconds: 10)
+              duration: const Duration(seconds: 10)
           )
       );
     }
@@ -294,62 +290,60 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          if (document != null) {
-            final fermentables = document.findAllElements('Yeast');
-            for(XmlElement element in fermentables) {
-              final model = yeast.YeastModel(
-                  name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.text}),
-                  reference: element.getElement('F_Y_PRODUCT_ID')!.text,
-                  laboratory: element.getElement('F_Y_LAB')!.text,
-                  cells: double.tryParse(element.getElement('F_Y_CELLS')!.text),
-                  attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
-                  attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
-                  tempmin: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text)),
-                  tempmax: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text))
-              );
-              final desc = element.getElement('F_Y_NOTES');
-              if (desc != null && desc.text.isNotEmpty) {
-                String text = desc.text.replaceAll(RegExp(r'\n'), '');
-                text = desc.text.replaceAll(RegExp(r'\r'), '');
-                text = desc.text.replaceAll('  ', '');
-                model.notes = LocalizedText(map: { 'en': text.trim()});
-              }
-              int form = int.parse(element.getElement('F_Y_FORM')!.text);
-              switch (form) {
-                case 0:
-                  model.form = yeast.Yeast.liquid;
-                  break;
-                case 1:
-                  model.form = yeast.Yeast.dry;
-                  break;
-                case 2:
-                  model.form = yeast.Yeast.slant;
-                  break;
-                case 3:
-                  model.form = yeast.Yeast.culture;
-                  break;
-              }
-              int type = int.parse(element.getElement('F_Y_TYPE')!.text);
-              switch (type) {
-                case 0:
-                  model.type = Fermentation.hight;
-                  break;
-                case 1:
-                  model.type = Fermentation.low;
-                  break;
-                case 4:
-                  model.type = Fermentation.spontaneous;
-                  break;
-              }
-              if (type != 2 && type != 3) {
-                List<yeast.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.reference, laboratory: model.laboratory);
-                if (list.isEmpty) {
-                  Database().add(model, ignoreAuth: true);
-                }
+          final fermentables = document.findAllElements('Yeast');
+          for(XmlElement element in fermentables) {
+            final model = yeast.YeastModel(
+                name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.text}),
+                reference: element.getElement('F_Y_PRODUCT_ID')!.text,
+                laboratory: element.getElement('F_Y_LAB')!.text,
+                cells: double.tryParse(element.getElement('F_Y_CELLS')!.text),
+                attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
+                attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
+                tempmin: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text)),
+                tempmax: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text))
+            );
+            final desc = element.getElement('F_Y_NOTES');
+            if (desc != null && desc.text.isNotEmpty) {
+              String text = desc.text.replaceAll(RegExp(r'\n'), '');
+              text = desc.text.replaceAll(RegExp(r'\r'), '');
+              text = desc.text.replaceAll('  ', '');
+              model.notes = LocalizedText(map: { 'en': text.trim()});
+            }
+            int form = int.parse(element.getElement('F_Y_FORM')!.text);
+            switch (form) {
+              case 0:
+                model.form = yeast.Yeast.liquid;
+                break;
+              case 1:
+                model.form = yeast.Yeast.dry;
+                break;
+              case 2:
+                model.form = yeast.Yeast.slant;
+                break;
+              case 3:
+                model.form = yeast.Yeast.culture;
+                break;
+            }
+            int type = int.parse(element.getElement('F_Y_TYPE')!.text);
+            switch (type) {
+              case 0:
+                model.type = Fermentation.hight;
+                break;
+              case 1:
+                model.type = Fermentation.low;
+                break;
+              case 4:
+                model.type = Fermentation.spontaneous;
+                break;
+            }
+            if (type != 2 && type != 3) {
+              List<yeast.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.reference, laboratory: model.laboratory);
+              if (list.isEmpty) {
+                Database().add(model, ignoreAuth: true);
               }
             }
-            onImported.call();
           }
+          onImported.call();
         } finally {
           EasyLoading.dismiss();
         }
@@ -357,8 +351,8 @@ class ImportHelper {
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Unsupported operation" + e.toString()),
-              duration: Duration(seconds: 10)
+              content: Text("Unsupported operation $e"),
+              duration: const Duration(seconds: 10)
           )
       );
     } catch (ex) {
@@ -366,7 +360,7 @@ class ImportHelper {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(ex.toString()),
-              duration: Duration(seconds: 10)
+              duration: const Duration(seconds: 10)
           )
       );
     }
@@ -389,72 +383,70 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          if (document != null) {
-            final fermentables = document.findAllElements('Misc');
-            for(XmlElement element in fermentables) {
-              final model = misc.MiscModel(
-                  name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.text})
-              );
-              int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
-              if (time != null) {
-                model.duration = time;
-              }
-              final desc = element.getElement('F_M_NOTES');
-              if (desc != null && desc.text.isNotEmpty) {
-                String text = desc.text.replaceAll(RegExp(r'\n'), '');
-                text = desc.text.replaceAll(RegExp(r'\r'), '');
-                text = desc.text.replaceAll('  ', '');
-                model.notes = LocalizedText(map: { 'en': text.trim()});
-              }
-              int type = int.parse(element.getElement('F_M_TYPE')!.text);
-              switch (type) {
-                case 0:
-                  model.type = misc.Misc.spice;
-                  break;
-                case 1:
-                  model.type = misc.Misc.fining;
-                  break;
-                case 2:
-                  model.type = misc.Misc.herb;
-                  break;
-                case 3:
-                  model.type = misc.Misc.flavor;
-                  break;
-                case 4:
-                  model.type = misc.Misc.other;
-                  break;
-                case 5:
-                  model.type = misc.Misc.water_agent;
-                  break;
-              }
-              int use = int.parse(element.getElement('F_M_USE')!.text);
-              switch (use) {
-                case 0:
-                  model.use = misc.Use.boil;
-                  break;
-                case 1:
-                  model.use = misc.Use.mash;
-                  break;
-                case 2:
-                  model.use = misc.Use.primary;
-                  break;
-                case 3:
-                  model.use = misc.Use.secondary;
-                  break;
-                case 4:
-                  model.use = misc.Use.bottling;
-                  break;
-                case 5:
-                  model.use = misc.Use.sparge;
-                  break;
-              }
-              List<misc.MiscModel> list = await Database().getMiscellaneous(name: model.name.toString());
-              if (list.isEmpty) {
-                Database().add(model, ignoreAuth: true);
-              }
+          final fermentables = document.findAllElements('Misc');
+          for(XmlElement element in fermentables) {
+            final model = misc.MiscModel(
+                name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.text})
+            );
+            int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
+            if (time != null) {
+              model.duration = time;
             }
-            onImported.call();
+            final desc = element.getElement('F_M_NOTES');
+            if (desc != null && desc.text.isNotEmpty) {
+              String text = desc.text.replaceAll(RegExp(r'\n'), '');
+              text = desc.text.replaceAll(RegExp(r'\r'), '');
+              text = desc.text.replaceAll('  ', '');
+              model.notes = LocalizedText(map: { 'en': text.trim()});
+            }
+            int type = int.parse(element.getElement('F_M_TYPE')!.text);
+            switch (type) {
+              case 0:
+                model.type = misc.Misc.spice;
+                break;
+              case 1:
+                model.type = misc.Misc.fining;
+                break;
+              case 2:
+                model.type = misc.Misc.herb;
+                break;
+              case 3:
+                model.type = misc.Misc.flavor;
+                break;
+              case 4:
+                model.type = misc.Misc.other;
+                break;
+              case 5:
+                model.type = misc.Misc.water_agent;
+                break;
+            }
+            int use = int.parse(element.getElement('F_M_USE')!.text);
+            switch (use) {
+              case 0:
+                model.use = misc.Use.boil;
+                break;
+              case 1:
+                model.use = misc.Use.mash;
+                break;
+              case 2:
+                model.use = misc.Use.primary;
+                break;
+              case 3:
+                model.use = misc.Use.secondary;
+                break;
+              case 4:
+                model.use = misc.Use.bottling;
+                break;
+              case 5:
+                model.use = misc.Use.sparge;
+                break;
+            }
+            List<misc.MiscModel> list = await Database().getMiscellaneous(name: model.name.toString());
+            if (list.isEmpty) {
+              Database().add(model, ignoreAuth: true);
+            }
           }
+          onImported.call();
         } finally {
           EasyLoading.dismiss();
         }
@@ -462,8 +454,8 @@ class ImportHelper {
     } on PlatformException catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Unsupported operation" + e.toString()),
-              duration: Duration(seconds: 10)
+              content: Text("Unsupported operation $e"),
+              duration: const Duration(seconds: 10)
           )
       );
     } catch (ex) {
@@ -471,7 +463,7 @@ class ImportHelper {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
               content: Text(ex.toString()),
-              duration: Duration(seconds: 10)
+              duration: const Duration(seconds: 10)
           )
       );
     }

@@ -48,7 +48,7 @@ class Storage {
       ListResult result = await storage.ref('images/$path').list(options);
       await Future.forEach(result.items, (Reference ref) async {
         bool canBeAdded = ref.name.toLowerCase() != '.ghostfile';
-        if (searchText != null && searchText.length > 0) {
+        if (searchText != null && searchText.isNotEmpty) {
           if (!ref.name.toLowerCase().contains(searchText.toLowerCase())) {
             canBeAdded = false;
           }
@@ -105,9 +105,9 @@ class Storage {
         } else {
           data = ImageLib.encodeJpg(image, quality: 80);
         }
-        await storage.ref('images/$path/${name}').putData(Uint8List.fromList(data), metadata);
+        await storage.ref('images/$path/$name').putData(Uint8List.fromList(data), metadata);
       } else {
-        await storage.ref('images/$path/${name}').putFile(File(file.path), metadata);
+        await storage.ref('images/$path/$name').putFile(File(file.path), metadata);
       }
       return true;
     }
@@ -121,7 +121,7 @@ class Storage {
   Future<int> remove(String url, {bool forced = false}) async {
     if (forced == false) {
       List used = await ModelHelper.models(url);
-      if (used.length > 0) {
+      if (used.isNotEmpty) {
         return used.length;
       }
     }
@@ -176,7 +176,7 @@ class Storage {
             customMetadata: metadata.customMetadata
         );
         Uint8List? data = await ref.getData();
-        await storage.ref('images/${name}').putData(data!, settable).then((TaskSnapshot value) async {
+        await storage.ref('images/$name').putData(data!, settable).then((TaskSnapshot value) async {
           String newUrl = await value.ref.getDownloadURL();
           await replace(image.url!, newUrl);
           await remove(image.url!);
@@ -261,10 +261,8 @@ class Storage {
       if (path.startsWith('images/')) {
         path.replaceFirst('images/', 'pictures/');
       }
-      Reference? newRef = await storage.ref('images').child(path);
-      if (newRef != null) {
-        return await newRef.getDownloadURL();
-      }
+      Reference? newRef = storage.ref('images').child(path);
+      return await newRef.getDownloadURL();
     }
     catch(e) {
       print('[$APP_NAME] Image ${ref.bucket} \'${ref.fullPath}\' ERROR: $e');

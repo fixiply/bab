@@ -23,7 +23,7 @@ extension Ex on double {
 
 class HopModel<T> extends Model {
   Status? status;
-  dynamic? name;
+  dynamic name;
   String? origin;
   double? alpha;
   double? beta;
@@ -33,7 +33,7 @@ class HopModel<T> extends Model {
   Use? use;
   Unit? unit;
   int? duration;
-  dynamic? notes;
+  dynamic notes;
 
   HopModel({
     String? uuid,
@@ -56,6 +56,7 @@ class HopModel<T> extends Model {
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
+  @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
@@ -71,6 +72,7 @@ class HopModel<T> extends Model {
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
+  @override
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
@@ -91,10 +93,10 @@ class HopModel<T> extends Model {
 
   HopModel copy() {
     return HopModel(
-      uuid: this.uuid,
-      inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      creator: this.creator,
+      uuid: uuid,
+      inserted_at: inserted_at,
+      updated_at: updated_at,
+      creator: creator,
       status: this.status,
       name: this.name,
       origin: this.origin,
@@ -111,9 +113,13 @@ class HopModel<T> extends Model {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is HopModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {
@@ -181,7 +187,7 @@ class HopModel<T> extends Model {
           values.addAll(deserialize(value));
         }
       } else {
-        HopModel model = new HopModel();
+        HopModel model = HopModel();
         model.fromMap(data);
         values.add(model);
       }
@@ -212,7 +218,7 @@ class HopModel<T> extends Model {
       if (data is List) {
         List<dynamic> values = [];
         for(final item in data) {
-          Quantity model = new Quantity();
+          Quantity model = Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
           model.duration = item.duration;

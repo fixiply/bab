@@ -36,7 +36,7 @@ class Notifications {
 
     /// Note: permissions aren't requested here just to demonstrate that can be
     /// done later
-    final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
+    const DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
         requestAlertPermission: true,
         requestBadgePermission: true,
         requestSoundPermission: true
@@ -86,7 +86,7 @@ class Notifications {
 
   Future<void> showNotification(int id, String title, {String? body, String? payload, String? scheduled}) async {
     await _configureLocalTimeZone();
-    var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+    var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
         channelId, 'Notifications',
         playSound: true,
         enableLights: true,
@@ -94,11 +94,11 @@ class Notifications {
         importance: Importance.max,
         priority: Priority.high,
         ticker: 'ticker');
-    var DarwinPlatformChannelSpecifics = new DarwinNotificationDetails();
-    var platformChannelSpecifics = new NotificationDetails(
+    var DarwinPlatformChannelSpecifics = const DarwinNotificationDetails();
+    var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
         iOS: DarwinPlatformChannelSpecifics);
-    if (scheduled != null && scheduled.length > 0) {
+    if (scheduled != null && scheduled.isNotEmpty) {
       var date = DateHelper.parse(scheduled);
       if (date != null && date.isAfter(DateTime.now())) {
         await flutterLocalNotificationsPlugin.zonedSchedule(

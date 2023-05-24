@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key? key}) : super(key: key);
-  _RegisterPageState createState() => new _RegisterPageState();
+
+  @override
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
 class _RegisterPageState extends State<RegisterPage> {
@@ -42,14 +43,14 @@ class _RegisterPageState extends State<RegisterPage> {
         foregroundColor: Colors.black,
         backgroundColor: Colors.white,
         leading: IconButton(
-            icon:Icon(Icons.close),
+            icon:const Icon(Icons.close),
             onPressed:() async {
               Navigator.pop(context);
             }
         )
       ),
       body: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
+        padding: const EdgeInsets.fromLTRB(18.0, 18.0, 18.0, 0),
         child: Form(
           key: _formKey,
           child: Column(
@@ -59,7 +60,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Expanded(
-                        child: Text(AppLocalizations.of(context)!.text('register'), style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
+                        child: Text(AppLocalizations.of(context)!.text('register'), style: const TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold))
                     ),
                     InkWell(
                       hoverColor: Colors.white,
@@ -72,26 +73,26 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       onTap: () {
                         Navigator.push(context, MaterialPageRoute(builder: (context) {
-                          return LoginPage();
+                          return const LoginPage();
                         }));
                       },
                     )
                   ]
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(AppLocalizations.of(context)!.text('full_name'), style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.text('full_name'), style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
               TextFormField(
                   controller: _fullNameController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                     ),
                     isDense: true,
-                    contentPadding: EdgeInsets.all(12),
+                    contentPadding: const EdgeInsets.all(12),
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -101,20 +102,20 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   }
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(AppLocalizations.of(context)!.text('email_address'), style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.text('email_address'), style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
               TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                     ),
                     isDense: true,
-                    contentPadding: EdgeInsets.all(12),
+                    contentPadding: const EdgeInsets.all(12),
                   ),
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   validator: (value) {
@@ -124,21 +125,21 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   }
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child: Text(AppLocalizations.of(context)!.text('password'), style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(AppLocalizations.of(context)!.text('password'), style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
               TextFormField(
                   controller: _passwordController,
                   obscureText: !passwordVisible,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: const OutlineInputBorder(),
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                     ),
                     isDense: true,
-                    contentPadding: EdgeInsets.all(12),
+                    contentPadding: const EdgeInsets.all(12),
                     suffixIcon: IconButton(
                       color: TextGrey,
                       splashRadius: 1,
@@ -156,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   }
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
                 child:Text.rich(
@@ -171,7 +172,7 @@ class _RegisterPageState extends State<RegisterPage> {
                             showDialog(
                                 context: context,
                                 builder: (context) {
-                                  return MarkdownDialog(filename: TERMS_CONDITIONS);
+                                  return const MarkdownDialog(filename: TERMS_CONDITIONS);
                                 }
                             );
                           }
@@ -187,7 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                   showDialog(
                                       context: context,
                                       builder: (context) {
-                                        return MarkdownDialog(filename: PRIVACY_POLICY);
+                                        return const MarkdownDialog(filename: PRIVACY_POLICY);
                                       }
                                   );
                                 }
@@ -198,7 +199,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   )
                 ),
               ),
-              SizedBox(height: 18),
+              const SizedBox(height: 18),
               CustomPrimaryButton(
                 textValue: AppLocalizations.of(context)!.text('register'),
                 onTap: () async {
@@ -250,7 +251,7 @@ class _RegisterPageState extends State<RegisterPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

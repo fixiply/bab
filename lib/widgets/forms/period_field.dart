@@ -36,14 +36,14 @@ class _PeriodFieldState extends FormFieldState<Term> {
   Widget build(BuildContext context) {
     return  InputDecorator(
       decoration: FormDecoration(
-        contentPadding: EdgeInsets.all(0.0),
-        icon: Icon(Icons.date_range_outlined)
+        contentPadding: const EdgeInsets.all(0.0),
+        icon: const Icon(Icons.date_range_outlined)
       ),
       child: Row(
           children: [
             Expanded(
               child: TextFormField(
-                initialValue: widget.initialValue!.each != null ? widget.initialValue!.each.toString() : null,
+                initialValue: widget.initialValue!.each.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => setState(() {
                   widget.initialValue!.each = int.tryParse(value);
@@ -56,7 +56,7 @@ class _PeriodFieldState extends FormFieldState<Term> {
                 ),
               ),
             ),
-            SizedBox(width: 12),
+            const SizedBox(width: 12),
             Expanded(
               child: DropdownButtonFormField<Period>(
                 value: widget.initialValue!.period,

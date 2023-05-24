@@ -1,6 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 // Internal package
 import 'package:bb/utils/app_localizations.dart';
@@ -40,7 +38,7 @@ class DeleteDialog extends StatefulWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString()),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
           )
         );
         deleted = false;

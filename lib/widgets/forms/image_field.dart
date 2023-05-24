@@ -29,11 +29,11 @@ class ImageField extends FormField<ImageModel> {
         children: <Widget>[
           InputDecorator(
             decoration: FormDecoration(
-              contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 12),
-              icon: Icon(Icons.image)
+              contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 12),
+              icon: const Icon(Icons.image)
             ),
             child: ListTile(
-              contentPadding: EdgeInsets.all(0.0),
+              contentPadding: const EdgeInsets.all(0.0),
               title:  Text(AppLocalizations.of(context)!.text('image')),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -41,14 +41,14 @@ class ImageField extends FormField<ImageModel> {
                   if (crop) Tooltip(
                     message: AppLocalizations.of(context)!.text('crop'),
                     child: IconButton(
-                      icon:Icon(Icons.crop),
+                      icon:const Icon(Icons.crop),
                       onPressed: () async {
                         state._showResizing();
                       }
                     )
                   ),
                   IconButton(
-                    icon:Icon(Icons.chevron_right),
+                    icon:const Icon(Icons.chevron_right),
                     onPressed: () async {
                       state._showPicker();
                     }
@@ -58,7 +58,7 @@ class ImageField extends FormField<ImageModel> {
             )
           ),
           image != null ? Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 color: Colors.white,
                 boxShadow: [ BoxShadow(color: Colors.grey) ]
             ),
@@ -85,14 +85,14 @@ class _ImageFieldState extends FormFieldState<ImageModel> {
     super.didChange(value);
   }
 
-  String getLabel(Uint8List image, fractionDigits) {
+  String getLabel(Uint8List? image, fractionDigits) {
     if (image == null) {
       return AppLocalizations.of(context)!.text('image');
     }
     const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     int bytes = image.lengthInBytes;
     var i = (log(bytes) / log(1024)).floor();
-    return ((bytes / pow(1024, i)).toStringAsFixed(fractionDigits)) + ' ' + suffixes[i];
+    return '${(bytes / pow(1024, i)).toStringAsFixed(fractionDigits)} ${suffixes[i]}';
   }
 
   _showResizing() {

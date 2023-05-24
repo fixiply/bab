@@ -33,9 +33,9 @@ class UserModel<T> {
     this.addresses,
     this.payments
   }) {
-    if(inserted_at == null) { inserted_at = DateTime.now(); }
-    if (addresses == null) { addresses = []; }
-    if (payments == null) { payments = []; }
+    inserted_at ??= DateTime.now();
+    addresses ??= [];
+    payments ??= [];
   }
 
   bool isAdmin() {
@@ -97,9 +97,13 @@ class UserModel<T> {
   }
 
   // ignore: hash_and_equals
+  @override
   bool operator ==(other) {
     return (other is UserModel && other.uuid == uuid);
   }
+
+  @override
+  int get hashCode => uuid.hashCode;
 
   @override
   String toString() {

@@ -6,7 +6,6 @@ import 'package:bb/widgets/containers/subscription_container.dart';
 // External package
 import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
-import 'package:json_class/json_class.dart';
 
 class SubscriptionBuilder extends JsonWidgetBuilder {
   static const type = 'subscription';

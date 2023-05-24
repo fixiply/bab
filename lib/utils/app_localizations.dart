@@ -48,7 +48,7 @@ class AppLocalizations {
     return _localisedValues![key] ?? "$key not found";
   }
 
-  String localizedText(dynamic? value, {Locale? locale}) {
+  String localizedText(dynamic value, {Locale? locale}) {
     return LocalizedText.text(locale ?? this.locale, value);
   }
 
@@ -147,7 +147,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    return this.numberFormat(number, symbol: '%');
+    return numberFormat(number, symbol: '%');
   }
 
   /// Returns the formatted duration, based on the given conditions.
@@ -186,7 +186,7 @@ class AppLocalizations {
         number = FormulaHelper.convertOunceToLivre(number);
         suffix = ' lb';
       }
-      return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
+      return numberFormat(number, symbol: (symbol == true ? suffix : null));
     }
 
     var suffix = ' g';
@@ -194,7 +194,7 @@ class AppLocalizations {
       number = number / 1000;
       suffix = ' kg';
     }
-    return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
+    return numberFormat(number, symbol: (symbol == true ? suffix : null));
   }
 
   /// Returns the suffix weight, based on the given conditions.
@@ -279,7 +279,7 @@ class AppLocalizations {
         number = number / 128;
         suffix = ' gal';
       }
-      return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
+      return numberFormat(number, symbol: (symbol == true ? suffix : null));
     }
 
     var suffix = ' ml';
@@ -287,7 +287,7 @@ class AppLocalizations {
       number = number / 1000;
       suffix = ' l';
     }
-    return this.numberFormat(number, symbol: (symbol == true ? suffix : null));
+    return numberFormat(number, symbol: (symbol == true ? suffix : null));
   }
 
   /// Returns the localized volume to litter, based on the given conditions.
@@ -309,9 +309,9 @@ class AppLocalizations {
       return null;
     }
     if (measure == Measure.imperial) {
-      return this.numberFormat(ColorHelper.toSRM(number));
+      return numberFormat(ColorHelper.toSRM(number));
     }
-    return this.numberFormat(number);
+    return numberFormat(number);
   }
 
   /// Returns the localized volume to litter, based on the given conditions.
@@ -333,7 +333,7 @@ class AppLocalizations {
   }
 
   /// Returns the formatted gravity.
-  String? gravityFormat(number) {
+  String? gravityFormat(number, {bool? symbol = true}) {
     switch(gravity) {
       case Gravity.sg:
         if (number == null || number <= 1 || number >= 2) {
@@ -344,12 +344,12 @@ class AppLocalizations {
         if (number == null) {
           return null;
         }
-        return this.numberFormat(FormulaHelper.convertSGToPlato(number), symbol: '°P');
+        return numberFormat(FormulaHelper.convertSGToPlato(number), symbol:  (symbol == true ? '°P' : null));
       case Gravity.brix:
         if (number == null) {
           return null;
         }
-        return this.numberFormat(FormulaHelper.convertSGToBrix(number), symbol: '°Bx');
+        return numberFormat(FormulaHelper.convertSGToBrix(number), symbol:  (symbol == true ? '°Bx' : null));
     }
   }
 }

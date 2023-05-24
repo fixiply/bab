@@ -21,7 +21,8 @@ class ChatGPTContainer extends AbstractContainer {
       product: product
   );
 
-  _ChatGPTContainerState createState() => new _ChatGPTContainerState();
+  @override
+  _ChatGPTContainerState createState() => _ChatGPTContainerState();
 }
 
 
@@ -48,20 +49,20 @@ class _ChatGPTContainerState extends AbstractContainerState {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: EdgeInsets.all(12.0),
+      padding: const EdgeInsets.all(12.0),
       child: Form(
         key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Text(AppLocalizations.of(context)!.text('mash_volume') + ' :', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+            Text('${AppLocalizations.of(context)!.text('mash_volume')} :', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.grey.shade200,
               ),
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: TextFormField(
                 initialValue: AppLocalizations.of(context)!.volumeFormat(_volume, symbol: false) ?? '',
                 onChanged: (value) => setState(() {
@@ -84,14 +85,14 @@ class _ChatGPTContainerState extends AbstractContainerState {
                 }
               ),
             ),
-            SizedBox(height: 20),
-            Text(AppLocalizations.of(context)!.text('description_beer') + " :", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+            const SizedBox(height: 20),
+            Text("${AppLocalizations.of(context)!.text('description_beer')} :", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 color: Colors.grey.shade200,
               ),
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: TextFormField(
                 maxLines: 8, //or null
                 decoration: InputDecoration(
@@ -114,22 +115,19 @@ class _ChatGPTContainerState extends AbstractContainerState {
                 },
               ),
             ),
-            if (messages.isNotEmpty) SizedBox(height: 20),
+            if (messages.isNotEmpty) const SizedBox(height: 20),
             if (messages.isNotEmpty) ListView.builder(
               itemCount: messages.length,
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemBuilder: (context, index){
                 return Container(
-                  // padding: EdgeInsets.all(8),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: SecondaryColorLight,
-                    ),
-                    padding: EdgeInsets.all(8),
-                    child: Text(messages[index], style: TextStyle(fontSize: 15)),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    color: SecondaryColorLight,
                   ),
+                  padding: const EdgeInsets.all(8),
+                  child: Text(messages[index], style: const TextStyle(fontSize: 15)),
                 );
               },
             ),
@@ -201,7 +199,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }

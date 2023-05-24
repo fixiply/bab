@@ -34,7 +34,7 @@ class Days {
       decoration: BoxDecoration(
           shape: BoxShape.circle,
           color: backColor),
-      child: Text(text, style: TextStyle(color: const Color(0xFFFAFAFA), fontSize: 16.0,))
+      child: Text(text, style: const TextStyle(color: Color(0xFFFAFAFA), fontSize: 16.0,))
     );
   }
 }

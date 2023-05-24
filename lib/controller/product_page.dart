@@ -1,5 +1,3 @@
-import 'package:bb/utils/rating.dart';
-import 'package:bb/widgets/dialogs/rating_dialog.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -15,7 +13,7 @@ import 'package:bb/widgets/containers/ratings_container.dart';
 import 'package:bb/widgets/modal_bottom_sheet.dart';
 import 'package:bb/widgets/paints/bezier_clipper.dart';
 import 'package:bb/widgets/paints/circle_clipper.dart';
-import 'package:flutter/rendering.dart';
+import 'package:bb/widgets/primary_button.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
@@ -26,11 +24,12 @@ import 'package:provider/provider.dart';
 class ProductPage extends StatefulWidget {
   final ProductModel model;
   ProductPage(this.model);
-  _ProductPageState createState() => new _ProductPageState();
+
+  @override
+  _ProductPageState createState() => _ProductPageState();
 }
 
 class _ProductPageState extends State<ProductPage> {
-  GlobalKey _keyReviews = GlobalKey();
   final ScrollController _controller = ScrollController();
   int _baskets = 0;
 
@@ -55,7 +54,7 @@ class _ProductPageState extends State<ProductPage> {
             foregroundColor: Colors.white,
             backgroundColor: Theme.of(context).primaryColor,
             flexibleSpace: FlexibleSpaceBar(
-              titlePadding: EdgeInsets.only(left: 140),
+              titlePadding: const EdgeInsets.only(left: 140),
               title: Text(widget.model.title!),
               background: Stack(
                 children: [
@@ -72,7 +71,7 @@ class _ProductPageState extends State<ProductPage> {
                   Row(
                     children: [
                       Container(
-                        padding: EdgeInsets.only(left: 30),
+                        padding: const EdgeInsets.only(left: 30),
                         child: ImageContainer(widget.model.image, width: null, height: null, color: Colors.transparent),
                       ),
                       Expanded(
@@ -91,7 +90,7 @@ class _ProductPageState extends State<ProductPage> {
                                 mainAxisSize: MainAxisSize.max,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  if (widget.model.rating > 0) Text(widget.model.rating.toStringAsPrecision(2), style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+                                  if (widget.model.rating > 0) Text(widget.model.rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
                                   RatingBar.builder(
                                     initialRating: widget.model.rating,
                                     direction: Axis.horizontal,
@@ -99,7 +98,7 @@ class _ProductPageState extends State<ProductPage> {
                                     itemCount: 5,
                                     itemSize: 18,
                                     itemPadding: EdgeInsets.zero,
-                                    itemBuilder: (context, _) => Icon(
+                                    itemBuilder: (context, _) => const Icon(
                                       Icons.star,
                                       color: Colors.amber,
                                     ),
@@ -109,7 +108,7 @@ class _ProductPageState extends State<ProductPage> {
                                     },
                                   ),
                                   const SizedBox(height: 3),
-                                  Text('${widget.model.notice} ${AppLocalizations.of(context)!.text('reviews')}', style: TextStyle(color: Colors.white)),
+                                  Text('${widget.model.notice} ${AppLocalizations.of(context)!.text('reviews')}', style: const TextStyle(color: Colors.white)),
                                   const SizedBox(height: 10),
                                   Stack(
                                     children: [
@@ -117,7 +116,7 @@ class _ProductPageState extends State<ProductPage> {
                                       Positioned(
                                           left: 22,
                                           top: 9,
-                                          child: Text('${widget.model.price!.toStringAsPrecision(3)} €', style: TextStyle(fontSize: 16, color: Colors.white))
+                                          child: Text('${widget.model.price!.toStringAsPrecision(3)} €', style: const TextStyle(fontSize: 16, color: Colors.white))
                                       )
                                     ],
                                   )
@@ -135,15 +134,15 @@ class _ProductPageState extends State<ProductPage> {
             actions: <Widget> [
               badge.Badge(
                 position: badge.BadgePosition.topEnd(top: 0, end: 3),
-                animationDuration: Duration(milliseconds: 300),
+                animationDuration: const Duration(milliseconds: 300),
                 animationType: badge.BadgeAnimationType.slide,
                 showBadge: _baskets > 0,
                 badgeContent: _baskets > 0 ? Text(
                   _baskets.toString(),
-                  style: TextStyle(color: Colors.white),
+                  style: const TextStyle(color: Colors.white),
                 ) : null,
                 child: IconButton(
-                  icon: Icon(Icons.shopping_cart_outlined),
+                  icon: const Icon(Icons.shopping_cart_outlined),
                   onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
                       return BasketPage();
@@ -152,7 +151,7 @@ class _ProductPageState extends State<ProductPage> {
                 ),
               ),
               if (currentUser != null && currentUser!.isAdmin()) IconButton(
-                icon: Icon(Icons.edit_note),
+                icon: const Icon(Icons.edit_note),
                 onPressed: () {
                   _edit(widget.model);
                 },
@@ -174,12 +173,12 @@ class _ProductPageState extends State<ProductPage> {
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
                       dense: true,
-                      contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('features'), style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      title: Text(AppLocalizations.of(context)!.text('features'), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
                     );
                   },
                   body: Container(
-                    padding: EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(data: widget.model.text!, softLineBreak: true,
                       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
                           .copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),)
@@ -195,15 +194,10 @@ class _ProductPageState extends State<ProductPage> {
       ),
       bottomNavigationBar: Container(
         width: double.infinity,
-        padding: EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        child: TextButton(
-          child: Text(AppLocalizations.of(context)!.text('buy_now')),
-          style:  TextButton.styleFrom(
-            foregroundColor: Colors.white,
-            backgroundColor: Theme.of(context).primaryColor,
-            textStyle: const TextStyle(fontWeight: FontWeight.bold),
-          ),
-          onPressed: () {
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
+        child: CustomPrimaryButton(
+          textValue: AppLocalizations.of(context)!.text('buy_now'),
+          onTap: () {
             ModalBottomSheet.showAddToCart(context, widget.model);
           },
         ),
@@ -232,7 +226,7 @@ class _ProductPageState extends State<ProductPage> {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
             content: Text(message),
-            duration: Duration(seconds: 10)
+            duration: const Duration(seconds: 10)
         )
     );
   }
