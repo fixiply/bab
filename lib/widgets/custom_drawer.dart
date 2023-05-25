@@ -1,4 +1,3 @@
-import 'package:bb/controller/test_page.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -10,6 +9,7 @@ import 'package:bb/controller/inventory_page.dart';
 import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/equipments_page.dart';
+import 'package:bb/controller/tools_page.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 
@@ -72,7 +72,7 @@ class CustomDrawer<Object> extends Drawer {
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return TestPage();
+              return ToolsPage();
             })).then((value) {
               Navigator.pop(context);
             });

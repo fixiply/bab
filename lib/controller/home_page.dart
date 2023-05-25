@@ -1,4 +1,3 @@
-import 'package:bb/controller/test_page.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -16,6 +15,7 @@ import 'package:bb/controller/orders_page.dart';
 import 'package:bb/controller/products_page.dart';
 import 'package:bb/controller/receipts_page.dart';
 import 'package:bb/controller/styles_page.dart';
+import 'package:bb/controller/tools_page.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/main.dart';
 import 'package:bb/models/event_model.dart';
@@ -257,7 +257,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
-                            builder: (_) => TestPage(),
+                            builder: (_) => ToolsPage(),
                           );
                         }
                       ),
@@ -426,6 +426,11 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   Widget _showPage() {
     return PageView(
       controller: _page,
+      onPageChanged: (index) {
+        setState(() {
+          _selectedIndex = index;
+        });
+      },
       children: [
         EventsPage(),
         ReceiptsPage(),
