@@ -1,5 +1,8 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/material.dart';
+
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/constants.dart';
 
@@ -11,23 +14,27 @@ class FormulaHelper {
   /// The `potential` argument is relative to the grain efficiency.
   ///
   /// The `efficiency` argument is relative to the theoretical efficiency of the equipment.
-  static double extract(double? mass, double? potential, double? efficiency) {
+  static double? extract(double? mass, double? potential, double? efficiency) {
     if (mass == null || potential == null || efficiency == null) {
-      return 0;
+      return null;
     }
-    return mass * (potential / 100) * (efficiency / 100);
+    double result = mass * (potential / 100) * (efficiency / 100);
+    if (Foundation.kDebugMode) debugPrint('og $result=$mass * ($potential / 100) * ($efficiency / 100)');
+    return result;
   }
 
   /// Returns the original gravity, based on the given conditions.
   ///
   /// The `extract` argument is relative to the dry extract.
   ///
-  /// The `volume` argument is relative to the pre-boil volume.
-  static double og(double? extract, double? volume) {
+  /// The `volume` argument is relativ-e to the pre-boil volume.
+  static double? og(double? extract, double? volume) {
     if (extract == null || volume == null) {
-      return 0;
+      return null;
     }
-    return 1 + ( 383 * extract / volume ) / 1000;
+    double result = 1 + ( 383 * extract / volume ) / 1000;
+    if (Foundation.kDebugMode) debugPrint('og $result=1 + ( 383 * $extract / $volume ) / 1000');
+    return result;
   }
 
   /// Returns the final gravity, based on the given conditions.
@@ -35,9 +42,9 @@ class FormulaHelper {
   /// The `og` argument is relative to the original gravity 1.xxx.
   ///
   /// The `attenuation` argument is relative to the theoretical yeast attenuation.
-  static double fg(double? og, double? attenuation) {
+  static double? fg(double? og, double? attenuation) {
     if (attenuation == null || og == null) {
-      return 0;
+      return null;
     }
     og = (og - 1) * 1000;
     attenuation = attenuation / 100;
@@ -50,12 +57,33 @@ class FormulaHelper {
   /// The `og` argument is relative to the original gravity 1.xxx.
   ///
   /// The `fg` argument is relative to the final gravity.
-  static double abv(double? og, double? fg) {
+  static double? abv(double? og, double? fg) {
     if (og == null || fg == null) {
-      return 0;
+      return null;
     }
-    return ((og * 1000) - (fg * 1000) ) / 7.6;
+    double result = ((og * 1000) - (fg * 1000) ) / 7.6;
+    if (Foundation.kDebugMode) debugPrint('abv $result=((($og * 1000) - ($fg * 1000) ) / 7.6');
+    return result;
   }
+
+  /// Returns the mash efficiency, based on the given conditions.
+  ///
+  /// The `volume` argument is relative to the final volume.
+  ///
+  /// The `og` argument is relative to the original gravity 1.xxx.
+  ///
+  /// The `mass` argument is relative to the grain mass in kilo.
+  ///
+  /// The `extract` argument is relative to the dry extract.
+  static double? efficiency(double? volume, double? og, double? mass, double? extract) {
+    if (volume == null || og == null || mass == null || extract == null) {
+      return null;
+    }
+    double result = (volume * og * convertSGToPlato(og)) / (mass * extract) * 100;
+    if (Foundation.kDebugMode) debugPrint('efficiency $result=($volume * $og * ${convertSGToPlato(og)}) / ($mass * $extract) * 100');
+    return result;
+  }
+
 
   /// Returns the bitterness index, based on the given conditions.
   ///
@@ -68,12 +96,14 @@ class FormulaHelper {
   /// The `duration` argument is relative to the boil duration in minute.
   ///
   /// The `volume` argument is relative to the final volume.
-  static double ibu(double? amount, double? alpha, double? og, int? duration, double? volume, {double? maximum}) {
+  static double? ibu(double? amount, double? alpha, double? og, int? duration, double? volume, {double? maximum}) {
     if (amount == null || alpha == null || og == null || duration == null || volume == null) {
-      return 0;
+      return null;
     }
     maximum ??= 4.15;
-    return 1.65 * pow(0.000125, og) * ((1 - pow(e, -0.04 * duration)) / maximum) * ((alpha * amount * 1000) / volume) * 100;
+    double result = 1.65 * pow(0.000125, og) * ((1 - pow(e, -0.04 * duration)) / maximum) * ((alpha * amount * 1000) / volume) * 100;
+    if (Foundation.kDebugMode) debugPrint('ibu $result=1.65 * pow(0.000125, $og) * ((1 - pow($e, -0.04 * $duration)) / $maximum) * (($alpha * $amount * 1000) / $volume) * 100');
+    return result;
   }
 
   /// Returns the yeast seeding rate, based on the given conditions.
@@ -90,9 +120,9 @@ class FormulaHelper {
   /// Pro Brewer 1.00 (high gravity ale)
   /// Pro Brewer 1.50 (minimum for lager)
   /// Pro Brewer 2.0 (high gravity lager)
-  static double yeast(double? og, double? volume, {Yeast form = Yeast.dry, double cells = 100, double rate = 0.75}) {
+  static double? yeast(double? og, double? volume, {Yeast form = Yeast.dry, double cells = 100, double rate = 0.75}) {
     if (og == null || volume == null) {
-      return 0;
+      return null;
     }
     var bc = billionCells(og, volume, rate: rate);
     if (form == Yeast.liquid) {
@@ -133,7 +163,9 @@ class FormulaHelper {
     if (volume == null || boil_losses == null || boil_off_rate == null) {
       return 0;
     }
-    return volume + boil_losses + (boil_off_rate * (duration / 60));
+    double result = volume + boil_losses + (boil_off_rate * (duration / 60));
+    if (Foundation.kDebugMode) debugPrint('preboilVolume $result=$volume + $boil_losses + ($boil_off_rate * ($duration / 60))');
+    return result;
   }
 
   /// Returns the mash water, based on the given conditions.
@@ -147,7 +179,9 @@ class FormulaHelper {
     if (weight == null || ratio == null || lost == null) {
       return 0;
     }
-    return (weight * ratio) + lost;
+    double result = (weight * ratio) + lost;
+    if (Foundation.kDebugMode) debugPrint('mashWater $result=($weight * $ratio) + $lost');
+    return result;
   }
 
   /// Returns the mash water, based on the given conditions.
@@ -163,7 +197,9 @@ class FormulaHelper {
     if (weight == null || volume == null || mash == null || absorption == null) {
       return 0;
     }
-    return volume - mash + (weight * absorption);
+    double result = volume - mash + (weight * absorption);
+    if (Foundation.kDebugMode) debugPrint('spargeWater $result=$volume - $mash + ($weight * $absorption');
+    return result;
   }
 
   /// Returns the gallon to liter conversion

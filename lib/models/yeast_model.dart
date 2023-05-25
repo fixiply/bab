@@ -165,7 +165,7 @@ class YeastModel<T> extends Model {
   /// Returns the final density, based on the given conditions.
   ///
   /// The `og` argument is relative to the original gravity 1.xxx.
-  double density(double? og) {
+  double? density(double? og) {
     return FormulaHelper.fg(og, attenuation);
   }
 

@@ -226,6 +226,23 @@ class ReceiptModel<T> extends Model {
     return rating;
   }
 
+
+  double get mass {
+    double mass = 0;
+    for(FermentableModel item in fermentables) {
+      mass += (item.amount ?? 0);
+    }
+    return mass;
+  }
+
+  double get extract {
+    double extract = 0;
+    for(FermentableModel item in fermentables) {
+      extract += (item.efficiency ?? 0) / fermentables.length;
+    }
+    return extract;
+  }
+
   set fermentables(List<FermentableModel>data) => _fermentables = data;
 
   List<FermentableModel> get fermentables => _fermentables ?? [];
@@ -318,9 +335,10 @@ class ReceiptModel<T> extends Model {
   }
 
   calculate({double? volume}) async {
-    og = 0.0;
-    fg = 0.0;
-    ibu = 0.0;
+    og = null;
+    fg = null;
+    ibu = null;
+    abv = null;
     double mcu = 0.0;
     double extract = 0.0;
     primaryday = null;
@@ -330,7 +348,7 @@ class ReceiptModel<T> extends Model {
     for(FermentableModel item in await getFermentables()) {
       if (item.use == Method.mashed) {
         // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
-        extract += item.extract(efficiency);
+        extract += (item.extract(efficiency) ?? 0);
         mcu += ColorHelper.mcu(item.ebc, item.amount, volume ?? this.volume);
       }
     }
@@ -352,12 +370,18 @@ class ReceiptModel<T> extends Model {
         case Fermentation.spontaneous:
           break;
       }
-      fg = (fg ?? 0) + item.density(og);
+      double? density =  item.density(og);
+      if (density != null) {
+        fg = (fg ?? 0) + density;
+      }
     }
 
     for(hop.HopModel item in await gethops()) {
       if (item.use == hop.Use.boil) {
-        ibu = (ibu ?? 0) + item.ibu(og, boil, volume ?? this.volume);
+        double? bitterness = item.ibu(og, boil, volume ?? this.volume);
+        if (bitterness != null) {
+          ibu = (ibu ?? 0) + bitterness;
+        }
       }
     }
 

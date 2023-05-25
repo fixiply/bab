@@ -224,14 +224,16 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         if (values != null) {
           if (widget.data != null) {
             for(YeastModel model in values) {
-              var amount = FormulaHelper.yeast(
+              double? amount = FormulaHelper.yeast(
                   widget.receipt!.og,
                   widget.receipt!.volume,
                   form: model.form!,
                   cells: model.cells!,
                   rate: model.pitchingRate(widget.receipt!.og)
               );
-              model.amount = amount.truncateToDouble();
+              if (amount != null) {
+                model.amount = amount.truncateToDouble();
+              }
               widget.data!.add(model);
             }
             widget.onChanged?.call(widget.data!);
