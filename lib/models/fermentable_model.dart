@@ -116,7 +116,7 @@ class FermentableModel<T> extends Model {
   /// Returns the dry extract, based on the given conditions.
   ///
   /// The `efficiency` argument is relative to the theoretical efficiency of the equipment.
-  double extract(double? efficiency) {
+  double? extract(double? efficiency) {
     return FormulaHelper.extract(this.amount, this.efficiency, efficiency);
   }
 

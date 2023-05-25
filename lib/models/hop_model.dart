@@ -137,7 +137,7 @@ class HopModel<T> extends Model {
   /// The `duration` argument is relative to the boil duration in minute.
   ///
   /// The `volume` argument is relative to the final volume.
-  double ibu(double? og, int? duration, double? volume, {double? maximum})  {
+  double? ibu(double? og, int? duration, double? volume, {double? maximum})  {
     return FormulaHelper.ibu(this.amount, this.alpha, og, this.duration, volume, maximum: maximum);
   }
 

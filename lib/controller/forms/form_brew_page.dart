@@ -200,7 +200,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency ?? 0), style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -216,7 +216,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(0), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv ?? 0), style: const TextStyle(fontWeight: FontWeight.bold)),
                               ],
                             ),
                           ),
@@ -413,6 +413,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ],
                       onChanged: (value) {
                         widget.model.og = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.first_page_outlined),
@@ -437,6 +438,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ],
                       onChanged: (value) {
                         widget.model.fg = AppLocalizations.of(context)!.decimal(value);
+                        _calculate();
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.last_page_outlined),
@@ -493,6 +495,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
     setState(() {
       widget.model.mash_water = widget.model.mash_water;
       widget.model.sparge_water = widget.model.sparge_water;
+      widget.model.efficiency = widget.model.efficiency;
+      widget.model.abv = widget.model.abv;
     });
   }
 

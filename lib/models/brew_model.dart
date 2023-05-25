@@ -1,6 +1,7 @@
 // Internal package
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/date_helper.dart';
+import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/models/fermentable_model.dart';
 import 'package:bb/models/model.dart';
@@ -198,6 +199,8 @@ class BrewModel<T> extends Model {
   }
 
   calculate() async {
+    abv = null;
+    efficiency = null;
     if (receipt != null && tank != null) {
       double weight = 0;
       for(FermentableModel item in await receipt!.getFermentables()) {
@@ -207,9 +210,11 @@ class BrewModel<T> extends Model {
       }
       mash_water = tank!.mash(weight);
       sparge_water = tank!.sparge(volume!, weight, duration: receipt!.boil!);
+      efficiency = FormulaHelper.efficiency(volume, og, receipt!.mass, receipt!.extract);
     } else {
       mash_water = null;
       sparge_water = null;
     }
+    if (og != 0 && fg != 0) abv = FormulaHelper.abv(og, fg);
   }
 }
