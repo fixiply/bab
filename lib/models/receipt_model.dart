@@ -205,7 +205,7 @@ class ReceiptModel<T> extends Model {
   // ignore: hash_and_equals
   @override
   bool operator ==(other) {
-    return (other is ReceiptModel && other.uuid == uuid);
+    return (other is ReceiptModel && other.uuid == uuid || other is String && other == uuid);
   }
 
   @override

@@ -82,8 +82,8 @@ class _ParallaxContainerState extends AbstractContainerState {
                           )
                         ),
                         const SizedBox(height: 12),
-                        Text(model.title!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                        if (model.subtitle != null) Text(model.subtitle!, style: const TextStyle(fontSize: 14)),
+                        Text(AppLocalizations.of(context)!.localizedText(model.title), style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+                        if (model.subtitle != null) Text(AppLocalizations.of(context)!.localizedText(model.subtitle), style: const TextStyle(fontSize: 14)),
                         const SizedBox(height: 4),
                         button(model)
                       ],

@@ -69,18 +69,28 @@ class _FormProductPageState extends State<FormProductPage> {
         ),
         actions: <Widget> [
           IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('save'),
-            icon: const Icon(Icons.save),
-            onPressed: _modified == true ? () {
-              if (_formKey.currentState!.validate()) {
-                Database().update(widget.model).then((value) async {
-                  Navigator.pop(context, widget.model);
-                }).onError((e,s) {
-                  _showSnackbar(e.toString());
-                });
+              padding: EdgeInsets.zero,
+              tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
+              icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
+              onPressed: () {
+                if (_modified == true || widget.model.uuid == null) {
+                  if (_formKey.currentState!.validate()) {
+                    Database().update(widget.model).then((value) async {
+                      Navigator.pop(context, widget.model);
+                    }).onError((e, s) {
+                      _showSnackbar(e.toString());
+                    });
+                  }
+                } else {
+                  ProductModel model = widget.model.copy();
+                  model.uuid = null;
+                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                    return FormProductPage(model);
+                  })).then((value) {
+                    Navigator.pop(context);
+                  });
+                }
               }
-            } : null
           ),
           if (widget.model.uuid != null) IconButton(
             padding: EdgeInsets.zero,
@@ -99,14 +109,6 @@ class _FormProductPageState extends State<FormProductPage> {
             onSelected: (value) async {
               if (value == 'information') {
                 await ModalBottomSheet.showInformation(context, widget.model);
-              } else if (value == 'duplicate') {
-                ProductModel model = widget.model.copy();
-                model.uuid = null;
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FormProductPage(model);
-                })).then((value) {
-                  Navigator.pop(context);
-                });
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -114,10 +116,6 @@ class _FormProductPageState extends State<FormProductPage> {
                 value: 'information',
                 child: Text(AppLocalizations.of(context)!.text('information')),
               ),
-              PopupMenuItem(
-                value: 'duplicate',
-                child: Text(AppLocalizations.of(context)!.text('duplicate')),
-              )
             ]
           )
         ]
@@ -160,26 +158,21 @@ class _FormProductPageState extends State<FormProductPage> {
                 builder: (context, snapshot) {
                   if (snapshot.data != null) {
                     return DropdownButtonFormField<String>(
-                        value: widget.model.receipt,
-                        decoration: FormDecoration(
-                          icon: const Icon(Icons.receipt_outlined),
-                          labelText: AppLocalizations.of(context)!.text('receipt'),
-                        ),
-                        items: snapshot.data!.map((ReceiptModel model) {
-                          return DropdownMenuItem<String>(
-                            value: model.uuid,
-                            child: Text(AppLocalizations.of(context)!.localizedText(model.title)));
-                        }).toList(),
-                        onChanged: (value) =>
-                            setState(() {
-                              widget.model.receipt = value;
-                            }),
-                        validator: (value) {
-                          if (value == null) {
-                            return AppLocalizations.of(context)!.text('required_field');
-                          }
-                          return null;
+                      value: snapshot.data!.contains(widget.model.receipt) ? widget.model.receipt : null,
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.receipt_outlined),
+                        labelText: AppLocalizations.of(context)!.text('receipt'),
+                      ),
+                      items: snapshot.data!.map((ReceiptModel model) {
+                        return DropdownMenuItem<String>(
+                          value: model.uuid,
+                          child: Text(AppLocalizations.of(context)!.localizedText(model.title)));
+                      }).toList(),
+                      onChanged: (value) =>
+                        setState(() {
+                          widget.model.receipt = value;
                         }
+                      ),
                     );
                   }
                   return Container();

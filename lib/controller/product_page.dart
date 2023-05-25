@@ -55,7 +55,7 @@ class _ProductPageState extends State<ProductPage> {
             backgroundColor: Theme.of(context).primaryColor,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: const EdgeInsets.only(left: 140),
-              title: Text(widget.model.title!),
+              title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
               background: Stack(
                 children: [
                   Opacity( //semi red clippath with more height and with 0.5 opacity

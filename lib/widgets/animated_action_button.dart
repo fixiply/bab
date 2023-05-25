@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class AnimatedActionButton extends StatefulWidget {
   final String title;
   final Icon icon;
   final void Function() onPressed;
   final int shrinkDuration;
+  final String? tag;
   final Color? backgroundColor;
 
-  AnimatedActionButton({required this.title, required this.icon, required this.onPressed, this.shrinkDuration = 5, this.backgroundColor});
+  AnimatedActionButton({required this.title, required this.icon, required this.onPressed, this.shrinkDuration = 5, this.tag, this.backgroundColor});
 
   @override
   State<StatefulWidget> createState() => _AnimatedActionButtonState();
@@ -34,6 +36,7 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
+      heroTag: widget.tag ?? Uuid().v1(),
       onPressed: widget.onPressed,
       backgroundColor: widget.backgroundColor ?? Theme.of(context).primaryColor,
       tooltip: widget.title,

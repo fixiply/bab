@@ -406,7 +406,7 @@ class Database {
       }
     });
     if (ordered == true) {
-      list.sort((a, b) => a.title!.toLowerCase().compareTo(b.title!.toLowerCase()));
+      list.sort((a, b) => a.title!.toString().toLowerCase().compareTo(b.title!.toString().toLowerCase()));
     }
     return list;
   }

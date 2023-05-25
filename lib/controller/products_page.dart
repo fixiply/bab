@@ -87,8 +87,8 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
                       ]
                     ),
                     // title: Text(alert.title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Theme.of(context).buttonColor)),
-                    title: Text(model.title!),
-                    subtitle: model.subtitle != null ? Text(model.subtitle!) : null,
+                    title: Text(AppLocalizations.of(context)!.localizedText(model.title)),
+                    subtitle: model.subtitle != null ? Text(AppLocalizations.of(context)!.localizedText(model.subtitle)) : null,
                     trailing: PopupMenuButton<String>(
                       icon: const Icon(Icons.more_vert),
                       tooltip: AppLocalizations.of(context)!.text('options'),
