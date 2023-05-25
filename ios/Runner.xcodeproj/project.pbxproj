@@ -3,11 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-<<<<<<< HEAD
 	objectVersion = 54;
-=======
-	objectVersion = 50;
->>>>>>> parent of 48832f2 (FirebaseOptions)
 	objects = {
 
 /* Begin PBXBuildFile section */
