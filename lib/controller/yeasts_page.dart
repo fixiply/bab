@@ -154,7 +154,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
                       }
                     });
                   },
-                  columns: YeastDataSource.columns(context: context, showQuantity: false),
+                  columns: YeastDataSource.columns(context: context),
                 );
               }
               return ListView.builder(

@@ -191,7 +191,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
           });
         }
       },
-      columns: YeastDataSource.columns(context: context, showQuantity: widget.data != null),
+      columns: YeastDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
     );
   }
 
@@ -235,6 +235,8 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
               }
               widget.data!.add(model);
             }
+            _dataSource.buildDataGridRows(widget.data!);
+            _dataSource.notifyListeners();
             widget.onChanged?.call(widget.data!);
           }
         }
@@ -278,7 +280,7 @@ class YeastDataSource extends EditDataSource {
   List<YeastModel> _data = [];
   final void Function(YeastModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
+  YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -290,6 +292,7 @@ class YeastDataSource extends EditDataSource {
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
+      if (showQuantity == true) DataGridCell<Unit>(columnName: 'unit', value: e.unit),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<dynamic>(columnName: 'reference', value: e.reference),
       DataGridCell<dynamic>(columnName: 'laboratory', value: e.laboratory),
@@ -334,6 +337,11 @@ class YeastDataSource extends EditDataSource {
   }
 
   @override
+  List<Enums>? isEnumType(String columnName) {
+    return YeastModel().isEnumType(columnName);
+  }
+
+  @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
       cells: row.getCells().map<Widget>((e) {
@@ -344,11 +352,13 @@ class YeastDataSource extends EditDataSource {
           alignment = Alignment.centerLeft;
         } else if (e.value is num) {
           if (e.columnName == 'amount') {
-            var form = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'form').value;
-            if (form == Yeast.liquid) {
+            var unit = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'unit').value;
+            if (unit == Unit.milliliter || unit == Unit.liter) {
               value = AppLocalizations.of(context)!.volumeFormat(e.value);
-            } else {
+            } else if (unit == Unit.gram  || unit == Unit.kilo) {
               value = AppLocalizations.of(context)!.weightFormat(e.value);
+            } else {
+              value = AppLocalizations.of(context)!.numberFormat(e.value, symbol: ' pqt');
             }
           } else if (e.columnName == 'attenuation') {
             value = AppLocalizations.of(context)!.percentFormat(e.value);
@@ -401,47 +411,51 @@ class YeastDataSource extends EditDataSource {
     final dynamic oldValue = dataGridRow.getCells()
         .firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
-    final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (dataRowIndex == -1 || oldValue == newCellValue) {
+    if (oldValue == newCellValue) {
       return;
     }
-    int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
+    int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
+        data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
+        break;
+      case 'unit':
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
+            DataGridCell<Unit>(columnName: column.columnName, value: newCellValue);
+        data[rowColumnIndex.rowIndex].unit = newCellValue;
         break;
       case 'name':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        if (data[dataRowIndex].name is LocalizedText) {
-          data[dataRowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
+        if (data[rowColumnIndex.rowIndex].name is LocalizedText) {
+          data[rowColumnIndex.rowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
         }
-        else data[dataRowIndex].name = newCellValue;
+        else data[rowColumnIndex.rowIndex].name = newCellValue;
         break;
       case 'reference':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].reference = newCellValue;
+        data[rowColumnIndex.rowIndex].reference = newCellValue;
         break;
       case 'laboratory':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].laboratory = newCellValue;
+        data[rowColumnIndex.rowIndex].laboratory = newCellValue;
         break;
       case 'type':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Fermentation>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue;
+        data[rowColumnIndex.rowIndex].type = newCellValue;
         break;
       case 'form':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Yeast>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].form = newCellValue;
+        data[rowColumnIndex.rowIndex].form = newCellValue;
         break;
     }
-    onChanged?.call(data[dataRowIndex], dataRowIndex);
+    onChanged?.call(data[rowColumnIndex.rowIndex], rowColumnIndex.rowIndex);
     updateDataSource();
   }
 
@@ -450,7 +464,7 @@ class YeastDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -464,6 +478,16 @@ class YeastDataSource extends EditDataSource {
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
+      ),
+      if (showQuantity == true) GridColumn(
+          width: allowEditing ? 90 : double.nan,
+          visible: allowEditing,
+          columnName: 'unit',
+          label: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('unit'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(

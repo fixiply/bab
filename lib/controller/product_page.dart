@@ -178,6 +178,7 @@ class _ProductPageState extends State<ProductPage> {
                     );
                   },
                   body: Container(
+                    alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(data: widget.model.text!, softLineBreak: true,
                       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))

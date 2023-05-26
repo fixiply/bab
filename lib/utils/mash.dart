@@ -148,7 +148,7 @@ class MashDataSource extends EditDataSource {
   List<Mash> data = [];
   final void Function(Mash value)? onChanged;
   /// Creates the employee data source class with required details.
-  MashDataSource(BuildContext context, {List<Mash>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: false, showCheckboxColumn: showCheckboxColumn!) {
+  MashDataSource(BuildContext context, {List<Mash>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: false, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -224,7 +224,7 @@ class MashDataSource extends EditDataSource {
     if (newCellValue == null || oldValue == newCellValue) {
       return;
     }
-    int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
+    int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =

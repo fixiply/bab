@@ -211,6 +211,8 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
             for (FermentableModel model in values) {
               widget.data!.add(model);
             }
+            _dataSource.buildDataGridRows(widget.data!);
+            _dataSource.notifyListeners();
             widget.onChanged?.call(widget.data!);
           }
         }
@@ -254,7 +256,7 @@ class FermentableDataSource extends EditDataSource {
   List<FermentableModel> _data = [];
   final void Function(FermentableModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
+  FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -296,7 +298,7 @@ class FermentableDataSource extends EditDataSource {
   dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     var value = super.getValue(dataGridRow, rowColumnIndex, column);
     if (value != null && column.columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value * 1000, weight: Weight.kilo);
+      double? weight = AppLocalizations.of(context)!.weight(value * 1000, unit: Unit.kilo);
       return weight!.toPrecision(2);
     }
     return value;
@@ -305,7 +307,7 @@ class FermentableDataSource extends EditDataSource {
   @override
   String? suffixText(String columnName) {
     if (columnName == 'amount') {
-      return AppLocalizations.of(context)!.weightSuffix(weight: Weight.kilo);
+      return AppLocalizations.of(context)!.weightSuffix(unit: Unit.kilo);
     }
     return null;
   }
@@ -402,52 +404,51 @@ class FermentableDataSource extends EditDataSource {
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
     final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
-    final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (dataRowIndex == -1 || oldValue == newCellValue) {
+    if (oldValue == newCellValue) {
       return;
     }
-    int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
+    int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue, weight: Weight.kilo);
+        _data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue, unit: Unit.kilo);
         break;
       case 'name':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        if (_data[dataRowIndex].name is LocalizedText) {
-          _data[dataRowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
+        if (_data[rowColumnIndex.rowIndex].name is LocalizedText) {
+          _data[rowColumnIndex.rowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
         }
-        else _data[dataRowIndex].name = newCellValue;
+        else _data[rowColumnIndex.rowIndex].name = newCellValue;
         break;
       case 'origin':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].name = newCellValue;
+        _data[rowColumnIndex.rowIndex].name = newCellValue;
         break;
       case 'type':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].type = newCellValue;
+        _data[rowColumnIndex.rowIndex].type = newCellValue;
         break;
       case 'method':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Method>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].use = newCellValue;
+        _data[rowColumnIndex.rowIndex].use = newCellValue;
         break;
       case 'efficiency':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].efficiency = newCellValue;
+        _data[rowColumnIndex.rowIndex].efficiency = newCellValue;
         break;
       case 'color':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].ebc = newCellValue;
+        _data[rowColumnIndex.rowIndex].ebc = newCellValue;
         break;
     }
-    onChanged?.call(_data[dataRowIndex], dataRowIndex);
+    onChanged?.call(_data[rowColumnIndex.rowIndex], rowColumnIndex.rowIndex);
     updateDataSource();
   }
 

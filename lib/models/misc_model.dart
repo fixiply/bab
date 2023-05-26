@@ -117,6 +117,8 @@ class MiscModel<T> extends Model {
       return Misc.values;
     } else  if (columnName == 'use') {
       return Use.values;
+    } else if (columnName == 'unit') {
+      return [ Unit.gram, Unit.kilo, Unit.milliliter, Unit.liter, Unit.units ];
     }
     return null;
   }
@@ -161,7 +163,7 @@ class MiscModel<T> extends Model {
         model.amount = item.amount;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
-        model.unit = Unit.mass;
+        model.unit = Unit.units;
         values.add(model);
       }
     }

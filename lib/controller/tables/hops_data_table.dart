@@ -209,6 +209,8 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
               model.duration = widget.receipt?.boil;
               widget.data!.add(model);
             }
+            _dataSource.buildDataGridRows(widget.data!);
+            _dataSource.notifyListeners();
             widget.onChanged?.call(widget.data!);
           }
         }
@@ -253,7 +255,7 @@ class HopDataSource extends EditDataSource {
   List<HopModel> _data = [];
   final void Function(HopModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity!, showCheckboxColumn: showCheckboxColumn!) {
+  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -392,57 +394,56 @@ class HopDataSource extends EditDataSource {
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
     final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
-    final int dataRowIndex = dataGridRows.indexOf(dataGridRow);
-    if (dataRowIndex == -1 || oldValue == newCellValue) {
+    if (oldValue == newCellValue) {
       return;
     }
-    int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
+    int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
+        data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
         break;
       case 'name':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        if (data[dataRowIndex].name is LocalizedText) {
-          data[dataRowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
+        if (data[rowColumnIndex.rowIndex].name is LocalizedText) {
+          data[rowColumnIndex.rowIndex].name.add(AppLocalizations.of(context)!.locale, newCellValue);
         }
-        else data[dataRowIndex].name = newCellValue;
+        else data[rowColumnIndex.rowIndex].name = newCellValue;
         break;
       case 'origin':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].name = newCellValue;
+        data[rowColumnIndex.rowIndex].name = newCellValue;
         break;
       case 'alpha':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].alpha = newCellValue;
+        data[rowColumnIndex.rowIndex].alpha = newCellValue;
         break;
       case 'form':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Hop>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].form = newCellValue;
+        data[rowColumnIndex.rowIndex].form = newCellValue;
         break;
       case 'type':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue;
+        data[rowColumnIndex.rowIndex].type = newCellValue;
         break;
       case 'use':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<Use>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].use = newCellValue;
+        data[rowColumnIndex.rowIndex].use = newCellValue;
         break;
       case 'duration':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].duration = newCellValue;
+        data[rowColumnIndex.rowIndex].duration = newCellValue;
         break;
     }
-    onChanged?.call(data[dataRowIndex], dataRowIndex);
+    onChanged?.call(data[rowColumnIndex.rowIndex], rowColumnIndex.rowIndex);
     updateDataSource();
   }
 

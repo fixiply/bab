@@ -154,7 +154,7 @@ class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<
                       }
                     });
                   },
-                  columns: MiscDataSource.columns(context: context, showQuantity: false),
+                  columns: MiscDataSource.columns(context: context),
                 );
               }
               return ListView.builder(

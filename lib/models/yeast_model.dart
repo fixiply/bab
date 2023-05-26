@@ -185,6 +185,8 @@ class YeastModel<T> extends Model {
       return Fermentation.values;
     } else if (columnName == 'form') {
       return Yeast.values;
+    } else if (columnName == 'unit') {
+      return [ Unit.gram, Unit.milliliter, Unit.packages ];
     }
     return null;
   }
@@ -227,7 +229,7 @@ class YeastModel<T> extends Model {
       YeastModel? model = await Database().getYeast(item.uuid!);
       if (model != null) {
         model.amount = item.amount;
-        model.unit = model.form == Yeast.liquid ? Unit.volume : Unit.mass;
+        model.unit = item.unit ?? (model.form == Yeast.liquid ? Unit.milliliter : Unit.gram);
         values.add(model);
       }
     }

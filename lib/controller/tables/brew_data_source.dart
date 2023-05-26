@@ -16,7 +16,7 @@ class BrewDataSource extends EditDataSource {
   List<BrewModel> _data = [];
   final void Function(BrewModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  BrewDataSource(BuildContext context, {List<BrewModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn!) {
+  BrewDataSource(BuildContext context, {List<BrewModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -101,7 +101,7 @@ class BrewDataSource extends EditDataSource {
     if (dataRowIndex == -1 || oldValue == newCellValue) {
       return;
     }
-    int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
+    int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'reference':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =

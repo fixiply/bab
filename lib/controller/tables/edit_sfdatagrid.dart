@@ -43,10 +43,6 @@ class EditSfDataGrid extends SfDataGrid {
     shrinkWrapRows: true,
     showCheckboxColumn: showCheckboxColumn,
     selectionMode: selectionMode,
-    onCellTap: (details) {
-      FocusManager.instance.primaryFocus?.unfocus();
-      debugPrint('onCellTap');
-    },
     // columnWidthCalculationRange: ColumnWidthCalculationRange.allRows,
     verticalScrollPhysics: verticalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
     horizontalScrollPhysics: horizontalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
@@ -104,7 +100,7 @@ class EditSfDataGrid extends SfDataGrid {
     startSwipeActionsBuilder: (BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
         onTap: () {
-          // onEdit?.call(row, rowIndex);
+          onEdit?.call(row, rowIndex);
         },
         child: Container(
           color: Colors.blueAccent,

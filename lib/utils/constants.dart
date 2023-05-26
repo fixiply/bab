@@ -40,8 +40,8 @@ mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   }
 }
 
-enum Unit with Enums { mass, volume, fraction;
-  List<Enum> get enums => [ mass, volume, fraction ];
+enum Unit with Enums { gram, kilo, milliliter, liter, packages, units;
+  List<Enum> get enums => [ gram, kilo, milliliter, liter, packages, units];
 }
 enum Fermentation with Enums { hight, low, spontaneous;
   List<Enum> get enums => [ hight, low, spontaneous ];
@@ -53,6 +53,7 @@ enum Payments with Enums { credit_card, paypal, apple_pay, google_pay;
   List<Enum> get enums => [ credit_card, paypal, apple_pay, google_pay ];
 }
 enum Period { day, week, month, year }
+enum Time { minutes, hours, days, weeks }
 enum Role with Enums { admin, editor, customer;
   List<Enum> get enums => [ admin, editor, customer ];
 }
@@ -61,7 +62,6 @@ enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size }
 enum Status { pending, publied, disabled }
 enum Measure { metric, imperial }
 enum Gravity { sg, plato, brix }
-enum Weight { kilo, gram }
 
 //Colors
 const Color PrimaryColor = Color(0xFF008351);

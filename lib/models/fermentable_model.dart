@@ -40,7 +40,7 @@ class FermentableModel<T> extends Model {
     this.status = Status.publied,
     this.name,
     this.type = Type.grain,
-    this.unit = Unit.mass,
+    this.unit = Unit.kilo,
     this.origin,
     this.amount,
     this.use = Method.mashed,
@@ -179,7 +179,7 @@ class FermentableModel<T> extends Model {
       if (model != null) {
         model.amount = item.amount;
         model.use = item.use != null ? Method.values.elementAt(item.use!) : Method.mashed;
-        model.unit = Unit.mass;
+        model.unit = Unit.kilo;
         values.add(model);
       }
     }

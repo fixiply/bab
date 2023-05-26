@@ -13,7 +13,7 @@ class Quantity<T> {
     this.amount,
     this.duration,
     this.use,
-    this.unit = Unit.mass,
+    this.unit = Unit.units,
   });
 
   void fromMap(Map<String, dynamic> map) {

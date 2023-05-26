@@ -227,7 +227,7 @@ class TankDataSource extends EditDataSource {
   List<EquipmentModel> _data = [];
   final void Function(EquipmentModel value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
-  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn!) {
+  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -268,7 +268,7 @@ class TankDataSource extends EditDataSource {
   dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
     var value = super.getValue(dataGridRow, rowColumnIndex, column);
     if (value != null && column.columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value * 1000, weight: Weight.kilo);
+      double? weight = AppLocalizations.of(context)!.weight(value * 1000, unit: Unit.kilo);
       return weight!.toPrecision(2);
     }
     return value;
@@ -277,7 +277,7 @@ class TankDataSource extends EditDataSource {
   @override
   String? suffixText(String columnName) {
     if (columnName == 'amount') {
-      return AppLocalizations.of(context)!.weightSuffix(weight: Weight.kilo);
+      return AppLocalizations.of(context)!.weightSuffix(unit: Unit.kilo);
     }
     return null;
   }
@@ -358,7 +358,7 @@ class TankDataSource extends EditDataSource {
     if (dataRowIndex == -1 || oldValue == newCellValue) {
       return;
     }
-    int columnIndex = showCheckboxColumn ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
+    int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'name':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -368,27 +368,27 @@ class TankDataSource extends EditDataSource {
       case 'volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
+        _data[dataRowIndex].volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
         break;
       case 'size':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].mash_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
+        _data[dataRowIndex].mash_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
         break;
       case 'efficiency':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].efficiency = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
+        _data[dataRowIndex].efficiency = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
         break;
       case 'absorption':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].absorption = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
+        _data[dataRowIndex].absorption = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
         break;
       case 'lost_volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].lost_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, weight: Weight.kilo);
+        _data[dataRowIndex].lost_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
         break;
     }
     onChanged?.call(_data[dataRowIndex], dataRowIndex);

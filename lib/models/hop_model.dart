@@ -203,7 +203,7 @@ class HopModel<T> extends Model {
         model.amount = item.amount;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
-        model.unit = Unit.mass;
+        model.unit = Unit.gram;
         values.add(model);
       }
     }

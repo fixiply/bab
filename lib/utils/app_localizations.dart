@@ -200,15 +200,15 @@ class AppLocalizations {
   /// Returns the suffix weight, based on the given conditions.
   ///
   /// The `weight` argument is relative to the number in grams.
-  String? weightSuffix({Weight? weight = Weight.gram}) {
+  String? weightSuffix({Unit? unit = Unit.gram}) {
     if (measure == Measure.imperial) {
-      if (weight == Weight.gram) {
+      if (unit == Unit.gram) {
         return 'oz';
       }
       return 'lb';
     }
 
-    if (weight == Weight.gram) {
+    if (unit == Unit.gram) {
       return 'g';
     }
     return 'kg';
@@ -217,20 +217,20 @@ class AppLocalizations {
   /// Returns the localized weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in grams.
-  double? weight(number, {Weight? weight = Weight.gram}) {
+  double? weight(number, {Unit? unit = Unit.gram}) {
     if (number == null) {
       return null;
     }
     if (measure == Measure.imperial) {
       number = FormulaHelper.convertGramToOunce(number);
-      if (weight == Weight.kilo) {
+      if (unit == Unit.kilo) {
         number = FormulaHelper.convertOunceToLivre(number);
       }
 
       return number;
     }
 
-    if (weight == Weight.kilo) {
+    if (unit == Unit.kilo) {
       number = number / 1000;
     }
     return number;
@@ -238,12 +238,12 @@ class AppLocalizations {
 
 
   /// Returns the localized weight to gram, based on the given conditions.
-  double? gram(number, {Weight? weight = Weight.gram}) {
+  double? gram(number, {Unit? unit = Unit.gram}) {
     if (number == null) {
       return null;
     }
     if (measure == Measure.imperial) {
-      if (weight == Weight.kilo) {
+      if (unit == Unit.kilo) {
         number = FormulaHelper.convertLivreToOunce(number);
         number = number / 1000;
       }
