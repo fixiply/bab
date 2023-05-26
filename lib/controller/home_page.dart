@@ -343,7 +343,7 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
             const WidgetSpan(
               child: RotatedBox(
                 quarterTurns: -1,
-                child: Text(' And', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.white))
+                child: Text(' AND', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9, color: Colors.white))
               )
             ),
             const TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
