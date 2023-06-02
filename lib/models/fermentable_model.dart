@@ -24,8 +24,8 @@ class FermentableModel<T> extends Model {
   Type? type;
   String? origin;
   double? amount;
-  Method? use;
   Unit? unit;
+  Method? use;
   double? efficiency;
   int? ebc;
   dynamic notes;
@@ -40,9 +40,9 @@ class FermentableModel<T> extends Model {
     this.status = Status.publied,
     this.name,
     this.type = Type.grain,
-    this.unit = Unit.kilo,
     this.origin,
     this.amount,
+    this.unit = Unit.kilo,
     this.use = Method.mashed,
     this.efficiency,
     this.ebc,

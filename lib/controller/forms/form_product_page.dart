@@ -159,6 +159,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   if (snapshot.data != null) {
                     return DropdownButtonFormField<String>(
                       value: snapshot.data!.contains(widget.model.receipt) ? widget.model.receipt : null,
+                      style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.receipt_outlined),
                         labelText: AppLocalizations.of(context)!.text('receipt'),
@@ -185,6 +186,7 @@ class _FormProductPageState extends State<FormProductPage> {
                   if (snapshot.data != null) {
                     return DropdownButtonFormField<String>(
                       value: widget.model.company,
+                      style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.store_outlined),
                         labelText: AppLocalizations.of(context)!.text('company'),

@@ -11,6 +11,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/duration_picker.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
 import 'package:bb/widgets/search_text.dart';
 
@@ -153,11 +154,31 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
       onEdit: (DataGridRow row, int rowIndex) {
         _edit(rowIndex);
       },
+      onCellTap: (DataGridCellTapDetails details) async {
+        if (details.column.columnName == 'duration') {
+          DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
+          var value = _dataSource.getValue(dataGridRow, details.column.columnName);
+          var duration = await showDurationPicker(
+            context: context,
+            initialTime: Duration(minutes: value ??  widget.receipt!.boil),
+            maxTime: Duration(minutes: widget.receipt!.boil!),
+            // showOkButton: false,
+            // onComplete: (duration, context) {
+            //   _dataSource.newCellValue = duration.inMinutes;
+            //   _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+            //   Navigator.pop(context);
+            // }
+          );
+          if (duration != null)  {
+            _dataSource.newCellValue = duration.inMinutes;
+            _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+          }
+        }
+      },
       onRemove: (DataGridRow row, int rowIndex) {
-        // setState(() {
-        //   _data!.then((value) => value.removeAt(rowIndex));
-        // });
         widget.data!.removeAt(rowIndex);
+        _dataSource.buildDataGridRows(widget.data!);
+        _dataSource.notifyListeners();
         widget.onChanged?.call(widget.data!);
       },
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
@@ -174,7 +195,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
           });
         }
       },
-      columns: HopDataSource.columns(context: context, showQuantity: widget.data != null),
+      columns: HopDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
     );
   }
 
@@ -235,6 +256,8 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
           values.first.use = widget.data![rowIndex].use;
           values.first.duration = widget.data![rowIndex].duration;
           widget.data![rowIndex] = values.first;
+          _dataSource.buildDataGridRows(widget.data!);
+          _dataSource.notifyListeners();
           widget.onChanged?.call(widget.data!);
         }
       }
@@ -295,9 +318,9 @@ class HopDataSource extends EditDataSource {
   }
 
   @override
-  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
-    var value = super.getValue(dataGridRow, rowColumnIndex, column);
-    if (value != null && column.columnName == 'amount') {
+  dynamic getValue(DataGridRow dataGridRow, String columnName) {
+    var value = super.getValue(dataGridRow, columnName);
+    if (value != null && columnName == 'amount') {
       double? weight = AppLocalizations.of(context)!.weight(value);
       return weight!.toPrecision(2);
     }
@@ -452,7 +475,7 @@ class HopDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -525,13 +548,14 @@ class HopDataSource extends EditDataSource {
           )
       ),
       if (showQuantity == true) GridColumn(
-          width: 90,
-          columnName: 'duration',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        width: 90,
+        columnName: 'duration',
+        allowEditing: false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.centerRight,
+            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
     ];
   }
@@ -542,9 +566,9 @@ class HopDataSource extends EditDataSource {
           showSummaryInRow: false,
           columns: <GridSummaryColumn>[
             const GridSummaryColumn(
-                name: 'amount',
-                columnName: 'amount',
-                summaryType: GridSummaryType.sum
+              name: 'amount',
+              columnName: 'amount',
+              summaryType: GridSummaryType.sum
             ),
           ],
           position: GridTableSummaryRowPosition.bottom

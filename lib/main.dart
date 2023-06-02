@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bb/controller/home_page.dart';
@@ -12,6 +14,7 @@ import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
+import 'package:bb/utils/device.dart';
 import 'package:bb/utils/edition_notifier.dart';
 import 'package:bb/utils/locale_notifier.dart';
 import 'package:bb/utils/notifications.dart';
@@ -24,6 +27,7 @@ import 'package:bb/widgets/builders/subscription_builder.dart';
 
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -152,6 +156,17 @@ class _AppState extends State<MyApp> {
       model = await Database().getUser(user.uid);
       if (model != null) {
         model.user = user;
+        if (!foundation.kIsWeb) {
+          String? name = await _name();
+          String? token = await _token();
+          if (name != null && token != null) {
+            Device device = Device(name: name, token: token, os: Platform.operatingSystem);
+            if (!model.devices!.contains(device)) {
+              model.devices!.add(device);
+              Database().update(model);
+            }
+          }
+        }
         print('[$APP_NAME] User \'${user.email}\' is signed in with \'${model.role}\'.');
       }
     }
@@ -160,10 +175,50 @@ class _AppState extends State<MyApp> {
     });
   }
 
+  Future<String?> _name() async {
+    DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    try {
+      if (foundation.kIsWeb) {
+        WebBrowserInfo info = await deviceInfoPlugin.webBrowserInfo;
+        return info.userAgent;
+      } else {
+        if (Platform.isAndroid) {
+          AndroidDeviceInfo info = await deviceInfoPlugin.androidInfo;
+          return info.model;
+        } else if (Platform.isIOS) {
+          IosDeviceInfo info = await deviceInfoPlugin.iosInfo;
+          return info.utsname.machine;
+        } else if (Platform.isLinux) {
+          LinuxDeviceInfo info = await deviceInfoPlugin.linuxInfo;
+          return info.name;
+        } else if (Platform.isMacOS) {
+          MacOsDeviceInfo info = await deviceInfoPlugin.macOsInfo;
+          return info.computerName;
+        } else if (Platform.isWindows) {
+          WindowsDeviceInfo info = await deviceInfoPlugin.windowsInfo;
+          return info.computerName;
+        }
+      }
+    } on PlatformException {
+    }
+    return null;
+  }
+
+  Future<String?> _token() async {
+    if (!foundation.kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
+      return await FirebaseMessaging.instance.getAPNSToken();
+    } else {
+      FirebaseApp app = Firebase.apps.first;
+      return await FirebaseMessaging.instance.getToken(
+          vapidKey: app.options.apiKey
+      );
+    }
+  }
+
   Future<void> _subscribe() async {
     if (!DeviceHelper.isDesktop) {
-      await FirebaseMessaging.instance.subscribeToTopic(Foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC);
-      print('[$APP_NAME] Firebase messaging subscribe from "${Foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
+      await FirebaseMessaging.instance.subscribeToTopic(foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC);
+      print('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       });
     }

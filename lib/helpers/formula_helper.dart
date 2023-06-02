@@ -1,6 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
 import 'package:bb/models/yeast_model.dart';
@@ -19,7 +19,7 @@ class FormulaHelper {
       return null;
     }
     double result = mass * (potential / 100) * (efficiency / 100);
-    if (Foundation.kDebugMode) debugPrint('og $result=$mass * ($potential / 100) * ($efficiency / 100)');
+    if (foundation.kDebugMode) debugPrint('og $result=$mass * ($potential / 100) * ($efficiency / 100)');
     return result;
   }
 
@@ -33,7 +33,7 @@ class FormulaHelper {
       return null;
     }
     double result = 1 + ( 383 * extract / volume ) / 1000;
-    if (Foundation.kDebugMode) debugPrint('og $result=1 + ( 383 * $extract / $volume ) / 1000');
+    if (foundation.kDebugMode) debugPrint('og $result=1 + ( 383 * $extract / $volume ) / 1000');
     return result;
   }
 
@@ -62,7 +62,7 @@ class FormulaHelper {
       return null;
     }
     double result = ((og * 1000) - (fg * 1000) ) / 7.6;
-    if (Foundation.kDebugMode) debugPrint('abv $result=((($og * 1000) - ($fg * 1000) ) / 7.6');
+    if (foundation.kDebugMode) debugPrint('abv $result=((($og * 1000) - ($fg * 1000) ) / 7.6');
     return result;
   }
 
@@ -80,7 +80,7 @@ class FormulaHelper {
       return null;
     }
     double result = (volume * og * convertSGToPlato(og)) / (mass * extract) * 100;
-    if (Foundation.kDebugMode) debugPrint('efficiency $result=($volume * $og * ${convertSGToPlato(og)}) / ($mass * $extract) * 100');
+    if (foundation.kDebugMode) debugPrint('efficiency $result=($volume * $og * ${convertSGToPlato(og)}) / ($mass * $extract) * 100');
     return result;
   }
 
@@ -102,7 +102,7 @@ class FormulaHelper {
     }
     maximum ??= 4.15;
     double result = 1.65 * pow(0.000125, og) * ((1 - pow(e, -0.04 * duration)) / maximum) * ((alpha * amount * 1000) / volume) * 100;
-    if (Foundation.kDebugMode) debugPrint('ibu $result=1.65 * pow(0.000125, $og) * ((1 - pow($e, -0.04 * $duration)) / $maximum) * (($alpha * $amount * 1000) / $volume) * 100');
+    if (foundation.kDebugMode) debugPrint('ibu $result=1.65 * pow(0.000125, $og) * ((1 - pow($e, -0.04 * $duration)) / $maximum) * (($alpha * $amount * 1000) / $volume) * 100');
     return result;
   }
 
@@ -164,7 +164,7 @@ class FormulaHelper {
       return 0;
     }
     double result = volume + boil_losses + (boil_off_rate * (duration / 60));
-    if (Foundation.kDebugMode) debugPrint('preboilVolume $result=$volume + $boil_losses + ($boil_off_rate * ($duration / 60))');
+    if (foundation.kDebugMode) debugPrint('preboilVolume $result=$volume + $boil_losses + ($boil_off_rate * ($duration / 60))');
     return result;
   }
 
@@ -180,7 +180,7 @@ class FormulaHelper {
       return 0;
     }
     double result = (weight * ratio) + lost;
-    if (Foundation.kDebugMode) debugPrint('mashWater $result=($weight * $ratio) + $lost');
+    if (foundation.kDebugMode) debugPrint('mashWater $result=($weight * $ratio) + $lost');
     return result;
   }
 
@@ -198,7 +198,7 @@ class FormulaHelper {
       return 0;
     }
     double result = volume - mash + (weight * absorption);
-    if (Foundation.kDebugMode) debugPrint('spargeWater $result=$volume - $mash + ($weight * $absorption');
+    if (foundation.kDebugMode) debugPrint('spargeWater $result=$volume - $mash + ($weight * $absorption');
     return result;
   }
 

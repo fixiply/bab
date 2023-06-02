@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/misc_page.dart';
 import 'package:bb/controller/tables/edit_data_source.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/controller/tables/fields/amount_field.dart' as amount;
 import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -11,6 +12,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/containers/error_container.dart';
+import 'package:bb/widgets/duration_picker.dart';
 import 'package:bb/widgets/image_animate_rotate.dart';
 import 'package:bb/widgets/search_text.dart';
 
@@ -162,11 +164,31 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
       onEdit: (DataGridRow row, int rowIndex) {
         _edit(rowIndex);
       },
+      onCellTap: (DataGridCellTapDetails details) async {
+        if (details.column.columnName == 'duration') {
+          DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
+          var value = _dataSource.getValue(dataGridRow, details.column.columnName);
+          var duration = await showDurationPicker(
+            context: context,
+            initialTime: Duration(minutes: value ??  widget.receipt!.boil),
+            maxTime: Duration(minutes: widget.receipt!.boil!),
+              // showOkButton: false,
+              // onComplete: (duration, context) {
+              //   _dataSource.newCellValue = duration.inMinutes;
+              //   _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+              //   Navigator.pop(context);
+              // }
+          );
+          if (duration != null)  {
+            _dataSource.newCellValue = duration.inMinutes;
+            _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+          }
+        }
+      },
       onRemove: (DataGridRow row, int rowIndex) {
-        // setState(() {
-        //   _data!.then((value) => value.removeAt(rowIndex));
-        // });
         widget.data!.removeAt(rowIndex);
+        _dataSource.buildDataGridRows(widget.data!);
+        _dataSource.notifyListeners();
         widget.onChanged?.call(widget.data!);
       },
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
@@ -243,6 +265,8 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
           values.first.use = widget.data![rowIndex].use;
           values.first.duration = widget.data![rowIndex].duration;
           widget.data![rowIndex] = values.first;
+          _dataSource.buildDataGridRows(widget.data!);
+          _dataSource.notifyListeners();
           widget.onChanged?.call(widget.data!);
         }
       }
@@ -275,18 +299,36 @@ class MiscDataSource extends EditDataSource {
     List<MiscModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
-      if (showQuantity == true) DataGridCell<Unit>(columnName: 'unit', value: e.unit),
+      if (showQuantity == true) DataGridCell<amount.Unit>(columnName: 'amount', value: amount.Unit(e.amount, e.unit)),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Misc>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
-      if (showQuantity == true)  DataGridCell<int>(columnName: 'time', value: e.duration),
+      if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
     ])).toList();
   }
 
   void buildDataGridRows(List<MiscModel> data) {
     this.data = data;
     dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
+    if (column.columnName == 'amount') {
+      var value = getValue(dataGridRow, column.columnName);
+      newCellValue = value;
+      return amount.AmountField(
+        value: value.copy(),
+        enums: isEnumType('unit'),
+        onChanged: (unit) {
+          newCellValue = unit;
+          /// Call [CellSubmit] callback to fire the canSubmitCell and
+          /// onCellSubmit to commit the new value in single place.
+          submitCell();
+        },
+      );
+    }
+    return super.buildEditWidget(dataGridRow, rowColumnIndex, column, submitCell);
   }
 
   @override
@@ -301,15 +343,15 @@ class MiscDataSource extends EditDataSource {
     dataGridRows.addAll(getDataRows(data: list));
   }
 
-  @override
-  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
-    var value = super.getValue(dataGridRow, rowColumnIndex, column);
-    if (value != null && column.columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value);
-      return weight!.toPrecision(2);
-    }
-    return value;
-  }
+  // @override
+  // dynamic getValue(DataGridRow dataGridRow, String columnName) {
+  //   var value = super.getValue(dataGridRow, columnName);
+  //   if (value != null && columnName == 'amount') {
+  //     double? weight = AppLocalizations.of(context)!.weight(value);
+  //     return weight!.toPrecision(2);
+  //   }
+  //   return value;
+  // }
 
   @override
   // String? suffixText(String columnName) {
@@ -338,17 +380,11 @@ class MiscDataSource extends EditDataSource {
         if (e.value is LocalizedText) {
           value = e.value?.get(AppLocalizations.of(context)!.locale);
           alignment = Alignment.centerLeft;
+        } else if (e.value is amount.Unit) {
+          value = AppLocalizations.of(context)!.numberFormat(e.value.amount, symbol: (e.value.unit?.symbol != null ? ' ' + e.value.unit?.symbol : null));
+          alignment = Alignment.centerRight;
         } else if (e.value is num) {
-          if (e.columnName == 'amount') {
-            var unit = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'unit').value;
-            if (unit == Unit.milliliter) {
-              value = AppLocalizations.of(context)!.volumeFormat(e.value);
-            } else if (unit == Unit.gram) {
-              value = AppLocalizations.of(context)!.weightFormat(e.value);
-            } else {
-              value = AppLocalizations.of(context)!.numberFormat(e.value);
-            }
-          } if (e.columnName == 'duration') {
+          if (e.columnName == 'duration') {
             value = AppLocalizations.of(context)!.durationFormat(e.value);
           } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
           alignment = Alignment.centerRight;
@@ -394,9 +430,8 @@ class MiscDataSource extends EditDataSource {
 
   @override
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
-    final dynamic oldValue = dataGridRow.getCells()
-        .firstWhere((DataGridCell dataGridCell) =>
-    dataGridCell.columnName == column.columnName).value ?? '';
+    final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
+      dataGridCell.columnName == column.columnName).value ?? '';
     if (oldValue == newCellValue) {
       return;
     }
@@ -404,13 +439,24 @@ class MiscDataSource extends EditDataSource {
     switch(column.columnName) {
       case 'amount':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
-        break;
-      case 'unit':
-        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<Unit>(columnName: column.columnName, value: newCellValue);
-        data[rowColumnIndex.rowIndex].unit = newCellValue;
+            DataGridCell<amount.Unit>(columnName: column.columnName, value: newCellValue);
+        switch(newCellValue.unit) {
+          case Unit.gram:
+            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue.amount);
+            break;
+          case Unit.kilo:
+            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue.amount * 1000);
+            break;
+          case Unit.milliliter:
+            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.volume(newCellValue.amount);
+            break;
+          case Unit.liter:
+            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.volume(newCellValue.amount * 1000);
+            break;
+          default:
+            data[rowColumnIndex.rowIndex].amount = newCellValue.amount;
+        }
+        data[rowColumnIndex.rowIndex].unit = newCellValue.unit;
         break;
       case 'name':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
@@ -430,7 +476,7 @@ class MiscDataSource extends EditDataSource {
             DataGridCell<Use>(columnName: column.columnName, value: newCellValue);
         data[rowColumnIndex.rowIndex].use = newCellValue;
         break;
-      case 'time':
+      case 'duration':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
         data[rowColumnIndex.rowIndex].duration = newCellValue;
@@ -453,22 +499,12 @@ class MiscDataSource extends EditDataSource {
           label: Container()
       ),
       if (showQuantity == true) GridColumn(
-          width: 90,
+          width: 120,
           columnName: 'amount',
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      if (showQuantity == true) GridColumn(
-          width: allowEditing ? 90 : double.nan,
-          visible: allowEditing,
-          columnName: 'unit',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('unit'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(
@@ -499,11 +535,12 @@ class MiscDataSource extends EditDataSource {
       ),
       if (showQuantity == true) GridColumn(
           width: 90,
-          columnName: 'time',
+          columnName: 'duration',
+          allowEditing: false,
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('time'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
     ];

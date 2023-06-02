@@ -92,6 +92,14 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
               },
             ),
           ),
+          if (DeviceHelper.isDesktop) IconButton(
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.refresh),
+            tooltip: AppLocalizations.of(context)!.text('refresh'),
+            onPressed: () {
+              _fetch();
+            },
+          ),
           CustomMenuButton(
             context: context,
             publish: false,
@@ -101,7 +109,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
           )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
       body: RefreshIndicator(
         onRefresh: () => _fetch(),
         child: FutureBuilder<List<ReceiptModel>>(

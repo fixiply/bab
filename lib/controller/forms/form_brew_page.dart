@@ -6,7 +6,7 @@ import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/localized_text.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -123,7 +123,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is CS.Measure) {
+              if (value is constants.Measure) {
                 // setState(() {
                 //   AppLocalizations.of(context)!.measure = value;
                 // });
@@ -146,7 +146,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
             children: <Widget>[
               ExpansionTile(
                 initiallyExpanded: true,
-                backgroundColor: CS.FillColor,
+                backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
                 title: Text(AppLocalizations.of(context)!.text('profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
@@ -232,7 +232,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 decoration: FormDecoration(
                     icon: const Icon(Icons.event_available),
                     labelText: AppLocalizations.of(context)!.text('date'),
-                    fillColor: CS.FillColor, filled: true
+                    fillColor: constants.FillColor, filled: true
                 ),
                 onChanged: (value) => setState(() {
                   widget.model.inserted_at = value;
@@ -267,7 +267,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                         icon: const Icon(Icons.tag),
                         labelText: AppLocalizations.of(context)!.text('reference'),
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -350,7 +350,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                     child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                   ),
                   border: InputBorder.none,
-                  fillColor: CS.FillColor, filled: true
+                  fillColor: constants.FillColor, filled: true
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {
@@ -375,7 +375,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                         icon: const Icon(Icons.water_drop_outlined),
                         labelText: 'pH ${AppLocalizations.of(context)!.text('mash').toLowerCase()}',
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -395,7 +395,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                         ),
                         labelText: 'pH ${AppLocalizations.of(context)!.text('sparge').toLowerCase()}',
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -418,13 +418,13 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       decoration: FormDecoration(
                         icon: const Icon(Icons.first_page_outlined),
                         labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
-                        hintText: CS.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
+                        hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
                         suffixIcon: Tooltip(
                           message: AppLocalizations.of(context)!.text('oiginal_gravity_tooltip'),
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                         ),
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -443,13 +443,13 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       decoration: FormDecoration(
                         icon: const Icon(Icons.last_page_outlined),
                         labelText: AppLocalizations.of(context)!.text('final_gravity'),
-                        hintText: CS.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
+                        hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
                         suffixIcon: Tooltip(
                           message: AppLocalizations.of(context)!.text('final_gravity_tooltip'),
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                         ),
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -476,7 +476,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
   _generate() async {
     if (_autogenerate && widget.model.uuid == null) {
       var newDate = DateTime.now();
-      List<BrewModel> brews = await Database().getBrews(user: CS.currentUser!.uuid, ordered: true);
+      List<BrewModel> brews = await Database().getBrews(user: constants.currentUser!.uuid, ordered: true);
       widget.model.reference = '${newDate.year.toString()}${AppLocalizations.of(context)!.numberFormat(brews.length + 1, pattern: "000")}';
       _identifierController.text = widget.model.reference!;
     }

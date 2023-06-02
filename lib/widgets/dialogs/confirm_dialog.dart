@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/utils/app_localizations.dart';
 
 class ConfirmDialog extends StatefulWidget {
   final String? title;
@@ -32,7 +31,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
         content: widget.content,
         actions: <CupertinoDialogAction>[
           if (widget.showCancel == true) CupertinoDialogAction(
-            child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
+            child: Text(widget.cancel ?? MaterialLocalizations.of(context).cancelButtonLabel),
             onPressed: () {
               if (widget.onCancel != null) {
                 widget.onCancel?.call();
@@ -42,7 +41,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
             },
           ),
           CupertinoDialogAction(
-              child: Text(widget.ok ?? AppLocalizations.of(context)!.text('ok')),
+              child: Text(widget.ok ?? MaterialLocalizations.of(context).okButtonLabel),
               isDestructiveAction: true,
               onPressed: () {
                 if (widget.onOk != null) {
@@ -61,7 +60,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
       content: widget.content,
       actions: <Widget>[
         if (widget.showCancel == true) TextButton(
-          child: Text(widget.cancel ?? AppLocalizations.of(context)!.text('cancel')),
+          child: Text(widget.cancel ?? MaterialLocalizations.of(context).cancelButtonLabel),
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16),
           ),
@@ -74,7 +73,7 @@ class _ConfirmDialogState extends State<ConfirmDialog> {
           }
         ),
         TextButton(
-          child: Text(widget.ok ?? AppLocalizations.of(context)!.text('ok')),
+          child: Text(widget.ok ?? MaterialLocalizations.of(context).okButtonLabel),
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16),
           ),

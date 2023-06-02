@@ -198,7 +198,7 @@ class _FormHopPageState extends State<FormHopPage> {
               const Divider(height: 10),
               DropdownButtonFormField<Type>(
                 value: widget.model.type,
-                  style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
+                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 decoration: FormDecoration(
                   icon: const Icon(Icons.type_specimen_outlined),
                   labelText: AppLocalizations.of(context)!.text('type'),

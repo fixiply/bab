@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 
 class DeviceHelper {
   static bool isMobile(BuildContext context) {
@@ -25,11 +25,11 @@ class DeviceHelper {
   }
 
   static bool get isDesktop {
-    return Foundation.kIsWeb || Foundation.defaultTargetPlatform == TargetPlatform.linux || Foundation.defaultTargetPlatform == TargetPlatform.windows || Foundation.defaultTargetPlatform == TargetPlatform.macOS;
+    return foundation.kIsWeb || foundation.defaultTargetPlatform == TargetPlatform.linux || foundation.defaultTargetPlatform == TargetPlatform.windows || foundation.defaultTargetPlatform == TargetPlatform.macOS;
   }
 
   static bool get isIOS {
-    return Foundation.defaultTargetPlatform == TargetPlatform.iOS;
+    return foundation.defaultTargetPlatform == TargetPlatform.iOS;
   }
 
   static bool landscapeOrientation(BuildContext context) {

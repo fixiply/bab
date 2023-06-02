@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bb/main.dart';
@@ -25,7 +25,7 @@ class Notifications {
   Notifications._internal();
 
   void initialize() async {
-    final NotificationAppLaunchDetails? notificationAppLaunchDetails = !Foundation.kIsWeb &&
+    final NotificationAppLaunchDetails? notificationAppLaunchDetails = !foundation.kIsWeb &&
         Platform.isLinux
         ? null
         : await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
@@ -63,7 +63,7 @@ class Notifications {
   }
 
   Future<void> _configureLocalTimeZone() async {
-    if (Foundation.kIsWeb || Platform.isLinux) {
+    if (foundation.kIsWeb || Platform.isLinux) {
       return;
     }
     tz.initializeTimeZones();
@@ -108,7 +108,7 @@ class Notifications {
             tz.TZDateTime.from(date, tz.local),
             platformChannelSpecifics,
             payload: payload,
-            androidAllowWhileIdle: true,
+            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
             uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
         );
       }

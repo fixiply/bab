@@ -4,11 +4,11 @@ import 'dart:io';
 // Internal package
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/helpers/formula_helper.dart';
-import 'package:bb/models/fermentable_model.dart' as fermentable;
-import 'package:bb/models/hop_model.dart' as hop;
-import 'package:bb/models/misc_model.dart' as misc;
+import 'package:bb/models/fermentable_model.dart' as fm;
+import 'package:bb/models/hop_model.dart' as hm;
+import 'package:bb/models/misc_model.dart' as mm;
 import 'package:bb/models/style_model.dart';
-import 'package:bb/models/yeast_model.dart' as yeast;
+import 'package:bb/models/yeast_model.dart' as ym;
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/utils/constants.dart';
@@ -115,7 +115,7 @@ class ImportHelper {
           }
           final fermentables = document.findAllElements('Grain');
           for (XmlElement element in fermentables) {
-            final model = fermentable.FermentableModel(
+            final model = fm.FermentableModel(
                 name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.text}),
                 origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.text),
                 efficiency: double.tryParse(element.getElement('F_G_YIELD')!.text)
@@ -134,31 +134,31 @@ class ImportHelper {
             int type = int.parse(element.getElement('F_G_TYPE')!.text);
             switch (type) {
               case 0:
-                model.type = fermentable.Type.grain;
+                model.type = fm.Type.grain;
                 break;
               case 1:
-                model.type = fermentable.Type.extract;
+                model.type = fm.Type.extract;
                 break;
               case 2:
-                model.type = fermentable.Type.sugar;
+                model.type = fm.Type.sugar;
                 break;
               case 3:
-                model.type = fermentable.Type.adjunct;
+                model.type = fm.Type.adjunct;
                 break;
               case 4:
-                model.type = fermentable.Type.dry_extract;
+                model.type = fm.Type.dry_extract;
                 break;
               case 5:
-                model.type = fermentable.Type.fruit;
+                model.type = fm.Type.fruit;
                 break;
               case 6:
-                model.type = fermentable.Type.juice;
+                model.type = fm.Type.juice;
                 break;
               case 7:
-                model.type = fermentable.Type.honey;
+                model.type = fm.Type.honey;
                 break;
             }
-            List<fermentable.FermentableModel> list = await Database().getFermentables(name: model.name.toString());
+            List<fm.FermentableModel> list = await Database().getFermentables(name: model.name.toString());
             if (list.isEmpty) {
               Database().add(model, ignoreAuth: true);
             }
@@ -205,7 +205,7 @@ class ImportHelper {
           }
           final hops = document.findAllElements('Hops');
           for(XmlElement element in hops) {
-            final model = hop.HopModel(
+            final model = hm.HopModel(
               name: LocalizedText( map: { 'en': element.getElement('F_H_NAME')!.text}),
               alpha: double.tryParse(element.getElement('F_H_ALPHA')!.text),
               beta: double.tryParse(element.getElement('F_H_BETA')!.text),
@@ -221,31 +221,31 @@ class ImportHelper {
             int form = int.parse(element.getElement('F_H_FORM')!.text);
             switch (form) {
               case 2:
-                model.form = hop.Hop.leaf;
+                model.form = hm.Hop.leaf;
                 break;
               case 0:
-                model.form = hop.Hop.pellet;
+                model.form = hm.Hop.pellet;
                 break;
               case 1:
-                model.form = hop.Hop.plug;
+                model.form = hm.Hop.plug;
                 break;
               default:
-                model.form = hop.Hop.other;
+                model.form = hm.Hop.other;
                 break;
             }
             int type = int.parse(element.getElement('F_H_TYPE')!.text);
             switch (type) {
               case 1:
-                model.type = hop.Type.aroma;
+                model.type = hm.Type.aroma;
                 break;
               case 0:
-                model.type = hop.Type.bittering;
+                model.type = hm.Type.bittering;
                 break;
               case 2:
-                model.type = hop.Type.both;
+                model.type = hm.Type.both;
                 break;
             }
-            List<hop.HopModel> list = await Database().getHops(name: model.name.toString());
+            List<hm.HopModel> list = await Database().getHops(name: model.name.toString());
             if (list.isEmpty) {
               Database().add(model, ignoreAuth: true);
             }
@@ -292,7 +292,7 @@ class ImportHelper {
           }
           final fermentables = document.findAllElements('Yeast');
           for(XmlElement element in fermentables) {
-            final model = yeast.YeastModel(
+            final model = ym.YeastModel(
                 name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.text}),
                 reference: element.getElement('F_Y_PRODUCT_ID')!.text,
                 laboratory: element.getElement('F_Y_LAB')!.text,
@@ -312,16 +312,16 @@ class ImportHelper {
             int form = int.parse(element.getElement('F_Y_FORM')!.text);
             switch (form) {
               case 0:
-                model.form = yeast.Yeast.liquid;
+                model.form = ym.Yeast.liquid;
                 break;
               case 1:
-                model.form = yeast.Yeast.dry;
+                model.form = ym.Yeast.dry;
                 break;
               case 2:
-                model.form = yeast.Yeast.slant;
+                model.form = ym.Yeast.slant;
                 break;
               case 3:
-                model.form = yeast.Yeast.culture;
+                model.form = ym.Yeast.culture;
                 break;
             }
             int type = int.parse(element.getElement('F_Y_TYPE')!.text);
@@ -337,7 +337,7 @@ class ImportHelper {
                 break;
             }
             if (type != 2 && type != 3) {
-              List<yeast.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.reference, laboratory: model.laboratory);
+              List<ym.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.reference, laboratory: model.laboratory);
               if (list.isEmpty) {
                 Database().add(model, ignoreAuth: true);
               }
@@ -385,7 +385,7 @@ class ImportHelper {
           }
           final fermentables = document.findAllElements('Misc');
           for(XmlElement element in fermentables) {
-            final model = misc.MiscModel(
+            final model = mm.MiscModel(
                 name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.text})
             );
             int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
@@ -402,46 +402,46 @@ class ImportHelper {
             int type = int.parse(element.getElement('F_M_TYPE')!.text);
             switch (type) {
               case 0:
-                model.type = misc.Misc.spice;
+                model.type = mm.Misc.spice;
                 break;
               case 1:
-                model.type = misc.Misc.fining;
+                model.type = mm.Misc.fining;
                 break;
               case 2:
-                model.type = misc.Misc.herb;
+                model.type = mm.Misc.herb;
                 break;
               case 3:
-                model.type = misc.Misc.flavor;
+                model.type = mm.Misc.flavor;
                 break;
               case 4:
-                model.type = misc.Misc.other;
+                model.type = mm.Misc.other;
                 break;
               case 5:
-                model.type = misc.Misc.water_agent;
+                model.type = mm.Misc.water_agent;
                 break;
             }
             int use = int.parse(element.getElement('F_M_USE')!.text);
             switch (use) {
               case 0:
-                model.use = misc.Use.boil;
+                model.use = mm.Use.boil;
                 break;
               case 1:
-                model.use = misc.Use.mash;
+                model.use = mm.Use.mash;
                 break;
               case 2:
-                model.use = misc.Use.primary;
+                model.use = mm.Use.primary;
                 break;
               case 3:
-                model.use = misc.Use.secondary;
+                model.use = mm.Use.secondary;
                 break;
               case 4:
-                model.use = misc.Use.bottling;
+                model.use = mm.Use.bottling;
                 break;
               case 5:
-                model.use = misc.Use.sparge;
+                model.use = mm.Use.sparge;
                 break;
             }
-            List<misc.MiscModel> list = await Database().getMiscellaneous(name: model.name.toString());
+            List<mm.MiscModel> list = await Database().getMiscellaneous(name: model.name.toString());
             if (list.isEmpty) {
               Database().add(model, ignoreAuth: true);
             }

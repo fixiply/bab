@@ -193,7 +193,15 @@ class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<
         rows.add(_dataSource.dataGridRows[index]);
       }
     }
-    _dataGridController.selectedRows = rows;
+    switch(widget.selectionMode) {
+      case SelectionMode.multiple :
+        _dataGridController.selectedRows = rows;
+        break;
+      case SelectionMode.single :
+      case SelectionMode.singleDeselect :
+        _dataGridController.selectedRow = rows.isNotEmpty ? rows.first : null;
+        break;
+    }
     return _dataGridController;
   }
 

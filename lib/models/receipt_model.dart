@@ -2,10 +2,10 @@
 import 'package:bb/helpers/color_helper.dart';
 import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart' as hop;
+import 'package:bb/models/hop_model.dart' as hm;
 import 'package:bb/models/hop_model.dart';
 import 'package:bb/models/image_model.dart';
-import 'package:bb/models/misc_model.dart';
+import 'package:bb/models/misc_model.dart' as mm;
 import 'package:bb/models/model.dart';
 import 'package:bb/models/style_model.dart';
 import 'package:bb/models/yeast_model.dart';
@@ -46,8 +46,8 @@ class ReceiptModel<T> extends Model {
   String? country;
 
   List<FermentableModel>? _fermentables;
-  List<hop.HopModel>? _hops;
-  List<MiscModel>? _misc;
+  List<hm.HopModel>? _hops;
+  List<mm.MiscModel>? _misc;
   List<YeastModel>? _yeasts;
 
   ReceiptModel({
@@ -143,8 +143,8 @@ class ReceiptModel<T> extends Model {
       'ibu': this.ibu,
       'ebc': this.ebc,
       'fermentables': FermentableModel.quantities(this._fermentables),
-      'hops': hop.HopModel.quantities(this._hops),
-      'miscellaneous': MiscModel.quantities(this._misc),
+      'hops': hm.HopModel.quantities(this._hops),
+      'miscellaneous': mm.MiscModel.quantities(this._misc),
       'yeasts': YeastModel.quantities(this._yeasts),
       'mash': Mash.serialize(this.mash),
       'primaryday': this.primaryday,
@@ -255,26 +255,32 @@ class ReceiptModel<T> extends Model {
     return _fermentables ?? [];
   }
 
-  set hops(List<hop.HopModel>data) => _hops = data;
+  set hops(List<hm.HopModel>data) => _hops = data;
 
-  List<hop.HopModel> get hops => _hops ?? [];
+  List<hm.HopModel> get hops => _hops ?? [];
 
-  Future<List<hop.HopModel>> gethops({double? volume}) async {
+  Future<List<hm.HopModel>> gethops({double? volume, hm.Use? use}) async {
     if (_hops == null) {
-      _hops = await hop.HopModel.data(cacheHops);
+      _hops = await hm.HopModel.data(cacheHops);
       resizeHops(volume);
+      if (use != null) {
+        return _hops!.where((element) => element.use == use).toList();
+      }
     }
     return _hops ?? [];
   }
 
-  set miscellaneous(List<MiscModel>data) => _misc = data;
+  set miscellaneous(List<mm.MiscModel>data) => _misc = data;
 
-  List<MiscModel> get miscellaneous => _misc ?? [];
+  List<mm.MiscModel> get miscellaneous => _misc ?? [];
 
-  Future<List<MiscModel>> getMisc({double? volume}) async {
+  Future<List<mm.MiscModel>> getMisc({double? volume, mm.Use? use}) async {
     if (_misc == null) {
-      _misc = await MiscModel.data(cacheMisc);
+      _misc = await mm.MiscModel.data(cacheMisc);
       resizeMisc(volume);
+      if (use != null) {
+        return _misc!.where((element) => element.use == use).toList();
+      }
     }
     return _misc ?? [];
   }
@@ -376,8 +382,8 @@ class ReceiptModel<T> extends Model {
       }
     }
 
-    for(hop.HopModel item in await gethops()) {
-      if (item.use == hop.Use.boil) {
+    for(hm.HopModel item in await gethops()) {
+      if (item.use == hm.Use.boil) {
         double? bitterness = item.ibu(og, boil, volume ?? this.volume);
         if (bitterness != null) {
           ibu = (ibu ?? 0) + bitterness;

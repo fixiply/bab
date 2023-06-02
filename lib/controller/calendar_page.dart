@@ -8,7 +8,7 @@ import 'package:bb/helpers/date_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/containers/empty_container.dart';
 import 'package:bb/widgets/containers/error_container.dart';
@@ -60,7 +60,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   Widget build(BuildContext context) {
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: CS.FillColor,
+      backgroundColor: constants.FillColor,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.text('calendar')),
         elevation: 0,
@@ -167,10 +167,10 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                         return null;
                       },
                       selectedBuilder: (context, day, focusedDay) {
-                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: CS.PrimaryColor);
+                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: constants.PrimaryColor);
                       },
                       todayBuilder: (context, day, focusedDay) {
-                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: CS.TextGrey);
+                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: constants.TextGrey);
                       }
                     ),
                   ),
@@ -216,7 +216,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   }
 
   _fetch() async {
-    _data = Database().getBrews(user: CS.currentUser!.uuid, ordered: true);
+    _data = Database().getBrews(user: constants.currentUser!.uuid, ordered: true);
   }
 
   List<ListTile> _getEventsForDay(List<Model> data, DateTime day) {
@@ -235,7 +235,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
       return false;
     }).toList();
     return brews.map((e) {
-      Color color = CS.SecondaryColor;
+      Color color = constants.SecondaryColor;
       String title = '';
       String? subtitle;
       Widget? leading;

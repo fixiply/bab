@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -5,16 +7,18 @@ import 'package:flutter/services.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart';
+import 'package:bb/models/hop_model.dart' as hp;
+import 'package:bb/models/misc_model.dart' as mm;
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/utils/database.dart';
-import 'package:bb/utils/mash.dart' as Mash;
+import 'package:bb/utils/mash.dart' as mash;
 import 'package:bb/utils/notifications.dart';
 import 'package:bb/widgets/circular_timer.dart';
 import 'package:bb/widgets/containers/error_container.dart';
 import 'package:bb/widgets/containers/ph_container.dart';
+import 'package:bb/widgets/countdown_text.dart';
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:bb/widgets/form_decoration.dart';
 
@@ -34,6 +38,7 @@ class StepperPage extends StatefulWidget {
 class MyStep extends Step {
   int index;
   bool completed = false;
+  final void Function(int index)? onStepTapped;
   final void Function(int index)? onStepCancel;
   final void Function(int index)? onStepContinue;
   MyStep({
@@ -42,28 +47,58 @@ class MyStep extends Step {
     Widget? subtitle,
     required Widget content,
     Widget? label,
+    StepState state: StepState.indexed,
+    bool isActive: false,
+    this.onStepTapped,
     this.onStepCancel,
     this.onStepContinue
   }) : super(
     title: title,
     subtitle: subtitle,
     content: content,
-    state: StepState.indexed,
-    isActive: false,
+    state: state,
+    isActive: isActive
   );
+}
+
+class Ingredient {
+  int minutes;
+  Map<String, String>? map;
+  Ingredient({
+    required this.minutes,
+    this.map
+  }) {
+    map ??= {};
+  }
+}
+
+extension ListParsing on List {
+  void set(Iterable<dynamic> iterable, BuildContext context) {
+    for(dynamic item in iterable) {
+      Ingredient? boil = this.cast<Ingredient?>().firstWhere((e) => e!.minutes == item.duration, orElse: () => null);
+      if (boil != null) {
+        boil.map![AppLocalizations.of(context)!.localizedText(item.name)] = AppLocalizations.of(context)!.weightFormat(item.amount)!;
+      } else {
+        add(Ingredient(
+          minutes: item.duration!,
+          map: { AppLocalizations.of(context)!.localizedText(item.name): AppLocalizations.of(context)!.weightFormat(item.amount)! },
+        ));
+      }
+    }
+  }
 }
 
 class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClientMixin<StepperPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  int _lastIndex = 0;
   int _index = 0;
+  int _lastStep = 0;
+  int _currentStep = 0;
+  int _boilDuration = 0;
 
   Future<List<MyStep>>? _steps;
   late SfRadialGauge _temp;
-  int _mash = 60;
 
-  CountDownController _mashController = CountDownController();
-  CountDownController _hopController = CountDownController();
+  CountDownController _boilController = CountDownController();
 
   @override
   bool get wantKeepAlive => true;
@@ -89,7 +124,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       },
       child: Scaffold(
         key: _scaffoldKey,
-        backgroundColor: CS.FillColor,
+        backgroundColor: constants.FillColor,
         appBar: AppBar(
           title: Text(AppLocalizations.of(context)!.text('stages')),
           elevation: 0,
@@ -98,7 +133,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           leading: IconButton(
             icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
-              Navigator.pop(context);
+              bool? exitResult = await showDialog(
+                context: context,
+                builder: (context) => ConfirmDialog(content: Text(AppLocalizations.of(context)!.text('stop_brewing'))),
+              );
+              if (exitResult == true) {
+                Navigator.pop(context);
+              }
             }
           ),
         ),
@@ -107,13 +148,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return Stepper(
-                currentStep: _index,
+                currentStep: _currentStep,
                 onStepCancel: () {
-                  if (_index > 0) {
+                  if (_currentStep > 0) {
                     try {
-                      snapshot.data![_index].onStepCancel?.call(_index);
+                      snapshot.data![_currentStep].onStepCancel?.call(_currentStep);
                       setState(() {
-                        _index -= 1;
+                        _currentStep -= 1;
                       });
                     } catch (e) {
                       _showSnackbar(e.toString());
@@ -121,20 +162,20 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   }
                 },
                 onStepContinue: () {
-                  if (_index < snapshot.data!.length - 1) {
+                  if (_currentStep < snapshot.data!.length - 1) {
                     try {
-                      snapshot.data![_index].onStepContinue?.call(_index);
+                      snapshot.data![_currentStep].onStepContinue?.call(_currentStep);
                       setState(() {
-                        _index += 1;
-                        if (_index > _lastIndex) _lastIndex = _index;
+                        _currentStep += 1;
+                        if (_currentStep > _lastStep) _lastStep = _currentStep;
                       });
                     } catch (e) {
                       _showSnackbar(e.toString(), action: SnackBarAction(
-                        label: 'Continue',
+                        label: 'Continuer',
                         onPressed: () {
                           setState(() {
-                            _index += 1;
-                            if (_index > _lastIndex) _lastIndex = _index;
+                            _currentStep += 1;
+                            if (_currentStep > _lastStep) _lastStep = _currentStep;
                           });
                         },
                       ));
@@ -142,9 +183,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   }
                 },
                 onStepTapped: (int index) {
-                  if (index <= _lastIndex) {
+                  if (index <= _lastStep) {
+                    snapshot.data![_currentStep].onStepTapped?.call(index);
                     setState(() {
-                      _index = index;
+                      _currentStep = index;
                     });
                   }
                 },
@@ -157,9 +199,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                         children: <Widget>[
                           ElevatedButton(
                             onPressed: controls.onStepContinue,
-                            child: Text(_index ==  0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel),
+                            child: Text(_currentStep ==  0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel),
                           ),
-                          if (_index != 0) TextButton(
+                          if (_currentStep != 0) TextButton(
                             onPressed: controls.onStepCancel,
                             child: Text(
                               AppLocalizations.of(context)!.text('return').toUpperCase(),
@@ -257,9 +299,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   Future<List<MyStep>> _generate() async {
     ReceiptModel receipt = widget.model.receipt!.copy();
+    _boilDuration = receipt.boil!;
     List<MyStep> steps = [
       MyStep(
-        index: 0,
+        index: ++_index,
         title: const Text('Début'),
         content: Container(
           alignment: Alignment.centerLeft,
@@ -270,10 +313,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             widget.model.status == Status.started;
             Database().update(widget.model);
           }
-        }
+        },
       ),
       MyStep(
-        index: 1,
+        index: ++_index,
         title: const Text('Concasser le grain'),
         content: Container(
           alignment: Alignment.centerLeft,
@@ -285,7 +328,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: snapshot.data!.map((e) {
-                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.kiloWeightFormat(e.amount)} de ${AppLocalizations.of(context)!.localizedText(e.name)}.'));
+                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.kiloWeightFormat(e.amount)} de «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
                   }).toList()
                 );
               }
@@ -295,7 +338,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
       ),
       MyStep(
-        index: 2,
+        index: ++_index,
         title: Text('Ajoutez ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
         content: Container(
           alignment: Alignment.centerLeft,
@@ -306,7 +349,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
       ),
       MyStep(
-        index: 3,
+        index: ++_index,
         title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(50)}'),
         content: Container(
           alignment: Alignment.centerLeft,
@@ -319,48 +362,36 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
       ),
       MyStep(
-        index: 4,
+        index: ++_index,
         title: const Text('Ajouter le grain'),
-        content: Container()
+        content: Container(),
       )
     ];
-    await _mashs(receipt, steps);
+    await _mash(receipt, steps);
     steps.add(MyStep(
-      index: steps.length,
+      index: ++_index,
       title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau'),
-      content: Container(),
-    ));
-    steps.add(MyStep(
-      index: steps.length,
-      title: const Text('Mettre en ébullition votre cuve'),
       content: Container(
         alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.all(8.0),
-        child: SizedBox(
-          width: 140,
-          height: 140,
-          child: _temp,
+        child: PHContainer(
+          target: widget.model.sparge_ph,
+          volume: widget.model.volume,
         )
       ),
-      onStepContinue: (int index) {
-        if (!_mashController.isStarted) {
-          _mashController.restart(duration: _mash * 60);
-        }
-      }
     ));
-    await _hops(receipt, steps);
+    await _boil(receipt, steps);
     steps.add(MyStep(
-      index: steps.length,
+      index: ++_index,
       title: const Text('Faire un whirlpool'),
       content: Container(),
     ));
     steps.add(MyStep(
-      index: steps.length,
+      index: ++_index,
       title: const Text('Transférer le moût dans le fermenteur'),
       content: Container(),
     ));
     steps.add(MyStep(
-      index: steps.length,
+      index: ++_index,
       title: const Text('Prendre la densité initiale'),
       content: TextField(
         keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -369,26 +400,28 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ],
         onChanged: (value) {
           widget.model.og = AppLocalizations.of(context)!.decimal(value);
+          widget.model.calculate();
+          Database().update(widget.model);
         },
         decoration: FormDecoration(
           icon: const Icon(Icons.first_page_outlined),
-            hintText: CS.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
+          hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
           labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
           border: InputBorder.none,
-          fillColor: CS.FillColor, filled: true
+          fillColor: constants.FillColor, filled: true
         ),
       ),
     ));
     await receipt.getYeasts(volume: widget.model.volume).then((values) {
       steps.add(MyStep(
-        index: steps.length,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure ${AppLocalizations.of(context)!.localizedText(receipt.yeasts.first.name)}'),
+        index: ++_index,
+        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure «${AppLocalizations.of(context)!.localizedText(receipt.yeasts.first.name)}»'),
         content: Container(),
       ));
     });
     steps.add(MyStep(
-      index: steps.length,
-      title: const Text('Fin'),
+      index: ++_index,
+      title: Text('Fin'),
       content: Container(
         alignment: Alignment.centerLeft,
         child: const Text('Votre brassin est prêt.')
@@ -397,11 +430,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     return steps;
   }
 
-  _mashs(ReceiptModel receipt, List<MyStep> steps) {
+  _mash(ReceiptModel receipt, List<MyStep> steps) {
     for(int i = 0 ; i < receipt.mash!.length ; i++) {
-      if (receipt.mash![i].type == Mash.Type.infusion) {
+      if (receipt.mash![i].type == mash.Type.infusion) {
+        CountDownController controller = CountDownController();
         steps.add(MyStep(
-          index: steps.length,
+          index: ++_index,
           title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)}'),
           content: Container(
             alignment: Alignment.centerLeft,
@@ -413,94 +447,127 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             )
           ),
           onStepContinue: (int index) {
-            if (!_mashController.isStarted) {
-              _mashController.restart(duration: _mash * 60);
+            if (!controller.isStarted) {
+              controller.restart(duration: receipt.mash![i].duration! * 60);
             }
-          }
+          },
         ));
         steps.add(MyStep(
-          index: steps.length,
-          title: Text('Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant $_mash minutes'),
+          index: ++_index,
+          title: Text('Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant ${receipt.mash![i].duration} minutes'),
           content: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(8.0),
-            child: CircularTimer(_mashController,
-                duration: _mash * 60,
-                index: steps.length,
-                onChange: (String timeStamp) {
-                  debugPrint('Countdown Changed $timeStamp');
-                },
-                onComplete: (int index) {
-                  Notifications().showNotification(
-                    const Uuid().hashCode,
-                    'BeAndBrew',
-                    body: 'Le Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
-                  );
-                  steps[index].completed = true;
-                }
+            child: CircularTimer(
+              controller,
+              duration: receipt.mash![i].duration! * 60,
+              index: steps.length,
+              onComplete: (int index) {
+                Notifications().showNotification(
+                  const Uuid().hashCode,
+                  'Le Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
+                );
+                steps[index].completed = true;
+              }
             )
           ),
           onStepContinue: (int index) {
             if (!steps[index].completed) {
-              throw 'Le processus n\'est pas terminé.';
+              throw 'Cette étape n\'est pas terminée.';
             }
-          }
+          },
         ));
       }
     }
   }
 
-  _hops(ReceiptModel receipt, List<MyStep> steps) async {
-    List<Widget> children = [];
-    await receipt.gethops(volume: widget.model.volume).then((values) {
-      List<HopModel> hops = values.where((element) => element.use == Use.boil).toList();
-      hops.sort((a, b) => a.duration!.compareTo(b.duration!));
-      for(int i = 0 ; i < hops.length; i++) {
-        String text = '${AppLocalizations.of(context)!.weightFormat(hops[i].amount)} de ${AppLocalizations.of(context)!.localizedText(hops[i].name)}';
-        if ((i+1) < hops.length) {
-          if (hops[i].duration == hops[i+1].duration) {
-            children.add(Text('Ajouter $text'));
-            continue;
-          }
+  _boil(ReceiptModel receipt, List<MyStep> steps) async {
+    Map<CountDownTextController, Ingredient> ingredients = await _ingredients(receipt);
+    steps.add(MyStep(
+      index: ++_index,
+      title: Text('Mettre en ébullition votre cuve'),
+      content: Container(
+        alignment: Alignment.centerLeft,
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          width: 140,
+          height: 140,
+          child: _temp,
+        )
+      ),
+      onStepContinue: (int index) {
+        if (!_boilController.isStarted) {
+          _boilController.restart(duration: receipt.boil! * 60);
+          ingredients.forEach((key, value) {
+            key.restart(Duration(minutes: _boilDuration - value.minutes));
+          });
         }
-        if (children.isNotEmpty) {
-          children.add(Text('Ajouter $text'));
-          children.add(const SizedBox(height: 12));
-          children.add(CircularTimer(_hopController,
-            duration: hops[i].duration! * 60,
-            index: steps.length,
-          ));
-        }
-        steps.add(MyStep(
-          index: steps.length,
-          title: Text(children.isNotEmpty ? 'Ajouter les houblons suivants...' : 'Ajouter $text'),
-          content: Container(
+      },
+    ));
+    steps.add(MyStep(
+      index: ++_index,
+      title: const Text('Commencer le houblonnage'),
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(8.0),
-            child: children.isNotEmpty ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: children,
-            ) : CircularTimer(_hopController,
-              duration: hops[i].duration! * 60,
+            child: CircularTimer(
+              _boilController,
+              duration: receipt.boil! * 60,
               index: steps.length,
               onComplete: (int index) {
-                // Notifications().showNotification(
-                //     Uuid().hashCode,
-                //     'BeAndBrew',
-                //     body: 'Le Palier ${receipt.mash![i].name} à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
-                // );
+                Notifications().showNotification(
+                  const Uuid().hashCode,
+                  'Houblonnage terminé.'
+                );
                 steps[index].completed = true;
+              },
+              onChange: (Duration duration) {
+                _boilDuration = duration.inMinutes;
               }
             )
-            // child: timer
           ),
-          onStepContinue: (int index) {
-            _hopController.restart(duration: hops[i].duration! * 60);
-          },
-        ));
-        children = [];
-      }
-    });
+          Container(
+            alignment: Alignment.centerLeft,
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: ingredients.entries.map((e) {
+                return CountDownText(
+                  duration: Duration(minutes: e.value.minutes),
+                  map: e.value.map!,
+                  controller: e.key,
+                );
+              }).toList()
+            )
+          )
+        ]
+      ),
+      onStepTapped: (int index) {
+        debugPrint('onStepTapped');
+      },
+      onStepContinue: (int index) {
+        if (!steps[index].completed) {
+          throw 'Cette étape n\'est pas terminée.';
+        }
+      },
+    ));
+  }
+
+  Future<Map<CountDownTextController, Ingredient>> _ingredients(ReceiptModel receipt) async {
+    List<Ingredient> list = [];
+    Map<CountDownTextController, Ingredient> map = {};
+    list.set(await receipt.gethops(volume: widget.model.volume, use: hp.Use.boil), context);
+    list.set(await receipt.getMisc(volume: widget.model.volume, use: mm.Use.boil), context);
+    for(Ingredient e in list) {
+      CountDownTextController controller = CountDownTextController(); 
+      map[controller] = e;
+    }
+    return map; 
   }
 
   _showSnackbar(String message, {SnackBarAction? action}) {

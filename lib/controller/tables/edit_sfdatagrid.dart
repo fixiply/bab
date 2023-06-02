@@ -1,9 +1,9 @@
-import 'package:bb/utils/app_localizations.dart';
 import 'package:flutter/material.dart' hide SelectionChangedCallback;
 
 // Internal package
 import 'package:bb/controller/tables/edit_data_source.dart';
 import 'package:bb/helpers/device_helper.dart';
+import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
 
 // External package
@@ -18,13 +18,14 @@ class EditSfDataGrid extends SfDataGrid {
     List<GridTableSummaryRow>? tableSummaryRows,
     this.onRemove,
     this.onEdit,
+    DataGridCellTapCallback? onCellTap,
     SelectionChangedCallback? onSelectionChanged,
     DataGridController? controller,
     bool allowEditing = true,
     bool allowSorting = true,
     bool showCheckboxColumn = false,
     bool? loadMoreRows,
-    SelectionMode selectionMode = SelectionMode.multiple,
+    SelectionMode? selectionMode,
     ScrollPhysics? verticalScrollPhysics,
     ScrollPhysics? horizontalScrollPhysics
   }) : super(
@@ -33,6 +34,7 @@ class EditSfDataGrid extends SfDataGrid {
     tableSummaryRows: tableSummaryRows ?? <GridTableSummaryRow>[],
     rowHeight: 40.0,
     controller: controller,
+    onCellTap: onCellTap,
     onSelectionChanged: onSelectionChanged,
     columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablette(context) ? ColumnWidthMode.fill : ColumnWidthMode.none,
     allowEditing: allowEditing,
@@ -42,7 +44,7 @@ class EditSfDataGrid extends SfDataGrid {
     editingGestureType: EditingGestureType.tap,
     shrinkWrapRows: true,
     showCheckboxColumn: showCheckboxColumn,
-    selectionMode: selectionMode,
+    selectionMode: selectionMode ?? SelectionMode.none,
     // columnWidthCalculationRange: ColumnWidthCalculationRange.allRows,
     verticalScrollPhysics: verticalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
     horizontalScrollPhysics: horizontalScrollPhysics ?? const AlwaysScrollableScrollPhysics(),
@@ -110,7 +112,7 @@ class EditSfDataGrid extends SfDataGrid {
             children: <Widget>[
               const Icon(Icons.edit, color: Colors.white, size: 20),
               const SizedBox(width: 16.0),
-              Text(AppLocalizations.of(context)!.text('edit').toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 15))
+              Text(AppLocalizations.of(context)!.text('replace').toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 15))
             ],
           ),
         ),

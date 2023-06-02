@@ -104,7 +104,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
           )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
       body: RefreshIndicator(
         onRefresh: () => _fetch(),
         child: FutureBuilder<List<EventModel>>(

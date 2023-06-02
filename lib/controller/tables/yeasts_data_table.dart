@@ -1,10 +1,11 @@
-import 'package:bb/helpers/formula_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/tables/edit_data_source.dart';
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
+import 'package:bb/controller/tables/fields/amount_field.dart' as amount;
 import 'package:bb/controller/yeasts_page.dart';
+import 'package:bb/helpers/formula_helper.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/app_localizations.dart';
@@ -44,7 +45,7 @@ class YeastsDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
-    this.selectionMode = SelectionMode.multiple,
+    this.selectionMode = SelectionMode.singleDeselect,
     this.receipt,
     this.onChanged}) : super(key: key);
 
@@ -171,10 +172,9 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         _edit(rowIndex);
       },
       onRemove: (DataGridRow row, int rowIndex) {
-        // setState(() {
-        //   _data!.then((value) => value.removeAt(rowIndex));
-        // });
         widget.data!.removeAt(rowIndex);
+        _dataSource.buildDataGridRows(widget.data!);
+        _dataSource.notifyListeners();
         widget.onChanged?.call(widget.data!);
       },
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
@@ -259,6 +259,8 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
         if (widget.data != null && widget.data!.isNotEmpty) {
           values.first.amount = widget.data![rowIndex].amount;
           widget.data![rowIndex] = values.first;
+          _dataSource.buildDataGridRows(widget.data!);
+          _dataSource.notifyListeners();
           widget.onChanged?.call(widget.data!);
         }
       }
@@ -291,22 +293,40 @@ class YeastDataSource extends EditDataSource {
     List<YeastModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<double>(columnName: 'amount', value: e.amount),
-      if (showQuantity == true) DataGridCell<Unit>(columnName: 'unit', value: e.unit),
+      if (showQuantity == true) DataGridCell<amount.Unit>(columnName: 'amount', value: amount.Unit(e.amount, e.unit)),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<dynamic>(columnName: 'reference', value: e.reference),
       DataGridCell<dynamic>(columnName: 'laboratory', value: e.laboratory),
       DataGridCell<Fermentation>(columnName: 'type', value: e.type),
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
-      DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
-      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
-      DataGridCell<double>(columnName: 'cells', value: e.cells)
+      if (showQuantity == false) DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
+      if (showQuantity == false) DataGridCell<double>(columnName: 'temperature', value: e.temperature),
+      if (showQuantity == false) DataGridCell<double>(columnName: 'cells', value: e.cells)
     ])).toList();
   }
 
   void buildDataGridRows(List<YeastModel> data) {
     this.data = data;
     dataGridRows = getDataRows(data: data);
+  }
+
+  @override
+  Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
+    if (column.columnName == 'amount') {
+      var value = getValue(dataGridRow, column.columnName);
+      newCellValue = value;
+      return amount.AmountField(
+        value: value.copy(),
+        enums: isEnumType('unit'),
+        onChanged: (unit) {
+          newCellValue = unit;
+          /// Call [CellSubmit] callback to fire the canSubmitCell and
+          /// onCellSubmit to commit the new value in single place.
+          submitCell();
+        },
+      );
+    }
+    return super.buildEditWidget(dataGridRow, rowColumnIndex, column, submitCell);
   }
 
   @override
@@ -322,14 +342,14 @@ class YeastDataSource extends EditDataSource {
   }
 
   @override
-  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
-    var value = super.getValue(dataGridRow, rowColumnIndex, column);
-    if (value != null && column.columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value);
-      return weight!.toPrecision(2);
-    }
-    return value;
-  }
+  // dynamic getValue(DataGridRow dataGridRow, String columnName) {
+  //   var value = super.getValue(dataGridRow, columnName);
+  //   if (value != null && columnName == 'amount') {
+  //     double? weight = AppLocalizations.of(context)!.weight(value);
+  //     return weight!.toPrecision(2);
+  //   }
+  //   return value;
+  // }
 
   @override
   bool isNumericType(String columnName) {
@@ -350,17 +370,11 @@ class YeastDataSource extends EditDataSource {
         if (e.value is LocalizedText) {
           value = e.value?.get(AppLocalizations.of(context)!.locale);
           alignment = Alignment.centerLeft;
+        } else if (e.value is amount.Unit) {
+          value = AppLocalizations.of(context)!.numberFormat(e.value.amount, symbol: (e.value.unit?.symbol != null ? ' ' + e.value.unit?.symbol : null));
+          alignment = Alignment.centerRight;
         } else if (e.value is num) {
-          if (e.columnName == 'amount') {
-            var unit = row.getCells().firstWhere((DataGridCell dataGridCell) => dataGridCell.columnName == 'unit').value;
-            if (unit == Unit.milliliter || unit == Unit.liter) {
-              value = AppLocalizations.of(context)!.volumeFormat(e.value);
-            } else if (unit == Unit.gram  || unit == Unit.kilo) {
-              value = AppLocalizations.of(context)!.weightFormat(e.value);
-            } else {
-              value = AppLocalizations.of(context)!.numberFormat(e.value, symbol: ' pqt');
-            }
-          } else if (e.columnName == 'attenuation') {
+          if (e.columnName == 'attenuation') {
             value = AppLocalizations.of(context)!.percentFormat(e.value);
           } else if (e.columnName == 'duration') {
             value = AppLocalizations.of(context)!.durationFormat(e.value);
@@ -408,23 +422,29 @@ class YeastDataSource extends EditDataSource {
 
   @override
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
-    final dynamic oldValue = dataGridRow.getCells()
-        .firstWhere((DataGridCell dataGridCell) =>
-    dataGridCell.columnName == column.columnName).value ?? '';
+    final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
+      dataGridCell.columnName == column.columnName).value ?? '';
+    debugPrint('onCellSubmit $oldValue $newCellValue');
     if (oldValue == newCellValue) {
       return;
     }
+    debugPrint('OK');
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
-        break;
-      case 'unit':
-        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<Unit>(columnName: column.columnName, value: newCellValue);
-        data[rowColumnIndex.rowIndex].unit = newCellValue;
+            DataGridCell<amount.Unit>(columnName: column.columnName, value: newCellValue);
+        switch(newCellValue.unit) {
+          case Unit.gram:
+            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue.amount);
+            break;
+          case Unit.milliliter:
+            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.volume(newCellValue.amount);
+            break;
+          default:
+            data[rowColumnIndex.rowIndex].amount = newCellValue.amount;
+        }
+        data[rowColumnIndex.rowIndex].unit = newCellValue.unit;
         break;
       case 'name':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
@@ -472,22 +492,12 @@ class YeastDataSource extends EditDataSource {
           label: Container()
       ),
       if (showQuantity == true) GridColumn(
-          width: 90,
+          width: 120,
           columnName: 'amount',
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      if (showQuantity == true) GridColumn(
-          width: allowEditing ? 90 : double.nan,
-          visible: allowEditing,
-          columnName: 'unit',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('unit'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(
@@ -535,7 +545,7 @@ class YeastDataSource extends EditDataSource {
               child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
-      GridColumn(
+      if (showQuantity == false) GridColumn(
         width: 90,
         columnName: 'attenuation',
         allowEditing: false,
@@ -545,7 +555,7 @@ class YeastDataSource extends EditDataSource {
             child: Text('Att.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      GridColumn(
+      if (showQuantity == false) GridColumn(
         width: 90,
         columnName: 'temperature',
         allowEditing: false,
@@ -555,7 +565,7 @@ class YeastDataSource extends EditDataSource {
             child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      GridColumn(
+      if (showQuantity == false) GridColumn(
         width: 90,
         columnName: 'cells',
         allowEditing: false,

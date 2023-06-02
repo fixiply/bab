@@ -125,9 +125,10 @@ class _FormEventPageState extends State<FormEventPage> {
             children: <Widget>[
               DropdownButtonFormField<Axis>(
                 value: widget.model.axis,
+                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 decoration: FormDecoration(
-                    icon: const Icon(Icons.directions),
-                    labelText: AppLocalizations.of(context)!.text('direction')
+                  icon: const Icon(Icons.directions),
+                  labelText: AppLocalizations.of(context)!.text('direction')
                 ),
                 items: Axis.values.map((Axis display) {
                   return DropdownMenuItem<Axis>(

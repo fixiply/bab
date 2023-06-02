@@ -156,10 +156,9 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
         _edit(rowIndex);
       },
       onRemove: (DataGridRow row, int rowIndex) {
-        // setState(() {
-        //   _data!.then((value) => value.removeAt(rowIndex));
-        // });
         widget.data!.removeAt(rowIndex);
+        _dataSource.buildDataGridRows(widget.data!);
+        _dataSource.notifyListeners();
         widget.onChanged?.call(widget.data!);
       },
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
@@ -236,6 +235,8 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
           values.first.amount = widget.data![rowIndex].amount;
           values.first.use = widget.data![rowIndex].use;
           widget.data![rowIndex] = values.first;
+          _dataSource.buildDataGridRows(widget.data!);
+          _dataSource.notifyListeners();
           widget.onChanged?.call(widget.data!);
         }
       }
@@ -295,9 +296,9 @@ class FermentableDataSource extends EditDataSource {
   }
 
   @override
-  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
-    var value = super.getValue(dataGridRow, rowColumnIndex, column);
-    if (value != null && column.columnName == 'amount') {
+  dynamic getValue(DataGridRow dataGridRow, String columnName) {
+    var value = super.getValue(dataGridRow, columnName);
+    if (value != null && columnName == 'amount') {
       double? weight = AppLocalizations.of(context)!.weight(value * 1000, unit: Unit.kilo);
       return weight!.toPrecision(2);
     }

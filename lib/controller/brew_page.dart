@@ -19,7 +19,7 @@ import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/widgets/animated_action_button.dart';
 import 'package:bb/widgets/containers/carousel_container.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -146,7 +146,7 @@ class _BrewPageState extends State<BrewPage> {
                 },
               ),
             ),
-            if (CS.currentUser != null && (CS.currentUser!.isAdmin() || widget.model.creator == CS.currentUser!.uuid))
+            if (constants.currentUser != null && (constants.currentUser!.isAdmin() || widget.model.creator == constants.currentUser!.uuid))
               IconButton(
                 icon: const Icon(Icons.edit_note),
                 onPressed: () {

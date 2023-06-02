@@ -19,22 +19,19 @@ enum Type with Enums { infusion, temperature, decoction;
 }
 
 class Mash<T> {
-  String? uuid;
   dynamic name;
   Type? type;
   double? temperature;
   int? duration;
 
   Mash({
-    this.uuid,
     this.name,
     this.type = Type.infusion,
     this.temperature = 65.0,
-    this.duration,
+    this.duration
   });
 
   void fromMap(Map<String, dynamic> map) {
-    this.uuid = map['uuid'];
     this.name = LocalizedText.deserialize(map['name']);
     this.type = Type.values.elementAt(map['type']);
     if (map['temperature'] != null) this.temperature = map['temperature'].toDouble();
@@ -43,7 +40,6 @@ class Mash<T> {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
-      'uuid': this.uuid,
       'name': LocalizedText.serialize(this.name),
       'type': this.type!.index,
       'temperature': this.temperature,
@@ -54,7 +50,6 @@ class Mash<T> {
 
   Mash copy() {
     return Mash(
-      uuid: this.uuid,
       name: this.name,
       type: this.type,
       temperature: this.temperature,
@@ -64,7 +59,7 @@ class Mash<T> {
 
   @override
   String toString() {
-    return 'Mash: $uuid';
+    return 'Mash: $name';
   }
 
   static dynamic serialize(dynamic data) {
@@ -102,25 +97,20 @@ class Mash<T> {
   static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
     return <GridColumn>[
       GridColumn(
-          columnName: 'uuid',
-          visible: false,
-          label: Container()
+        columnName: 'name',
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.centerLeft,
+            child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
-          columnName: 'name',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
-      ),
-      GridColumn(
-          columnName: 'type',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        columnName: 'type',
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
         width: 90,
@@ -134,19 +124,20 @@ class Mash<T> {
       GridColumn(
         width: 90,
         columnName: 'duration',
+        allowEditing: false,
         label: Container(
             padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
-      )
+      ),
     ];
   }
 }
 
 class MashDataSource extends EditDataSource {
   List<Mash> data = [];
-  final void Function(Mash value)? onChanged;
+  final void Function(Mash value, int dataRowIndex)? onChanged;
   /// Creates the employee data source class with required details.
   MashDataSource(BuildContext context, {List<Mash>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: false, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
@@ -155,20 +146,11 @@ class MashDataSource extends EditDataSource {
   void buildDataGridRows(List<Mash> data) {
     this.data = data;
     dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
-      DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Type>(columnName: 'type', value: e.type),
       DataGridCell<double>(columnName: 'temperature', value: e.temperature),
-      DataGridCell<int>(columnName: 'duration', value: e.duration)
+      DataGridCell<int>(columnName: 'duration', value: e.duration),
     ])).toList();
-  }
-
-  @override
-  Widget? buildEditWidget(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
-    if (column.columnName == 'name') {
-      return super.typeHeadWidget(Bearing.protein, submitCell);
-    }
-    return super.buildEditWidget(dataGridRow, rowColumnIndex, column, submitCell);
   }
 
   @override
@@ -187,32 +169,31 @@ class MashDataSource extends EditDataSource {
   @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
-        cells: row.getCells().map<Widget>((e) {
-          Color? color;
-          String? value = e.value?.toString();
-          var alignment = Alignment.centerLeft;
-          if (e.value is LocalizedText) {
-            value = e.value?.get(AppLocalizations.of(context)!.locale);
-            alignment = Alignment.centerLeft;
-          } else if (e.value is num) {
-            if (e.columnName == 'temperature') {
-              value = AppLocalizations.of(context)!.tempFormat(e.value);
-            } else if (e.columnName == 'duration') {
-              value = AppLocalizations.of(context)!.durationFormat(e.value);
-            } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
-            alignment = Alignment.centerRight;
-          } else if (e.value is Enum) {
-            alignment = Alignment.center;
-            value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
-          }
-
-          return Container(
-            color: color,
-            alignment: alignment,
-            padding: const EdgeInsets.all(8.0),
-            child: Text(value ?? ''),
-          );
-        }).toList()
+      cells: row.getCells().map<Widget>((e) {
+        Color? color;
+        String? value = e.value?.toString();
+        var alignment = Alignment.centerLeft;
+        if (e.value is LocalizedText) {
+          value = e.value?.get(AppLocalizations.of(context)!.locale);
+          alignment = Alignment.centerLeft;
+        } else if (e.value is num) {
+          if (e.columnName == 'temperature') {
+            value = AppLocalizations.of(context)!.tempFormat(e.value);
+          } else if (e.columnName == 'duration') {
+            value = AppLocalizations.of(context)!.durationFormat(e.value);
+          } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
+          alignment = Alignment.centerRight;
+        } else if (e.value is Enum) {
+          alignment = Alignment.center;
+          value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+        }
+        return Container(
+          color: color,
+          alignment: alignment,
+          padding: const EdgeInsets.all(8.0),
+          child: Text(value ?? ''),
+        );
+      }).toList()
     );
   }
 
@@ -250,7 +231,7 @@ class MashDataSource extends EditDataSource {
         data[dataRowIndex].duration = newCellValue as int;
         break;
     }
-    onChanged?.call(data[dataRowIndex]);
+    onChanged?.call(data[dataRowIndex], rowColumnIndex.rowIndex);
     updateDataSource();
   }
 

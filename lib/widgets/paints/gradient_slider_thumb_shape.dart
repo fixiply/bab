@@ -63,7 +63,7 @@ class GradientSliderThumbShape implements SliderComponentShape {
 
     var number = getValue(value);
     if (number > 0) {
-      Color color = SRM_COLORS[ColorHelper.toSRM(number)];
+      Color color = SRM_COLORS[ColorHelper.toSRM(number)-1];
       final Paint strokePaint = Paint()
         ..color = color
         ..style = PaintingStyle.fill;

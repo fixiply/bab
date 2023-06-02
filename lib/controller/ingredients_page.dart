@@ -89,7 +89,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
             ),
           ),
         ),
-        drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
+        drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
         body: TabBarView(
           children: [
             FermentablesPage(allowEditing: currentUser != null),

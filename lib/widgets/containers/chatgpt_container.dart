@@ -1,6 +1,6 @@
 import 'package:bb/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bb/utils/constants.dart';
@@ -41,7 +41,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
         receiveTimeout: const Duration(seconds: 20),
         connectTimeout: const Duration(seconds: 20)
         ),
-        enableLog: Foundation.kDebugMode
+        enableLog: foundation.kDebugMode
       );
     super.initState();
   }

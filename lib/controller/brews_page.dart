@@ -70,121 +70,129 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
+      key: _scaffoldKey,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: SearchText(_searchQueryController, () {  _fetch(); }),
+        elevation: 0,
+        foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          title: SearchText(_searchQueryController, () {  _fetch(); }),
-          elevation: 0,
-          foregroundColor: Theme.of(context).primaryColor,
-          backgroundColor: Colors.white,
-          actions: [
-            if (_showList && widget.allowEditing) IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(Icons.delete_outline),
-                tooltip: AppLocalizations.of(context)!.text('delete'),
-                onPressed: () {
-                  _delete();
-                }
-            ),
-            if (widget.allowEditing) IconButton(
-                padding: EdgeInsets.zero,
-                icon: const Icon(Icons.download_outlined),
-                tooltip: AppLocalizations.of(context)!.text('import'),
-                onPressed: () {
-                  ImportHelper.fermentables(context, () {
-                    _fetch();
-                  });
-                }
-            ),
-            IconButton(
+        actions: [
+          if (_showList && widget.allowEditing) IconButton(
               padding: EdgeInsets.zero,
-              icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
-              tooltip: AppLocalizations.of(context)!.text(_showList ? 'grid_view' : 'view_list'),
+              icon: const Icon(Icons.delete_outline),
+              tooltip: AppLocalizations.of(context)!.text('delete'),
               onPressed: () {
-                setState(() { _showList = !_showList; });
-              },
-            ),
-          ],
-        ),
-        body: RefreshIndicator(
-          onRefresh: () => _fetch(),
-          child: FutureBuilder<List<BrewModel>>(
-            future: _data,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data!.isEmpty) {
-                  return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+                _delete();
+              }
+          ),
+          if (widget.allowEditing) IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.download_outlined),
+              tooltip: AppLocalizations.of(context)!.text('import'),
+              onPressed: () {
+                ImportHelper.fermentables(context, () {
+                  _fetch();
+                });
+              }
+          ),
+          if (DeviceHelper.isDesktop) IconButton(
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.refresh),
+            tooltip: AppLocalizations.of(context)!.text('refresh'),
+            onPressed: () {
+              _fetch();
+            },
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
+            tooltip: AppLocalizations.of(context)!.text(_showList ? 'grid_view' : 'view_list'),
+            onPressed: () {
+              setState(() { _showList = !_showList; });
+            },
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: () => _fetch(),
+        child: FutureBuilder<List<BrewModel>>(
+          future: _data,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              if (snapshot.data!.isEmpty) {
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+              }
+              if (_showList) {
+                if (widget.loadMore) {
+                  _dataSource.data = snapshot.data!;
+                  _dataSource.handleLoadMoreRows();
+                } else {
+                  _dataSource.buildDataGridRows(snapshot.data!);
                 }
-                if (_showList) {
-                  if (widget.loadMore) {
-                    _dataSource.data = snapshot.data!;
-                    _dataSource.handleLoadMoreRows();
-                  } else {
-                    _dataSource.buildDataGridRows(snapshot.data!);
-                  }
-                  _dataSource.notifyListeners();
-                  return EditSfDataGrid(
-                    context,
-                    allowEditing: widget.allowEditing,
-                    showCheckboxColumn: widget.allowEditing,
-                    selectionMode: SelectionMode.multiple,
-                    source: _dataSource,
-                    controller: getDataGridController(),
-                    onEdit: (DataGridRow row, int rowIndex) {
-                      _data!.then((value) async {
-                        _edit(value.elementAt(rowIndex));
-                      });
-                    },
-                    onRemove: (DataGridRow row, int rowIndex) {
-                      _data!.then((value) async {
-                        if (await DeleteDialog.model(
-                            context, value.elementAt(rowIndex), forced: true)) {
-                          _fetch();
-                        }
-                      });
-                    },
-                    onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
-                      setState(() {
-                        for(var row in addedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.add(snapshot.data![index]);
-                        }
-                        for(var row in removedRows) {
-                          final index = _dataSource.rows.indexOf(row);
-                          _selected.remove(snapshot.data![index]);
-                        }
-                      });
-                    },
-                    columns: BrewDataSource.columns(
-                        context: context, showQuantity: false),
-                  );
-                }
-                return ListView.builder(
-                    controller: _controller,
-                    shrinkWrap: true,
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                    itemBuilder: (context, index) {
-                      BrewModel model = snapshot.data![index];
-                      return _item(model);
-                    }
+                _dataSource.notifyListeners();
+                return EditSfDataGrid(
+                  context,
+                  allowEditing: widget.allowEditing,
+                  showCheckboxColumn: widget.allowEditing,
+                  selectionMode: SelectionMode.multiple,
+                  source: _dataSource,
+                  controller: getDataGridController(),
+                  onEdit: (DataGridRow row, int rowIndex) {
+                    _data!.then((value) async {
+                      _edit(value.elementAt(rowIndex));
+                    });
+                  },
+                  onRemove: (DataGridRow row, int rowIndex) {
+                    _data!.then((value) async {
+                      if (await DeleteDialog.model(
+                          context, value.elementAt(rowIndex), forced: true)) {
+                        _fetch();
+                      }
+                    });
+                  },
+                  onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
+                    setState(() {
+                      for(var row in addedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.add(snapshot.data![index]);
+                      }
+                      for(var row in removedRows) {
+                        final index = _dataSource.rows.indexOf(row);
+                        _selected.remove(snapshot.data![index]);
+                      }
+                    });
+                  },
+                  columns: BrewDataSource.columns(
+                      context: context, showQuantity: false),
                 );
               }
-              if (snapshot.hasError) {
-                return ErrorContainer(snapshot.error.toString());
-              }
-              return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+              return ListView.builder(
+                  controller: _controller,
+                  shrinkWrap: true,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  itemBuilder: (context, index) {
+                    BrewModel model = snapshot.data![index];
+                    return _item(model);
+                  }
+              );
             }
-          )
-        ),
-        floatingActionButton: Visibility(
-          visible: currentUser != null,
-          child: AnimatedActionButton(
-            title: AppLocalizations.of(context)!.text('new_brew'),
-            icon: const Icon(Icons.add),
-            onPressed: _new,
-          )
+            if (snapshot.hasError) {
+              return ErrorContainer(snapshot.error.toString());
+            }
+            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+          }
         )
+      ),
+      floatingActionButton: Visibility(
+        visible: currentUser != null,
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new_brew'),
+          icon: const Icon(Icons.add),
+          onPressed: _new,
+        )
+      )
     );
   }
 

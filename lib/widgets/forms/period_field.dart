@@ -25,6 +25,8 @@ class PeriodField extends FormField<Term> {
 }
 
 class _PeriodFieldState extends FormFieldState<Term> {
+  @override
+  PeriodField get widget => super.widget as PeriodField;
   
   @override
   void didChange(Term? value) {
@@ -60,6 +62,7 @@ class _PeriodFieldState extends FormFieldState<Term> {
             Expanded(
               child: DropdownButtonFormField<Period>(
                 value: widget.initialValue!.period,
+                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 items: Period.values.map((Period period) {
                   return DropdownMenuItem<Period>(
                       value: period,

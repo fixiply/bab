@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bb/controller/about_page.dart';
 import 'package:bb/controller/address_page.dart';
 import 'package:bb/controller/basket_page.dart';
+import 'package:bb/controller/devices_page.dart';
 import 'package:bb/controller/login_page.dart';
 import 'package:bb/controller/payments_page.dart';
 import 'package:bb/controller/purchases_page.dart';
@@ -73,7 +74,7 @@ class _AccountPageState extends State<AccountPage> {
           )
         ]
       ),
-      drawer: !DeviceHelper.isDesktop && currentUser != null ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
         child: Column(
@@ -115,6 +116,16 @@ class _AccountPageState extends State<AccountPage> {
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) {
                         return PurchasesPage();
+                      }));
+                    },
+                  ),
+                  if (currentUser != null) ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: const Icon(Icons.devices),
+                    title: Text(AppLocalizations.of(context)!.text('my_devices')),
+                    onTap: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return DevicesPage();
                       }));
                     },
                   ),

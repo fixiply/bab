@@ -265,9 +265,9 @@ class TankDataSource extends EditDataSource {
   }
 
   @override
-  dynamic getValue(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) {
-    var value = super.getValue(dataGridRow, rowColumnIndex, column);
-    if (value != null && column.columnName == 'amount') {
+  dynamic getValue(DataGridRow dataGridRow, String columnName) {
+    var value = super.getValue(dataGridRow, columnName);
+    if (value != null && columnName == 'amount') {
       double? weight = AppLocalizations.of(context)!.weight(value * 1000, unit: Unit.kilo);
       return weight!.toPrecision(2);
     }

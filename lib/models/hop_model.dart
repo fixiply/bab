@@ -64,11 +64,8 @@ class HopModel<T> extends Model {
     this.origin = map['origin'];
     if (map['alpha'] != null) this.alpha = map['alpha'].toDouble();
     if (map['beta'] != null) this.beta = map['beta'].toDouble();
-    // if (map['amount'] != null) this.amount = map['amount'].toDouble();
     this.form = Hop.values.elementAt(map['form']);
     this.type = Type.values.elementAt(map['type']);
-    // if (map['use'] != null) this.use = HopUse.values.elementAt(map['use']);
-    // this.duration = map['duration'];
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
@@ -81,11 +78,8 @@ class HopModel<T> extends Model {
       'origin': this.origin,
       'alpha': this.alpha,
       'beta': this.beta,
-      // 'amount': this.amount,
       'form': this.form!.index,
       'type': this.type!.index,
-      // 'use': this.use!.index,
-      // 'duration': this.duration,
       'notes': LocalizedText.serialize(this.notes),
     });
     return map;
@@ -103,10 +97,10 @@ class HopModel<T> extends Model {
       alpha: this.alpha,
       beta: this.beta,
       amount: this.amount,
+      unit: this.unit,
       form: this.form,
       type: this.type,
       use: this.use,
-      unit: this.unit,
       duration: this.duration,
       notes: this.notes,
     );

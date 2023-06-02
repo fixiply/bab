@@ -3,6 +3,7 @@ import 'package:bb/utils/adress.dart';
 import 'package:bb/models/payment_model.dart';
 import 'package:bb/utils/constants.dart';
 import 'package:bb/helpers/date_helper.dart';
+import 'package:bb/utils/device.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,6 +20,7 @@ class UserModel<T> {
   String? company;
   List<Adress>? addresses;
   List<PaymentModel>? payments;
+  List<Device>? devices;
 
   UserModel({
     this.uuid,
@@ -31,11 +33,13 @@ class UserModel<T> {
     this.role = Role.editor,
     this.company,
     this.addresses,
-    this.payments
+    this.payments,
+    this.devices
   }) {
     inserted_at ??= DateTime.now();
     addresses ??= [];
     payments ??= [];
+    devices ??= [];
   }
 
   bool isAdmin() {
@@ -61,6 +65,7 @@ class UserModel<T> {
     this.company = map['company'];
     this.addresses = Adress.deserialize(map['addresses']);
     this.payments = PaymentModel.deserialize(map['payments']);
+    this.devices = Device.deserialize(map['devices']);
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -74,6 +79,7 @@ class UserModel<T> {
       'company': company,
       'addresses': Adress.serialize(this.addresses),
       'payments': PaymentModel.serialize(this.payments),
+      'devices': Device.serialize(this.devices),
     };
     if (persist == true) {
       map.addAll({'uuid': this.uuid});
@@ -93,6 +99,7 @@ class UserModel<T> {
       role: this.role,
       addresses: this.addresses,
       payments: this.payments,
+      devices: this.devices,
     );
   }
 

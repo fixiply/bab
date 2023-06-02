@@ -40,7 +40,19 @@ mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   }
 }
 
-enum Unit with Enums { gram, kilo, milliliter, liter, packages, units;
+enum Unit with Enums {
+  gram(symbol: 'g'),
+  kilo(symbol: 'kg'),
+  milliliter(symbol: 'ml'),
+  liter(symbol: 'l'),
+  packages(),
+  units();
+
+  const Unit({
+    this.symbol
+  });
+  final String? symbol;
+
   List<Enum> get enums => [ gram, kilo, milliliter, liter, packages, units];
 }
 enum Fermentation with Enums { hight, low, spontaneous;
@@ -53,7 +65,9 @@ enum Payments with Enums { credit_card, paypal, apple_pay, google_pay;
   List<Enum> get enums => [ credit_card, paypal, apple_pay, google_pay ];
 }
 enum Period { day, week, month, year }
-enum Time { minutes, hours, days, weeks }
+enum Time with Enums { minutes, hours, days, weeks, month;
+  List<Enum> get enums => [ minutes, hours, days, weeks, month];
+}
 enum Role with Enums { admin, editor, customer;
   List<Enum> get enums => [ admin, editor, customer ];
 }

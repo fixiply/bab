@@ -1,11 +1,12 @@
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/mash.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bb/controller/tables/edit_sfdatagrid.dart';
 import 'package:bb/models/receipt_model.dart';
+import 'package:bb/utils/app_localizations.dart';
 import 'package:bb/utils/constants.dart';
+import 'package:bb/utils/mash.dart';
+import 'package:bb/widgets/duration_picker.dart';
 
 // External package
 import 'package:syncfusion_flutter_core/theme.dart';
@@ -55,8 +56,14 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
     _dataSource = MashDataSource(context,
       data: widget.data ?? [],
       showCheckboxColumn: widget.showCheckboxColumn!,
-      onChanged: (Mash value) {
-        widget.onChanged?.call([value]);
+      onChanged: (Mash value, int dataRowIndex) {
+        if (widget.data != null) {
+          widget.data![dataRowIndex].name = value.name;
+          widget.data![dataRowIndex].type = value.type;
+          widget.data![dataRowIndex].temperature = value.temperature;
+          widget.data![dataRowIndex].duration = value.duration;
+        }
+        widget.onChanged?.call(widget.data ?? [value]);
       }
     );
     if (widget.allowEditing != true) _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
@@ -98,6 +105,27 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                 allowSorting: widget.allowSorting,
                 controller: getDataGridController(),
                 verticalScrollPhysics: const NeverScrollableScrollPhysics(),
+                onCellTap: (DataGridCellTapDetails details) async {
+                  if (details.column.columnName == 'duration') {
+                    DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
+                    var value = _dataSource.getValue(dataGridRow, details.column.columnName);
+                    var duration = await showDurationPicker(
+                      context: context,
+                      initialTime: Duration(minutes: value ??  widget.receipt!.boil),
+                      maxTime: Duration(minutes: widget.receipt!.boil!),
+                        // showOkButton: false,
+                        // onComplete: (duration, context) {
+                        //   _dataSource.newCellValue = duration.inMinutes;
+                        //   _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+                        //   Navigator.pop(context);
+                        // }
+                    );
+                    if (duration != null)  {
+                      _dataSource.newCellValue = duration.inMinutes;
+                      _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+                    }
+                  }
+                },
                 onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                   if (widget.showCheckboxColumn == true) {
                     setState(() {

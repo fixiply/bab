@@ -83,6 +83,7 @@ class _PHContainerState extends State<PHContainer> {
               Expanded(
                 flex: 2,
                 child: DropdownButtonFormField<Acid>(
+                  isExpanded: true,
                   style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                   onChanged: (value) {
                     _acid = value;
@@ -95,8 +96,9 @@ class _PHContainerState extends State<PHContainer> {
                   ),
                   items: Acid.values.map((Acid display) {
                     return DropdownMenuItem<Acid>(
-                        value: display,
-                        child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                      value: display,
+                      child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase()))
+                    );
                   }).toList()
                 ),
               ),

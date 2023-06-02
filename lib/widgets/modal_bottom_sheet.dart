@@ -165,7 +165,7 @@ class ModalBottomSheet {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       TextButton(
-                        child: Text(AppLocalizations.of(context)!.text('cancel'),
+                        child: Text(MaterialLocalizations.of(context).cancelButtonLabel,
                             style: const TextStyle(color: Colors.red)),
                         style: TextButton.styleFrom(backgroundColor: Colors.transparent),
                         onPressed: () async {
@@ -265,7 +265,7 @@ class ModalBottomSheet {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         TextButton(
-                          child: Text(AppLocalizations.of(context)!.text('cancel'),
+                          child: Text(MaterialLocalizations.of(context).cancelButtonLabel,
                           style: const TextStyle(color: Colors.red)),
                           style: TextButton.styleFrom(backgroundColor: Colors.transparent),
                           onPressed: () async {

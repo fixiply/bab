@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/equipment_model.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/utils/constants.dart';
 import 'package:bb/utils/database.dart';
 import 'package:bb/widgets/custom_menu_button.dart';
@@ -102,7 +102,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
             filtered: false,
             archived: false,
             onSelected: (value) {
-              if (value is CS.Measure) {
+              if (value is constants.Measure) {
                 // setState(() {
                 //   AppLocalizations.of(context)!.measure = value;
                 // });
@@ -134,7 +134,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   icon: const Icon(Icons.title),
                   labelText: AppLocalizations.of(context)!.text('name'),
                   border: InputBorder.none,
-                  fillColor: CS.FillColor, filled: true
+                  fillColor: constants.FillColor, filled: true
                 ),
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 validator: (value) {

@@ -1,3 +1,5 @@
+import 'package:bb/widgets/duration_picker.dart';
+import 'package:bb/widgets/forms/duration_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -6,13 +8,13 @@ import 'package:bb/controller/forms/form_brew_page.dart';
 import 'package:bb/helpers/device_helper.dart';
 import 'package:bb/models/brew_model.dart';
 import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart' as hop;
+import 'package:bb/models/hop_model.dart' as hm;
 import 'package:bb/models/misc_model.dart';
 import 'package:bb/models/receipt_model.dart';
 import 'package:bb/models/yeast_model.dart';
 import 'package:bb/utils/abv.dart';
 import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as CS;
+import 'package:bb/utils/constants.dart' as constants;
 import 'package:bb/utils/database.dart';
 import 'package:bb/utils/ibu.dart';
 import 'package:bb/widgets/animated_action_button.dart';
@@ -112,7 +114,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 ReceiptModel model = widget.model.copy();
                 model.uuid = null;
                 model.title = null;
-                model.status = CS.Status.disabled;
+                model.status = constants.Status.disabled;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormReceiptPage(model);
                 })).then((value) {
@@ -138,7 +140,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
             archived: false,
             measures: true,
             onSelected: (value) {
-              if (value is CS.Measure) {
+              if (value is constants.Measure) {
                 setState(() {
                   AppLocalizations.of(context)!.measure = value;
                 });
@@ -161,7 +163,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
             children: <Widget>[
               ExpansionTile(
                 initiallyExpanded: true,
-                backgroundColor: CS.FillColor,
+                backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
                 title: Text(AppLocalizations.of(context)!.text('profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
@@ -203,7 +205,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                                 trackShape: const GradientRectSliderTrackShape(darkenInactive: false),
                                 thumbColor: Theme.of(context).primaryColor,
                                 overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                                thumbShape: GradientSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: CS.FillColor, selectedValue: 10, max: AppLocalizations.of(context)!.maxColor),
+                                thumbShape: GradientSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: constants.FillColor, selectedValue: 10, max: AppLocalizations.of(context)!.maxColor),
                               ),
                               child: Slider(
                                 label: '${widget.model.ebc}',
@@ -241,7 +243,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                         icon: const Icon(Icons.title),
                         labelText: AppLocalizations.of(context)!.text('title'),
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -293,7 +295,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                         labelText: AppLocalizations.of(context)!.text('pasting_efficiency'),
                         suffixText: '%',
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -331,7 +333,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                           child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
                         ),
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -344,35 +346,26 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: TextFormField(
-                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.boil) ?? '',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
+                    child: DurationField(
+                      value: widget.model.boil ?? 0,
                       onChanged: (value) {
-                        widget.model.boil = int.parse(value);
+                        widget.model.boil = value;
                         _calculate();
                       },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.timer_outlined),
-                        labelText: AppLocalizations.of(context)!.text('boiling_time'),
-                        suffixText: 'minutes',
-                        border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
-                      ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
                         if (value!.isEmpty) {
                           return AppLocalizations.of(context)!.text('validator_field_required');
                         }
                         return null;
                       }
-                    )
+                    ),
                   ),
                 ]
               ),
               const Divider(height: 10),
               IngredientsField(
                 context: context,
-                ingredient: CS.Ingredient.fermentable,
+                ingredient: constants.Ingredient.fermentable,
                 receipt: widget.model,
                 onChanged: (values) {
                   widget.model.fermentables = values as List<FermentableModel>;
@@ -382,17 +375,17 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               const Divider(height: 10),
               IngredientsField(
                 context: context,
-                ingredient: CS.Ingredient.hops,
+                ingredient: constants.Ingredient.hops,
                 receipt: widget.model,
                 onChanged: (values) {
-                  widget.model.hops = values as List<hop.HopModel>;
+                  widget.model.hops = values as List<hm.HopModel>;
                   _calculate();
                 },
               ),
               const Divider(height: 10),
               IngredientsField(
                 context: context,
-                ingredient: CS.Ingredient.yeast,
+                ingredient: constants.Ingredient.yeast,
                 receipt: widget.model,
                 onChanged: (values) {
                   widget.model.yeasts = values as List<YeastModel>;
@@ -402,7 +395,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               const Divider(height: 10),
               IngredientsField(
                 context: context,
-                ingredient: CS.Ingredient.misc,
+                ingredient: constants.Ingredient.misc,
                 receipt: widget.model,
                 onChanged: (values) => widget.model.miscellaneous = values as List<MiscModel>
               ),
@@ -429,7 +422,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                           labelText: AppLocalizations.of(context)!.text('primary_fermentation'),
                           suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
                           border: InputBorder.none,
-                          fillColor: CS.FillColor, filled: true
+                          fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -450,7 +443,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                           labelText: AppLocalizations.of(context)!.text('temperature'),
                           suffixText: AppLocalizations.of(context)!.tempMeasure,
                           border: InputBorder.none,
-                          fillColor: CS.FillColor, filled: true
+                          fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -472,7 +465,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                         labelText: AppLocalizations.of(context)!.text('secondary_fermentation'),
                         suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -493,7 +486,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                         labelText: AppLocalizations.of(context)!.text('temperature'),
                         suffixText: AppLocalizations.of(context)!.tempMeasure,
                         border: InputBorder.none,
-                        fillColor: CS.FillColor, filled: true
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -514,7 +507,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                           labelText: AppLocalizations.of(context)!.text('tertiary_fermentation'),
                           suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
                           border: InputBorder.none,
-                          fillColor: CS.FillColor, filled: true
+                          fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -534,7 +527,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                           labelText: AppLocalizations.of(context)!.text('temperature'),
                           suffixText: AppLocalizations.of(context)!.tempMeasure,
                           border: InputBorder.none,
-                          fillColor: CS.FillColor, filled: true
+                          fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),

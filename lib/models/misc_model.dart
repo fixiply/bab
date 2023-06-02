@@ -22,9 +22,9 @@ class MiscModel<T> extends Model {
   dynamic name;
   Misc? type;
   Use? use;
+  double? amount;
   Unit? unit;
   int? duration;
-  double? amount;
   dynamic notes;
 
   MiscModel({
@@ -38,9 +38,9 @@ class MiscModel<T> extends Model {
     this.name,
     this.type = Misc.flavor,
     this.use = Use.mash,
+    this.amount,
     this.unit,
     this.duration,
-    this.amount,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
 
@@ -50,8 +50,6 @@ class MiscModel<T> extends Model {
     this.status = Status.values.elementAt(map['status']);
     this.name = LocalizedText.deserialize(map['name']);
     this.type = Misc.values.elementAt(map['type']);
-    // if (map['use'] != null) this.use = MiscUse.values.elementAt(map['use']);
-    // this.time = map['time'];
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
@@ -62,9 +60,6 @@ class MiscModel<T> extends Model {
       'status': this.status!.index,
       'name': LocalizedText.serialize(this.name),
       'type': this.type!.index,
-      // 'use': this.use!.index,
-      // 'time': this.time,
-      // 'amount': this.amount,
       'notes': LocalizedText.serialize(this.notes),
     });
     return map;
@@ -80,9 +75,9 @@ class MiscModel<T> extends Model {
       name: this.name,
       type: this.type,
       use: this.use,
+      amount: this.amount,
       unit: this.unit,
       duration: this.duration,
-      amount: this.amount,
       notes: this.notes,
     );
   }
@@ -161,9 +156,9 @@ class MiscModel<T> extends Model {
       MiscModel? model = await Database().getMisc(item.uuid!);
       if (model != null) {
         model.amount = item.amount;
+        model.unit = Unit.units;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
-        model.unit = Unit.units;
         values.add(model);
       }
     }
@@ -181,9 +176,9 @@ class MiscModel<T> extends Model {
           Quantity model = Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
+          if (item.unit != null) model.unit = item.unit;
           model.duration = item.duration;
           model.use = item.use?.index;
-          if (item.unit != null) model.unit = item.unit;
           values.add(Quantity.serialize(model));
         }
         return values;

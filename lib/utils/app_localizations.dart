@@ -59,6 +59,34 @@ class AppLocalizations {
     return ':';
   }
 
+  String? symbol(Enum e) {
+    switch (e) {
+      case Time.minutes:
+        return 'min';
+      case Time.hours:
+        return 'h';
+      case Time.days:
+        return 'd';
+      case Time.weeks:
+        return 'week';
+      case Time.month:
+        return 'm';
+      case Unit.gram:
+        return 'g';
+      case Unit.kilo:
+        return 'kg';
+      case Unit.milliliter:
+        return 'ml';
+      case Unit.liter:
+        return 'l';
+      case Unit.packages:
+        return 'pkt';
+      case Unit.units:
+        return 'u';
+    }
+    return null;
+  }
+
   String get liquid {
     if (measure == Measure.imperial) {
       return text('gallons');

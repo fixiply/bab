@@ -4,33 +4,33 @@ import 'package:bb/utils/constants.dart';
 class Quantity<T> {
   String? uuid;
   double? amount;
+  Unit? unit;
   int? duration;
   int? use;
-  Unit? unit;
 
   Quantity({
     this.uuid,
     this.amount,
+    this.unit = Unit.units,
     this.duration,
     this.use,
-    this.unit = Unit.units,
   });
 
   void fromMap(Map<String, dynamic> map) {
     this.uuid = map['uuid'];
     if (map['amount'] != null) this.amount = map['amount'].toDouble();
+    if (map.containsKey('unit')) this.unit = Unit.values.elementAt(map['unit']);
     this.duration = map['duration'];
     this.use = map['use'];
-    if (map.containsKey('unit')) this.unit = Unit.values.elementAt(map['unit']);
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'uuid': this.uuid,
       'amount': this.amount,
+      'unit': this.unit!.index,
       'duration': this.duration,
       'use': this.use,
-      'unit': this.unit!.index,
     };
     return map;
   }
@@ -39,9 +39,9 @@ class Quantity<T> {
     return Quantity(
       uuid: this.uuid,
       amount: this.amount,
+      unit: this.unit,
       duration: this.duration,
       use: this.use,
-      unit: this.unit,
     );
   }
 

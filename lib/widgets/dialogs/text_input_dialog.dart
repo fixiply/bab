@@ -47,13 +47,13 @@ class _TextInputDialogState extends State<TextInputDialog> {
         ),
         actions: <CupertinoDialogAction>[
           CupertinoDialogAction(
-            child: Text(AppLocalizations.of(context)!.text('cancel')),
+            child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
             onPressed: () {
               Navigator.pop(context);
             },
           ),
           CupertinoDialogAction(
-            child: Text(AppLocalizations.of(context)!.text('ok')),
+            child: Text(MaterialLocalizations.of(context).okButtonLabel),
             isDestructiveAction: true,
             onPressed: () {
               Navigator.pop(context, _textFieldController.text);
@@ -80,7 +80,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
       actions: <Widget>[
         TextButton(
           // textColor: Theme.of(context).colorScheme.secondary,
-          child: Text(AppLocalizations.of(context)!.text('cancel')),
+          child: Text(MaterialLocalizations.of(context).cancelButtonLabel),
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16),
           ),
@@ -90,7 +90,7 @@ class _TextInputDialogState extends State<TextInputDialog> {
         ),
         TextButton(
           // textColor: Theme.of(context).colorScheme.secondary,
-          child: Text(AppLocalizations.of(context)!.text('ok')),
+          child: Text(MaterialLocalizations.of(context).okButtonLabel),
           style: TextButton.styleFrom(
             textStyle: const TextStyle(fontSize: 16),
           ),

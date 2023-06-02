@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart' as Foundation;
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
@@ -22,9 +22,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String? _email = Foundation.kDebugMode ? RECIPIENT : null;
+  String? _email = foundation.kDebugMode ? RECIPIENT : null;
   late TextEditingController _emailController;
-  final FocusNode _textNode = FocusNode();
   final TextEditingController _passwordController = TextEditingController();
 
   bool passwordVisible = false;
@@ -120,45 +119,36 @@ class _LoginPageState extends State<LoginPage> {
                 alignment: Alignment.centerLeft,
                 child: Text(AppLocalizations.of(context)!.text('password'), style: const TextStyle(fontWeight: FontWeight.bold)),
               ),
-              RawKeyboardListener(
-                autofocus: true,
-                focusNode: _textNode,
-                onKey: (RawKeyEvent event) {
-                  if (event.runtimeType.toString() == 'RawKeyDownEvent' ||  // debug mode
-                      event.runtimeType.toString() == 'minified:kW')        // compiled mode
-                      {  }
-                },
-                child: TextFormField(
-                  controller: _passwordController,
-                  obscureText: !passwordVisible,
-                  decoration: InputDecoration(
-                    border: const OutlineInputBorder(),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
-                    ),
-                    isDense: true,
-                    contentPadding: const EdgeInsets.all(12),
-                    suffixIcon: IconButton(
-                      color: TextGrey,
-                      icon: Icon(passwordVisible
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
-                      onPressed: togglePassword,
-                    ),
+              TextFormField(
+                controller: _passwordController,
+                obscureText: !passwordVisible,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
                   ),
-                  onEditingComplete: () async {
-                    if (_formKey.currentState!.validate()) {
-                      await _signInWithEmailAndPassword();
-                    }
-                  },
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return AppLocalizations.of(context)!.text('password_required');
-                    }
-                    return null;
-                  }
+                  isDense: true,
+                  contentPadding: const EdgeInsets.all(12),
+                  suffixIcon: IconButton(
+                    color: TextGrey,
+                    icon: Icon(passwordVisible
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
+                    onPressed: togglePassword,
+                  ),
                 ),
+                onEditingComplete: () async {
+                  if (_formKey.currentState!.validate()) {
+                    await _signInWithEmailAndPassword();
+                  }
+                },
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return AppLocalizations.of(context)!.text('password_required');
+                  }
+                  return null;
+                }
               ),
               const SizedBox(height: 6),
               Align(
