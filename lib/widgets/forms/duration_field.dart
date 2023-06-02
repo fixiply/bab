@@ -40,6 +40,7 @@ class _DurationFieldState extends FormFieldState<int> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      readOnly: true,
       controller: _textController..text = AppLocalizations.of(context)!.numberFormat(widget.initialValue) ?? '',
       decoration: FormDecoration(
         icon: widget.icon ?? Icon(Icons.timer_outlined),
