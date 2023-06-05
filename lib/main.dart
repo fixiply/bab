@@ -35,6 +35,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
+import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
 
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
@@ -43,6 +44,8 @@ String? selectedNotificationPayload;
 final ValuesNotifier editionNotifier = ValuesNotifier();
 final BasketNotifier basketNotifier = BasketNotifier();
 final LocaleNotifier localeNotifier = LocaleNotifier();
+
+var logger = Logger();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -167,7 +170,8 @@ class _AppState extends State<MyApp> {
             }
           }
         }
-        print('[$APP_NAME] User \'${user.email}\' is signed in with \'${model.role}\'.');
+        logger.d('[$APP_NAME] User "${user.email}" is signed in with "${model.role}".');
+        debugPrint('[$APP_NAME] User "${user.email}" is signed in with "${model.role}".');
       }
     }
     setState(() {
@@ -218,7 +222,8 @@ class _AppState extends State<MyApp> {
   Future<void> _subscribe() async {
     if (!DeviceHelper.isDesktop) {
       await FirebaseMessaging.instance.subscribeToTopic(foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC);
-      print('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
+      logger.d('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
+      debugPrint('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       });
     }
@@ -229,10 +234,10 @@ class _AppState extends State<MyApp> {
     if (notification != null) {
       String? id = message.data['id'];
       Notifications().showNotification(
-          id != null ? id.hashCode : 0,
-          notification.title!,
-          body: notification.body,
-          payload: id
+        id != null ? id.hashCode : 0,
+        title: notification.title,
+        body: notification.body,
+        payload: id
       );
     }
   }

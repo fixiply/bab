@@ -13,8 +13,9 @@ class CountDownText extends StatefulWidget {
   Duration duration;
   Map<String, String> map;
   final CountDownTextController? controller;
+  Function()? onComplete;
 
-  CountDownText({Key? key, required this.duration, required this.map, this.controller}): super(key: key);
+  CountDownText({Key? key, required this.duration, required this.map, this.controller, this.onComplete}): super(key: key);
   @override
   CountDownTextState createState() => CountDownTextState();
 }
@@ -28,34 +29,29 @@ class CountDownTextController {
 }
 
 class CountDownTextState extends State<CountDownText> {
-  CountDownTextController? controller;
+  Timer? _timer;
+  CountDownTextController? _controller;
 
   @override
   void initState() {
-    controller = widget.controller ?? CountDownTextController();
+    _controller = widget.controller ?? CountDownTextController();
     super.initState();
     _setController();
   }
 
   void _setController() {
-    controller?._state = this;
+    _controller?._state = this;
   }
 
   void run(Duration duration) {
     widget.duration = duration;
-    Timer.periodic(Duration(seconds: 1), (Timer timer) {
+    _timer?.cancel();
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       if (!mounted) return;
       setState(() {
         final seconds = widget.duration.inSeconds - 1;
         if (seconds < 0) {
-          String text = '';
-          widget.map.forEach((k, v) {
-            text += '${text.isNotEmpty ? ', ' : ''} $v de $k';
-          });
-          Notifications().showNotification(
-            const Uuid().hashCode,
-            'Ajoutez $text.'
-          );
+          widget.onComplete?.call();
           timer.cancel();
         } else {
           widget.duration = Duration(seconds: seconds);
@@ -80,7 +76,7 @@ class CountDownTextState extends State<CountDownText> {
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(width: 30, child: index == 1 ? Icon(widget.duration.inSeconds == 0 ? Icons.check_box_outlined : Icons.check_box_outline_blank_outlined, color: widget.duration.inSeconds == 0 ? Theme.of(context).primaryColor : Colors.black54) : null),
+            SizedBox(width: 30, child: index == 1 ? Icon(widget.duration.inSeconds <= 0 ? Icons.check_box_outlined : Icons.check_box_outline_blank_outlined, color: widget.duration.inSeconds <= 0 ? Theme.of(context).primaryColor : Colors.black54) : null),
             Flexible(child: Text('Ajoutez ${e.value} de «${e.key}»' + (widget.duration.inSeconds > 0 && widget.map.length == index ? ' dans $hours:$minutes:$seconds' : ''))),
           ],
         );

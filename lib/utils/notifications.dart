@@ -84,7 +84,7 @@ class Notifications {
     );
   }
 
-  Future<void> showNotification(int id, String title, {String? body, String? payload, String? scheduled}) async {
+  Future<void> showNotification(int id, {String? title, String? body, String? payload, String? scheduled}) async {
     await _configureLocalTimeZone();
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
         channelId, 'Notifications',
@@ -93,7 +93,9 @@ class Notifications {
         color: PrimaryColor,
         importance: Importance.max,
         priority: Priority.high,
-        ticker: 'ticker');
+        ticker: 'ticker',
+        styleInformation: BigTextStyleInformation('')
+    );
     var DarwinPlatformChannelSpecifics = const DarwinNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,

@@ -7,7 +7,7 @@ import 'package:bb/utils/constants.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 
 class CircularTimer extends CircularCountDownTimer {
-  CircularTimer(CountDownController controller, {required int duration, required int index, ValueChanged<Duration>? onChange, Function(int index)? onComplete}) : super(
+  CircularTimer(CountDownController controller, {required int duration, required int index, VoidCallback? onStart, ValueChanged<Duration>? onChange, Function(int index)? onComplete}) : super(
     duration: duration,
     initialDuration: 0,
     controller: controller,
@@ -27,7 +27,7 @@ class CircularTimer extends CircularCountDownTimer {
     isReverseAnimation: false,
     isTimerTextShown: true,
     autoStart: false,
-    onStart: () {},
+    onStart: onStart,
     onComplete: () {
       onComplete?.call(index);
     },
