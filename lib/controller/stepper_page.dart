@@ -95,7 +95,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
   int _lastStep = 0;
-  int _currentStep = 10;
+  int _currentStep = 0;
 
   Future<List<MyStep>>? _steps;
   late SfRadialGauge _temp;
