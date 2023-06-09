@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/text_format.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/utils/text_format.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 // External package
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';

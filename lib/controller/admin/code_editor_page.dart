@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
 
 // External package
 import 'package:highlight/languages/dart.dart';

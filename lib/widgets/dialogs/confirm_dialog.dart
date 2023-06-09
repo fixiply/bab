@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
+import 'package:bab/helpers/device_helper.dart';
 
 class ConfirmDialog extends StatefulWidget {
   final String? title;

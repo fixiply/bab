@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/helpers/class_helper.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/helpers/class_helper.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 class DeleteDialog extends StatefulWidget {
   final String? title;

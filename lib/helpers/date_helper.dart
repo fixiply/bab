@@ -1,14 +1,21 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 // External package
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class DateHelper {
-  static DateTime? parse(String? value) {
-    return value != null ? DateTime.parse(value) : null;
+  static DateTime? parse(dynamic value) {
+    if (value is String) {
+      return DateTime.parse(value);
+    }
+    if (value is Timestamp) {
+      return (value as Timestamp).toDate();
+    }
+    return value;
   }
 
   static bool isToday(DateTime date) {

@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/basket_page.dart';
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/event_model.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/widgets/containers/image_container.dart';
+import 'package:bab/controller/basket_page.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/event_model.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/widgets/containers/image_container.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;

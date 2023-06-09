@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/rating.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/utils/rating.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/utils/app_localizations.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class RatingDialog extends StatefulWidget {

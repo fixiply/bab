@@ -1,14 +1,14 @@
 // Internal package
-import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/helpers/formula_helper.dart';
-import 'package:bb/models/equipment_model.dart';
-import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/model.dart';
-import 'package:bb/models/receipt_model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/localized_text.dart';
+import 'package:bab/helpers/color_helper.dart';
+import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/helpers/formula_helper.dart';
+import 'package:bab/models/equipment_model.dart';
+import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/models/receipt_model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/utils/localized_text.dart';
 
 enum Status with Enums { pending, started, finished, stoped;
   List<Enum> get enums => [ pending, started, finished, stoped ];
@@ -61,9 +61,9 @@ class BrewModel<T> extends Model {
     this.abv,
     this.og,
     this.fg,
-    this.primaryday,
-    this.secondaryday,
-    this.tertiaryday,
+    // this.primaryday,
+    // this.secondaryday,
+    // this.tertiaryday,
     this.notes
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     color ??= ColorHelper.random();
@@ -88,9 +88,9 @@ class BrewModel<T> extends Model {
     if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['og'] != null) this.og = map['og'].toDouble();
     if (map['fg'] != null) this.fg = map['fg'].toDouble();
-    this.primaryday = map['primaryday'];
-    this.secondaryday = map['secondaryday'];
-    this.tertiaryday = map['tertiaryday'];
+    // this.primaryday = map['primaryday'];
+    // this.secondaryday = map['secondaryday'];
+    // this.tertiaryday = map['tertiaryday'];
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
@@ -100,7 +100,7 @@ class BrewModel<T> extends Model {
     map.addAll({
       'color': this.color,
       'status': this.status!.index,
-      'started_at': started_at != null ? this.started_at!.toIso8601String() : null,
+      'started_at': started_at,
       'reference': this.reference,
       'receipt': this.receipt != null ? this.receipt!.uuid : null,
       'tank': this.tank != null ? this.tank!.uuid : null,
@@ -114,9 +114,9 @@ class BrewModel<T> extends Model {
       'abv': this.abv,
       'og': this.og,
       'fg': this.fg,
-      'primaryday': this.primaryday,
-      'secondaryday': this.secondaryday,
-      'tertiaryday': this.tertiaryday,
+      // 'primaryday': this.primaryday,
+      // 'secondaryday': this.secondaryday,
+      // 'tertiaryday': this.tertiaryday,
       'notes': LocalizedText.serialize(this.notes),
     });
     return map;
@@ -144,9 +144,9 @@ class BrewModel<T> extends Model {
       abv: this.abv,
       og: this.og,
       fg: this.fg,
-      primaryday: this.primaryday,
-      secondaryday: this.secondaryday,
-      tertiaryday: this.tertiaryday,
+      // primaryday: this.primaryday,
+      // secondaryday: this.secondaryday,
+      // tertiaryday: this.tertiaryday,
       notes: this.notes
     );
   }
@@ -165,24 +165,20 @@ class BrewModel<T> extends Model {
     return 'Breaw: $reference, UUID: $uuid';
   }
 
-  DateTime started() {
-    return started_at ?? inserted_at!;
-  }
-
-  DateTime? secondaryDate() {
+  DateTime? primaryDate() {
     int? primary = primaryday ?? receipt?.primaryday;
     if (primary != null) {
-      return DateHelper.toDate(inserted_at!.add(Duration(days: primary)));
+      return DateHelper.toDate(started_at!.add(Duration(days: primary)));
     }
     return null;
   }
 
-  DateTime? tertiaryDate() {
+  DateTime? secondaryDate() {
     int? secondary = secondaryday ?? receipt?.secondaryday;
     if (secondary != null) {
       int? primary = primaryday ?? receipt?.primaryday;
       int days = (primary ?? 0) + secondary;
-      return DateHelper.toDate(inserted_at!.add(Duration(days: days)));
+      return DateHelper.toDate(started_at!.add(Duration(days: days)));
     }
     return null;
   }
@@ -193,7 +189,7 @@ class BrewModel<T> extends Model {
     int? tertiary = tertiaryday ?? receipt?.tertiaryday;
     if (primary != null || secondary != null || tertiary != null) {
       int days = (primary ?? 0) + (secondary ?? 0) + (tertiary ?? 0);
-      return DateHelper.toDate(inserted_at!.add(Duration(days: days)));
+      return DateHelper.toDate(started_at!.add(Duration(days: days)));
     }
     return null;
   }

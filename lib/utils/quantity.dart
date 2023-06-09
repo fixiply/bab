@@ -1,5 +1,5 @@
 // Internal package
-import 'package:bb/utils/constants.dart';
+import 'package:bab/utils/constants.dart';
 
 class Quantity<T> {
   String? uuid;

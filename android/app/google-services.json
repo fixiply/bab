@@ -1,41 +1,48 @@
 {
   "project_info": {
-    "project_number": "955480665092",
-    "firebase_url": "https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app",
-    "project_id": "brasseur-bordelais",
-    "storage_bucket": "brasseur-bordelais.appspot.com"
+    "project_number": "94135687117",
+    "project_id": "beandbrew",
+    "storage_bucket": "beandbrew.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:955480665092:android:e3b7bd21ccd6fa5759d951",
+        "mobilesdk_app_id": "1:94135687117:android:60908768de2a724dca1684",
         "android_client_info": {
-          "package_name": "com.fixiply.bb"
+          "package_name": "com.fixiply.bab"
         }
       },
       "oauth_client": [
         {
-          "client_id": "955480665092-lf0h09hgfkav0oo005d19r2146s5d1dc.apps.googleusercontent.com",
+          "client_id": "94135687117-e3grq4jekda8r41qnohr21tt2ve31vna.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.fixiply.bab",
+            "certificate_hash": "08e4cfb96ad3c30eec0653c58f9094d26672ab16"
+          }
+        },
+        {
+          "client_id": "94135687117-i4jau56069uhu2mjtpv3d28v1nict4nh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAJWa2a4Ge5DDfD2oIqdRecHF7q1fJAFd0"
+          "current_key": "AIzaSyBPEbLsKz6nNIAvRNtIFZzSehTFCntJ2qY"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "955480665092-lf0h09hgfkav0oo005d19r2146s5d1dc.apps.googleusercontent.com",
+              "client_id": "94135687117-i4jau56069uhu2mjtpv3d28v1nict4nh.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "955480665092-tvire7q52i740rsng3mq7cfnmscom5cc.apps.googleusercontent.com",
+              "client_id": "94135687117-pdhnsvd8n6ohe80d8dqr8d0ifv6i80o9.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.fixiply.bb"
+                "bundle_id": "com.fixiply.bab"
               }
             }
           ]

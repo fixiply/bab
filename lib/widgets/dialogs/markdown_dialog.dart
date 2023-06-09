@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 // External package
 import 'package:flutter_markdown/flutter_markdown.dart';

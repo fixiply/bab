@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 // External package

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/constants.dart';
+import 'package:bab/utils/constants.dart';
 
 class FormDecoration extends InputDecoration {
   FormDecoration({

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 // Internal package
-import 'package:bb/models/basket_model.dart';
+import 'package:bab/models/basket_model.dart';
 
 class BasketNotifier with ChangeNotifier {
   List<BasketModel> _baskets = [];

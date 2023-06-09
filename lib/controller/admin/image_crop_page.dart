@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 // External package
 import 'package:extended_image/extended_image.dart';

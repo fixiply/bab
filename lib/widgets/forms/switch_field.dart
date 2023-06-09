@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/widgets/form_decoration.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/widgets/form_decoration.dart';
 
 class SwitchField extends FormField<bool> {
   final void Function(bool)? onChanged;

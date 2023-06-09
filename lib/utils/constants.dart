@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/user_model.dart';
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/models/user_model.dart';
+import 'package:bab/utils/app_localizations.dart';
 
-const String APP_NAME = 'BB';
-const String BUNDLE_IDENTIFIER = 'com.fixiply.bb';
+const String APP_NAME = 'BAB';
+const String BUNDLE_IDENTIFIER = 'com.fixiply.bab';
 const String RECIPIENT = 'contact@beandbrew.com';
-const String PROJECT_ID = 'brasseur-bordelais';
+const String PROJECT_ID = 'beandbrew';
 const String BUCKET = '$PROJECT_ID.appspot.com';
 const NOTIFICATION_TOPIC = 'default';
 const NOTIFICATION_TOPIC_DEBUG = 'debug';

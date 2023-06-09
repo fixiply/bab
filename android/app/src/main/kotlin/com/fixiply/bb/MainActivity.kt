@@ -1,4 +1,4 @@
-package com.fixiply.bb
+package com.fixiply.bab
 
 import io.flutter.embedding.android.FlutterActivity
 

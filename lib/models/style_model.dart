@@ -1,7 +1,7 @@
 // Internal package
-import 'package:bb/models/model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/localized_text.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/localized_text.dart';
 
 class StyleModel<T> extends Model {
   Status? status;

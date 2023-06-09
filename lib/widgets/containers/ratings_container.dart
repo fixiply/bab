@@ -1,11 +1,11 @@
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/dialogs/rating_dialog.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/dialogs/rating_dialog.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/rating.dart';
+import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/rating.dart';
 
 // External package
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';

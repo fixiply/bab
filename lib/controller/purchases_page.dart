@@ -1,13 +1,13 @@
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/containers/empty_container.dart';
-import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/image_animate_rotate.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/containers/empty_container.dart';
+import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/purchase_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/models/purchase_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
 
 class PurchasesPage extends StatefulWidget {
   @override

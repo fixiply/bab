@@ -1,25 +1,25 @@
 import 'package:flutter/widgets.dart';
 
 // Internal package
-import 'package:bb/helpers/class_helper.dart';
-import 'package:bb/models/basket_model.dart';
-import 'package:bb/models/brew_model.dart';
-import 'package:bb/models/company_model.dart';
-import 'package:bb/models/equipment_model.dart';
-import 'package:bb/models/event_model.dart';
-import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart';
-import 'package:bb/models/inventory_model.dart';
-import 'package:bb/models/misc_model.dart';
-import 'package:bb/models/model.dart';
-import 'package:bb/models/product_model.dart';
-import 'package:bb/models/purchase_model.dart';
-import 'package:bb/utils/rating.dart';
-import 'package:bb/models/receipt_model.dart';
-import 'package:bb/models/style_model.dart';
-import 'package:bb/models/user_model.dart';
-import 'package:bb/models/yeast_model.dart';
-import 'package:bb/utils/constants.dart' as constants;
+import 'package:bab/helpers/class_helper.dart';
+import 'package:bab/models/basket_model.dart';
+import 'package:bab/models/brew_model.dart';
+import 'package:bab/models/company_model.dart';
+import 'package:bab/models/equipment_model.dart';
+import 'package:bab/models/event_model.dart';
+import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/hop_model.dart';
+import 'package:bab/models/inventory_model.dart';
+import 'package:bab/models/misc_model.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/models/product_model.dart';
+import 'package:bab/models/purchase_model.dart';
+import 'package:bab/utils/rating.dart';
+import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/style_model.dart';
+import 'package:bab/models/user_model.dart';
+import 'package:bab/models/yeast_model.dart';
+import 'package:bab/utils/constants.dart' as constants;
 
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';

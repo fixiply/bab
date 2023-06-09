@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/text_format.dart';
+import 'package:bab/utils/text_format.dart';
 
 // External package
 import 'package:firebase_storage/firebase_storage.dart';

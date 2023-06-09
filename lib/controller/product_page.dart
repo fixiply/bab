@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/basket_page.dart';
-import 'package:bb/controller/forms/form_product_page.dart';
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/product_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/containers/image_container.dart';
-import 'package:bb/widgets/containers/ratings_container.dart';
-import 'package:bb/widgets/modal_bottom_sheet.dart';
-import 'package:bb/widgets/paints/bezier_clipper.dart';
-import 'package:bb/widgets/paints/circle_clipper.dart';
-import 'package:bb/widgets/primary_button.dart';
+import 'package:bab/controller/basket_page.dart';
+import 'package:bab/controller/forms/form_product_page.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/product_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/containers/image_container.dart';
+import 'package:bab/widgets/containers/ratings_container.dart';
+import 'package:bab/widgets/modal_bottom_sheet.dart';
+import 'package:bab/widgets/paints/bezier_clipper.dart';
+import 'package:bab/widgets/paints/circle_clipper.dart';
+import 'package:bab/widgets/primary_button.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;

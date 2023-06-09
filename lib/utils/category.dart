@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/style_model.dart';
-import 'package:bb/utils/localized_text.dart';
+import 'package:bab/models/style_model.dart';
+import 'package:bab/utils/localized_text.dart';
 
 class Category {
   dynamic name;

@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart' show defaultTargetPlatform, TargetPlatform;
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/utils/constants.dart';
 import 'package:flutter/material.dart';
 
 class Payment {

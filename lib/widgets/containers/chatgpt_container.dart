@@ -1,11 +1,11 @@
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/containers/abstract_container.dart';
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/containers/abstract_container.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 // External package
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';

@@ -1,9 +1,9 @@
 // Internal package
-import 'package:bb/utils/adress.dart';
-import 'package:bb/models/payment_model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/utils/device.dart';
+import 'package:bab/utils/adress.dart';
+import 'package:bab/models/payment_model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/utils/device.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -70,8 +70,8 @@ class UserModel<T> {
 
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = {
-      'inserted_at': this.inserted_at!.toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
+      'inserted_at': this.inserted_at,
+      'updated_at': DateTime.now(),
       'verified': this.verified,
       'full_name': this.full_name,
       'email': this.email,

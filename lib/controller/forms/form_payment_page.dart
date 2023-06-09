@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/payment_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/form_decoration.dart';
+import 'package:bab/models/payment_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/form_decoration.dart';
 
 class FormPaymentPage extends StatefulWidget {
   final PaymentModel model;

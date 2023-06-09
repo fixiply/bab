@@ -1,10 +1,10 @@
 // Internal package
-import 'package:bb/models/image_model.dart';
-import 'package:bb/models/model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:bb/utils/rating.dart';
-import 'package:bb/utils/term.dart';
+import 'package:bab/models/image_model.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/localized_text.dart';
+import 'package:bab/utils/rating.dart';
+import 'package:bab/utils/term.dart';
 
 enum Product with Enums { article, booking, other;
   List<Enum> get enums => [ article, booking, other ];

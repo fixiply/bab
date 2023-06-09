@@ -1,12 +1,12 @@
-import 'package:bb/utils/edition_notifier.dart';
+import 'package:bab/utils/edition_notifier.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/locale_notifier.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/utils/locale_notifier.dart';
 
 // External package
 import 'package:app_settings/app_settings.dart';

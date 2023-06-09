@@ -3,11 +3,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/register_page.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/dialogs/markdown_dialog.dart';
-import 'package:bb/widgets/primary_button.dart';
+import 'package:bab/controller/register_page.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/dialogs/markdown_dialog.dart';
+import 'package:bab/widgets/primary_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // External package
@@ -253,6 +253,8 @@ class _LoginPageState extends State<LoginPage> {
         _showSnackbar(AppLocalizations.of(context)!.text('no_user_found'));
       } else if (e.code == 'wrong-password') {
         _showSnackbar(AppLocalizations.of(context)!.text('wrong_password'));
+      } else {
+        _showSnackbar(e.message!);
       }
     }
   }

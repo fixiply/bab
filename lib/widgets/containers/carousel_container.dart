@@ -1,12 +1,12 @@
-import 'package:bb/widgets/containers/abstract_container.dart';
+import 'package:bab/widgets/containers/abstract_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/product_page.dart';
-import 'package:bb/models/product_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/widgets/custom_image.dart';
-import 'package:bb/widgets/modal_bottom_sheet.dart';
+import 'package:bab/controller/product_page.dart';
+import 'package:bab/models/product_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/widgets/custom_image.dart';
+import 'package:bab/widgets/modal_bottom_sheet.dart';
 
 // External package
 import 'package:carousel_slider/carousel_slider.dart';

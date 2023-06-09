@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 class EmptyContainer extends StatelessWidget {
   final Widget? image;

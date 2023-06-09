@@ -1,4 +1,4 @@
-import 'package:bb/widgets/containers/abstract_container.dart';
+import 'package:bab/widgets/containers/abstract_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package

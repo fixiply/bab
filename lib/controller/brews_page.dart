@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/brew_page.dart';
-import 'package:bb/controller/forms/form_brew_page.dart';
-import 'package:bb/controller/stepper_page.dart';
-import 'package:bb/controller/tables/brew_data_source.dart';
-import 'package:bb/controller/tables/edit_sfdatagrid.dart';
-import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/helpers/import_helper.dart';
-import 'package:bb/models/brew_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/animated_action_button.dart';
-import 'package:bb/widgets/containers/empty_container.dart';
-import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/dialogs/delete_dialog.dart';
-import 'package:bb/widgets/search_text.dart';
+import 'package:bab/controller/brew_page.dart';
+import 'package:bab/controller/forms/form_brew_page.dart';
+import 'package:bab/controller/stepper_page.dart';
+import 'package:bab/controller/tables/brew_data_source.dart';
+import 'package:bab/controller/tables/edit_sfdatagrid.dart';
+import 'package:bab/helpers/color_helper.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/helpers/import_helper.dart';
+import 'package:bab/models/brew_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/containers/empty_container.dart';
+import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/dialogs/delete_dialog.dart';
+import 'package:bab/widgets/search_text.dart';
 
 // External package
 import 'package:expandable_text/expandable_text.dart';
@@ -238,7 +238,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(text: '#${model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
-              TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(model.started())}'),
+              if (model.started_at != null) TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(model.started_at)}'),
             ],
           ),
         ),

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/inventory_model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/image_animate_rotate.dart';
-import 'package:bb/widgets/search_text.dart';
+import 'package:bab/models/inventory_model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/image_animate_rotate.dart';
+import 'package:bab/widgets/search_text.dart';
 
 // External package
 

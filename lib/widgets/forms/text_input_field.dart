@@ -1,11 +1,11 @@
-import 'package:bb/utils/locale_notifier.dart';
-import 'package:bb/utils/localized_text.dart';
+import 'package:bab/utils/locale_notifier.dart';
+import 'package:bab/utils/localized_text.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/form_decoration.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/form_decoration.dart';
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 import 'package:provider/provider.dart';

@@ -6,24 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/main.dart';
-import 'package:bb/models/brew_model.dart';
-import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart' as hp;
-import 'package:bb/models/misc_model.dart' as mm;
-import 'package:bb/models/receipt_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as constants;
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/mash.dart' as mash;
-import 'package:bb/utils/notifications.dart';
-import 'package:bb/widgets/circular_timer.dart';
-import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/containers/ph_container.dart';
-import 'package:bb/widgets/countdown_text.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
-import 'package:bb/widgets/form_decoration.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/main.dart';
+import 'package:bab/models/brew_model.dart';
+import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/hop_model.dart' as hp;
+import 'package:bab/models/misc_model.dart' as mm;
+import 'package:bab/models/receipt_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/utils/database.dart';
+import 'package:bab/utils/mash.dart' as mash;
+import 'package:bab/utils/notifications.dart';
+import 'package:bab/widgets/circular_timer.dart';
+import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/containers/ph_container.dart';
+import 'package:bab/widgets/countdown_text.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/widgets/form_decoration.dart';
 
 // External package
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
@@ -180,7 +180,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                       });
                     } catch (e) {
                       _showSnackbar(e.toString(), action: SnackBarAction(
-                        label: 'Continuer',
+                        label: localizations.continueButtonLabel.toUpperCase(),
+                        textColor: Colors.white,
                         onPressed: () {
                           setState(() {
                             _currentStep += 1;
@@ -208,7 +209,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                         children: <Widget>[
                           if (_currentStep < snapshot.data!.length - 1) ElevatedButton(
                             onPressed: controls.onStepContinue,
-                            child: Text(_currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel),
+                            child: Text(_currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel.toUpperCase()),
                           ),
                           if (_currentStep != 0) TextButton(
                             onPressed: controls.onStepCancel,
@@ -330,8 +331,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
         onStepContinue: (int index) {
           if (widget.model.status == Status.pending) {
-            widget.model.status == Status.started;
-            Database().update(widget.model);
+            widget.model.started_at = DateTime.now();
+            widget.model.status = Status.started;
+            Database().update(widget.model, updateAll: false);
+            debugPrint('Update ${widget.model.toMap()}');
           }
         },
       ),
@@ -418,13 +421,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         inputFormatters: <TextInputFormatter>[
           FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
         ],
-        onChanged: (value) {
+        onSubmitted: (value) {
           widget.model.og = AppLocalizations.of(context)!.decimal(value);
           widget.model.calculate();
           Database().update(widget.model);
         },
         decoration: FormDecoration(
-          icon: const Icon(Icons.first_page_outlined),
+          icon: const Icon(Icons.colorize_outlined),
           hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
           labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
           border: InputBorder.none,

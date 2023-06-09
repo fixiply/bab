@@ -6,24 +6,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/controller/home_page.dart';
-import 'package:bb/firebase_options.dart';
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/user_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/device.dart';
-import 'package:bb/utils/edition_notifier.dart';
-import 'package:bb/utils/locale_notifier.dart';
-import 'package:bb/utils/notifications.dart';
-import 'package:bb/widgets/builders/carousel_builder.dart';
-import 'package:bb/widgets/builders/chatgpt_builder.dart';
-import 'package:bb/widgets/builders/list_builder.dart';
-import 'package:bb/widgets/builders/markdown_builder.dart';
-import 'package:bb/widgets/builders/parallax_builder.dart';
-import 'package:bb/widgets/builders/subscription_builder.dart';
+import 'package:bab/controller/home_page.dart';
+import 'package:bab/firebase_options.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/user_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/utils/device.dart';
+import 'package:bab/utils/edition_notifier.dart';
+import 'package:bab/utils/locale_notifier.dart';
+import 'package:bab/utils/notifications.dart';
+import 'package:bab/widgets/builders/carousel_builder.dart';
+import 'package:bab/widgets/builders/chatgpt_builder.dart';
+import 'package:bab/widgets/builders/list_builder.dart';
+import 'package:bab/widgets/builders/markdown_builder.dart';
+import 'package:bab/widgets/builders/parallax_builder.dart';
+import 'package:bab/widgets/builders/subscription_builder.dart';
 
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -47,13 +47,25 @@ final LocaleNotifier localeNotifier = LocaleNotifier();
 
 var logger = Logger();
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  print('Handling a background message ${message.messageId}');
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  Notifications().initialize();
+  // Set the background messaging handler early on, as a named top-level function
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  if (!foundation.kIsWeb) {
+    Notifications().initialize();
+  }
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
 
   runApp(
@@ -225,6 +237,7 @@ class _AppState extends State<MyApp> {
       logger.d('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       debugPrint('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        _notification(message);
       });
     }
   }

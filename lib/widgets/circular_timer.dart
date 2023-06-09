@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/utils/constants.dart';
+import 'package:bab/utils/constants.dart';
 
 // External package
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';

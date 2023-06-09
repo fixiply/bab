@@ -2,13 +2,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/login_page.dart';
-import 'package:bb/models/user_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/dialogs/markdown_dialog.dart';
-import 'package:bb/widgets/primary_button.dart';
+import 'package:bab/controller/login_page.dart';
+import 'package:bab/models/user_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/dialogs/markdown_dialog.dart';
+import 'package:bab/widgets/primary_button.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';

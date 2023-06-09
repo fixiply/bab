@@ -1,5 +1,5 @@
 // Internal package
-import 'package:bb/helpers/date_helper.dart';
+import 'package:bab/helpers/date_helper.dart';
 
 class Adress<T> {
   String? uuid;
@@ -40,8 +40,8 @@ class Adress<T> {
 
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = {
-      'inserted_at': this.inserted_at!.toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
+      'inserted_at': this.inserted_at,
+      'updated_at': DateTime.now(),
       'name': this.name,
       'street': this.address,
       'zip': this.zip,

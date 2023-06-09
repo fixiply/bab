@@ -6,18 +6,17 @@ importScripts("https://www.gstatic.com/firebasejs/9.10/firebase-messaging.js");
 importScripts("https://www.gstatic.com/firebasejs/9.10/firebase-analytics.js");
 
 var firebaseConfig = {
-    apiKey: "AIzaSyAAEsXWUis1p3rQSh7K7Xi6Rh2vD9utcXA",
-    authDomain: "brasseur-bordelais.firebaseapp.com",
-    databaseURL: "https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "brasseur-bordelais",
-    storageBucket: "brasseur-bordelais.appspot.com",
-    messagingSenderId: "955480665092",
-    appId: "1:955480665092:web:b9943e1fe865871b59d951",
-    measurementId: "G-JDKVC86LYX"
+    apiKey: "AIzaSyA0M2m4ywAyaBqEnyXvYBdSybSgtQBOGFM",
+    authDomain: "beandbrew.firebaseapp.com",
+    projectId: "beandbrew",
+    storageBucket: "beandbrew.appspot.com",
+    messagingSenderId: "94135687117",
+    appId: "1:94135687117:web:1eeccf8f5e36c7ccca1684",
+    measurementId: "G-46JRTNPPYH"
 };
+firebase.analytics();
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-firebase.analytics();
 
 const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload) {

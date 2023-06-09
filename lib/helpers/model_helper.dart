@@ -1,10 +1,10 @@
 // Internal package
-import 'package:bb/models/event_model.dart';
-import 'package:bb/models/image_model.dart';
-import 'package:bb/models/receipt_model.dart';
-import 'package:bb/models/style_model.dart';
-import 'package:bb/helpers/class_helper.dart';
-import 'package:bb/utils/database.dart';
+import 'package:bab/models/event_model.dart';
+import 'package:bab/models/image_model.dart';
+import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/style_model.dart';
+import 'package:bab/helpers/class_helper.dart';
+import 'package:bab/utils/database.dart';
 
 class ModelHelper {
   /// Obtient tous les modèles

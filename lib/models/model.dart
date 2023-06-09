@@ -1,6 +1,6 @@
 // Internal package
-import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/utils/constants.dart';
 
 class Model<T> {
   String? uuid;
@@ -30,8 +30,8 @@ class Model<T> {
 
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = {
-      'inserted_at': this.inserted_at!.toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
+      'inserted_at': this.inserted_at,
+      'updated_at': DateTime.now(),
       'creator': this.creator,
     };
     if (persist == true) {

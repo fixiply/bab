@@ -44,44 +44,42 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAAEsXWUis1p3rQSh7K7Xi6Rh2vD9utcXA',
-    appId: '1:955480665092:web:b9943e1fe865871b59d951',
-    messagingSenderId: '955480665092',
-    projectId: 'brasseur-bordelais',
-    authDomain: 'brasseur-bordelais.firebaseapp.com',
-    databaseURL: 'https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'brasseur-bordelais.appspot.com',
-    measurementId: 'G-JDKVC86LYX',
+    apiKey: 'AIzaSyA0M2m4ywAyaBqEnyXvYBdSybSgtQBOGFM',
+    appId: '1:94135687117:web:1eeccf8f5e36c7ccca1684',
+    messagingSenderId: '94135687117',
+    projectId: 'beandbrew',
+    authDomain: 'beandbrew.firebaseapp.com',
+    storageBucket: 'beandbrew.appspot.com',
+    measurementId: 'G-46JRTNPPYH',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAJWa2a4Ge5DDfD2oIqdRecHF7q1fJAFd0',
-    appId: '1:955480665092:android:e3b7bd21ccd6fa5759d951',
-    messagingSenderId: '955480665092',
-    projectId: 'brasseur-bordelais',
-    databaseURL: 'https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'brasseur-bordelais.appspot.com',
+    apiKey: 'AIzaSyBPEbLsKz6nNIAvRNtIFZzSehTFCntJ2qY',
+    appId: '1:94135687117:android:60908768de2a724dca1684',
+    messagingSenderId: '94135687117',
+    projectId: 'beandbrew',
+    storageBucket: 'beandbrew.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCiQtMKGzSYK9cBXrHcLdZNhrSX2pbkcHE',
-    appId: '1:955480665092:ios:9f036ad4bda4b58959d951',
-    messagingSenderId: '955480665092',
-    projectId: 'brasseur-bordelais',
-    databaseURL: 'https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'brasseur-bordelais.appspot.com',
-    iosClientId: '955480665092-tvire7q52i740rsng3mq7cfnmscom5cc.apps.googleusercontent.com',
-    iosBundleId: 'com.fixiply.bb',
+    apiKey: 'AIzaSyBKnxvQJWoCbEVKNjjiBA3uZmBLfn4Kng8',
+    appId: '1:94135687117:ios:bf0935c8fb93be4eca1684',
+    messagingSenderId: '94135687117',
+    projectId: 'beandbrew',
+    storageBucket: 'beandbrew.appspot.com',
+    androidClientId: '94135687117-e3grq4jekda8r41qnohr21tt2ve31vna.apps.googleusercontent.com',
+    iosClientId: '94135687117-pdhnsvd8n6ohe80d8dqr8d0ifv6i80o9.apps.googleusercontent.com',
+    iosBundleId: 'com.fixiply.bab',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCiQtMKGzSYK9cBXrHcLdZNhrSX2pbkcHE',
-    appId: '1:955480665092:ios:9f036ad4bda4b58959d951',
-    messagingSenderId: '955480665092',
-    projectId: 'brasseur-bordelais',
-    databaseURL: 'https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app',
-    storageBucket: 'brasseur-bordelais.appspot.com',
-    iosClientId: '955480665092-tvire7q52i740rsng3mq7cfnmscom5cc.apps.googleusercontent.com',
-    iosBundleId: 'com.fixiply.bb',
+    apiKey: 'AIzaSyBKnxvQJWoCbEVKNjjiBA3uZmBLfn4Kng8',
+    appId: '1:94135687117:ios:bf0935c8fb93be4eca1684',
+    messagingSenderId: '94135687117',
+    projectId: 'beandbrew',
+    storageBucket: 'beandbrew.appspot.com',
+    androidClientId: '94135687117-e3grq4jekda8r41qnohr21tt2ve31vna.apps.googleusercontent.com',
+    iosClientId: '94135687117-pdhnsvd8n6ohe80d8dqr8d0ifv6i80o9.apps.googleusercontent.com',
+    iosBundleId: 'com.fixiply.bab',
   );
 }

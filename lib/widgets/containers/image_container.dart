@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/image_model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/custom_image.dart';
-import 'package:bb/utils/text_format.dart';
+import 'package:bab/models/image_model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/custom_image.dart';
+import 'package:bab/utils/text_format.dart';
 
 // External package
 import 'package:carousel_slider/carousel_slider.dart';

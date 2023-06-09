@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/utils/app_localizations.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 class DropdownDialog extends StatefulWidget {
   final String title;

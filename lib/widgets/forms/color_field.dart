@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/helpers/color_helper.dart';
+import 'package:bab/helpers/color_helper.dart';
 
 // External package
 import 'package:flex_color_picker/flex_color_picker.dart';

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';import 'package:flutter/services.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/equipment_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as constants;
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/custom_menu_button.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
-import 'package:bb/widgets/dialogs/delete_dialog.dart';
-import 'package:bb/widgets/form_decoration.dart';
-import 'package:bb/widgets/forms/image_field.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/equipment_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/widgets/dialogs/delete_dialog.dart';
+import 'package:bab/widgets/form_decoration.dart';
+import 'package:bab/widgets/forms/image_field.dart';
 
 // External package
 import 'package:markdown_editable_textinput/format_markdown.dart';
@@ -161,11 +161,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.waves_outlined),
-                          labelText: AppLocalizations.of(context)!.text('tank_volume'),
-                          suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true
+                        icon: const Icon(Icons.waves_outlined),
+                        labelText: AppLocalizations.of(context)!.text('tank_volume'),
+                        suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -191,15 +191,15 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.waves_outlined),
-                          labelText: AppLocalizations.of(context)!.text('mash_volume'),
-                          suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
-                          suffixIcon: Tooltip(
-                            message: AppLocalizations.of(context)!.text('final_volume'),
-                            child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
-                          ),
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true
+                        icon: const Icon(Icons.waves_outlined),
+                        labelText: AppLocalizations.of(context)!.text('mash_volume'),
+                        suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('final_volume'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
+                        border: InputBorder.none,
+                        fillColor: FillColor, filled: true
                       ),
                       autovalidateMode: AutovalidateMode.onUserInteraction,
                       validator: (value) {
@@ -258,7 +258,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.propane_tank_outlined),
+                        icon: const Icon(Icons.looks_one_outlined),
                         labelText: AppLocalizations.of(context)!.text('absorption_grains'),
                         suffixText: 'L/Kg',
                         border: InputBorder.none,
@@ -283,7 +283,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.propane_tank_outlined),
+                        icon: const Icon(Icons.looks_two_outlined),
                         labelText: AppLocalizations.of(context)!.text('lost_volume'),
                         suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                         border: InputBorder.none,
@@ -304,7 +304,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.propane_tank_outlined),
+                          icon: const Icon(Icons.looks_3_outlined),
                           labelText: AppLocalizations.of(context)!.text('mash_ratio'),
                           suffixText: 'L/Kg',
                           border: InputBorder.none,
@@ -339,7 +339,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.propane_tank_outlined),
+                          icon: const Icon(Icons.looks_4_outlined),
                           labelText: AppLocalizations.of(context)!.text('boil_loss'),
                           suffixText: 'L/HR',
                           border: InputBorder.none,
@@ -360,7 +360,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.propane_tank_outlined),
+                        icon: const Icon(Icons.looks_5_outlined),
                         labelText: AppLocalizations.of(context)!.text('wort_shrinkage'),
                         suffixText: '%',
                         border: InputBorder.none,
@@ -384,7 +384,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                     _calculate();
                   },
                   decoration: FormDecoration(
-                    icon: const Icon(Icons.propane_tank_outlined),
+                    icon: const Icon(Icons.looks_6_outlined),
                     labelText: AppLocalizations.of(context)!.text('head_loss'),
                       suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                     border: InputBorder.none,

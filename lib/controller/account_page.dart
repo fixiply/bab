@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/about_page.dart';
-import 'package:bb/controller/address_page.dart';
-import 'package:bb/controller/basket_page.dart';
-import 'package:bb/controller/devices_page.dart';
-import 'package:bb/controller/login_page.dart';
-import 'package:bb/controller/payments_page.dart';
-import 'package:bb/controller/purchases_page.dart';
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/custom_drawer.dart';
-import 'package:bb/widgets/custom_menu_button.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/controller/about_page.dart';
+import 'package:bab/controller/address_page.dart';
+import 'package:bab/controller/basket_page.dart';
+import 'package:bab/controller/devices_page.dart';
+import 'package:bab/controller/login_page.dart';
+import 'package:bab/controller/payments_page.dart';
+import 'package:bab/controller/purchases_page.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/custom_drawer.dart';
+import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;

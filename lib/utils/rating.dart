@@ -1,6 +1,6 @@
 // Internal package
-import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/utils/localized_text.dart';
+import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/utils/localized_text.dart';
 
 class Rating<T> {
   String? creator;
@@ -30,7 +30,7 @@ class Rating<T> {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = {
       'creator': this.creator,
-      'inserted_at': this.inserted_at!.toIso8601String(),
+      'inserted_at': this.inserted_at,
       'name': this.name,
       'rating': this.rating,
       'comment': LocalizedText.serialize(this.comment),

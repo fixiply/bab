@@ -1,6 +1,6 @@
 // Internal package
-import 'package:bb/models/model.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/utils/constants.dart';
 
 class PurchaseModel<T> extends Model {
   Status? status;

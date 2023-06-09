@@ -1,30 +1,30 @@
-import 'package:bb/models/fermentable_model.dart';
-import 'package:bb/models/hop_model.dart';
-import 'package:bb/models/misc_model.dart';
-import 'package:bb/models/yeast_model.dart';
-import 'package:bb/utils/database.dart';
+import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/hop_model.dart';
+import 'package:bab/models/misc_model.dart';
+import 'package:bab/models/yeast_model.dart';
+import 'package:bab/utils/database.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/basket_page.dart';
-import 'package:bb/controller/forms/form_brew_page.dart';
-import 'package:bb/controller/stepper_page.dart';
-import 'package:bb/controller/tables/fermentables_data_table.dart';
-import 'package:bb/controller/tables/hops_data_table.dart';
-import 'package:bb/controller/tables/mash_data_table.dart';
-import 'package:bb/controller/tables/misc_data_table.dart';
-import 'package:bb/controller/tables/yeasts_data_table.dart';
-import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/brew_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart' as constants;
-import 'package:bb/widgets/animated_action_button.dart';
-import 'package:bb/widgets/containers/carousel_container.dart';
-import 'package:bb/widgets/custom_menu_button.dart';
-import 'package:bb/widgets/paints/bezier_clipper.dart';
-import 'package:bb/widgets/paints/circle_clipper.dart';
+import 'package:bab/controller/basket_page.dart';
+import 'package:bab/controller/forms/form_brew_page.dart';
+import 'package:bab/controller/stepper_page.dart';
+import 'package:bab/controller/tables/fermentables_data_table.dart';
+import 'package:bab/controller/tables/hops_data_table.dart';
+import 'package:bab/controller/tables/mash_data_table.dart';
+import 'package:bab/controller/tables/misc_data_table.dart';
+import 'package:bab/controller/tables/yeasts_data_table.dart';
+import 'package:bab/helpers/color_helper.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/brew_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/containers/carousel_container.dart';
+import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/paints/bezier_clipper.dart';
+import 'package:bab/widgets/paints/circle_clipper.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
@@ -67,7 +67,17 @@ class _BrewPageState extends State<BrewPage> {
           ),
           flexibleSpace: FlexibleSpaceBar(
             titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
-            title: Text('#${AppLocalizations.of(context)!.localizedText(widget.model.reference)} - ${AppLocalizations.of(context)!.dateFormat(widget.model.started())}'),
+            title: RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(text: '#${widget.model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (widget.model.started_at != null) TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(widget.model.started_at)}'),
+                ],
+              ),
+            ),
             background: Stack(
               children: [
               Opacity(

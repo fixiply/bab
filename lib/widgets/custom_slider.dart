@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/widgets/paints/rect_slider_thumb_shape.dart';
+import 'package:bab/widgets/paints/rect_slider_thumb_shape.dart';
 
 // External package
 import 'package:intl/intl.dart';

@@ -13,11 +13,11 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.fixiply.bb</string>
+	<string>com.fixiply.bab</string>
 	<key>PROJECT_ID</key>
-	<string>brasseur-bordelais</string>
+	<string>beandbrew</string>
 	<key>STORAGE_BUCKET</key>
-	<string>brasseur-bordelais.appspot.com</string>
+	<string>beandbrew.appspot.com</string>
 	<key>IS_ADS_ENABLED</key>
 	<false></false>
 	<key>IS_ANALYTICS_ENABLED</key>
@@ -31,6 +31,6 @@
 	<key>GOOGLE_APP_ID</key>
 	<string>1:955480665092:ios:9f036ad4bda4b58959d951</string>
 	<key>DATABASE_URL</key>
-	<string>https://brasseur-bordelais-default-rtdb.europe-west1.firebasedatabase.app</string>
+	<string>https://beandbrew-default-rtdb.europe-west1.firebasedatabase.app</string>
 </dict>
 </plist>

@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/localized_text.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 class EditDialog extends StatefulWidget {
   final Model model;

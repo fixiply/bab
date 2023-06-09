@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/models/product_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/rating.dart';
-import 'package:bb/widgets/modal_bottom_sheet.dart';
-import 'package:bb/widgets/primary_button.dart';
+import 'package:bab/models/product_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/utils/rating.dart';
+import 'package:bab/widgets/modal_bottom_sheet.dart';
+import 'package:bab/widgets/primary_button.dart';
 
 // External package
 

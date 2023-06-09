@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/basket_page.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/widgets/containers/empty_container.dart';
-import 'package:bb/widgets/custom_menu_button.dart';
+import 'package:bab/controller/basket_page.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/containers/empty_container.dart';
+import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;

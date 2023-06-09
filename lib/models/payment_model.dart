@@ -1,5 +1,5 @@
 // Internal package
-import 'package:bb/helpers/date_helper.dart';
+import 'package:bab/helpers/date_helper.dart';
 
 class PaymentModel<T> {
   String? uuid;
@@ -43,8 +43,8 @@ class PaymentModel<T> {
 
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = {
-      'inserted_at': this.inserted_at!.toIso8601String(),
-      'updated_at': DateTime.now().toIso8601String(),
+      'inserted_at': this.inserted_at,
+      'updated_at': DateTime.now(),
       'name': this.name,
       'number': this.number,
       'date': this.date,

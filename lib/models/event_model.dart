@@ -1,8 +1,8 @@
 // Internal package
-import 'package:bb/models/image_model.dart';
-import 'package:bb/models/model.dart';
-import 'package:bb/utils/constants.dart';
-import 'package:bb/utils/text_format.dart';
+import 'package:bab/models/image_model.dart';
+import 'package:bab/models/model.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/text_format.dart';
 import 'package:flutter/material.dart';
 
 class EventModel<T> extends Model {

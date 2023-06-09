@@ -3,8 +3,8 @@ import 'dart:math';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
-import 'package:bb/models/yeast_model.dart';
-import 'package:bb/utils/constants.dart';
+import 'package:bab/models/yeast_model.dart';
+import 'package:bab/utils/constants.dart';
 
 class FormulaHelper {
   /// Returns the dry extract, based on the given conditions.

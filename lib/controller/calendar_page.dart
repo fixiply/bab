@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bb/controller/basket_page.dart';
-import 'package:bb/controller/brew_page.dart';
-import 'package:bb/helpers/color_helper.dart';
-import 'package:bb/helpers/date_helper.dart';
-import 'package:bb/models/brew_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/basket_notifier.dart';
-import 'package:bb/utils/constants.dart' as constants;
-import 'package:bb/utils/database.dart';
-import 'package:bb/widgets/containers/empty_container.dart';
-import 'package:bb/widgets/containers/error_container.dart';
-import 'package:bb/widgets/custom_menu_button.dart';
-import 'package:bb/widgets/days.dart';
+import 'package:bab/controller/basket_page.dart';
+import 'package:bab/controller/brew_page.dart';
+import 'package:bab/helpers/color_helper.dart';
+import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/models/brew_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/containers/empty_container.dart';
+import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/days.dart';
 
 // External package
 import 'package:table_calendar/table_calendar.dart';
@@ -222,12 +222,15 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   List<ListTile> _getEventsForDay(List<Model> data, DateTime day) {
     List<Model> brews = data.where((element) {
       if (element is BrewModel) {
-        if (DateHelper.toDate(element.started()) == DateHelper.toDate(day)) {
+        if (element.started_at == false) {
+          return false;
+        }
+        if (DateHelper.toDate(element.started_at!) == DateHelper.toDate(day)) {
           return true;
         }
         if (element.status != Status.pending &&
             ((element.finish() == DateHelper.toDate(day)) ||
-            (element.secondaryDate() == DateHelper.toDate(day)) ||
+            (element.primaryDate() == DateHelper.toDate(day)) ||
             (element.secondaryDate() == DateHelper.toDate(day)))) {
           return true;
         }
@@ -244,13 +247,13 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
       if (e is BrewModel) {
         color = ColorHelper.fromHex(e.color!) ?? color;
         title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.receipt!.title)}';
-        if (DateHelper.toDate(e.started()) == DateHelper.toDate(day)) {
+        if (e.started_at != null && DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
           subtitle = 'Démarrage du brassin.';
         }  else if (e.finish() == DateHelper.toDate(day)) {
-          subtitle = 'Fin de la fermentation.';
-        } else if (e.secondaryDate() == DateHelper.toDate(day)) {
+          subtitle = 'Fin du brassin.';
+        } else if (e.primaryDate() == DateHelper.toDate(day)) {
           subtitle = 'Début de la fermentation à ${AppLocalizations.of(context)!.tempFormat(e.receipt!.secondarytemp)}.';
-        } else if (e.tertiaryDate() == DateHelper.toDate(day)) {
+        } else if (e.secondaryDate() == DateHelper.toDate(day)) {
           subtitle = 'Début de la fermentation à ${AppLocalizations.of(context)!.tempFormat(e.receipt!.tertiaryday)}.';
         }
         trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: const TextStyle(color: Colors.white));

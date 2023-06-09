@@ -2,23 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
-import 'package:bb/helpers/device_helper.dart';
-import 'package:bb/models/brew_model.dart';
-import 'package:bb/models/equipment_model.dart';
-import 'package:bb/utils/app_localizations.dart';
-import 'package:bb/utils/constants.dart' as constants;
-import 'package:bb/utils/database.dart';
-import 'package:bb/utils/localized_text.dart';
-import 'package:bb/widgets/custom_menu_button.dart';
-import 'package:bb/widgets/dialogs/confirm_dialog.dart';
-import 'package:bb/widgets/dialogs/delete_dialog.dart';
-import 'package:bb/widgets/form_decoration.dart';
-import 'package:bb/widgets/forms/color_field.dart';
-import 'package:bb/widgets/forms/datetime_field.dart';
-import 'package:bb/widgets/forms/equipment_field.dart';
-import 'package:bb/widgets/forms/receipt_field.dart';
-import 'package:bb/widgets/forms/switch_field.dart';
-import 'package:bb/widgets/forms/text_input_field.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/brew_model.dart';
+import 'package:bab/models/equipment_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/utils/database.dart';
+import 'package:bab/utils/localized_text.dart';
+import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/widgets/dialogs/delete_dialog.dart';
+import 'package:bab/widgets/form_decoration.dart';
+import 'package:bab/widgets/forms/color_field.dart';
+import 'package:bab/widgets/forms/datetime_field.dart';
+import 'package:bab/widgets/forms/equipment_field.dart';
+import 'package:bab/widgets/forms/receipt_field.dart';
+import 'package:bab/widgets/forms/switch_field.dart';
+import 'package:bab/widgets/forms/text_input_field.dart';
 
 class FormBrewPage extends StatefulWidget {
   final BrewModel model;
@@ -389,10 +389,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                       ],
                       onChanged: (value) => widget.model.sparge_ph = AppLocalizations.of(context)!.decimal(value),
                       decoration: FormDecoration(
-                        icon:  const RotationTransition(
-                          turns: AlwaysStoppedAnimation(90 / 360),
-                          child: Icon(Icons.air_outlined),
-                        ),
+                        icon: const Icon(Icons.shower_outlined),
                         labelText: 'pH ${AppLocalizations.of(context)!.text('sparge').toLowerCase()}',
                         border: InputBorder.none,
                         fillColor: constants.FillColor, filled: true
@@ -416,7 +413,14 @@ class _FormBrewPageState extends State<FormBrewPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.first_page_outlined),
+                        icon: Transform.flip(
+                          flipX: true,
+                          child: const Icon(Icons.colorize_outlined),
+                        ),
+                        // icon: Transform.rotate(
+                        //   angle: 360,
+                        //   child: Icon(Icons.colorize_outlined),
+                        // ),
                         labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
                         hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
                         suffixIcon: Tooltip(
@@ -441,7 +445,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                         _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.last_page_outlined),
+                        icon: const Icon(Icons.colorize_outlined),
                         labelText: AppLocalizations.of(context)!.text('final_gravity'),
                         hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
                         suffixIcon: Tooltip(
