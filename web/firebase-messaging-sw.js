@@ -14,9 +14,9 @@ var firebaseConfig = {
     appId: "1:94135687117:web:1eeccf8f5e36c7ccca1684",
     measurementId: "G-46JRTNPPYH"
 };
-firebase.analytics();
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
+firebase.analytics();
 
 const messaging = firebase.messaging();
 messaging.onBackgroundMessage(function(payload) {
