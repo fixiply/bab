@@ -35,34 +35,37 @@ exports.pushNotification = functions.region('europe-west1').pubsub.schedule('0 *
             return;
         }
         snapshot.forEach(async doc => {
+            var user;
             const brew = doc.data();
             const started = brew.started_at.toDate();
             const receiptDoc = await firestore.collection('receipts').doc(brew.receipt).get();
             if (receiptDoc.exists) {
                 const receipt= receiptDoc.data();
-                const title = 'Brassin #' + brew.reference
+                const userDoc = await firestore.collection('users').doc(brew.creator).get();
+                if (userDoc.exists) {
+                    user = userDoc.data();
+                }
+                const name = localizedText(receipt.title, user != null ? user.language : null);
+                const title = 'Brassin #' + brew.reference + (name != null ? ' - '+ name : '')
                 if (receipt.primaryday != null) {
                     started.setDate(started.getDate() + receipt.primaryday);
                     if (isTime(started)) {
-                        const body = receipt.secondaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation.';
-                        await sendToDevice(brew.creator, title, body, doc.id);
-                        console.debug(doc.id, '->', brew.reference, ' receipt: ', brew.receipt, 'primary date', started);
+                        const body = receipt.secondaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation primaire.';
+                        await sendToDevice(user, title, body, doc.id);
                     }
                 }
                 if (receipt.secondaryday != null) {
                     started.setDate(new Date(started.getDate() + receipt.secondaryday));
                     if (isTime(started)) {
-                        const body = receipt.tertiaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation.';
-                        await sendToDevice(brew.creator, title, body, doc.id);
-                        console.debug(doc.id, '->', brew.reference, ' receipt: ', brew.receipt, 'secondary date', started);
+                        const body = receipt.tertiaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation secondaire.';
+                        await sendToDevice(user, title, body, doc.id);
                     }
                 }
                 if (receipt.tertiaryday != null) {
                     started.setDate(started.getDate() + receipt.tertiaryday);
                     if (isTime(started)) {
                         const body = 'Fin du brassin.';
-                        await sendToDevice(brew.creator, title, body, doc.id);
-                        console.debug(doc.id, '->', brew.reference, ' receipt: ', brew.receipt, 'tertiary date', started);
+                        await sendToDevice(user, title, body, doc.id);
                     }
                 }
             }
@@ -90,30 +93,26 @@ const sendToTopic = async (topic, title, body, id) => {
     )
 }
 
-const sendToDevice = async (userId, title, body, id) => {
-    const userDoc = await firestore.collection('users').doc(userId).get();
-    if (userDoc.exists) {
-        const user = userDoc.data();
-        if (user.devices != null) {
-            for (const device of user.devices) {
-                console.debug('Send ', '->', user.full_name, 'device', device.token);
-                await messaging.sendToDevice(device.token,
-                    {
-                        notification: {
-                            title: title,
-                            body: body,
-                            sound: 'default'
-                        },
-                        data: {
-                            id: id
-                        }
+const sendToDevice = async (user, title, body, id) => {
+    if (user != null && user.devices != null) {
+        for (const device of user.devices) {
+            await messaging.sendToDevice(device.token,
+                {
+                    notification: {
+                        title: title,
+                        body: body,
+                        sound: 'default'
                     },
-                    {
-                        priority: 'high',
-                        contentAvailable: true,
+                    data: {
+                        id: id
                     }
-                )
-            }
+                },
+                {
+                    priority: 'high',
+                    contentAvailable: true,
+                }
+            );
+            functions.logger.log("Successfully sent message: ", user.full_name, '=>', device.name);
         }
     }
 }
@@ -132,6 +131,20 @@ function isTime(date) {
     }
     const now = new Date();
     return isToday(date) && now.getHours() === date.getHours();
+}
+
+function localizedText(value, language) {
+    if (value instanceof Object) {
+        try {
+            const map = new Map(Object.entries(value));
+            if (language != null && map.has(language)) {
+                return map.get(language);
+            }
+            return map.entries().next().value[1];
+        }
+        catch (e) { }
+    }
+    return value;
 }
 
 exports.updates = functions.https.onRequest(async (req, res) => {
