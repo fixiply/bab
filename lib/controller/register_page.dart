@@ -226,7 +226,8 @@ class _RegisterPageState extends State<RegisterPage> {
       UserModel user = UserModel(
         full_name: _fullNameController.text,
         email: _emailController.text.trim(),
-        user: credential.user
+        user: credential.user,
+        language: AppLocalizations.of(context)!.currentLanguage
       );
       Database().set(credential.user!.uid, user).then((value) async {
         if (value == true) {

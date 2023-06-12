@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
 import 'package:bab/controller/basket_page.dart';
@@ -117,7 +118,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                 }
                 return EmptyContainer(message: AppLocalizations.of(context)!.text('no_event'));
               }
-              if (DeviceHelper.isDesktop || DeviceHelper.isTablette(context)) {
+              if (_isGrid()) {
                 return GridView.builder(
                   controller: _controller,
                   padding: const EdgeInsets.all(4),
@@ -161,6 +162,16 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
         )
       )
     );
+  }
+
+  bool _isGrid() {
+    if (Foundation.kIsWeb) {
+      return true;
+    }
+    if (DeviceHelper.isMobile(context)) {
+      return DeviceHelper.landscapeOrientation(context);
+    }
+    return DeviceHelper.isDesktop || DeviceHelper.isTablette(context);
   }
 
   Widget _item(EventModel model, bool grid) {

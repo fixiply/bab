@@ -18,6 +18,7 @@ class UserModel<T> {
   User? user;
   Role? role;
   String? company;
+  String? language;
   List<Adress>? addresses;
   List<PaymentModel>? payments;
   List<Device>? devices;
@@ -32,6 +33,7 @@ class UserModel<T> {
     this.user,
     this.role = Role.editor,
     this.company,
+    this.language,
     this.addresses,
     this.payments,
     this.devices
@@ -63,6 +65,7 @@ class UserModel<T> {
     this.email = map['email'];
     this.role = Role.values.elementAt(map['role']);
     this.company = map['company'];
+    this.language = map['language'];
     this.addresses = Adress.deserialize(map['addresses']);
     this.payments = PaymentModel.deserialize(map['payments']);
     this.devices = Device.deserialize(map['devices']);
@@ -77,6 +80,7 @@ class UserModel<T> {
       'email': this.email,
       'role': this.role!.index,
       'company': company,
+      'language': language,
       'addresses': Adress.serialize(this.addresses),
       'payments': PaymentModel.serialize(this.payments),
       'devices': Device.serialize(this.devices),
@@ -97,6 +101,8 @@ class UserModel<T> {
       email: this.email,
       user: this.user,
       role: this.role,
+      company: this.company,
+      language: this.language,
       addresses: this.addresses,
       payments: this.payments,
       devices: this.devices,
