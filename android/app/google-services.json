@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "94135687117-e3grq4jekda8r41qnohr21tt2ve31vna.apps.googleusercontent.com",
+          "client_id": "94135687117-ml1mkjo1ddan2f67g0esu9a7r0edjslh.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.fixiply.bab",
-            "certificate_hash": "08e4cfb96ad3c30eec0653c58f9094d26672ab16"
+            "certificate_hash": "a0caea5aefc444cff6b6d16b6dd62e79f4a64305"
           }
         },
         {

@@ -3,13 +3,15 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>955480665092-tvire7q52i740rsng3mq7cfnmscom5cc.apps.googleusercontent.com</string>
+	<string>94135687117-pdhnsvd8n6ohe80d8dqr8d0ifv6i80o9.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.955480665092-tvire7q52i740rsng3mq7cfnmscom5cc</string>
+	<string>com.googleusercontent.apps.94135687117-pdhnsvd8n6ohe80d8dqr8d0ifv6i80o9</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>94135687117-ml1mkjo1ddan2f67g0esu9a7r0edjslh.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
-	<string>AIzaSyCiQtMKGzSYK9cBXrHcLdZNhrSX2pbkcHE</string>
+	<string>AIzaSyBKnxvQJWoCbEVKNjjiBA3uZmBLfn4Kng8</string>
 	<key>GCM_SENDER_ID</key>
-	<string>955480665092</string>
+	<string>94135687117</string>
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
@@ -29,8 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:955480665092:ios:9f036ad4bda4b58959d951</string>
-	<key>DATABASE_URL</key>
-	<string>https://beandbrew-default-rtdb.europe-west1.firebasedatabase.app</string>
+	<string>1:94135687117:ios:bf0935c8fb93be4eca1684</string>
 </dict>
 </plist>
