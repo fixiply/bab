@@ -57,7 +57,6 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -67,7 +66,7 @@ Future<void> main() async {
     Notifications().initialize();
   }
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
-
+  await dotenv.load(fileName: 'assets/.env');
   runApp(
     MultiProvider(
       providers: [
@@ -172,10 +171,10 @@ class _AppState extends State<MyApp> {
       if (model != null) {
         model.user = user;
         if (!foundation.kIsWeb) {
-          String? name = await _name();
+          Device? device = await _device();
           String? token = await _token();
-          if (name != null && token != null) {
-            Device device = Device(name: name, token: token, os: Platform.operatingSystem);
+          if (device != null && token != null) {
+            device.token = token;
             if (!model.devices!.contains(device)) {
               model.devices!.add(device);
               Database().update(model);
@@ -191,43 +190,43 @@ class _AppState extends State<MyApp> {
     });
   }
 
-  Future<String?> _name() async {
+  Future<Device?> _device() async {
     DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
     try {
       if (foundation.kIsWeb) {
         WebBrowserInfo info = await deviceInfoPlugin.webBrowserInfo;
-        return info.userAgent;
+        return Device(name: info.browserName.name, os: 'Web');
       } else {
         if (Platform.isAndroid) {
           AndroidDeviceInfo info = await deviceInfoPlugin.androidInfo;
           if (foundation.kDebugMode) {
             debugPrint(DeviceHelper.readAndroidBuildData(info).toString());
           }
-          return info.model;
+          return Device(name: info.model, os: 'Android');
         } else if (Platform.isIOS) {
           IosDeviceInfo info = await deviceInfoPlugin.iosInfo;
           if (foundation.kDebugMode) {
             debugPrint(DeviceHelper.readIosDeviceInfo(info).toString());
           }
-          return info.utsname.machine;
+          return Device(name: info.utsname.nodename, os: 'iOS');
         } else if (Platform.isLinux) {
           LinuxDeviceInfo info = await deviceInfoPlugin.linuxInfo;
           if (foundation.kDebugMode) {
             debugPrint(DeviceHelper.readLinuxDeviceInfo(info).toString());
           }
-          return info.name;
+          return Device(name: info.name, os: 'linux');
         } else if (Platform.isMacOS) {
           MacOsDeviceInfo info = await deviceInfoPlugin.macOsInfo;
           if (foundation.kDebugMode) {
             debugPrint(DeviceHelper.readMacOsDeviceInfo(info).toString());
           }
-          return info.computerName;
+          return Device(name: info.computerName, os: 'macOS');
         } else if (Platform.isWindows) {
           WindowsDeviceInfo info = await deviceInfoPlugin.windowsInfo;
           if (foundation.kDebugMode) {
             debugPrint(DeviceHelper.readWindowsDeviceInfo(info).toString());
           }
-          return info.computerName;
+          return Device(name: info.computerName, os: 'Windows');
         }
       }
     } on PlatformException {

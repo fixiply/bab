@@ -46,16 +46,16 @@ class Device<T> {
   // ignore: hash_and_equals
   @override
   bool operator ==(other) {
-    return (other is Device && other.token == token);
+    return (other is Device && other.name == name && other.os == os);
   }
 
   @override
-  int get hashCode => token.hashCode;
+  int get hashCode => name.hashCode;
 
 
   @override
   String toString() {
-    return 'Device: $token';
+    return 'Device: $name';
   }
 
   static dynamic serialize(dynamic data) {
