@@ -200,18 +200,33 @@ class _AppState extends State<MyApp> {
       } else {
         if (Platform.isAndroid) {
           AndroidDeviceInfo info = await deviceInfoPlugin.androidInfo;
+          if (foundation.kDebugMode) {
+            debugPrint(DeviceHelper.readAndroidBuildData(info).toString());
+          }
           return info.model;
         } else if (Platform.isIOS) {
           IosDeviceInfo info = await deviceInfoPlugin.iosInfo;
+          if (foundation.kDebugMode) {
+            debugPrint(DeviceHelper.readIosDeviceInfo(info).toString());
+          }
           return info.utsname.machine;
         } else if (Platform.isLinux) {
           LinuxDeviceInfo info = await deviceInfoPlugin.linuxInfo;
+          if (foundation.kDebugMode) {
+            debugPrint(DeviceHelper.readLinuxDeviceInfo(info).toString());
+          }
           return info.name;
         } else if (Platform.isMacOS) {
           MacOsDeviceInfo info = await deviceInfoPlugin.macOsInfo;
+          if (foundation.kDebugMode) {
+            debugPrint(DeviceHelper.readMacOsDeviceInfo(info).toString());
+          }
           return info.computerName;
         } else if (Platform.isWindows) {
           WindowsDeviceInfo info = await deviceInfoPlugin.windowsInfo;
+          if (foundation.kDebugMode) {
+            debugPrint(DeviceHelper.readWindowsDeviceInfo(info).toString());
+          }
           return info.computerName;
         }
       }
