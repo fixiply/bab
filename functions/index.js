@@ -21,7 +21,7 @@ const mailTransport = nodemailer.createTransport({
     }
 });
 
-exports.pushNotification = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
+exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
     .timeZone('Europe/Paris') // Users can choose timezone - default is America/Los_Angeles
     .onRun(async (context) => {
         const currentDate = new Date();
@@ -90,7 +90,8 @@ const sendToTopic = async (topic, title, body, id) => {
             priority: 'high',
             contentAvailable: true,
         }
-    )
+    );
+    functions.logger.log("Successfully sent message: ", topic, '=>', title);
 }
 
 const sendToDevice = async (user, title, body, id) => {
@@ -112,7 +113,7 @@ const sendToDevice = async (user, title, body, id) => {
                     contentAvailable: true,
                 }
             );
-            functions.logger.log("Successfully sent message: ", user.full_name, '=>', device.name);
+            functions.logger.log("Successfully sent message: ", user.full_name, '=>', device.name, device.token);
         }
     }
 }
@@ -146,6 +147,11 @@ function localizedText(value, language) {
     }
     return value;
 }
+
+exports.messaging = functions.https.onRequest(async (req, res) => {
+    await sendToTopic('debug', 'Test', 'Cloud messaging', '0');
+    return null;
+});
 
 exports.updates = functions.https.onRequest(async (req, res) => {
     const collection = firestore.collection('brews');
