@@ -175,6 +175,10 @@ class _AppState extends State<MyApp> {
           String? token = await _token();
           if (device != null && token != null) {
             device.token = token;
+            dynamic old = model.devices!.firstWhere((e) => e.name == device.name && e.os == device.os);
+            if (old != null) {
+              debugPrint('[$APP_NAME] Device "${old.name}" token "${token == device.token}".');
+            }
             if (!model.devices!.contains(device)) {
               model.devices!.add(device);
               Database().update(model);
