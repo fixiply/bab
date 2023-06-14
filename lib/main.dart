@@ -175,10 +175,6 @@ class _AppState extends State<MyApp> {
           String? token = await _token();
           if (device != null && token != null) {
             device.token = token;
-            dynamic old = model.devices!.firstWhere((e) => e.name == device.name && e.os == device.os);
-            if (old != null) {
-              debugPrint('[$APP_NAME] Device "${old.name}" token "${token == device.token}".');
-            }
             if (!model.devices!.contains(device)) {
               model.devices!.add(device);
               Database().update(model);
@@ -239,14 +235,10 @@ class _AppState extends State<MyApp> {
   }
 
   Future<String?> _token() async {
-    if (!foundation.kIsWeb && (Platform.isIOS || Platform.isMacOS)) {
-      return await FirebaseMessaging.instance.getAPNSToken();
-    } else {
-      FirebaseApp app = Firebase.apps.first;
-      return await FirebaseMessaging.instance.getToken(
-          vapidKey: app.options.apiKey
-      );
-    }
+    FirebaseApp app = Firebase.apps.first;
+    return await FirebaseMessaging.instance.getToken(
+        vapidKey: app.options.apiKey
+    );
   }
 
   Future<void> _subscribe() async {
