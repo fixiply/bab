@@ -252,9 +252,9 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         }  else if (e.finish() == DateHelper.toDate(day)) {
           subtitle = 'Fin du brassin.';
         } else if (e.primaryDate() == DateHelper.toDate(day)) {
-          subtitle = 'Début de la fermentation à ${AppLocalizations.of(context)!.tempFormat(e.receipt!.secondarytemp)}.';
+          subtitle = 'Fin de la fermentation primaire.';
         } else if (e.secondaryDate() == DateHelper.toDate(day)) {
-          subtitle = 'Début de la fermentation à ${AppLocalizations.of(context)!.tempFormat(e.receipt!.tertiaryday)}.';
+          subtitle = 'Fin de la fermentation secondaire.';
         }
         trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: const TextStyle(color: Colors.white));
         onTap = () {

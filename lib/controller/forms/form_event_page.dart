@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -6,6 +7,7 @@ import 'package:bab/models/event_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
+import 'package:bab/utils/push.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -15,6 +17,9 @@ import 'package:bab/widgets/forms/switch_field.dart';
 import 'package:bab/widgets/forms/text_format_field.dart';
 import 'package:bab/widgets/forms/widgets_field.dart';
 import 'package:bab/widgets/modal_bottom_sheet.dart';
+
+// External package
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 // External package
 
@@ -59,17 +64,35 @@ class _FormEventPageState extends State<FormEventPage> {
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('save'),
-            icon: const Icon(Icons.save),
-            onPressed: _modified == true ? () {
-              if (_formKey.currentState!.validate()) {
-                Database().update(widget.model).then((value) async {
-                  Navigator.pop(context, widget.model);
-                }).onError((e,s) {
-                  _showSnackbar(e.toString());
+            tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
+            icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
+            onPressed: () {
+              if (_modified == true || widget.model.uuid == null) {
+                if (_formKey.currentState!.validate()) {
+                  Database().update(widget.model).then((value) async {
+                    Navigator.pop(context, widget.model);
+                  }).onError((e,s) {
+                    _showSnackbar(e.toString());
+                  });
+                }
+              } else {
+                EventModel model = widget.model.copy();
+                model.uuid = null;
+                model.axis = widget.model.axis;
+                model.sliver = widget.model.sliver;
+                model.title = widget.model.title;
+                model.subtitle = widget.model.subtitle;
+                model.top_left = widget.model.top_left;
+                model.top_right = widget.model.top_right;
+                model.bottom_left = widget.model.bottom_left;
+                model.status = Status.pending;
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormEventPage(model);
+                })).then((value) {
+                  Navigator.pop(context);
                 });
               }
-            } : null
+            }
           ),
           if (widget.model.uuid != null) IconButton(
             padding: EdgeInsets.zero,
@@ -88,15 +111,17 @@ class _FormEventPageState extends State<FormEventPage> {
             onSelected: (value) async {
               if (value == 'information') {
                 await ModalBottomSheet.showInformation(context, widget.model);
-              } else if (value == 'duplicate') {
-                EventModel model = widget.model.copy();
-                model.uuid = null;
-                model.status = Status.pending;
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FormEventPage(model);
-                })).then((value) {
-                  Navigator.pop(context);
-                });
+              } else if (value == 'sending') {
+                try {
+                  EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+                  await Push.send(widget.model, topic: foundation.kDebugMode ? 'debug' : 'default').onError((e, s) {
+                    _showSnackbar(e.toString());
+                  });
+                } catch (e) {
+                  _showSnackbar(e.toString());
+                } finally {
+                  EasyLoading.dismiss();
+                }
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -105,8 +130,8 @@ class _FormEventPageState extends State<FormEventPage> {
                 child: Text(AppLocalizations.of(context)!.text('information')),
               ),
               PopupMenuItem(
-                value: 'duplicate',
-                child: Text(AppLocalizations.of(context)!.text('duplicate')),
+                value: 'sending',
+                child: Text(AppLocalizations.of(context)!.text('notification_sending')),
               )
             ]
           )

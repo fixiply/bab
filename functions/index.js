@@ -83,7 +83,8 @@ const sendToTopic = async (topic, title, body, id) => {
                 sound: 'default'
             },
             data: {
-                id: id
+                id: id,
+                name: 'brew'
             }
         },
         {
@@ -105,7 +106,8 @@ const sendToDevice = async (user, title, body, id) => {
                         sound: 'default'
                     },
                     data: {
-                        id: id
+                        id: id,
+                        name: 'brew'
                     }
                 },
                 {

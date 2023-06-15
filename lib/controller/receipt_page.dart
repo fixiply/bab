@@ -443,6 +443,38 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 title: Text(AppLocalizations.of(context)!.text('mash'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                  SizedBox(height: 8),
+                  Wrap(
+                    children: [
+                      if (widget.model.primaryday != null && widget.model.primarytemp != null) _fermentation(
+                        AppLocalizations.of(context)!.text('primary'),
+                        widget.model.primaryday!,
+                        widget.model.primarytemp!,
+                      ),
+                      SizedBox(width: 12),
+                      if (widget.model.secondaryday != null && widget.model.secondarytemp != null) _fermentation(
+                        AppLocalizations.of(context)!.text('secondary'),
+                        widget.model.secondaryday!,
+                        widget.model.secondarytemp!,
+                      ),
+                      SizedBox(width: 12),
+                      if (widget.model.tertiaryday != null && widget.model.tertiarytemp != null) _fermentation(
+                        AppLocalizations.of(context)!.text('tertiary'),
+                        widget.model.tertiaryday!,
+                        widget.model.tertiarytemp!,
+                      ),
+                    ],
+                  )
+                ]
+              )
             )
           ]
         )),
@@ -460,6 +492,20 @@ class _ReceiptPageState extends State<ReceiptPage> {
         icon: const Icon(Icons.add),
         onPressed: _new,
       )
+    );
+  }
+
+  RichText _fermentation(String title, int day, double temp) {
+    return RichText(
+      textAlign: TextAlign.left,
+      overflow: TextOverflow.ellipsis,
+      text: TextSpan(
+        style: DefaultTextStyle.of(context).style,
+        children: <TextSpan>[
+          TextSpan(text: '$title :', style: const TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: '  $day ${AppLocalizations.of(context)!.text('days').toLowerCase()} ${AppLocalizations.of(context)!.text('to').toLowerCase()} ${AppLocalizations.of(context)!.tempFormat(temp)}'),
+        ],
+      ),
     );
   }
 
