@@ -10,6 +10,7 @@ import 'package:bab/models/event_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/inventory_model.dart';
+import 'package:bab/models/message_model.dart';
 import 'package:bab/models/misc_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/product_model.dart';
@@ -37,6 +38,7 @@ class Database {
   final fermenters = firestore.collection("fermenters");
   final hops = firestore.collection("hops");
   final inventory = firestore.collection("inventory");
+  final messages = firestore.collection("messages");
   final miscellaneous = firestore.collection("miscellaneous");
   final products = firestore.collection("products");
   final purchases = firestore.collection("purchases");
@@ -66,6 +68,8 @@ class Database {
       return hops;
     } else if (o is InventoryModel) {
       return inventory;
+    } else if (o is MessageModel) {
+      return messages;
     } else if (o is MiscModel) {
       return miscellaneous;
     } else if (o is ProductModel) {
@@ -152,8 +156,6 @@ class Database {
 
   Future<void> publishAll() async {
     await publish(events);
-    await publish(receipts);
-    await publish(styles);
   }
 
   Future<void> publish(CollectionReference collection, {bool push = false}) async {
@@ -729,6 +731,36 @@ class Database {
     });
     if (ordered == true) {
       // list.sort((a, b) => a.name!.toString().toLowerCase().compareTo(b.name!.toString().toLowerCase()));
+    }
+    return list;
+  }
+
+  Future<MessageModel?> getMessage(String uuid) async {
+    DocumentSnapshot snapshot = await messages.doc(uuid).get();
+    if (snapshot.exists) {
+      MessageModel model = MessageModel();
+      model.uuid = snapshot.id;
+      model.fromMap(snapshot.data() as Map<String, dynamic>);
+      return model;
+    }
+    return null;
+  }
+
+  Future<List<MessageModel>> getMessages({String? user, required String topic}) async {
+    List<MessageModel> list = [];
+    if (user != null) {
+      Query query = messages;
+      query = query.where('creator', isEqualTo: user);
+      query = query.where('topic', isEqualTo: topic);
+      query = query.orderBy('inserted_at', descending: true);
+      await query.get().then((result) {
+        for (var doc in result.docs) {
+          MessageModel model = MessageModel();
+          model.uuid = doc.id;
+          model.fromMap(doc.data() as Map<String, dynamic>);
+          list.add(model);
+        }
+      });
     }
     return list;
   }

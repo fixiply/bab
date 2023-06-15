@@ -6,7 +6,6 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/rating.dart';
 import 'package:bab/widgets/modal_bottom_sheet.dart';
-import 'package:bab/widgets/primary_button.dart';
 
 // External package
 
@@ -42,12 +41,13 @@ class AbstractContainerState extends State<AbstractContainer> {
       return Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        child: CustomPrimaryButton(
-          textValue: AppLocalizations.of(context)!.text('select_dates'),
-          onTap: () {
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+          child: Text(AppLocalizations.of(context)!.text('select_dates')),
+          onPressed: () async {
             ModalBottomSheet.showCalendar(context, model);
           },
-        )
+        ),
       );
     }
     return SizedBox(

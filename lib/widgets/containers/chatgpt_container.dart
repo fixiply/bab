@@ -1,11 +1,17 @@
-import 'package:bab/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/controller/forms/form_receipt_page.dart';
+import 'package:bab/models/receipt_model.dart';
+import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
-import 'package:bab/utils/constants.dart';
-import 'package:bab/widgets/containers/abstract_container.dart';
+import 'package:bab/models/message_model.dart';
 import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/containers/abstract_container.dart';
+import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 // External package
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
@@ -16,9 +22,9 @@ import 'package:sprintf/sprintf.dart';
 
 class ChatGPTContainer extends AbstractContainer {
   ChatGPTContainer({String? company, String? receipt, int? product}) : super(
-      company: company,
-      receipt: receipt,
-      product: product
+    company: company,
+    receipt: receipt,
+    product: product
   );
 
   @override
@@ -27,23 +33,25 @@ class ChatGPTContainer extends AbstractContainer {
 
 
 class _ChatGPTContainerState extends AbstractContainerState {
-  late OpenAI openAI;
+  late OpenAI _openAI;
   final _formKey = GlobalKey<FormState>();
-  List<String> messages = [];
+  Future<List<MessageModel>>? _messages;
   String? _text;
   double _volume = 23;
+  String topic = 'chatgpt';
 
   @override
   void initState() {
-    openAI = OpenAI.instance.build(
-      token: dotenv.env["OPEN_AI_API_KEY"],
-      baseOption: HttpSetup(
-        receiveTimeout: const Duration(seconds: 20),
-        connectTimeout: const Duration(seconds: 20)
+    _openAI = OpenAI.instance.build(
+        token: dotenv.env["OPEN_AI_API_KEY"],
+        baseOption: HttpSetup(
+            receiveTimeout: const Duration(seconds: 20),
+            connectTimeout: const Duration(seconds: 20)
         ),
         enableLog: foundation.kDebugMode
-      );
+    );
     super.initState();
+    _fetch();
   }
 
   @override
@@ -98,11 +106,6 @@ class _ChatGPTContainerState extends AbstractContainerState {
                 decoration: InputDecoration(
                   hintText: AppLocalizations.of(context)!.text('description_beer_hint'),
                   border: InputBorder.none,
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.send, color: Theme.of(context).primaryColor),
-                    tooltip: AppLocalizations.of(context)!.text(messages.isNotEmpty ? 'resend' : 'send'),
-                    onPressed: _text != null ? _send : null
-                  )
                   // fillColor: FillColor, filled: true
                 ),
                 onEditingComplete: () async {
@@ -115,26 +118,91 @@ class _ChatGPTContainerState extends AbstractContainerState {
                 },
               ),
             ),
-            if (messages.isNotEmpty) const SizedBox(height: 20),
-            if (messages.isNotEmpty) ListView.builder(
-              itemCount: messages.length,
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemBuilder: (context, index){
-                return Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: SecondaryColorLight,
-                  ),
-                  padding: const EdgeInsets.all(8),
-                  child: Text(messages[index], style: const TextStyle(fontSize: 15)),
-                );
-              },
+            const SizedBox(height: 4),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+                icon: Icon(Icons.send, size: 18),
+                label: Text(AppLocalizations.of(context)!.text('send')),
+                onPressed: _text != null ? _send : null,
+              ),
             ),
+            FutureBuilder<List<MessageModel>>(
+              future: _messages,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  if (snapshot.data!.isEmpty) {
+                    return Container();
+                  }
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Text(AppLocalizations.of(context)!.text('answers'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                        SizedBox(height: 8),
+                        ListView.separated(
+                          shrinkWrap: true,
+                          itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                          physics: const NeverScrollableScrollPhysics(),
+                          separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+                          itemBuilder: (context, index){
+                            return Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: SecondaryColorLight,
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Expanded(child: Text(snapshot.data![index].response ?? '')),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      IconButton(
+                                        icon: Icon(Icons.add_circle_outline),
+                                        tooltip: AppLocalizations.of(context)!.text('new_recipe'),
+                                        onPressed: _new
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Tooltip(message: '${AppLocalizations.of(context)!.text('description')}: ${snapshot.data![index].send}', child: Icon(Icons.help_outline)),
+                                      const SizedBox(height: 4),
+                                      IconButton(
+                                        icon: Icon(Icons.delete_outline),
+                                        onPressed: () {
+                                          _delete(snapshot.data![index]);
+                                        }
+                                      )
+                                    ],
+                                  ),
+                                ]
+                              )
+                            );
+                          },
+                        )
+                      ]
+                    )
+                  );
+                }
+                if (snapshot.hasError) {
+                  return ErrorContainer(snapshot.error.toString());
+                }
+                return Container();
+              }
+            )
           ]
         ),
-      )
+      ),
     );
+  }
+
+  _fetch() async {
+    setState(() {
+      _messages = Database().getMessages(user: currentUser!.uuid, topic: topic);
+    });
   }
 
   _send() async {
@@ -153,19 +221,21 @@ class _ChatGPTContainerState extends AbstractContainerState {
       String prompt = sprintf(AppLocalizations.of(context)!.text('chatgpt_model'),
         [ _text, _volume, AppLocalizations.of(context)!.liquid.toLowerCase() ]
       );
-      debugPrint('prompt $prompt');
       final request = CompleteText(
-          prompt: prompt,
-          model: Model.textDavinci3,
-          maxTokens: 255
+        prompt: prompt,
+        model: Model.textDavinci3,
+        maxTokens: 255
       );
 
       EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
-      openAI.onCompletion(request: request).then((value) {
+      _openAI.onCompletion(request: request).then((value) {
         if (value != null) {
-          setState(() {
-            messages.add(value.choices.last.text);
-          });
+          Database().add(MessageModel(
+            topic: topic,
+            send: _text,
+            response: value.choices.last.text.trim()
+          ));
+          _fetch();
         }
         EasyLoading.dismiss();
       }).onError((error, stackTrace) {
@@ -178,22 +248,35 @@ class _ChatGPTContainerState extends AbstractContainerState {
     }
   }
 
-  // _send2() async {
-  //   try {
-  //     EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
-  //     final request = EmbedRequest(
-  //         model: EmbedModel.embedTextModel,
-  //         input: 'The food was delicious and the waiter');
-  //
-  //     final response = await openAI.embed.embedding(request);
-  //     setState(() {
-  //       response.data.last.embedding
-  //     });
-  //     EasyLoading.dismiss();
-  //   } finally {
-  //     EasyLoading.dismiss();
-  //   }
-  // }
+  _new() async {
+    ReceiptModel newModel = ReceiptModel();
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return FormReceiptPage(newModel);
+    })).then((value) {
+      _fetch();
+    });
+  }
+
+  Future<bool> _delete(MessageModel model) async {
+    bool confirm = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return DeleteDialog(
+          title: AppLocalizations.of(context)!.text('delete_item_title'),
+        );
+      }
+    );
+    if (confirm) {
+      try {
+        await Database().delete(model, forced: true);
+      } catch (e) {
+        _showSnackbar(e.toString());
+      }
+      _fetch();
+      return true;
+    }
+    return false;
+  }
 
   _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

@@ -8,7 +8,6 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/dialogs/markdown_dialog.dart';
-import 'package:bab/widgets/primary_button.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -200,14 +199,18 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 18),
-              CustomPrimaryButton(
-                textValue: AppLocalizations.of(context)!.text('register'),
-                onTap: () async {
-                  if (_formKey.currentState!.validate()) {
-                    await _createUserWithEmailAndPassword();
-                  }
-                },
-              )
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+                  child: Text(AppLocalizations.of(context)!.text('register')),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await _createUserWithEmailAndPassword();
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         )

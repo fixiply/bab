@@ -13,7 +13,6 @@ import 'package:bab/widgets/containers/ratings_container.dart';
 import 'package:bab/widgets/modal_bottom_sheet.dart';
 import 'package:bab/widgets/paints/bezier_clipper.dart';
 import 'package:bab/widgets/paints/circle_clipper.dart';
-import 'package:bab/widgets/primary_button.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
@@ -196,9 +195,10 @@ class _ProductPageState extends State<ProductPage> {
       bottomNavigationBar: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
-        child: CustomPrimaryButton(
-          textValue: AppLocalizations.of(context)!.text('buy_now'),
-          onTap: () {
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+          child: Text(AppLocalizations.of(context)!.text('buy_now')),
+          onPressed: () async {
             ModalBottomSheet.showAddToCart(context, widget.model);
           },
         ),

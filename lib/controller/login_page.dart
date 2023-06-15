@@ -7,7 +7,6 @@ import 'package:bab/controller/register_page.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/dialogs/markdown_dialog.dart';
-import 'package:bab/widgets/primary_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // External package
@@ -204,14 +203,18 @@ class _LoginPageState extends State<LoginPage> {
                 ),
               ),
               const SizedBox(height: 18),
-              CustomPrimaryButton(
-                textValue: AppLocalizations.of(context)!.text('to_connect'),
-                onTap: () async {
-                  if (_formKey.currentState!.validate()) {
-                    await _signInWithEmailAndPassword();
-                  }
-                },
-              )
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+                  child: Text(AppLocalizations.of(context)!.text('to_connect')),
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      await _signInWithEmailAndPassword();
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         )

@@ -406,9 +406,9 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   }
 
   _new() async {
-    ReceiptModel newArticle = ReceiptModel();
+    ReceiptModel newModel = ReceiptModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormReceiptPage(newArticle);
+      return FormReceiptPage(newModel);
     })).then((value) {
       _fetch();
     });

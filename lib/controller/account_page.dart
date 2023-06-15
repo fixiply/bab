@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -154,7 +155,7 @@ class _AccountPageState extends State<AccountPage> {
                     leading: const Icon(Icons.help_outline),
                     title: Text(AppLocalizations.of(context)!.text('customer_support')),
                   ),
-                  ListTile(
+                  if (!foundation.kIsWeb) ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.notifications),
                     title: Text(AppLocalizations.of(context)!.text('alert_settings')),
