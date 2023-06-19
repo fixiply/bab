@@ -114,11 +114,7 @@ class _FormEventPageState extends State<FormEventPage> {
               } else if (value == 'sending') {
                 try {
                   EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
-                  await Push.send(widget.model, topic: foundation.kDebugMode ? 'debug' : 'default').onError((e, s) {
-                    _showSnackbar(e.toString());
-                  });
-                } catch (e) {
-                  _showSnackbar(e.toString());
+                  await Push.notification(context,widget.model, topic: foundation.kDebugMode ? 'debug' : 'default');
                 } finally {
                   EasyLoading.dismiss();
                 }
