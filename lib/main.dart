@@ -49,10 +49,23 @@ var logger = Logger();
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  // If you're going to use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-  print('Handling a background message ${message.messageId}');
+  // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  // Notifications().initialize();
+  // showNotification(message);
+  debugPrint('[$APP_NAME] Handling a background message ${message.messageId}');
+}
+
+Future<void> showNotification(RemoteMessage message) async {
+  RemoteNotification? notification = message.notification;
+  if (notification != null) {
+    String? id = message.data['id'];
+    Notifications().showNotification(
+        id != null ? id.hashCode : 0,
+        title: notification.title,
+        body: notification.body,
+        payload: id
+    );
+  }
 }
 
 Future<void> main() async {
@@ -60,8 +73,7 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // Set the background messaging handler early on, as a named top-level function
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  _configureFirebaseMessaging();
   if (!foundation.kIsWeb) {
     Notifications().initialize();
   }
@@ -75,6 +87,16 @@ Future<void> main() async {
         ChangeNotifierProvider(create: (_) => localeNotifier),
       ],
       child: MyApp()),
+  );
+}
+
+void _configureFirebaseMessaging() async {
+  // Set the background messaging handler early on, as a named top-level function
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  await FirebaseMessaging.instance.requestPermission(
+    alert: true,
+    badge: true,
+    sound: true,
   );
 }
 
@@ -247,21 +269,8 @@ class _AppState extends State<MyApp> {
       logger.d('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       debugPrint('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        _notification(message);
+        showNotification(message);
       });
-    }
-  }
-
-  Future<void> _notification(RemoteMessage message) async {
-    RemoteNotification? notification = message.notification;
-    if (notification != null) {
-      String? id = message.data['id'];
-      Notifications().showNotification(
-        id != null ? id.hashCode : 0,
-        title: notification.title,
-        body: notification.body,
-        payload: id
-      );
     }
   }
 

@@ -390,6 +390,14 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
         _payload(payload);
       }
     });
+    FirebaseMessaging.instance.getInitialMessage().then((value) {
+      setState(() {
+        if (value != null) {
+          selectedNotificationPayload  = value.data['id'];
+          selectNotificationStream.add(selectedNotificationPayload);
+        }
+      });
+    });
   }
 
   void _configureFirebaseMessaging() {
@@ -401,13 +409,13 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       }
     });
 
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      if (notification != null) {
-        String? payload = message.data['id'];
-        _payload(payload);
-      }
-    });
+    // FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    //   RemoteNotification? notification = message.notification;
+    //   if (notification != null) {
+    //     String? payload = message.data['id'];
+    //     _payload(payload);
+    //   }
+    // });
   }
 
   _payload(String? payload) async {

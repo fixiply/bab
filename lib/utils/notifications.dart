@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:bab/main.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/helpers/date_helper.dart';
+import 'package:flutter/material.dart';
 
 // External package
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';

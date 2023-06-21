@@ -74,7 +74,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
     }
 );
 
-const sendToTopic = async (topic, title, body, id) => {
+const sendToTopic = async (topic, title, body, id, model) => {
     await messaging.sendToTopic(topic,
         {
             notification: {
@@ -84,7 +84,7 @@ const sendToTopic = async (topic, title, body, id) => {
             },
             data: {
                 id: id,
-                name: 'brew'
+                name: model
             }
         },
         {
@@ -150,9 +150,9 @@ function localizedText(value, language) {
     return value;
 }
 
-exports.messaging = functions.https.onRequest(async (req, res) => {
-    await sendToTopic('debug', 'Test', 'Cloud messaging', '0');
-    return null;
+exports.notification = functions.https.onCall(async(data, context) => {
+    await sendToTopic(data.topic, data.title, data.subtitle, data.uuid, data.model);
+    return true;
 });
 
 exports.updates = functions.https.onRequest(async (req, res) => {
@@ -178,5 +178,5 @@ exports.updates = functions.https.onRequest(async (req, res) => {
             }
         }
     });
-    return null;
+    return true;
 });
