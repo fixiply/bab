@@ -22,7 +22,7 @@ class Push {
         'title': model.title,
         'subtitle': model.subtitle,
         'uuid': model.uuid,
-        'model': 'event'
+        'route': 'event'
       });
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(

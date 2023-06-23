@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/controller/account_page.dart';
 import 'package:bab/controller/admin/gallery_page.dart';
+import 'package:bab/controller/brew_page.dart';
 import 'package:bab/controller/brews_page.dart';
 import 'package:bab/controller/calendar_page.dart';
 import 'package:bab/controller/companies_page.dart';
@@ -18,6 +19,7 @@ import 'package:bab/controller/styles_page.dart';
 import 'package:bab/controller/tools_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/main.dart';
+import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/event_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
@@ -404,8 +406,9 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       if (notification != null) {
-        String? payload = message.data['id'];
-        _payload(payload);
+        String? uuid = message.data['id'];
+        String? route = message.data['route'];
+        _payload(uuid, route: route);
       }
     });
 
@@ -418,15 +421,26 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
     // });
   }
 
-  _payload(String? payload) async {
-    if (payload != null) {
-      EventModel? model = await Database().getEvent(payload);
-      if (model != null) {
-        Navigator.push(context,
-          MaterialPageRoute(builder: (context) =>
-            EventPage(model, cache: false)
-          ),
-        );
+  _payload(String? uuid, {String? route}) async {
+    if (uuid != null) {
+      if (route == 'brew') {
+        BrewModel? model = await Database().getBrew(uuid);
+        if (model != null) {
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) =>
+                BrewPage(model)
+            ),
+          );
+        }
+      } else {
+        EventModel? model = await Database().getEvent(uuid);
+        if (model != null) {
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) =>
+                EventPage(model, cache: false)
+            ),
+          );
+        }
       }
     }
   }

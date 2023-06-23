@@ -51,21 +51,21 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
                     started.setDate(started.getDate() + receipt.primaryday);
                     if (isTime(started)) {
                         const body = receipt.secondaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation primaire.';
-                        await sendToDevice(user, title, body, doc.id);
+                        await sendToDevice(user, title, body, doc.id, 'brew');
                     }
                 }
                 if (receipt.secondaryday != null) {
                     started.setDate(new Date(started.getDate() + receipt.secondaryday));
                     if (isTime(started)) {
                         const body = receipt.tertiaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation secondaire.';
-                        await sendToDevice(user, title, body, doc.id);
+                        await sendToDevice(user, title, body, doc.id, 'brew');
                     }
                 }
                 if (receipt.tertiaryday != null) {
                     started.setDate(started.getDate() + receipt.tertiaryday);
                     if (isTime(started)) {
                         const body = 'Fin du brassin.';
-                        await sendToDevice(user, title, body, doc.id);
+                        await sendToDevice(user, title, body, doc.id, 'brew');
                     }
                 }
             }
@@ -74,7 +74,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
     }
 );
 
-const sendToTopic = async (topic, title, body, id, model) => {
+const sendToTopic = async (topic, title, body, id, route) => {
     await messaging.sendToTopic(topic,
         {
             notification: {
@@ -84,7 +84,7 @@ const sendToTopic = async (topic, title, body, id, model) => {
             },
             data: {
                 id: id,
-                name: model
+                route: route
             }
         },
         {
@@ -95,7 +95,7 @@ const sendToTopic = async (topic, title, body, id, model) => {
     functions.logger.log("Successfully sent message: ", topic, '=>', title);
 }
 
-const sendToDevice = async (user, title, body, id) => {
+const sendToDevice = async (user, title, body, id, route) => {
     if (user != null && user.devices != null) {
         for (const device of user.devices) {
             await messaging.sendToDevice(device.token,
@@ -107,7 +107,7 @@ const sendToDevice = async (user, title, body, id) => {
                     },
                     data: {
                         id: id,
-                        name: 'brew'
+                        route: route
                     }
                 },
                 {
@@ -151,7 +151,7 @@ function localizedText(value, language) {
 }
 
 exports.notification = functions.https.onCall(async(data, context) => {
-    await sendToTopic(data.topic, data.title, data.subtitle, data.uuid, data.model);
+    await sendToTopic(data.topic, data.title, data.subtitle, data.uuid, data.route);
     return true;
 });
 
