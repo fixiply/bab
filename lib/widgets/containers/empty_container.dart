@@ -6,59 +6,42 @@ import 'package:bab/utils/app_localizations.dart';
 class EmptyContainer extends StatelessWidget {
   final Widget? image;
   final String? message;
+  final double? size;
+  final double? fontSize;
+  final double initHeight;
 
   EmptyContainer({
     this.image,
     this.message,
+    this.size = 80,
+    this.fontSize = 18,
+    this.initHeight = 0,
   });
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height; // Full screen width and height
     EdgeInsets padding = MediaQuery.of(context).padding; // Height (without SafeArea)
     double appbar = Scaffold.of(context).appBarMaxHeight ?? kToolbarHeight; // Height (without SafeArea)
-    double netHeight = height - padding.top - kBottomNavigationBarHeight - appbar;
-
-    return SingleChildScrollView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      child: SizedBox(
-        height: netHeight,
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              image ?? Image.asset('assets/images/logo.png', width: 100, height: 100, color: Theme.of(context).primaryColor),
-              Text(message != null ? message! : AppLocalizations.of(context)!.text('empty_list'),
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        double netHeight = constraints.maxHeight - padding.top - kBottomNavigationBarHeight - appbar - initHeight;
+        return SizedBox(
+          height: netHeight,
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Flexible(child: image ?? Image.asset('assets/images/logo.png', width: size, height: size, color: Theme.of(context).primaryColor)),
+                Text(message != null ? message! : AppLocalizations.of(context)!.text('empty_list'),
                   textAlign: TextAlign.center,
                   overflow: TextOverflow.clip,
-                  style: TextStyle(fontSize: 25, color: Theme.of(context).primaryColor)
-              )
-            ],
+                  style: TextStyle(fontSize: fontSize, color: Theme.of(context).primaryColor)
+                )
+              ],
+            )
           )
-        )
-      ),
+        );
+      }
     );
   }
-
-  // @override
-  // Widget old(BuildContext context) {
-  //   return CustomScrollView(
-  //     slivers: <Widget>[
-  //       SliverFillRemaining(
-  //         child: Center(
-  //           child: Column(
-  //             mainAxisAlignment: MainAxisAlignment.center,
-  //             children: [
-  //               Image.asset('assets/images/logo.png', width: 100, height: 100, color: Colors.black38),
-  //               Text(message != null ? message! : AppLocalizations.of(context)!.text('empty_list'),
-  //                   textAlign: TextAlign.center,
-  //                   style: const TextStyle(fontSize: 25, color: Colors.black38)
-  //               )
-  //             ],
-  //           ),
-  //         )
-  //       )
-  //     ]
-  //   );
-  // }
 }

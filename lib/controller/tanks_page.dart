@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/controller/bluetooth_page.dart';
 import 'package:bab/controller/forms/form_equipment_page.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/tanks_data_table.dart';
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/helpers/import_helper.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -145,16 +145,6 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
                 _delete();
               }
           ),
-          if (widget.allowEditing) IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(Icons.download_outlined),
-            tooltip: AppLocalizations.of(context)!.text('import'),
-            onPressed: () {
-              ImportHelper.fermentables(context, () {
-                _fetch();
-              });
-            }
-          ),
           IconButton(
             padding: EdgeInsets.zero,
             icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
@@ -172,7 +162,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data!.isEmpty) {
-                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_tank'), initHeight: 46);
               }
               if (_showList || widget.showCheckboxColumn == true) {
                 if (widget.loadMore) {
@@ -225,7 +215,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('new'),
+          title: AppLocalizations.of(context)!.text('add'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )
@@ -252,37 +242,57 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
         weight: 100,
         leading: CustomImage.network(model.image!.url, height: 100, width: 70, emptyImage: Image.asset('assets/images/logo.jpg', fit: BoxFit.fill)),
         title: Text(AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        subtitle: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            RichText(
-              textAlign: TextAlign.left,
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                style: DefaultTextStyle.of(context).style,
-                children: <TextSpan>[
-                  if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.volume)}'),
-                  if (model.volume != null || model.mash_volume != null) const TextSpan(text: '  -  '),
-                  if (model.mash_volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.mash_volume)}'),
-                ],
-              ),
-            ),
-            if (model.efficiency != null ) Text('${AppLocalizations.of(context)!.text('mash_efficiency')}: ${AppLocalizations.of(context)!.percentFormat(model.efficiency)}'),
-            if (model.notes != null ) _text(AppLocalizations.of(context)!.localizedText(model.notes))
-          ],
+        subtitle: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+            backgroundColor: (model.isSelected == true ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
+          ),
+          child: Text(AppLocalizations.of(context)!.text('to_connect'),
+            style: TextStyle(color: (model.isSelected == true ? Colors.white : Colors.black87)),
+          ),
+          onPressed: () async {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return BluetoothPage();
+            }));
+          },
         ),
+        // subtitle: Column(
+        //   mainAxisAlignment: MainAxisAlignment.start,
+        //   crossAxisAlignment: CrossAxisAlignment.start,
+        //   children: [
+        //     RichText(
+        //       textAlign: TextAlign.left,
+        //       overflow: TextOverflow.ellipsis,
+        //       text: TextSpan(
+        //         style: DefaultTextStyle.of(context).style,
+        //         children: <TextSpan>[
+        //           if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.volume)}'),
+        //           if (model.volume != null || model.mash_volume != null) const TextSpan(text: '  -  '),
+        //           if (model.mash_volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.mash_volume)}'),
+        //         ],
+        //       ),
+        //     ),
+        //     if (model.efficiency != null ) Text('${AppLocalizations.of(context)!.text('mash_efficiency')}: ${AppLocalizations.of(context)!.percentFormat(model.efficiency)}'),
+        //     if (model.notes != null ) _text(AppLocalizations.of(context)!.localizedText(model.notes))
+        //   ],
+        // ),
         trailing: model.isEditable() ? PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) {
-            if (value == 'edit') {
+            if (value == 'connect') {
+              _edit(model);
+            } else if (value == 'edit') {
               _edit(model);
             } else if (value == 'remove') {
               DeleteDialog.model(context, model, forced: true);
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+            PopupMenuItem(
+              value: 'connect',
+              child: Text(AppLocalizations.of(context)!.text('connect')),
+            ),
             PopupMenuItem(
               value: 'edit',
               child: Text(AppLocalizations.of(context)!.text('edit')),

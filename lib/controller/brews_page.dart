@@ -86,16 +86,6 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                 _delete();
               }
           ),
-          if (widget.allowEditing) IconButton(
-              padding: EdgeInsets.zero,
-              icon: const Icon(Icons.download_outlined),
-              tooltip: AppLocalizations.of(context)!.text('import'),
-              onPressed: () {
-                ImportHelper.fermentables(context, () {
-                  _fetch();
-                });
-              }
-          ),
           if (DeviceHelper.isDesktop) IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.refresh),

@@ -36,6 +36,7 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
@@ -79,15 +80,35 @@ Future<void> main() async {
   }
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   await dotenv.load(fileName: 'assets/.env');
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (_) => editionNotifier),
-        ChangeNotifierProvider(create: (_) => basketNotifier),
-        ChangeNotifierProvider(create: (_) => localeNotifier),
-      ],
-      child: MyApp()),
-  );
+  if (Platform.isAndroid) {
+    WidgetsFlutterBinding.ensureInitialized();
+    [
+      Permission.storage,
+      Permission.bluetooth,
+      Permission.bluetoothConnect,
+      Permission.bluetoothScan
+    ].request().then((status) {
+      runApp(
+        MultiProvider(
+          providers: [
+            ChangeNotifierProvider(create: (_) => editionNotifier),
+            ChangeNotifierProvider(create: (_) => basketNotifier),
+            ChangeNotifierProvider(create: (_) => localeNotifier),
+          ],
+          child: MyApp()),
+      );
+    });
+  } else {
+    runApp(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider(create: (_) => editionNotifier),
+          ChangeNotifierProvider(create: (_) => basketNotifier),
+          ChangeNotifierProvider(create: (_) => localeNotifier),
+        ],
+        child: MyApp()),
+    );
+  }
 }
 
 void _configureFirebaseMessaging() async {

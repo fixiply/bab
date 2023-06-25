@@ -344,7 +344,7 @@ class TankDataSource extends EditDataSource {
             color: color,
             alignment: alignment,
             padding: const EdgeInsets.all(8.0),
-            child: Text(value ?? ''),
+            child: tooltipText(value),
           );
         }).toList()
     );

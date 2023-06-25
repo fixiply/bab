@@ -31,6 +31,7 @@ class EquipmentModel<T> extends Model {
   double? head_loss;
   dynamic notes;
   ImageModel? image;
+  bool selected = false;
 
   EquipmentModel({
     String? uuid,

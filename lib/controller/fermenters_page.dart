@@ -140,16 +140,6 @@ class _FermentersPageState extends State<FermentersPage> with AutomaticKeepAlive
                 _delete();
               }
           ),
-          if (widget.allowEditing) IconButton(
-            padding: EdgeInsets.zero,
-            icon: const Icon(Icons.download_outlined),
-            tooltip: AppLocalizations.of(context)!.text('import'),
-            onPressed: () {
-              ImportHelper.fermentables(context, () {
-                _fetch();
-              });
-            }
-          ),
           IconButton(
             padding: EdgeInsets.zero,
             icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
@@ -167,7 +157,7 @@ class _FermentersPageState extends State<FermentersPage> with AutomaticKeepAlive
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data!.isEmpty) {
-                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_fermenter'), initHeight: 46);
               }
               if (_showList || widget.showCheckboxColumn == true) {
                 if (widget.loadMore) {
@@ -220,7 +210,7 @@ class _FermentersPageState extends State<FermentersPage> with AutomaticKeepAlive
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('new'),
+          title: AppLocalizations.of(context)!.text('add'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )

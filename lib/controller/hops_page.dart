@@ -99,7 +99,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
                 _delete();
               }
           ),
-          if (widget.allowEditing) IconButton(
+          if (currentUser != null && currentUser!.isAdmin() && widget.allowEditing) IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.download_outlined),
             tooltip: AppLocalizations.of(context)!.text('import'),
