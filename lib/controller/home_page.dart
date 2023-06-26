@@ -382,9 +382,6 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
 
   void _configureSelectNotificationSubject() {
     if (widget.payload != null) {
-      setState(() {
-        _selectedIndex = 0;
-      });
       _payload(widget.payload!);
     }
     selectNotificationStream.stream.listen((String? payload) async {
@@ -422,10 +419,13 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
   }
 
   _payload(String? uuid, {String? route}) async {
-    if (uuid != null) {
+    if (uuid != null && uuid.isNotEmpty) {
       if (route == 'brew') {
         BrewModel? model = await Database().getBrew(uuid);
         if (model != null) {
+          setState(() {
+            _selectedIndex = 0;
+          });
           Navigator.push(context,
             MaterialPageRoute(builder: (context) =>
                 BrewPage(model)
@@ -435,6 +435,9 @@ class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
       } else {
         EventModel? model = await Database().getEvent(uuid);
         if (model != null) {
+          setState(() {
+            _selectedIndex = 5;
+          });
           Navigator.push(context,
             MaterialPageRoute(builder: (context) =>
                 EventPage(model, cache: false)

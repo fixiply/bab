@@ -36,6 +36,14 @@ class DeviceHelper {
     return foundation.defaultTargetPlatform == TargetPlatform.iOS;
   }
 
+  static bool get isAndroid {
+    return foundation.defaultTargetPlatform == TargetPlatform.android;
+  }
+
+  static bool get isMacOs {
+    return foundation.defaultTargetPlatform == TargetPlatform.macOS;
+  }
+
   static bool landscapeOrientation(BuildContext context) {
     return MediaQuery.of(context).orientation == Orientation.landscape;
   }

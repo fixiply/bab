@@ -80,35 +80,15 @@ Future<void> main() async {
   }
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   await dotenv.load(fileName: 'assets/.env');
-  if (Platform.isAndroid) {
-    WidgetsFlutterBinding.ensureInitialized();
-    [
-      Permission.storage,
-      Permission.bluetooth,
-      Permission.bluetoothConnect,
-      Permission.bluetoothScan
-    ].request().then((status) {
-      runApp(
-        MultiProvider(
-          providers: [
-            ChangeNotifierProvider(create: (_) => editionNotifier),
-            ChangeNotifierProvider(create: (_) => basketNotifier),
-            ChangeNotifierProvider(create: (_) => localeNotifier),
-          ],
-          child: MyApp()),
-      );
-    });
-  } else {
-    runApp(
-      MultiProvider(
-        providers: [
-          ChangeNotifierProvider(create: (_) => editionNotifier),
-          ChangeNotifierProvider(create: (_) => basketNotifier),
-          ChangeNotifierProvider(create: (_) => localeNotifier),
-        ],
-        child: MyApp()),
-    );
-  }
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => editionNotifier),
+        ChangeNotifierProvider(create: (_) => basketNotifier),
+        ChangeNotifierProvider(create: (_) => localeNotifier),
+      ],
+      child: MyApp()),
+  );
 }
 
 void _configureFirebaseMessaging() async {

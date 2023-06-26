@@ -248,13 +248,13 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
             backgroundColor: (model.isSelected == true ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
           ),
           child: Text(AppLocalizations.of(context)!.text('to_connect'),
-            style: TextStyle(color: (model.isSelected == true ? Colors.white : Colors.black87)),
+            style: TextStyle(color: Colors.white),
           ),
-          onPressed: () async {
+          onPressed: DeviceHelper.isAndroid || DeviceHelper.isIOS ? () async {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return BluetoothPage();
             }));
-          },
+          } : null,
         ),
         // subtitle: Column(
         //   mainAxisAlignment: MainAxisAlignment.start,
