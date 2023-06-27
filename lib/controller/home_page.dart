@@ -40,11 +40,14 @@ class HomePage extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomeState extends State<HomePage> with AutomaticKeepAliveClientMixin<HomePage>, SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   PageController _page = PageController(initialPage: 0);
   SideMenuController _sideMenu = SideMenuController(initialPage: 0);
   String? _version;
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void initState() {
