@@ -3,12 +3,12 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 
 // External package
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class BluetoothPage extends StatefulWidget {
   @override
@@ -59,9 +59,12 @@ class _BluetoothPageState extends State<BluetoothPage> with AutomaticKeepAliveCl
                             }
                             return ElevatedButton(
                               child: Text(AppLocalizations.of(context)!.text('activate_bluetooth')),
-                              onPressed: Platform.isAndroid
-                                ? () => FlutterBluePlus.instance.turnOn()
-                                : null,
+                              onPressed: Platform.isAndroid ? () async {
+                                if (!await Permission.bluetooth.isGranted) {
+                                  await Permission.bluetoothConnect.request();
+                                }
+                                FlutterBluePlus.instance.turnOn();
+                              } : null,
                             );
                           }
                         ),
