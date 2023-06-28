@@ -223,7 +223,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
       );
       final request = CompleteText(
         prompt: prompt,
-        model: Model.textDavinci3,
+        model: TextDavinci3Model(),
         maxTokens: 255
       );
 
