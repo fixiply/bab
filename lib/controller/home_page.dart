@@ -99,85 +99,71 @@ class _HomeState extends State<HomePage> {
                   // List of SideMenuItem to show them on SideMenu
                   items: [
                     SideMenuItem(
-                      priority: 0,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.home_outlined),
                       title: AppLocalizations.of(context)!.text('home')
                     ),
                     SideMenuItem(
-                      priority: 1,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.sports_bar_outlined),
                       title: AppLocalizations.of(context)!.text('receipts'),
                     ),
                     SideMenuItem(
-                      priority: 2,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.style_outlined),
                       title: AppLocalizations.of(context)!.text('beer_styles'),
                     ),
                     SideMenuItem(
-                      priority: 3,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.science_outlined),
                       title: AppLocalizations.of(context)!.text('ingredients'),
                     ),
                     if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
-                      priority: 4,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.delete_outline),
                       title: AppLocalizations.of(context)!.text('equipments'),
                     ),
                     if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
-                      priority: 5,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.outdoor_grill_outlined),
                       title: AppLocalizations.of(context)!.text('brews'),
                     ),
                     if (currentUser != null && currentUser!.isEditor()) SideMenuItem(
-                      priority: 6,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.inventory_outlined),
                       title: AppLocalizations.of(context)!.text('inventory'),
                     ),
                     if (currentUser != null) SideMenuItem(
-                      priority: 7,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.calendar_month_outlined),
                       title: AppLocalizations.of(context)!.text('calendar'),
                     ),
                     if (currentUser != null) SideMenuItem(
-                      priority: 8,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.build_outlined),
                       title: AppLocalizations.of(context)!.text('tools'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                      priority: 9,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.local_offer_outlined),
                       title: AppLocalizations.of(context)!.text('orders'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                      priority: 10,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.photo_library_outlined),
                       title: AppLocalizations.of(context)!.text('image_gallery'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                      priority: 11,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.article_outlined),
                       title: AppLocalizations.of(context)!.text('products'),
                     ),
                     if (currentUser != null && currentUser!.isAdmin()) SideMenuItem(
-                      priority: 12,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.groups_outlined),
                       title: AppLocalizations.of(context)!.text('companies'),
                     ),
                     SideMenuItem(
-                      priority: 13,
                       onTap: (page, _) => _sideMenu.changePage(page),
                       icon: const Icon(Icons.person_outline),
                       title: AppLocalizations.of(context)!.text('my_account'),

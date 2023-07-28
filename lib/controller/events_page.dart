@@ -69,8 +69,9 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
         actions: <Widget> [
           badge.Badge(
             position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            animationDuration: const Duration(milliseconds: 300),
-            animationType: badge.BadgeAnimationType.slide,
+            badgeAnimation:  badge.BadgeAnimation.slide(
+              // animationDuration: const Duration(milliseconds: 300),
+            ),
             showBadge: _baskets > 0,
             badgeContent: _baskets > 0 ? Text(
               _baskets.toString(),
