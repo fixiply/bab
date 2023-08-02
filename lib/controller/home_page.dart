@@ -209,7 +209,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isEditor()) Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -217,7 +217,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isEditor()) Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -225,7 +225,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isEditor()) Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -233,7 +233,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null) Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -241,7 +241,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null) Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -249,7 +249,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isAdmin()) Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -257,7 +257,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isAdmin())Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -265,7 +265,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isAdmin())Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
@@ -273,7 +273,7 @@ class _HomeState extends State<HomePage> {
                           );
                         }
                       ),
-                      Navigator(
+                      if (currentUser != null && currentUser!.isAdmin())Navigator(
                         onGenerateRoute: (RouteSettings settings) {
                           return MaterialPageRoute(
                             fullscreenDialog: true,
