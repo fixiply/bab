@@ -133,7 +133,7 @@ class _ProductPageState extends State<ProductPage> {
             actions: <Widget> [
               badge.Badge(
                 position: badge.BadgePosition.topEnd(top: 0, end: 3),
-                badgeAnimation:  badge.BadgeAnimation.slide(
+                badgeAnimation: const badge.BadgeAnimation.slide(
                   // animationDuration: const Duration(milliseconds: 300),
                 ),
                 showBadge: _baskets > 0,
@@ -197,7 +197,7 @@ class _ProductPageState extends State<ProductPage> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+          style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
           child: Text(AppLocalizations.of(context)!.text('buy_now')),
           onPressed: () async {
             ModalBottomSheet.showAddToCart(context, widget.model);

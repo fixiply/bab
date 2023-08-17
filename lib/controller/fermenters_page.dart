@@ -5,7 +5,6 @@ import 'package:bab/controller/forms/form_equipment_page.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/tanks_data_table.dart';
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/helpers/import_helper.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/app_localizations.dart';

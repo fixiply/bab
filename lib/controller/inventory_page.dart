@@ -63,7 +63,7 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
           actions: [
             badge.Badge(
               position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation:  badge.BadgeAnimation.slide(
+              badgeAnimation: const badge.BadgeAnimation.slide(
                 // animationDuration: const Duration(milliseconds: 300),
               ),
               showBadge: _baskets > 0,
@@ -98,10 +98,10 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
         ),
         body: TabBarView(
           children: [
-            FermentablesDataTable(data: [], color: Colors.white),
-            HopsDataTable(data: [], color: Colors.white),
-            YeastsDataTable(data: [], color: Colors.white),
-            MiscDataTable(data: [], color: Colors.white),
+            FermentablesDataTable(data: const [], color: Colors.white),
+            HopsDataTable(data: const [], color: Colors.white),
+            YeastsDataTable(data: const [], color: Colors.white),
+            MiscDataTable(data: const [], color: Colors.white),
           ]
         ),
       )

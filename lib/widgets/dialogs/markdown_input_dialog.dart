@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/utils/app_localizations.dart';
 
 // External package
 import 'package:markdown_editable_textinput/markdown_text_input.dart';

@@ -116,22 +116,22 @@ class ImportHelper {
           final fermentables = document.findAllElements('Grain');
           for (XmlElement element in fermentables) {
             final model = fm.FermentableModel(
-                name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.text}),
-                origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.text),
-                efficiency: double.tryParse(element.getElement('F_G_YIELD')!.text)
+                name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.innerText}),
+                origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.innerText),
+                efficiency: double.tryParse(element.getElement('F_G_YIELD')!.innerText)
             );
             final color = element.getElement('F_G_COLOR');
-            if (color != null && color.text.isNotEmpty) {
-              model.ebc = ColorHelper.toEBC(double.tryParse(color.text)!.toInt());
+            if (color != null && color.innerText.isNotEmpty) {
+              model.ebc = ColorHelper.toEBC(double.tryParse(color.innerText)!.toInt());
             }
             final desc = element.getElement('F_G_NOTES');
-            if (desc != null && desc.text.isNotEmpty) {
-              String text = desc.text.replaceAll(RegExp(r'\n'), '');
-              text = desc.text.replaceAll(RegExp(r'\r'), '');
-              text = desc.text.replaceAll('  ', '');
+            if (desc != null && desc.innerText.isNotEmpty) {
+              String text = desc.innerText.replaceAll(RegExp(r'\n'), '');
+              text = desc.innerText.replaceAll(RegExp(r'\r'), '');
+              text = desc.innerText.replaceAll('  ', '');
               model.notes = LocalizedText(map: { 'en': text.trim()});
             }
-            int type = int.parse(element.getElement('F_G_TYPE')!.text);
+            int type = int.parse(element.getElement('F_G_TYPE')!.innerText);
             switch (type) {
               case 0:
                 model.type = fm.Type.grain;
@@ -206,19 +206,19 @@ class ImportHelper {
           final hops = document.findAllElements('Hops');
           for(XmlElement element in hops) {
             final model = hm.HopModel(
-              name: LocalizedText( map: { 'en': element.getElement('F_H_NAME')!.text}),
-              alpha: double.tryParse(element.getElement('F_H_ALPHA')!.text),
-              beta: double.tryParse(element.getElement('F_H_BETA')!.text),
-              origin: LocalizedText.country(element.getElement('F_H_ORIGIN')!.text),
+              name: LocalizedText( map: { 'en': element.getElement('F_H_NAME')!.innerText}),
+              alpha: double.tryParse(element.getElement('F_H_ALPHA')!.innerText),
+              beta: double.tryParse(element.getElement('F_H_BETA')!.innerText),
+              origin: LocalizedText.country(element.getElement('F_H_ORIGIN')!.innerText),
             );
             final desc = element.getElement('F_H_NOTES');
-            if (desc != null && desc.text.isNotEmpty) {
-              String text = desc.text.replaceAll(RegExp(r'\n'), '');
-              text = desc.text.replaceAll(RegExp(r'\r'), '');
-              text = desc.text.replaceAll('  ', '');
+            if (desc != null && desc.innerText.isNotEmpty) {
+              String text = desc.innerText.replaceAll(RegExp(r'\n'), '');
+              text = desc.innerText.replaceAll(RegExp(r'\r'), '');
+              text = desc.innerText.replaceAll('  ', '');
               model.notes = LocalizedText(map: { 'en': text.trim()});
             }
-            int form = int.parse(element.getElement('F_H_FORM')!.text);
+            int form = int.parse(element.getElement('F_H_FORM')!.innerText);
             switch (form) {
               case 2:
                 model.form = hm.Hop.leaf;
@@ -233,7 +233,7 @@ class ImportHelper {
                 model.form = hm.Hop.other;
                 break;
             }
-            int type = int.parse(element.getElement('F_H_TYPE')!.text);
+            int type = int.parse(element.getElement('F_H_TYPE')!.innerText);
             switch (type) {
               case 1:
                 model.type = hm.Type.aroma;
@@ -293,23 +293,23 @@ class ImportHelper {
           final fermentables = document.findAllElements('Yeast');
           for(XmlElement element in fermentables) {
             final model = ym.YeastModel(
-                name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.text}),
-                reference: element.getElement('F_Y_PRODUCT_ID')!.text,
-                laboratory: element.getElement('F_Y_LAB')!.text,
-                cells: double.tryParse(element.getElement('F_Y_CELLS')!.text),
-                attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.text),
-                attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.text),
-                tempmin: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MIN_TEMP')!.text)),
-                tempmax: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MAX_TEMP')!.text))
+                name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.innerText}),
+                reference: element.getElement('F_Y_PRODUCT_ID')!.innerText,
+                laboratory: element.getElement('F_Y_LAB')!.innerText,
+                cells: double.tryParse(element.getElement('F_Y_CELLS')!.innerText),
+                attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.innerText),
+                attmax: double.tryParse(element.getElement('F_Y_MAX_ATTENUATION')!.innerText),
+                tempmin: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MIN_TEMP')!.innerText)),
+                tempmax: FormulaHelper.convertFarenheitToCelcius(double.tryParse(element.getElement('F_Y_MAX_TEMP')!.innerText))
             );
             final desc = element.getElement('F_Y_NOTES');
-            if (desc != null && desc.text.isNotEmpty) {
-              String text = desc.text.replaceAll(RegExp(r'\n'), '');
-              text = desc.text.replaceAll(RegExp(r'\r'), '');
-              text = desc.text.replaceAll('  ', '');
+            if (desc != null && desc.innerText.isNotEmpty) {
+              String text = desc.innerText.replaceAll(RegExp(r'\n'), '');
+              text = desc.innerText.replaceAll(RegExp(r'\r'), '');
+              text = desc.innerText.replaceAll('  ', '');
               model.notes = LocalizedText(map: { 'en': text.trim()});
             }
-            int form = int.parse(element.getElement('F_Y_FORM')!.text);
+            int form = int.parse(element.getElement('F_Y_FORM')!.innerText);
             switch (form) {
               case 0:
                 model.form = ym.Yeast.liquid;
@@ -324,7 +324,7 @@ class ImportHelper {
                 model.form = ym.Yeast.culture;
                 break;
             }
-            int type = int.parse(element.getElement('F_Y_TYPE')!.text);
+            int type = int.parse(element.getElement('F_Y_TYPE')!.innerText);
             switch (type) {
               case 0:
                 model.type = Fermentation.hight;
@@ -386,20 +386,20 @@ class ImportHelper {
           final fermentables = document.findAllElements('Misc');
           for(XmlElement element in fermentables) {
             final model = mm.MiscModel(
-                name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.text})
+                name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.innerText})
             );
-            int? time = int.tryParse(element.getElement('F_M_TIME')!.text);
+            int? time = int.tryParse(element.getElement('F_M_TIME')!.innerText);
             if (time != null) {
               model.duration = time;
             }
             final desc = element.getElement('F_M_NOTES');
-            if (desc != null && desc.text.isNotEmpty) {
-              String text = desc.text.replaceAll(RegExp(r'\n'), '');
-              text = desc.text.replaceAll(RegExp(r'\r'), '');
-              text = desc.text.replaceAll('  ', '');
+            if (desc != null && desc.innerText.isNotEmpty) {
+              String text = desc.innerText.replaceAll(RegExp(r'\n'), '');
+              text = desc.innerText.replaceAll(RegExp(r'\r'), '');
+              text = desc.innerText.replaceAll('  ', '');
               model.notes = LocalizedText(map: { 'en': text.trim()});
             }
-            int type = int.parse(element.getElement('F_M_TYPE')!.text);
+            int type = int.parse(element.getElement('F_M_TYPE')!.innerText);
             switch (type) {
               case 0:
                 model.type = mm.Misc.spice;
@@ -420,7 +420,7 @@ class ImportHelper {
                 model.type = mm.Misc.water_agent;
                 break;
             }
-            int use = int.parse(element.getElement('F_M_USE')!.text);
+            int use = int.parse(element.getElement('F_M_USE')!.innerText);
             switch (use) {
               case 0:
                 model.use = mm.Use.boil;

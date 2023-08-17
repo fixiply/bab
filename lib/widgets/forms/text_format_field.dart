@@ -98,10 +98,10 @@ class _TextFormatFieldState extends FormFieldState<TextFormat> {
                       ],
                     ),
                     ToggleButtons(
-                      children: <Widget>[
-                        const Icon(Icons.format_bold),
-                        const Icon(Icons.format_italic),
-                        const Icon(Icons.format_underline),
+                      children: const <Widget>[
+                        Icon(Icons.format_bold),
+                        Icon(Icons.format_italic),
+                        Icon(Icons.format_underline),
                       ],
                       onPressed: (int index) {
                         setState(() {

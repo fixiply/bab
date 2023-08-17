@@ -57,7 +57,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
           actions: [
             badge.Badge(
               position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation:  badge.BadgeAnimation.slide(
+              badgeAnimation: const badge.BadgeAnimation.slide(
                 // animationDuration: const Duration(milliseconds: 300),
               ),
               showBadge: _baskets > 0,

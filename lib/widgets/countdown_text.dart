@@ -1,12 +1,8 @@
 import 'dart:async';
 
-import 'package:bab/utils/notifications.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/models/hop_model.dart';
-import 'package:bab/utils/app_localizations.dart';
-import 'package:uuid/uuid.dart';
 
 
 class CountDownText extends StatefulWidget {
@@ -46,7 +42,7 @@ class CountDownTextState extends State<CountDownText> {
   void run(Duration duration) {
     widget.duration = duration;
     _timer?.cancel();
-    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer timer) {
       if (!mounted) return;
       setState(() {
         final seconds = widget.duration.inSeconds - 1;

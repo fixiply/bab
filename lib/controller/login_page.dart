@@ -206,7 +206,7 @@ class _LoginPageState extends State<LoginPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
                   child: Text(AppLocalizations.of(context)!.text('to_connect')),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {

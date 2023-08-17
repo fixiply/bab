@@ -109,7 +109,7 @@ class CustomDrawer<Object> extends Drawer {
           ),
           onTap: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return GalleryPage([]);
+              return GalleryPage(const []);
             })).then((value) {
               Navigator.pop(context);
             });

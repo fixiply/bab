@@ -140,7 +140,7 @@ class _BrewPageState extends State<BrewPage> {
           actions: <Widget>[
             badge.Badge(
               position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation:  badge.BadgeAnimation.slide(
+              badgeAnimation: const badge.BadgeAnimation.slide(
                 // animationDuration: const Duration(milliseconds: 300),
               ),
               showBadge: _baskets > 0,
@@ -383,7 +383,7 @@ class _BrewPageState extends State<BrewPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Wrap(
                     children: [
                       if (widget.model.primaryDay() != null && widget.model.receipt!.primarytemp != null) _fermentation(
@@ -391,13 +391,13 @@ class _BrewPageState extends State<BrewPage> {
                         widget.model.primaryDay()!,
                         widget.model.receipt!.primarytemp!,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       if (widget.model.secondaryDay() != null && widget.model.receipt!.secondarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('secondary'),
                         widget.model.secondaryDay()!,
                         widget.model.receipt!.secondarytemp!,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       if (widget.model.tertiaryDay() != null && widget.model.receipt!.tertiarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('tertiary'),
                         widget.model.tertiaryDay()!,

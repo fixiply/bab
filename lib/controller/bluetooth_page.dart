@@ -97,7 +97,7 @@ class _BluetoothPageState extends State<BluetoothPage> with AutomaticKeepAliveCl
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) => DeviceScreen(device: d),
-                                      settings: RouteSettings(name: '/deviceScreen')));
+                                      settings: const RouteSettings(name: '/deviceScreen')));
                                 },
                               );
                             }
@@ -107,14 +107,14 @@ class _BluetoothPageState extends State<BluetoothPage> with AutomaticKeepAliveCl
                                 onPressed: () {
                                   Navigator.of(context).push(MaterialPageRoute(
                                       builder: (context) {
-                                        d.connect(timeout: Duration(seconds: 4)).catchError((e) {
+                                        d.connect(timeout: const Duration(seconds: 4)).catchError((e) {
                                           final snackBar =
                                           SnackBar(content: Text('Connect Error: $e'));
                                           snackBarKeyB.currentState?.showSnackBar(snackBar);
                                         });
                                         return DeviceScreen(device: d);
                                       },
-                                      settings: RouteSettings(name: '/deviceScreen')));
+                                      settings: const RouteSettings(name: '/deviceScreen')));
                                 }
                               );
                             }
@@ -146,7 +146,7 @@ class _BluetoothPageState extends State<BluetoothPage> with AutomaticKeepAliveCl
             padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
           child: ElevatedButton(
             child: Text(AppLocalizations.of(context)!.text('find_device')),
-            style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
             onPressed: () async {
               try {
                 if (FlutterBluePlus.isScanningNow == false) {
@@ -274,7 +274,7 @@ class DeviceScreen extends StatelessWidget {
                   case BluetoothConnectionState.disconnected:
                     onPressed = () async {
                       try {
-                        await device.connect(timeout: Duration(seconds: 4));
+                        await device.connect(timeout: const Duration(seconds: 4));
                       } catch (e) {
                         final snackBar = SnackBar(content: Text('Connect Error: $e'));
                         snackBarKeyC.currentState?.showSnackBar(snackBar);

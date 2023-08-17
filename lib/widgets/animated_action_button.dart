@@ -36,7 +36,7 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton> {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
-      heroTag: widget.tag ?? Uuid().v1(),
+      heroTag: widget.tag ?? const Uuid().v1(),
       onPressed: widget.onPressed,
       backgroundColor: widget.backgroundColor ?? Theme.of(context).primaryColor,
       tooltip: widget.title,

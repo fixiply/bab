@@ -244,11 +244,11 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
         title: Text(AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 12),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
             backgroundColor: (model.isSelected == true ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
           ),
           child: Text(AppLocalizations.of(context)!.text('to_connect'),
-            style: TextStyle(color: Colors.white),
+            style: const TextStyle(color: Colors.white),
           ),
           onPressed: DeviceHelper.isAndroid || DeviceHelper.isIOS ? () async {
             Navigator.push(context, MaterialPageRoute(builder: (context) {

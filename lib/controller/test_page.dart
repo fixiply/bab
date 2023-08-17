@@ -67,31 +67,29 @@ class _TestPageState extends State<TestPage> {
                               GridColumn(
                                 columnName: 'id',
                                 label: Container(
-                                    padding: EdgeInsets.all(16.0),
-                                    alignment: Alignment.centerRight,
-                                    child: Text(
-                                      'ID',
-                                    ))),
+                                  padding: const EdgeInsets.all(16.0),
+                                  alignment: Alignment.centerRight,
+                                  child: Text('ID',))),
                               GridColumn(
                                 allowEditing: true,
                                 columnName: 'name',
                                 label: Container(
-                                    padding: EdgeInsets.all(16.0),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text('Name'))),
+                                  padding: const EdgeInsets.all(16.0),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text('Name'))),
                               GridColumn(
                                 columnName: 'designation',
                                 width: 120,
                                 label: Container(
-                                    padding: EdgeInsets.all(16.0),
-                                    alignment: Alignment.centerLeft,
-                                    child: Text('Designation'))),
+                                  padding: const EdgeInsets.all(16.0),
+                                  alignment: Alignment.centerLeft,
+                                  child: Text('Designation'))),
                               GridColumn(
                                 columnName: 'salary',
                                 label: Container(
-                                    padding: EdgeInsets.all(16.0),
-                                    alignment: Alignment.centerRight,
-                                    child: Text('Salary'))),
+                                  padding: const EdgeInsets.all(16.0),
+                                  alignment: Alignment.centerRight,
+                                  child: Text('Salary'))),
                             ],
                           );
                         }
@@ -121,31 +119,29 @@ class _TestPageState extends State<TestPage> {
                                     GridColumn(
                                         columnName: 'id',
                                         label: Container(
-                                            padding: EdgeInsets.all(16.0),
-                                            alignment: Alignment.centerRight,
-                                            child: Text(
-                                              'ID',
-                                            ))),
+                                          padding: const EdgeInsets.all(16.0),
+                                          alignment: Alignment.centerRight,
+                                          child: Text('ID'))),
                                     GridColumn(
                                         allowEditing: true,
                                         columnName: 'name',
                                         label: Container(
-                                            padding: EdgeInsets.all(16.0),
-                                            alignment: Alignment.centerLeft,
-                                            child: Text('Name'))),
+                                          padding: const EdgeInsets.all(16.0),
+                                          alignment: Alignment.centerLeft,
+                                          child: Text('Name'))),
                                     GridColumn(
                                         columnName: 'designation',
                                         width: 120,
                                         label: Container(
-                                            padding: EdgeInsets.all(16.0),
-                                            alignment: Alignment.centerLeft,
-                                            child: Text('Designation'))),
+                                          padding: const EdgeInsets.all(16.0),
+                                          alignment: Alignment.centerLeft,
+                                          child: Text('Designation'))),
                                     GridColumn(
                                         columnName: 'salary',
                                         label: Container(
-                                            padding: EdgeInsets.all(16.0),
-                                            alignment: Alignment.centerRight,
-                                            child: Text('Salary'))),
+                                          padding: const EdgeInsets.all(16.0),
+                                          alignment: Alignment.centerRight,
+                                          child: Text('Salary'))),
                                   ],
                                 );
                               }
@@ -194,7 +190,7 @@ class EmployeeDataSource extends DataGridSource {
           alignment: (dataGridCell.columnName == 'id' || dataGridCell.columnName == 'salary')
               ? Alignment.centerRight
               : Alignment.centerLeft,
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Text(dataGridCell.value.toString()),
         );
       }).toList());
@@ -247,8 +243,8 @@ class EmployeeDataSource extends DataGridSource {
         controller: TextEditingController()..text = displayText,
         textAlign: isTextAlignRight ? TextAlign.right : TextAlign.left,
         autocorrect: false,
-        decoration: InputDecoration(
-            contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 16.0),
+        decoration: const InputDecoration(
+            contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 16.0),
             focusedBorder: UnderlineInputBorder(
             borderSide: BorderSide(color: Colors.black))),
         keyboardType:

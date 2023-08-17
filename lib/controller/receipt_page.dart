@@ -156,7 +156,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
           actions: <Widget>[
             badge.Badge(
               position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation:  badge.BadgeAnimation.slide(
+              badgeAnimation: const badge.BadgeAnimation.slide(
                 // animationDuration: const Duration(milliseconds: 300),
               ),
               showBadge: _baskets > 0,
@@ -452,7 +452,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                  SizedBox(height: 8),
+                  const SizedBox(height: 8),
                   Wrap(
                     children: [
                       if (widget.model.primaryday != null && widget.model.primarytemp != null) _fermentation(
@@ -460,13 +460,13 @@ class _ReceiptPageState extends State<ReceiptPage> {
                         widget.model.primaryday!,
                         widget.model.primarytemp!,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       if (widget.model.secondaryday != null && widget.model.secondarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('secondary'),
                         widget.model.secondaryday!,
                         widget.model.secondarytemp!,
                       ),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       if (widget.model.tertiaryday != null && widget.model.tertiarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('tertiary'),
                         widget.model.tertiaryday!,

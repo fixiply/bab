@@ -42,7 +42,7 @@ class AbstractContainerState extends State<AbstractContainer> {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 4),
         child: ElevatedButton(
-          style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+          style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
           child: Text(AppLocalizations.of(context)!.text('select_dates')),
           onPressed: () async {
             ModalBottomSheet.showCalendar(context, model);

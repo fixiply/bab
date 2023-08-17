@@ -122,8 +122,8 @@ class _ChatGPTContainerState extends AbstractContainerState {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
-                icon: Icon(Icons.send, size: 18),
+                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
+                icon: const Icon(Icons.send, size: 18),
                 label: Text(AppLocalizations.of(context)!.text('send')),
                 onPressed: _text != null ? _send : null,
               ),
@@ -142,7 +142,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
                       mainAxisAlignment: MainAxisAlignment.start,
                       children: [
                         Text(AppLocalizations.of(context)!.text('answers'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                        SizedBox(height: 8),
+                        const SizedBox(height: 8),
                         ListView.separated(
                           shrinkWrap: true,
                           itemCount: snapshot.hasData ? snapshot.data!.length : 0,
@@ -163,7 +163,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       IconButton(
-                                        icon: Icon(Icons.add_circle_outline),
+                                        icon: const Icon(Icons.add_circle_outline),
                                         tooltip: AppLocalizations.of(context)!.text('new_recipe'),
                                         onPressed: _new
                                       ),
@@ -171,7 +171,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
                                       Tooltip(message: '${AppLocalizations.of(context)!.text('description')}: ${snapshot.data![index].send}', child: Icon(Icons.help_outline)),
                                       const SizedBox(height: 4),
                                       IconButton(
-                                        icon: Icon(Icons.delete_outline),
+                                        icon: const Icon(Icons.delete_outline),
                                         onPressed: () {
                                           _delete(snapshot.data![index]);
                                         }

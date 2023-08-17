@@ -202,7 +202,7 @@ class _RegisterPageState extends State<RegisterPage> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(padding: EdgeInsets.all(18)),
+                  style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
                   child: Text(AppLocalizations.of(context)!.text('register')),
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {

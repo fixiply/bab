@@ -616,7 +616,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       SystemSound.play(SystemSoundType.alert);
       Flushbar(
         icon: Icon(Icons.check, color: Theme.of(context).primaryColor),
-        messageText: Text(message, style: TextStyle(fontSize: 18.0)),
+        messageText: Text(message, style: const TextStyle(fontSize: 18.0)),
         mainButton: TextButton(
           onPressed: () {
             Navigator.pop(context);
@@ -626,7 +626,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             style: TextStyle(color: Theme.of(context).primaryColor),
           ),
         ),
-        duration: Duration(seconds: 25),
+        duration: const Duration(seconds: 25),
         backgroundColor: Colors.white,
         flushbarPosition: FlushbarPosition.TOP,
         flushbarStyle: FlushbarStyle.FLOATING,

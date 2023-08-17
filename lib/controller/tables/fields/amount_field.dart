@@ -78,8 +78,8 @@ class _AmountFieldState extends FormFieldState<Unit> {
               autofocus: true,
               controller: _textController..text = value!.amount?.toString() ?? '',
               textAlign: TextAlign.right,
-              decoration: InputDecoration(
-                  contentPadding: const EdgeInsets.fromLTRB(0, 0, 0, 16.0)
+              decoration: const InputDecoration(
+                  contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 16.0)
               ),
               keyboardType: TextInputType.number,
               inputFormatters: <TextInputFormatter>[
