@@ -321,7 +321,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'boiling' : 'boiling_time')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.tempFormat(widget.model.boil), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              TextSpan(text: AppLocalizations.of(context)!.durationFormat(widget.model.boil), style: const TextStyle(fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),

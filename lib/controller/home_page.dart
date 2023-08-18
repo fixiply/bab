@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -61,16 +63,15 @@ class _HomeState extends State<HomePage> {
     _controller.addListener(() {
       _page.jumpToPage(_controller.selectedIndex);
     });
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Jump to last page (Account) if the user connects or disconnects.
-    if (_page.hasClients && _page.page != 0) {
-      debugPrint('didChangeDependencies ${_page.page} ${_controller.selectedIndex} $_numberOfPages');
-      _page.jumpToPage(_numberOfPages);
-    }
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+      // Jump to last page (My account) if the user connects or disconnects.
+      if (_page.hasClients && _page.page != 0) {
+        Timer(Duration(milliseconds: 300), () {
+          debugPrint('authStateChanges ${_page.page} ${_controller.selectedIndex} $_numberOfPages');
+          _page.jumpToPage(_numberOfPages);
+        });
+      }
+    });
   }
 
   @override
@@ -265,116 +266,116 @@ class _HomeState extends State<HomePage> {
   List<Widget> _generateItems(bool isLargeScreen) {
     List<Widget> pages = [
       Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => EventsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => EventsPage(),
+          );
+        }
       ),
       Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => ReceiptsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => ReceiptsPage(),
+          );
+        }
       ),
       Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => StylesPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => StylesPage(),
+          );
+        }
       ),
       Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => IngredientsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => IngredientsPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isEditor()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => EquipmentsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => EquipmentsPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isEditor()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => BrewsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => BrewsPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isEditor()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => InventoryPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => InventoryPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => CalendarPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => CalendarPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => ToolsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => ToolsPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isAdmin()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => OrdersPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => OrdersPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isAdmin()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => GalleryPage(const [], close: false),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => GalleryPage(const [], close: false),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isAdmin()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => ProductsPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => ProductsPage(),
+          );
+        }
       ),
       if (isLargeScreen && currentUser != null && currentUser!.isAdmin()) Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => CompaniesPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => CompaniesPage(),
+          );
+        }
       ),
       Navigator(
-          onGenerateRoute: (RouteSettings settings) {
-            return MaterialPageRoute(
-              fullscreenDialog: true,
-              builder: (_) => AccountPage(),
-            );
-          }
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => AccountPage(),
+          );
+        }
       )
     ];
     _numberOfPages = pages.length;
