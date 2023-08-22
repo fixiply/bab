@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bab/controller/home_page.dart';
+import 'package:bab/controller/home2_page.dart';
 import 'package:bab/firebase_options.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/user_model.dart';
@@ -156,7 +157,7 @@ class _AppState extends State<MyApp> {
         ),
         // inputDecorationTheme: theme.inputDecorationTheme.copyWith(focusColor: PrimaryColor),
       ),
-      home: HomePage(),
+      home: Home2Page(),
       builder: EasyLoading.init(),
       localizationsDelegates: [
         _newLocaleDelegate!,
