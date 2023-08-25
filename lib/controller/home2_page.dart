@@ -48,6 +48,121 @@ class _Home2State extends State<Home2Page> {
   final PageController _page = PageController(initialPage: 0);
   final SidebarXController _controller = SidebarXController(selectedIndex: 0, extended: true);
 
+  List<Widget> _pages = [
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => EventsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => ReceiptsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => StylesPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => IngredientsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => EquipmentsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => BrewsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => InventoryPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => CalendarPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => ToolsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => OrdersPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => GalleryPage(const [], close: false),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => ProductsPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => CompaniesPage(),
+          );
+        }
+    ),
+    Navigator(
+        onGenerateRoute: (RouteSettings settings) {
+          return MaterialPageRoute(
+            fullscreenDialog: true,
+            builder: (_) => AccountPage(),
+          );
+        }
+    )
+  ];
+
   @override
   void dispose() {
     _page.dispose();
@@ -63,7 +178,7 @@ class _Home2State extends State<Home2Page> {
     _controller.addListener(() {
       _page.jumpToPage(_controller.selectedIndex);
     });
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+    FirebaseAuth.instance.userChanges().listen((User? user) async {
       // Jump to last page (My account) if the user connects or disconnects.
       if (_page.hasClients && _page.page != 0) {
         Timer(Duration(milliseconds: 300), () {
@@ -118,13 +233,19 @@ class _Home2State extends State<Home2Page> {
         children: [
           if (isLargeScreen) _sideBarX(),
           Expanded(
-            child: PageView(
+            child: PageView.builder(
               controller: _page,
-              pageSnapping: false,
               onPageChanged: (index) {
                 _controller.selectIndex(index);
               },
-              children: _generateItems(isLargeScreen)
+              itemBuilder: (context, position) {
+                debugPrint('position: $position');
+                if (position > 3 && currentUser == null) {
+                  debugPrint('length: ${_pages.length}');
+                  return _pages[_pages.length-1];
+                }
+                return _pages[position];
+              }
             ),
           )
         ],
