@@ -233,19 +233,20 @@ class _Home2State extends State<Home2Page> {
         children: [
           if (isLargeScreen) _sideBarX(),
           Expanded(
-            child: PageView.builder(
+            child: PageView(
               controller: _page,
               onPageChanged: (index) {
                 _controller.selectIndex(index);
               },
-              itemBuilder: (context, position) {
-                debugPrint('position: $position');
-                if (position > 3 && currentUser == null) {
-                  debugPrint('length: ${_pages.length}');
-                  return _pages[_pages.length-1];
-                }
-                return _pages[position];
-              }
+              children: _generateItems(isLargeScreen)
+              // itemBuilder: (context, position) {
+              //   debugPrint('position: $position');
+              //   if (position > 3 && currentUser == null) {
+              //     debugPrint('length: ${_pages.length}');
+              //     return _pages[_pages.length-1];
+              //   }
+              //   return _pages[position];
+              // }
             ),
           )
         ],
