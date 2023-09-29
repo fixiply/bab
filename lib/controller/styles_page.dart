@@ -362,10 +362,12 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
 
   _fetch() async {
     List<StyleModel> list = await Database().getStyles(ordered: true);
-    Category.populate(_categories, list, AppLocalizations.of(context)!.locale);
-    setState(() {
-      _styles = _filter(list);
-    });
+    if (mounted == true) {
+      Category.populate(_categories, list, AppLocalizations.of(context)!.locale);
+      setState(() {
+        _styles = _filter(list);
+      });
+    }
   }
 
   Future<List<StyleModel>> _filter<T>(List<StyleModel> list) async {

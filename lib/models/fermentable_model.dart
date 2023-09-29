@@ -14,7 +14,7 @@ enum Method with Enums { mashed,  steeped;
   List<Enum> get enums => [ mashed,  steeped ];
 }
 
-extension Ex on double {
+extension DoubleParsing on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 

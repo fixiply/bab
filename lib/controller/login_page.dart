@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _email = foundation.kDebugMode ? RECIPIENT : null;
   late TextEditingController _emailController;
-  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController(text: foundation.kDebugMode ? 'mot2passe' : null);
 
   bool passwordVisible = false;
   void togglePassword() {

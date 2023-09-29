@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bab/controller/home_page.dart';
-import 'package:bab/controller/home2_page.dart';
 import 'package:bab/firebase_options.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/user_model.dart';
@@ -19,6 +18,7 @@ import 'package:bab/utils/device.dart';
 import 'package:bab/utils/edition_notifier.dart';
 import 'package:bab/utils/locale_notifier.dart';
 import 'package:bab/utils/notifications.dart';
+import 'package:bab/utils/user_notifier.dart';
 import 'package:bab/widgets/builders/carousel_builder.dart';
 import 'package:bab/widgets/builders/chatgpt_builder.dart';
 import 'package:bab/widgets/builders/list_builder.dart';
@@ -45,6 +45,7 @@ String? selectedNotificationPayload;
 final ValuesNotifier editionNotifier = ValuesNotifier();
 final BasketNotifier basketNotifier = BasketNotifier();
 final LocaleNotifier localeNotifier = LocaleNotifier();
+final UserNotifier userNotifier = UserNotifier();
 
 var logger = Logger();
 
@@ -83,9 +84,10 @@ Future<void> main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => editionNotifier),
         ChangeNotifierProvider(create: (_) => basketNotifier),
+        ChangeNotifierProvider(create: (_) => editionNotifier),
         ChangeNotifierProvider(create: (_) => localeNotifier),
+        ChangeNotifierProvider(create: (_) => userNotifier),
       ],
       child: MyApp()),
   );
@@ -141,6 +143,7 @@ class _AppState extends State<MyApp> {
       primaryColorLight: PrimaryColorLight,
       primaryColorDark: PrimaryColorDark,
       bottomAppBarTheme: const BottomAppBarTheme(color: PrimaryColor),
+      // navigationBarTheme: const NavigationBarThemeData(backgroundColor: PrimaryColor),
     );
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
@@ -157,7 +160,7 @@ class _AppState extends State<MyApp> {
         ),
         // inputDecorationTheme: theme.inputDecorationTheme.copyWith(focusColor: PrimaryColor),
       ),
-      home: Home2Page(),
+      home: HomePage(),
       builder: EasyLoading.init(),
       localizationsDelegates: [
         _newLocaleDelegate!,
@@ -208,6 +211,7 @@ class _AppState extends State<MyApp> {
         debugPrint('[$APP_NAME] User "${user.email}" is signed in with "${model.role}".');
       }
     }
+    Provider.of<UserNotifier>(context, listen: false).set(model);
     setState(() {
       currentUser = model;
     });

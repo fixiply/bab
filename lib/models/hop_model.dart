@@ -17,7 +17,7 @@ enum Use with Enums { mash, first_wort, boil, aroma, dry_hop;
   List<Enum> get enums => [ mash, first_wort, boil, aroma, dry_hop ];
 }
 
-extension Ex on double {
+extension DoubleParsing on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 

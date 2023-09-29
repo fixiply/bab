@@ -359,12 +359,14 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   }
 
   _fetch() async {
-    _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
-    Category.populate(_categories, _styles, AppLocalizations.of(context)!.locale);
     List<ReceiptModel> list = await Database().getReceipts(user: currentUser?.uuid, myData: _my_receips, ordered: true);
-    setState(() {
-      _receipts = _filter(list);
-    });
+    _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
+    if (mounted == true) {
+      Category.populate(  _categories, _styles, AppLocalizations.of(context)!.locale);
+      setState(() {
+        _receipts = _filter(list);
+      });
+    }
   }
 
   Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> list) async {

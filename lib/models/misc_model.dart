@@ -13,7 +13,7 @@ enum Use with Enums { boil, mash, primary, secondary, bottling, sparge;
   List<Enum> get enums => [ boil, mash, primary, secondary, bottling, sparge ];
 }
 
-extension Ex on double {
+extension DoubleParsing on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 

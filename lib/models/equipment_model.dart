@@ -11,7 +11,7 @@ enum Equipment with Enums { tank, fermenter;
   List<Enum> get enums => [ tank, fermenter ];
 }
 
-extension Ex on double {
+extension DoubleParsing on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 
