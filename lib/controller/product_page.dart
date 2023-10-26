@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/forms/form_product_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/product_model.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/image_container.dart';
 import 'package:bab/widgets/containers/ratings_container.dart';
 import 'package:bab/widgets/modal_bottom_sheet.dart';
@@ -15,10 +14,8 @@ import 'package:bab/widgets/paints/bezier_clipper.dart';
 import 'package:bab/widgets/paints/circle_clipper.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
 
 class ProductPage extends StatefulWidget {
   final ProductModel model;
@@ -30,16 +27,9 @@ class ProductPage extends StatefulWidget {
 
 class _ProductPageState extends State<ProductPage> {
   final ScrollController _controller = ScrollController();
-  int _baskets = 0;
 
   // Edition mode
   bool _features = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -131,25 +121,7 @@ class _ProductPageState extends State<ProductPage> {
               ),
             ),
             actions: <Widget> [
-              badge.Badge(
-                position: badge.BadgePosition.topEnd(top: 0, end: 3),
-                badgeAnimation: const badge.BadgeAnimation.slide(
-                  // animationDuration: const Duration(milliseconds: 300),
-                ),
-                showBadge: _baskets > 0,
-                badgeContent: _baskets > 0 ? Text(
-                  _baskets.toString(),
-                  style: const TextStyle(color: Colors.white),
-                ) : null,
-                child: IconButton(
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return BasketPage();
-                    }));
-                  },
-                ),
-              ),
+              BasketButton(),
               if (currentUser != null && currentUser!.isAdmin()) IconButton(
                 icon: const Icon(Icons.edit_note),
                 onPressed: () {
@@ -205,17 +177,6 @@ class _ProductPageState extends State<ProductPage> {
         ),
       ),
     );
-  }
-
-  _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
-    });
   }
 
   _edit(ProductModel model) {

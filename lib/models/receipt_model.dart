@@ -14,6 +14,7 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
 import 'package:bab/utils/rating.dart';
+import 'package:flutter/material.dart';
 
 class ReceiptModel<T> extends Model {
   Status? status;
@@ -247,8 +248,8 @@ class ReceiptModel<T> extends Model {
 
   List<FermentableModel> get fermentables => _fermentables ?? [];
 
-  Future<List<FermentableModel>> getFermentables({double? volume}) async {
-    if (_fermentables == null) {
+  Future<List<FermentableModel>> getFermentables({double? volume, bool forceResizing = false}) async {
+    if (_fermentables == null || forceResizing) {
       _fermentables = await FermentableModel.data(cacheFermentables);
       resizeFermentales(volume);
     }
@@ -259,8 +260,8 @@ class ReceiptModel<T> extends Model {
 
   List<hm.HopModel> get hops => _hops ?? [];
 
-  Future<List<hm.HopModel>> gethops({double? volume, hm.Use? use}) async {
-    if (_hops == null) {
+  Future<List<hm.HopModel>> gethops({double? volume, hm.Use? use, bool forceResizing = false}) async {
+    if (_hops == null|| forceResizing) {
       _hops = await hm.HopModel.data(cacheHops);
       resizeHops(volume);
       if (use != null) {
@@ -274,8 +275,8 @@ class ReceiptModel<T> extends Model {
 
   List<mm.MiscModel> get miscellaneous => _misc ?? [];
 
-  Future<List<mm.MiscModel>> getMisc({double? volume, mm.Use? use}) async {
-    if (_misc == null) {
+  Future<List<mm.MiscModel>> getMisc({double? volume, mm.Use? use, bool forceResizing = false}) async {
+    if (_misc == null || forceResizing) {
       _misc = await mm.MiscModel.data(cacheMisc);
       resizeMisc(volume);
       if (use != null) {
@@ -307,6 +308,7 @@ class ReceiptModel<T> extends Model {
       return;
     }
     for(FermentableModel item in fermentables) {
+      debugPrint('resizeFermentales old: ${item.amount} new ${ (item.amount! * (volume / this.volume!)).abs()}');
       item.amount = (item.amount! * (volume / this.volume!)).abs();
     }
     calculate(volume: volume);

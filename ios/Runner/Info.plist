@@ -45,6 +45,7 @@
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>fetch</string>
+		<string>processing</string>
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
@@ -73,5 +74,9 @@
       <key>NSAllowsArbitraryLoads</key>
       <true/>
     </dict>
+    <key>BGTaskSchedulerPermittedIdentifiers</key>
+    <array>
+        <string>fr.bab.delayed-notification</string>
+    </array>
 </dict>
 </plist>

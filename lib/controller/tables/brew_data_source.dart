@@ -31,7 +31,9 @@ class BrewDataSource extends EditDataSource {
       DataGridCell<DateTime>(columnName: 'inserted_at', value: e.inserted_at),
       DataGridCell<ReceiptModel>(columnName: 'receipt', value: e.receipt),
       DataGridCell<EquipmentModel>(columnName: 'tank', value: e.tank),
-      DataGridCell<EquipmentModel>(columnName: 'fermenter', value: e.fermenter),
+      DataGridCell<double>(columnName: 'volume', value: e.volume),
+      DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
+      DataGridCell<double>(columnName: 'abv', value: e.abv),
       DataGridCell<Status>(columnName: 'status', value: e.status),
     ])).toList();
   }
@@ -68,7 +70,11 @@ class BrewDataSource extends EditDataSource {
             value = e.value?.get(AppLocalizations.of(context)!.locale);
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
-            AppLocalizations.of(context)!.numberFormat(e.value);
+            if (e.columnName == 'efficiency' || e.columnName == 'abv') {
+              value = AppLocalizations.of(context)!.percentFormat(e.value);
+            } if (e.columnName == 'volume') {
+              value = AppLocalizations.of(context)!.litterVolumeFormat(e.value);
+            } else value = AppLocalizations.of(context)!.numberFormat(e.value);
             alignment = Alignment.centerRight;
           } else if (e.value is Enum) {
             alignment = Alignment.center;
@@ -118,10 +124,20 @@ class BrewDataSource extends EditDataSource {
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].tank = newCellValue;
         break;
-      case 'fermenter':
+      case 'volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].fermenter = newCellValue;
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        data[dataRowIndex].volume = newCellValue;
+        break;
+      case 'efficiency':
+        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        data[dataRowIndex].efficiency = newCellValue;
+        break;
+      case 'abv':
+        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        data[dataRowIndex].abv = newCellValue;
         break;
       case 'status':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -183,12 +199,30 @@ class BrewDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          columnName: 'fermenter',
+          columnName: 'volume',
           allowEditing: false,
           label: Container(
               padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('fermenter'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              alignment: Alignment.centerLeft,
+              child: Text(AppLocalizations.of(context)!.text('volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
+      ),
+      GridColumn(
+          columnName: 'efficiency',
+          allowEditing: false,
+          label: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerLeft,
+              child: Text(AppLocalizations.of(context)!.text('efficiency'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
+      ),
+      GridColumn(
+          columnName: 'abv',
+          allowEditing: false,
+          label: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerLeft,
+              child: Text(AppLocalizations.of(context)!.text('alcohol'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(

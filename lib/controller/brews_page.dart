@@ -27,7 +27,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 class BrewsPage extends StatefulWidget {
   bool allowEditing;
   bool loadMore;
-  BrewsPage({Key? key, this.allowEditing = false, this.loadMore = false}) : super(key: key);
+  BrewsPage({Key? key, this.allowEditing = true, this.loadMore = false}) : super(key: key);
 
   @override
   _BrewsPageState createState() => _BrewsPageState();
@@ -140,6 +140,13 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                       }
                     });
                   },
+                  // onCellTap: (DataGridCellTapDetails details) {
+                  //   _data!.then((value) async {
+                  //     Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  //       return BrewPage(value.elementAt(details.rowColumnIndex.rowIndex));
+                  //     }));
+                  //   });
+                  // },
                   onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                     setState(() {
                       for(var row in addedRows) {
@@ -267,6 +274,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
+              iconSize: 34,
               icon: const Icon(Icons.play_circle_outline, color: Colors.redAccent),
               onPressed: () {
                 Navigator.push(context,

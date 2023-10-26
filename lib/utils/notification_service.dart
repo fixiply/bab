@@ -5,8 +5,6 @@ import 'package:flutter/foundation.dart' as foundation;
 // Internal package
 import 'package:bab/main.dart';
 import 'package:bab/utils/constants.dart';
-import 'package:bab/helpers/date_helper.dart';
-import 'package:flutter/material.dart';
 
 // External package
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -16,14 +14,14 @@ import 'package:timezone/timezone.dart' as tz;
 
 final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
-class Notifications {
-  static final Notifications _singleton = Notifications._internal();
+class NotificationService {
+  static final NotificationService _instance = NotificationService();
 
-  factory Notifications() {
-    return _singleton;
+  static NotificationService get instance => _instance;
+
+  void cancelAll() async {
+    await flutterLocalNotificationsPlugin.cancelAll();
   }
-
-  Notifications._internal();
 
   void initialize() async {
     final NotificationAppLaunchDetails? notificationAppLaunchDetails = !foundation.kIsWeb &&
@@ -34,18 +32,11 @@ class Notifications {
       selectedNotificationPayload = notificationAppLaunchDetails!.notificationResponse!.payload;
     }
     const AndroidInitializationSettings initializationSettingsAndroid = AndroidInitializationSettings('app_icon');
-
-    /// Note: permissions aren't requested here just to demonstrate that can be
-    /// done later
     const DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
-        requestAlertPermission: true,
-        requestBadgePermission: true,
-        requestSoundPermission: true
+      requestAlertPermission: true,
+      requestBadgePermission: true,
+      requestSoundPermission: true,
     );
-    // final MacOSInitializationSettings initializationSettingsMacOS = MacOSInitializationSettings(
-    //     requestAlertPermission: false,
-    //     requestBadgePermission: false,
-    //     requestSoundPermission: false);
     final LinuxInitializationSettings initializationSettingsLinux = LinuxInitializationSettings(
       defaultActionName: 'Open notification',
       defaultIcon: AssetsLinuxIcon('icons/app_icon.png'),
@@ -56,7 +47,6 @@ class Notifications {
       macOS: initializationSettingsDarwin,
       linux: initializationSettingsLinux,
     );
-
     await flutterLocalNotificationsPlugin.initialize(initializationSettings, onDidReceiveNotificationResponse: (NotificationResponse notificationResponse) async {
       selectedNotificationPayload = notificationResponse.payload;
       selectNotificationStream.add(selectedNotificationPayload);
@@ -72,20 +62,46 @@ class Notifications {
     tz.setLocalLocation(tz.getLocation(timeZoneName!));
   }
 
-  void permissions() async {
-    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
-    flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<MacOSFlutterLocalNotificationsPlugin>()?.requestPermissions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+  Future<bool> isAndroidPermissionGranted() async {
+    if (Platform.isAndroid) {
+      return await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+          ?.areNotificationsEnabled() ??
+          false;
+    }
+    return false;
   }
 
-  Future<void> showNotification(int id, {String? title, String? body, String? payload, String? scheduled}) async {
+  Future<void> requestPermissions() async {
+    if (Platform.isIOS || Platform.isMacOS) {
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          IOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          MacOSFlutterLocalNotificationsPlugin>()
+          ?.requestPermissions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    } else if (Platform.isAndroid) {
+      final AndroidFlutterLocalNotificationsPlugin? androidImplementation =
+      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
+      final bool? grantedNotificationPermission =
+      await androidImplementation?.requestNotificationsPermission();
+    }
+  }
+
+  Future<void> showNotification(int id, {String? title, String? body, String? payload, Duration? duration}) async {
     await _configureLocalTimeZone();
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
         channelId, 'Notifications',
@@ -97,24 +113,29 @@ class Notifications {
         ticker: 'ticker',
         styleInformation: BigTextStyleInformation('')
     );
-    var DarwinPlatformChannelSpecifics = const DarwinNotificationDetails();
+    var DarwinPlatformChannelSpecifics = const DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+      presentBanner: true,
+    );
     var platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
-        iOS: DarwinPlatformChannelSpecifics);
-    if (scheduled != null && scheduled.isNotEmpty) {
-      var date = DateHelper.parse(scheduled);
-      if (date != null && date.isAfter(DateTime.now())) {
-        await flutterLocalNotificationsPlugin.zonedSchedule(
-            id,
-            title,
-            body,
-            tz.TZDateTime.from(date, tz.local),
-            platformChannelSpecifics,
-            payload: payload,
-            androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-            uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
-        );
-      }
+        iOS: DarwinPlatformChannelSpecifics,
+        macOS: DarwinPlatformChannelSpecifics
+    );
+    if (duration != null && duration.inSeconds > 0) {
+      await flutterLocalNotificationsPlugin.zonedSchedule(
+        id,
+        title,
+        body,
+        tz.TZDateTime.now(tz.local).add(duration),
+        platformChannelSpecifics,
+        payload: payload,
+        matchDateTimeComponents: DateTimeComponents.dateAndTime,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime
+      );
     } else {
       await flutterLocalNotificationsPlugin.show(
         id,
@@ -135,5 +156,6 @@ class Notifications {
     final String timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timeZoneName));
   }
+
 }
 

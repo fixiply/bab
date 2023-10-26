@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/forms/form_receipt_page.dart';
 import 'package:bab/controller/receipt_page.dart';
 import 'package:bab/helpers/color_helper.dart';
@@ -10,12 +9,12 @@ import 'package:bab/models/receipt_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/utils/abv.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/category.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/filter_receipt_appbar.dart';
 import 'package:bab/widgets/custom_drawer.dart';
@@ -25,11 +24,9 @@ import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:bab/widgets/search_text.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:provider/provider.dart';
 
 class ReceiptsPage extends StatefulWidget {
   ReceiptsPage({Key? key}) : super(key: key);
@@ -43,7 +40,6 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   Future<List<ReceiptModel>>? _receipts;
   List<StyleModel> _styles = [];
   List<Category> _categories = [];
-  int _baskets = 0;
 
   IBU _ibu = IBU();
   ABV _abv = ABV();
@@ -74,25 +70,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          badge.Badge(
-            position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            badgeAnimation: const badge.BadgeAnimation.slide(
-              // animationDuration: const Duration(milliseconds: 300),
-            ),
-            showBadge: _baskets > 0,
-            badgeContent: _baskets > 0 ? Text(
-              _baskets.toString(),
-              style: const TextStyle(color: Colors.white),
-            ) : null,
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BasketPage();
-                }));
-              },
-            ),
-          ),
+          BasketButton(),
           if (DeviceHelper.isDesktop) IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.refresh),
@@ -346,14 +324,6 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
       if (mounted) {
         _fetch();
       }
-    });
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
     });
     _fetch();
   }

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/brew_page.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/models/brew_model.dart';
+import 'package:bab/models/model.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
@@ -17,10 +17,6 @@ import 'package:bab/widgets/days.dart';
 
 // External package
 import 'package:table_calendar/table_calendar.dart';
-import 'package:badges/badges.dart' as badge;
-import 'package:provider/provider.dart';
-
-import '../models/model.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -28,7 +24,6 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
-  int _baskets = 0;
   Future<List<Model>>? _data;
   final ValueNotifier<List<ListTile>> _selectedEvents = ValueNotifier([]);
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -45,7 +40,6 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   void initState() {
     super.initState();
     _selectedDay = _focusedDay;
-    _initialize();
     _fetch();
   }
 
@@ -67,25 +61,15 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
-          badge.Badge(
-            position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            badgeAnimation:  const badge.BadgeAnimation.slide(
-              // animationDuration: const Duration(milliseconds: 300),
-            ),
-            showBadge: _baskets > 0,
-            badgeContent: _baskets > 0 ? Text(
-              _baskets.toString(),
-              style: const TextStyle(color: Colors.white),
-            ) : null,
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BasketPage();
-                }));
-              },
-            ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.refresh),
+            tooltip: AppLocalizations.of(context)!.text('refresh'),
+            onPressed: () {
+              _fetch();
+            },
           ),
+          BasketButton(),
           CustomMenuButton(
             context: context,
             publish: false,
@@ -205,25 +189,16 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
     );
   }
 
-  _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
-    });
-  }
-
   _fetch() async {
-    _data = Database().getBrews(user: constants.currentUser!.uuid, ordered: true);
+    setState(() {
+      _data = Database().getBrews(user: constants.currentUser!.uuid, ordered: true);
+    });
   }
 
   List<ListTile> _getEventsForDay(List<Model> data, DateTime day) {
     List<Model> brews = data.where((element) {
       if (element is BrewModel) {
-        if (element.started_at == false) {
+        if (element.started_at == null || element.started_at == false) {
           return false;
         }
         if (DateHelper.toDate(element.started_at!) == DateHelper.toDate(day)) {

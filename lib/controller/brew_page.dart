@@ -1,12 +1,6 @@
-import 'package:bab/models/fermentable_model.dart';
-import 'package:bab/models/hop_model.dart';
-import 'package:bab/models/misc_model.dart';
-import 'package:bab/models/yeast_model.dart';
-import 'package:bab/utils/database.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/forms/form_brew_page.dart';
 import 'package:bab/controller/stepper_page.dart';
 import 'package:bab/controller/tables/fermentables_data_table.dart';
@@ -17,22 +11,28 @@ import 'package:bab/controller/tables/yeasts_data_table.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/brew_model.dart';
+import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/hop_model.dart';
+import 'package:bab/models/misc_model.dart';
+import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/changes_notifier.dart';
 import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/carousel_container.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/paints/bezier_clipper.dart';
 import 'package:bab/widgets/paints/circle_clipper.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:provider/provider.dart';
 
 class BrewPage extends StatefulWidget {
-  final BrewModel model;
+  BrewModel model;
   BrewPage(this.model);
 
   @override
@@ -40,9 +40,10 @@ class BrewPage extends StatefulWidget {
 }
 
 class _BrewPageState extends State<BrewPage> {
+  Key _key = UniqueKey();
+
   // Edition mode
   bool _expanded = true;
-  int _baskets = 0;
 
   @override
   void initState() {
@@ -53,9 +54,11 @@ class _BrewPageState extends State<BrewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _key,
       body: CustomScrollView(slivers: <Widget>[
         SliverAppBar(
           pinned: true,
+          centerTitle: false,
           expandedHeight: 235.0,
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
@@ -66,7 +69,7 @@ class _BrewPageState extends State<BrewPage> {
             }
           ),
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
+            // titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
             title: RichText(
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
@@ -138,25 +141,7 @@ class _BrewPageState extends State<BrewPage> {
             ]),
           ),
           actions: <Widget>[
-            badge.Badge(
-              position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation: const badge.BadgeAnimation.slide(
-                // animationDuration: const Duration(milliseconds: 300),
-              ),
-              showBadge: _baskets > 0,
-              badgeContent: _baskets > 0 ? Text(
-                _baskets.toString(),
-                style: const TextStyle(color: Colors.white),
-              ) : null,
-              child: IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return BasketPage();
-                  }));
-                },
-              ),
-            ),
+            BasketButton(),
             if (constants.currentUser != null && (constants.currentUser!.isAdmin() || widget.model.creator == constants.currentUser!.uuid))
               IconButton(
                 icon: const Icon(Icons.edit_note),
@@ -482,20 +467,30 @@ class _BrewPageState extends State<BrewPage> {
   }
 
   _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
+    final changesProvider = Provider.of<ChangesNotifier>(context, listen: false);
+    changesProvider.addListener(() {
+      if (changesProvider.model == widget.model.receipt) {
+        if (!mounted) return;
+        debugPrint('changesProvider ${changesProvider.model}');
+        setState(() {
+          widget.model.receipt = changesProvider.model as ReceiptModel;
+          _key = UniqueKey();
+        });
+      }
     });
   }
 
   _edit(BrewModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormBrewPage(model);
-    }));
+    })).then((value) {
+      if (value != null) {
+        setState(() {
+          widget.model = value;
+          _key = UniqueKey();
+        });
+      }
+    });
   }
 
   _start() async {

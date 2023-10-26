@@ -12,12 +12,13 @@ import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/user_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/utils/changes_notifier.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/device.dart';
 import 'package:bab/utils/edition_notifier.dart';
 import 'package:bab/utils/locale_notifier.dart';
-import 'package:bab/utils/notifications.dart';
+import 'package:bab/utils/notification_service.dart';
 import 'package:bab/utils/user_notifier.dart';
 import 'package:bab/widgets/builders/carousel_builder.dart';
 import 'package:bab/widgets/builders/chatgpt_builder.dart';
@@ -38,14 +39,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
+import 'package:workmanager/workmanager.dart';
 
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 String? selectedNotificationPayload;
 
-final ValuesNotifier editionNotifier = ValuesNotifier();
 final BasketNotifier basketNotifier = BasketNotifier();
+final ChangesNotifier changesNotifier = ChangesNotifier();
 final LocaleNotifier localeNotifier = LocaleNotifier();
 final UserNotifier userNotifier = UserNotifier();
+final ValuesNotifier editionNotifier = ValuesNotifier();
 
 var logger = Logger();
 
@@ -61,13 +64,21 @@ Future<void> showNotification(RemoteMessage message) async {
   RemoteNotification? notification = message.notification;
   if (notification != null) {
     String? id = message.data['id'];
-    Notifications().showNotification(
-        id != null ? id.hashCode : 0,
-        title: notification.title,
-        body: notification.body,
-        payload: id
+    NotificationService.instance.showNotification(
+      id != null ? id.hashCode : 0,
+      title: notification.title,
+      body: notification.body,
+      payload: id
     );
   }
+}
+
+@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) {
+    print("Native called background task: $task"); //simpleTask will be emitted here.
+    return Future.value(true);
+  });
 }
 
 Future<void> main() async {
@@ -77,14 +88,18 @@ Future<void> main() async {
   );
   _configureFirebaseMessaging();
   if (!foundation.kIsWeb) {
-    Notifications().initialize();
+    NotificationService.instance.initialize();
   }
+  Workmanager().initialize(
+    callbackDispatcher, // The top level function, aka callbackDispatcher
+  );
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   await dotenv.load(fileName: 'assets/.env');
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => basketNotifier),
+        ChangeNotifierProvider(create: (_) => changesNotifier),
         ChangeNotifierProvider(create: (_) => editionNotifier),
         ChangeNotifierProvider(create: (_) => localeNotifier),
         ChangeNotifierProvider(create: (_) => userNotifier),
@@ -176,18 +191,14 @@ class _AppState extends State<MyApp> {
   }
 
   _initialize() async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // provider.setEdition(prefs.getBool(EDITION_MODE_KEY) ?? false);
-    // provider.setEditable(prefs.getBool(EDIT_KEY) ?? false);
+    NotificationService.instance.isAndroidPermissionGranted();
+    NotificationService.instance.requestPermissions();
   }
 
   _authStateChanges() async {
-    FirebaseAuth.instance.userChanges().listen((User? user) async {
+    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
       _loadUser(user);
     });
-    // FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-    //   _loadUser(user);
-    // });
   }
 
   _loadUser(User? user) async {

@@ -73,7 +73,7 @@ class _FormStylePageState extends State<FormStylePage> {
             icon: const Icon(Icons.save),
             onPressed: _modified == true ? () {
               if (_formKey.currentState!.validate()) {
-                Database().update(widget.model).then((value) async {
+                Database().update(widget.model, context: context).then((value) async {
                   Navigator.pop(context, widget.model);
                 }).onError((e,s) {
                   _showSnackbar(e.toString());

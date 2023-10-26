@@ -15,16 +15,18 @@ import 'package:bab/models/misc_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/product_model.dart';
 import 'package:bab/models/purchase_model.dart';
-import 'package:bab/utils/rating.dart';
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/models/user_model.dart';
 import 'package:bab/models/yeast_model.dart';
+import 'package:bab/utils/changes_notifier.dart';
 import 'package:bab/utils/constants.dart' as constants;
+import 'package:bab/utils/rating.dart';
 
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class Database {
   static final firestore = FirebaseFirestore.instance;
@@ -98,7 +100,7 @@ class Database {
     });
   }
 
-  Future<String> add(dynamic d, {bool? ignoreAuth = false}) async {
+  Future<String> add(dynamic d, {bool? ignoreAuth = false, BuildContext? context}) async {
     try {
       if (ignoreAuth == false && d is Model && _auth.currentUser != null) {
         d.creator = _auth.currentUser!.uid;
@@ -110,15 +112,21 @@ class Database {
       debugPrint(s.toString());
       rethrow;
     }
+    if (context != null) {
+      Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.added);
+    }
     return d.uuid;
   }
 
-  Future<bool> set(String id, dynamic d, {bool? ignoreAuth = false}) async {
+  Future<bool> set(String id, dynamic d, {bool? ignoreAuth = false, BuildContext? context}) async {
     try {
       if (ignoreAuth == false && d is Model && _auth.currentUser != null) {
         d.creator = _auth.currentUser!.uid;
       }
       bool updated = await getTableName(d)!.doc(id).set(d.toMap()).then((value) {
+        if (context != null) {
+          Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.modified);
+        }
         return true;
       }).catchError((error) {
         return false;
@@ -132,7 +140,7 @@ class Database {
   }
 
   //Returns document iD if the record is created, null is updated.
-  Future<String?> update(dynamic d, {bool updateAll = true}) async {
+  Future<String?> update(dynamic d, {bool updateAll = true, BuildContext? context}) async {
     if (d.uuid == null) {
       return add(d);
     }
@@ -146,12 +154,36 @@ class Database {
         }
       }
       await getTableName(d)!.doc(d.uuid).update(d.toMap());
+      if (context != null) {
+        Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.modified);
+      }
     }
     catch (e, s) {
       debugPrint(s.toString());
       rethrow;
     }
     return null;
+  }
+
+
+  Future<void> delete(dynamic d, {bool forced = false, BuildContext? context}) async {
+    try {
+      if (forced == true || (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled)) {
+        return await getTableName(d)!.doc(d.uuid).delete();
+      } else {
+        if (ClassHelper.hasStatus(d)) {
+          d.status = constants.Status.disabled;
+        }
+        await getTableName(d)!.doc(d.uuid).update(d.toMap());
+        if (context != null) {
+          Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.deleted);
+        }
+      }
+    }
+    catch (e, s) {
+      debugPrint(s.toString());
+      rethrow;
+    }
   }
 
   Future<void> publishAll() async {
@@ -173,23 +205,6 @@ class Database {
         }
       }
     });
-  }
-
-  Future<void> delete(dynamic d, {bool forced = false}) async {
-    try {
-      if (forced == true || (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled)) {
-        return await getTableName(d)!.doc(d.uuid).delete();
-      } else {
-        if (ClassHelper.hasStatus(d)) {
-          d.status = constants.Status.disabled;
-        }
-        await getTableName(d)!.doc(d.uuid).update(d.toMap());
-      }
-    }
-    catch (e, s) {
-      debugPrint(s.toString());
-      rethrow;
-    }
   }
 
   Future<UserModel?> getUser(String uuid) async {
@@ -686,9 +701,9 @@ class Database {
         list.add(model);
       }
     });
-    if (ordered == true) {
-      list.sort((a, b) => a.inserted_at!.toString().toLowerCase().compareTo(b.inserted_at!.toString().toLowerCase()));
-    }
+    // if (ordered == true) {
+    //   list.sort((a, b) => a.inserted_at!.toString().toLowerCase().compareTo(b.inserted_at!.toString().toLowerCase()));
+    // }
     return list;
   }
 

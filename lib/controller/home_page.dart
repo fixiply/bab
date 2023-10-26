@@ -140,8 +140,8 @@ class _HomeState extends State<HomePage> {
     });
     final userNotifier = Provider.of<UserNotifier>(context, listen: false);
     userNotifier.addListener(() {
+      _generateItems();
       if (_page.hasClients && ((userNotifier.user != null && _page.page == 4) || (userNotifier.user == null && _page.page == 9))) {
-        _generateItems();
         // Jump to last page (My account) if the user connects or disconnects.
         Timer(Duration(milliseconds: 500), () {
           _controller.selectIndex(_pages.length - 1);

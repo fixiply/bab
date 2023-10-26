@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as Foundation;
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/event_page.dart';
 import 'package:bab/controller/forms/form_event_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/event_model.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/builders/full_widget_page.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
@@ -19,12 +18,10 @@ import 'package:bab/widgets/containers/image_container.dart';
 import 'package:bab/widgets/containers/shimmer_container.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
-import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:bab/widgets/search_text.dart';
+import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
-import 'package:provider/provider.dart';
 
 class EventsPage extends StatefulWidget {
   EventsPage({Key? key}) : super(key: key);
@@ -37,7 +34,6 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
   late ScrollController? _controller;
   final TextEditingController _searchQueryController = TextEditingController();
   Future<List<EventModel>>? _events;
-  int _baskets = 0;
 
   // Edition mode
   bool _remove = false;
@@ -67,25 +63,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          badge.Badge(
-            position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            badgeAnimation: const badge.BadgeAnimation.slide(
-              // animationDuration: const Duration(milliseconds: 300),
-            ),
-            showBadge: _baskets > 0,
-            badgeContent: _baskets > 0 ? Text(
-              _baskets.toString(),
-              style: const TextStyle(color: Colors.white),
-            ) : null,
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BasketPage();
-                }));
-              },
-            ),
-          ),
+          BasketButton(),
           CustomMenuButton(
             context: context,
             publish: currentUser != null && currentUser!.isAdmin(),
@@ -362,14 +340,6 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
   }
 
   _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
-    });
     _fetch();
   }
 

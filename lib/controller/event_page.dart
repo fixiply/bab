@@ -2,17 +2,14 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/event_model.dart';
-import 'package:bab/utils/basket_notifier.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/image_container.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:palette_generator/palette_generator.dart';
-import 'package:provider/provider.dart';
 
 class EventPage extends StatefulWidget {
   final EventModel model;
@@ -25,7 +22,6 @@ class EventPage extends StatefulWidget {
 
 class _EventPageState extends State<EventPage> {
   final Color _dominantColor = Colors.white;
-  int _baskets = 0;
 
   @override
   void initState() {
@@ -52,25 +48,7 @@ class _EventPageState extends State<EventPage> {
           }
         ),
         actions: <Widget> [
-          badge.Badge(
-            position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            badgeAnimation: const badge.BadgeAnimation.slide(
-              // animationDuration: const Duration(milliseconds: 300),
-            ),
-            showBadge: _baskets > 0,
-            badgeContent: _baskets > 0 ? Text(
-              _baskets.toString(),
-              style: const TextStyle(color: Colors.white),
-            ) : null,
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BasketPage();
-                }));
-              },
-            ),
-          ),
+          BasketButton()
         ]
       ) : null,
       body: widget.model.sliver == false ? SingleChildScrollView(
@@ -145,25 +123,7 @@ class _EventPageState extends State<EventPage> {
               ),
             ),
             actions: <Widget> [
-              badge.Badge(
-                position: badge.BadgePosition.topEnd(top: 0, end: 3),
-                badgeAnimation: const badge.BadgeAnimation.slide(
-                  // animationDuration: const Duration(milliseconds: 300),
-                ),
-                showBadge: _baskets > 0,
-                badgeContent: _baskets > 0 ? Text(
-                  _baskets.toString(),
-                  style: const TextStyle(color: Colors.white),
-                ) : null,
-                child: IconButton(
-                  icon: const Icon(Icons.shopping_cart_outlined),
-                  onPressed: () {
-                    Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return BasketPage();
-                    }));
-                  },
-                ),
-              ),
+              BasketButton()
             ]
           ),
           SliverList(
@@ -183,14 +143,6 @@ class _EventPageState extends State<EventPage> {
   }
 
   _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
-    });
     if (widget.model.images!.isNotEmpty) {
       PaletteGenerator paletteGenerator = await PaletteGenerator.fromImageProvider(NetworkImage(widget.model.images!.first.url!));
       Color? dominantColor = paletteGenerator.dominantColor!.color;

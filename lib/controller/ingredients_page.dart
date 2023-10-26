@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/fermentables_page.dart';
 import 'package:bab/controller/hops_page.dart';
 import 'package:bab/controller/misc_page.dart';
@@ -9,11 +8,11 @@ import 'package:bab/controller/yeasts_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 
 class IngredientsPage extends StatefulWidget {
   IngredientsPage({Key? key}) : super(key: key);
@@ -23,7 +22,6 @@ class IngredientsPage extends StatefulWidget {
 }
 
 class _IngredientsPageState extends State<IngredientsPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<IngredientsPage> {
-  int _baskets = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -55,25 +53,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
           actions: [
-            badge.Badge(
-              position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation: const badge.BadgeAnimation.slide(
-                // animationDuration: const Duration(milliseconds: 300),
-              ),
-              showBadge: _baskets > 0,
-              badgeContent: _baskets > 0 ? Text(
-                _baskets.toString(),
-                style: const TextStyle(color: Colors.white),
-              ) : null,
-              child: IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return BasketPage();
-                  }));
-                },
-              ),
-            ),
+            BasketButton(),
             CustomMenuButton(
               context: context,
               publish: false,

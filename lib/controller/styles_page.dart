@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/forms/form_style_page.dart';
 import 'package:bab/controller/style_page.dart';
+import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/helpers/import_helper.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/utils/abv.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/category.dart';
-import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/filter_style_appbar.dart';
 import 'package:bab/widgets/custom_drawer.dart';
@@ -25,11 +24,9 @@ import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:bab/widgets/search_text.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:expandable_text/expandable_text.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:intl/intl.dart';
-import 'package:provider/provider.dart';
 
 class StylesPage extends StatefulWidget {
   StylesPage({Key? key}) : super(key: key);
@@ -43,7 +40,6 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   Future<List<StyleModel>>? _styles;
   List<Category> _categories = [];
-  int _baskets = 0;
 
   // Edition mode
   IBU _ibu = IBU();
@@ -58,7 +54,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
   @override
   void initState() {
     super.initState();
-    _initialize();
+    _fetch();
   }
 
   @override
@@ -75,25 +71,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: <Widget> [
-          badge.Badge(
-            position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            badgeAnimation: const badge.BadgeAnimation.slide(
-              // animationDuration: const Duration(milliseconds: 300),
-            ),
-            showBadge: _baskets > 0,
-            badgeContent: _baskets > 0 ? Text(
-              _baskets.toString(),
-              style: const TextStyle(color: Colors.white),
-            ) : null,
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BasketPage();
-                }));
-              },
-            ),
-          ),
+          BasketButton(),
           if (DeviceHelper.isDesktop) IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.refresh),
@@ -344,18 +322,6 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
       _ibu.clear();
       _abv.clear();
       _selectedFermentations.clear();
-    });
-    _fetch();
-  }
-
-  _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
     });
     _fetch();
   }

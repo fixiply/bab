@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/foundation.dart' as foundation;
@@ -7,7 +8,6 @@ import 'package:flutter/services.dart';
 
 // Internal package
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/main.dart';
 import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart' as hp;
@@ -17,7 +17,7 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/mash.dart' as mash;
-import 'package:bab/utils/notifications.dart';
+import 'package:bab/utils/notification_service.dart';
 import 'package:bab/widgets/circular_timer.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/ph_container.dart';
@@ -91,7 +91,7 @@ extension ListParsing on List {
   }
 }
 
-class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClientMixin<StepperPage>, WidgetsBindingObserver {
+class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClientMixin<StepperPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
   int _lastStep = 0;
@@ -108,7 +108,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+    // WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       _initialize();
     });
@@ -116,7 +116,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
+    // WidgetsBinding.instance.removeObserver(this);
+    NotificationService.instance.cancelAll();
     super.dispose();
   }
 
@@ -135,7 +136,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         key: _scaffoldKey,
         backgroundColor: constants.FillColor,
         appBar: AppBar(
-          title: Text(AppLocalizations.of(context)!.text('stages')),
+          title: Text(AppLocalizations.of(context)!.text('brewing_steps')),
+          centerTitle: false,
           elevation: 0,
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
@@ -207,6 +209,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                       constraints: const BoxConstraints.tightFor(height: 48.0),
                       child: Row(
                         children: <Widget>[
+                          if (_currentStep == snapshot.data!.length - 1) ElevatedButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: Text(localizations.closeButtonLabel.toUpperCase()),
+                          ),
                           if (_currentStep < snapshot.data!.length - 1) ElevatedButton(
                             onPressed: controls.onStepContinue,
                             child: Text(_currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel.toUpperCase()),
@@ -214,7 +222,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                           if (_currentStep != 0) TextButton(
                             onPressed: controls.onStepCancel,
                             child: Text(
-                              AppLocalizations.of(context)!.text('return').toUpperCase(),
+                              localizations.backButtonTooltip.toUpperCase(),
                               style: const TextStyle(color: Colors.grey),
                             ),
                           ),
@@ -236,17 +244,17 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     );
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    // TODO: implement didChangeAppLifecycleState
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.paused) {
-      logger.d('Lifecycle state paused');
-    }
-    if (state == AppLifecycleState.resumed) {
-      logger.d('Lifecycle state resumed');
-    }
-  }
+  // @override
+  // void didChangeAppLifecycleState(AppLifecycleState state) {
+  //   // TODO: implement didChangeAppLifecycleState
+  //   super.didChangeAppLifecycleState(state);
+  //   if (state == AppLifecycleState.paused) {
+  //     logger.d('Lifecycle state paused');
+  //   }
+  //   if (state == AppLifecycleState.resumed) {
+  //     logger.d('Lifecycle state resumed');
+  //   }
+  // }
 
   _initialize() async {
     _temp = SfRadialGauge(
@@ -344,7 +352,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         content: Container(
           alignment: Alignment.centerLeft,
           child: FutureBuilder<List<FermentableModel>>(
-            future: receipt.getFermentables(volume: widget.model.volume),
+            future: receipt.getFermentables(volume: widget.model.volume, forceResizing: true),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(
@@ -373,7 +381,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: ++_index,
-        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(50)}'),
+        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(72.3)}'),
         content: Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.all(8.0),
@@ -486,8 +494,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 duration: 0,
                 index: steps.length,
                 onComplete: (int index) {
-                  Notifications().showNotification(
-                    const Uuid().hashCode,
+                  NotificationService.instance.showNotification(
+                    Uuid().v4().hashCode,
                     body: 'Le Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
                   );
                   steps[index].completed = true;
@@ -530,7 +538,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     ));
     steps.add(MyStep(
       index: ++_index,
-      title: const Text('Commencer le houblonnage'),
+      title: Text('Commencer le houblonnage pendant ${AppLocalizations.of(context)!.durationFormat(receipt.boil)}'),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -557,7 +565,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   var secondes = receipt.boil! * 60;
                   _boilController.restart(duration: secondes);
                   ingredients.forEach((key, value) {
-                    key.restart(Duration(seconds: secondes - (value.minutes * 60)));
+                    Duration duration = Duration(seconds: secondes - (value.minutes * 60));
+                    key.start(duration);
+                    String text = '';
+                    value.map!.forEach((k, v) {
+                      text += '${text.isNotEmpty ? '\n' : ''}Ajoutez $v de «$k»';
+                    });
+                    _notification(text, duration: duration);
                   });
                 }
               }
@@ -574,13 +588,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   duration: Duration(minutes: receipt.boil! - e.value.minutes),
                   map: e.value.map!,
                   controller: e.key,
-                  onComplete: () {
-                    String text = '';
-                    e.value.map!.forEach((k, v) {
-                      text += '${text.isNotEmpty ? '\n' : ''}Ajoutez $v de «$k»';
-                    });
-                    _notification(text);
-                  },
                 );
               }).toList()
             )
@@ -601,8 +608,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   Future<Map<CountDownTextController, Ingredient>> _ingredients(ReceiptModel receipt) async {
     List<Ingredient> list = [];
     Map<CountDownTextController, Ingredient> map = {};
-    list.set(await receipt.gethops(volume: widget.model.volume, use: hp.Use.boil), context);
-    list.set(await receipt.getMisc(volume: widget.model.volume, use: mm.Use.boil), context);
+    list.set(await receipt.gethops(volume: widget.model.volume, use: hp.Use.boil, forceResizing: true), context);
+    list.set(await receipt.getMisc(volume: widget.model.volume, use: mm.Use.boil, forceResizing: true), context);
     list.sort((a, b) => b.minutes.compareTo(a.minutes));
     for(Ingredient e in list) {
       CountDownTextController controller = CountDownTextController(); 
@@ -611,7 +618,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     return map;
   }
 
-  _notification(String message) async {
+  _notification(String message, {Duration? duration}) async {
     if (foundation.kIsWeb) {
       SystemSound.play(SystemSoundType.alert);
       Flushbar(
@@ -636,9 +643,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ).show(context);
       return;
     }
-    Notifications().showNotification(
-        const Uuid().hashCode,
-        body: message
+    NotificationService.instance.showNotification(
+        Uuid().v4().hashCode,
+        body: message,
+        duration: duration
     );
   }
   

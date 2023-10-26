@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/forms/form_brew_page.dart';
 import 'package:bab/controller/forms/form_receipt_page.dart';
 import 'package:bab/controller/tables/fermentables_data_table.dart';
@@ -19,10 +18,10 @@ import 'package:bab/models/receipt_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/abv.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/carousel_container.dart';
 import 'package:bab/widgets/containers/ratings_container.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
@@ -33,13 +32,11 @@ import 'package:bab/widgets/paints/gradient_slider_thumb_shape.dart';
 import 'package:bab/widgets/paints/gradient_slider_track_shape.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:provider/provider.dart';
 
 class ReceiptPage extends StatefulWidget {
-  final ReceiptModel model;
+  ReceiptModel model;
   ReceiptPage(this.model);
 
   @override
@@ -47,25 +44,22 @@ class ReceiptPage extends StatefulWidget {
 }
 
 class _ReceiptPageState extends State<ReceiptPage> {
+  Key _key = UniqueKey();
+
   // Edition mode
   bool _expanded = true;
-  int _baskets = 0;
 
   double _rating = 0;
   int _notices = 0;
 
   @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _key,
       body: CustomScrollView(slivers: <Widget>[
         SliverAppBar(
           pinned: true,
+          centerTitle: false,
           expandedHeight: 235.0,
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
@@ -76,7 +70,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             }
           ),
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
+            // titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
             title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
             background: Stack(
               children: [
@@ -154,25 +148,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             ]),
           ),
           actions: <Widget>[
-            badge.Badge(
-              position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation: const badge.BadgeAnimation.slide(
-                // animationDuration: const Duration(milliseconds: 300),
-              ),
-              showBadge: _baskets > 0,
-              badgeContent: _baskets > 0 ? Text(
-                _baskets.toString(),
-                style: const TextStyle(color: Colors.white),
-              ) : null,
-              child: IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return BasketPage();
-                  }));
-                },
-              ),
-            ),
+            BasketButton(),
             if (widget.model.isEditable()) IconButton(
               icon: const Icon(Icons.edit_note),
               onPressed: () {
@@ -510,21 +486,17 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
-  _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
-    });
-  }
-
   _edit(ReceiptModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormReceiptPage(model);
-    }));
+    })).then((value) {
+      if (value != null) {
+        setState(() {
+          widget.model = value;
+          _key = UniqueKey();
+        });
+      }
+    });
   }
 
   _new() async {

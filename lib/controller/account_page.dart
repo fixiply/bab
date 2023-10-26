@@ -4,24 +4,21 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/controller/about_page.dart';
 import 'package:bab/controller/address_page.dart';
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/devices_page.dart';
 import 'package:bab/controller/login_page.dart';
 import 'package:bab/controller/payments_page.dart';
 import 'package:bab/controller/purchases_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 
 class AccountPage extends StatefulWidget {
   AccountPage({Key? key}) : super(key: key);
@@ -30,19 +27,6 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  int _baskets = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    _initialize();
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,25 +38,7 @@ class _AccountPageState extends State<AccountPage> {
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
-          badge.Badge(
-            position: badge.BadgePosition.topEnd(top: 0, end: 3),
-            badgeAnimation: const badge.BadgeAnimation.slide(
-              // animationDuration: const Duration(milliseconds: 300),
-            ),
-            showBadge: _baskets > 0,
-            badgeContent: _baskets > 0 ? Text(
-              _baskets.toString(),
-              style: const TextStyle(color: Colors.white),
-            ) : null,
-            child: IconButton(
-              icon: const Icon(Icons.shopping_cart_outlined),
-              onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return BasketPage();
-                }));
-              },
-            ),
-          ),
+          BasketButton(),
           CustomMenuButton(
             context: context,
             publish: false,
@@ -208,18 +174,6 @@ class _AccountPageState extends State<AccountPage> {
         ),
       ),
     );
-  }
-
-  _initialize() async {
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
-      if (!mounted) return;
-      setState(() {
-        _baskets = basketProvider.size;
-      });
-    });
-    // _fetch();
   }
 }
 

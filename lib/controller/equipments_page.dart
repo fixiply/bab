@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/basket_page.dart';
 import 'package:bab/controller/fermenters_page.dart';
 import 'package:bab/controller/tanks_page.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
-import 'package:badges/badges.dart' as badge;
 
 class EquipmentsPage extends StatefulWidget {
   EquipmentsPage({Key? key}) : super(key: key);
@@ -18,7 +17,6 @@ class EquipmentsPage extends StatefulWidget {
 }
 
 class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<EquipmentsPage> {
-  int _baskets = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
@@ -48,25 +46,7 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
           actions: [
-            badge.Badge(
-              position: badge.BadgePosition.topEnd(top: 0, end: 3),
-              badgeAnimation: const badge.BadgeAnimation.slide(
-                // animationDuration: const Duration(milliseconds: 300),
-              ),
-              showBadge: _baskets > 0,
-              badgeContent: _baskets > 0 ? Text(
-                _baskets.toString(),
-                style: const TextStyle(color: Colors.white),
-              ) : null,
-              child: IconButton(
-                icon: const Icon(Icons.shopping_cart_outlined),
-                onPressed: () {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return BasketPage();
-                  }));
-                },
-              ),
-            ),
+            BasketButton(),
             CustomMenuButton(
               context: context,
               publish: false,
