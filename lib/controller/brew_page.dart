@@ -73,7 +73,7 @@ class _BrewPageState extends State<BrewPage> {
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                style: DefaultTextStyle.of(context).style,
+                style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
                 children: <TextSpan>[
                   TextSpan(text: '#${widget.model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
                   if (widget.model.started_at != null) TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(widget.model.started_at)}'),
