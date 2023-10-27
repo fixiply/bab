@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bab/controller/forms/form_brew_page.dart';
@@ -59,7 +60,6 @@ class _ReceiptPageState extends State<ReceiptPage> {
       body: CustomScrollView(slivers: <Widget>[
         SliverAppBar(
           pinned: true,
-          centerTitle: false,
           expandedHeight: 235.0,
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
@@ -70,7 +70,7 @@ class _ReceiptPageState extends State<ReceiptPage> {
             }
           ),
           flexibleSpace: FlexibleSpaceBar(
-            // titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
+            centerTitle: true,
             title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
             background: Stack(
               children: [

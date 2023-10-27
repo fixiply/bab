@@ -58,7 +58,6 @@ class _BrewPageState extends State<BrewPage> {
       body: CustomScrollView(slivers: <Widget>[
         SliverAppBar(
           pinned: true,
-          centerTitle: false,
           expandedHeight: 235.0,
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
@@ -69,7 +68,7 @@ class _BrewPageState extends State<BrewPage> {
             }
           ),
           flexibleSpace: FlexibleSpaceBar(
-            // titlePadding: const EdgeInsets.only(left: 170, bottom: 15),
+            centerTitle: true,
             title: RichText(
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
