@@ -69,83 +69,16 @@ class _ReceiptPageState extends State<ReceiptPage> {
               Navigator.pop(context);
             }
           ),
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: true,
-            title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
-            background: Stack(
-              children: [
-              Opacity(
-                //semi red clippath with more height and with 0.5 opacity
-                opacity: 0.5,
-                child: ClipPath(
-                  clipper: BezierClipper(), //set our custom wave clipper
-                  child: Container(
-                    color: Colors.black,
-                    height: 200,
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Image.asset('assets/images/beer_1.png',
-                          color: ColorHelper.color(widget.model.ebc) ?? Colors.white,
-                          colorBlendMode: BlendMode.modulate
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Image.asset('assets/images/beer_2.png'),
-                      ),
-                    ]
-                  ),
-                  Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ClipPath(
-                          clipper: CircleClipper(), //set our custom wave clipper
-                          child: Container(
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
-                              RatingBar.builder(
-                                initialRating: _rating,
-                                direction: Axis.horizontal,
-                                allowHalfRating: true,
-                                itemCount: 5,
-                                itemSize: 18,
-                                itemPadding: EdgeInsets.zero,
-                                itemBuilder: (context, _) => const Icon(
-                                  Icons.star,
-                                  color: Colors.amber,
-                                ),
-                                tapOnlyMode: true,
-                                ignoreGestures: true,
-                                onRatingUpdate: (rating) async {
-                                },
-                              ),
-                              const SizedBox(height: 3),
-                              Text('$_notices ${AppLocalizations.of(context)!.text('reviews')}', style: const TextStyle(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]),
+          flexibleSpace: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              double top = constraints.biggest.height;
+              return FlexibleSpaceBar(
+                // centerTitle: true,
+                titlePadding: top > 140 && (foundation.kIsWeb || DeviceHelper.isMobile(context)) ? const EdgeInsets.only(left: 170, bottom: 15) : EdgeInsetsDirectional.only(start: 72, bottom: 16),
+                title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
+                background: _backgroundFlexible(),
+              );
+            }
           ),
           actions: <Widget>[
             BasketButton(),
@@ -507,5 +440,82 @@ class _ReceiptPageState extends State<ReceiptPage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormBrewPage(newModel);
     }));
+  }
+
+  _backgroundFlexible() {
+    return Stack(
+        children: [
+          Opacity(
+            //semi red clippath with more height and with 0.5 opacity
+            opacity: 0.5,
+            child: ClipPath(
+              clipper: BezierClipper(), //set our custom wave clipper
+              child: Container(
+                color: Colors.black,
+                height: 200,
+              ),
+            ),
+          ),
+          Row(
+              children: [
+                Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: Image.asset('assets/images/beer_1.png',
+                            color: ColorHelper.color(widget.model.ebc) ?? Colors.white,
+                            colorBlendMode: BlendMode.modulate
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: Image.asset('assets/images/beer_2.png'),
+                      ),
+                    ]
+                ),
+                Expanded(
+                    child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ClipPath(
+                            clipper: CircleClipper(), //set our custom wave clipper
+                            child: Container(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (_rating > 0) Text(_rating.toStringAsPrecision(2), style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600, color: Colors.white)),
+                                RatingBar.builder(
+                                  initialRating: _rating,
+                                  direction: Axis.horizontal,
+                                  allowHalfRating: true,
+                                  itemCount: 5,
+                                  itemSize: 18,
+                                  itemPadding: EdgeInsets.zero,
+                                  itemBuilder: (context, _) => const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
+                                  ),
+                                  tapOnlyMode: true,
+                                  ignoreGestures: true,
+                                  onRatingUpdate: (rating) async {
+                                  },
+                                ),
+                                const SizedBox(height: 3),
+                                Text('$_notices ${AppLocalizations.of(context)!.text('reviews')}', style: const TextStyle(color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ]
+                    )
+                )
+              ]
+          )
+        ]);
   }
 }

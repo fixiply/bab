@@ -31,7 +31,6 @@ import 'package:bab/utils/edition_notifier.dart';
 import 'package:bab/utils/user_notifier.dart';
 
 // External package
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';

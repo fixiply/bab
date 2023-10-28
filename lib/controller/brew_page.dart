@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bab/controller/forms/form_brew_page.dart';
@@ -67,77 +68,25 @@ class _BrewPageState extends State<BrewPage> {
               Navigator.pop(context);
             }
           ),
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: true,
-            title: RichText(
-              textAlign: TextAlign.left,
-              overflow: TextOverflow.ellipsis,
-              text: TextSpan(
-                style: DefaultTextStyle.of(context).style.copyWith(color: Colors.white),
-                children: <TextSpan>[
-                  TextSpan(text: '#${widget.model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                  if (widget.model.started_at != null) TextSpan(text: '  - ${AppLocalizations.of(context)!.datetimeFormat(widget.model.started_at)}'),
-                ],
-              ),
-            ),
-            background: Stack(
-              children: [
-              Opacity(
-                //semi red clippath with more height and with 0.5 opacity
-                opacity: 0.5,
-                child: ClipPath(
-                  clipper: BezierClipper(), //set our custom wave clipper
-                  child: Container(
-                    color: Colors.black,
-                    height: 200,
+          flexibleSpace: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              double top = constraints.biggest.height;
+              return FlexibleSpaceBar(
+                titlePadding: top > 140 && (foundation.kIsWeb || DeviceHelper.isMobile(context)) ? const EdgeInsets.only(left: 170, bottom: 15) : EdgeInsetsDirectional.only(start: 72, bottom: 16),
+                title: RichText(
+                  textAlign: TextAlign.left,
+                  overflow: TextOverflow.ellipsis,
+                  text: TextSpan(
+                    style: Theme.of(context).primaryTextTheme.titleLarge!,
+                    children: <TextSpan>[
+                      TextSpan(text: '#${widget.model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      if (widget.model.started_at != null && !DeviceHelper.isMobile(context)) TextSpan(text: '  - ${AppLocalizations.of(context)!.dateFormat(widget.model.started_at)}'),
+                    ],
                   ),
                 ),
-              ),
-              Row(
-                children: [
-                  Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Image.asset('assets/images/beer_1.png',
-                          color: ColorHelper.color(widget.model.receipt!.ebc) ?? Colors.white,
-                          colorBlendMode: BlendMode.modulate
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Image.asset('assets/images/beer_2.png'),
-                      ),
-                    ]
-                  ),
-                  Expanded(
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ClipPath(
-                          clipper: CircleClipper(radius: 65), //set our custom wave clipper
-                          child: Container(
-                            color: Theme.of(context).primaryColor,
-                          ),
-                        ),
-                        Padding(
-                          padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              if (widget.model.receipt!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.receipt!.ebc)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
-                              if (widget.model.receipt!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.receipt!.ibu)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
-                              if (widget.model.receipt!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.receipt!.abv)!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                      ]
-                    )
-                  )
-                ]
-              )
-            ]),
+                background: _backgroundFlexible(),
+              );
+            }
           ),
           actions: <Widget>[
             BasketButton(),
@@ -164,7 +113,7 @@ class _BrewPageState extends State<BrewPage> {
               textAlign: TextAlign.left,
               overflow: TextOverflow.ellipsis,
               text: TextSpan(
-                  style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
+                style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
                 children: [
                   TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.receipt!.title), style: const TextStyle(fontWeight: FontWeight.w600)),
                   if (widget.model.receipt!.style != null) TextSpan(text: '  -  ${AppLocalizations.of(context)!.localizedText(widget.model.receipt!.style!.name)}'),
@@ -502,6 +451,67 @@ class _BrewPageState extends State<BrewPage> {
     } else {
       _showSnackbar(AppLocalizations.of(context)!.text('brew_start_error'));
     }
+  }
+
+  _backgroundFlexible() {
+    return Stack(
+        children: [
+          Opacity(
+            //semi red clippath with more height and with 0.5 opacity
+            opacity: 0.5,
+            child: ClipPath(
+              clipper: BezierClipper(), //set our custom wave clipper
+              child: Container(
+                color: Colors.black,
+                height: 200,
+              ),
+            ),
+          ),
+          Row(
+              children: [
+                Stack(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: Image.asset('assets/images/beer_1.png',
+                            color: ColorHelper.color(widget.model.receipt!.ebc) ?? Colors.white,
+                            colorBlendMode: BlendMode.modulate
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.only(left: 30),
+                        child: Image.asset('assets/images/beer_2.png'),
+                      ),
+                    ]
+                ),
+                Expanded(
+                    child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          ClipPath(
+                            clipper: CircleClipper(radius: 65), //set our custom wave clipper
+                            child: Container(
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                if (widget.model.receipt!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.receipt!.ebc)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
+                                if (widget.model.receipt!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.receipt!.ibu)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
+                                if (widget.model.receipt!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.receipt!.abv)!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                              ],
+                            ),
+                          ),
+                        ]
+                    )
+                )
+              ]
+          )
+        ]);
   }
 
   _showSnackbar(String message) {
