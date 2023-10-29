@@ -72,7 +72,8 @@ class _BrewPageState extends State<BrewPage> {
             builder: (BuildContext context, BoxConstraints constraints) {
               double top = constraints.biggest.height;
               return FlexibleSpaceBar(
-                titlePadding: top > 140 && (foundation.kIsWeb || DeviceHelper.isMobile(context)) ? const EdgeInsets.only(left: 170, bottom: 15) : EdgeInsetsDirectional.only(start: 72, bottom: 16),
+                centerTitle: false,
+                titlePadding: top > 140 ? const EdgeInsets.only(left: 170, bottom: 15) : EdgeInsetsDirectional.only(start: 72, bottom: 16),
                 title: RichText(
                   textAlign: TextAlign.left,
                   overflow: TextOverflow.ellipsis,

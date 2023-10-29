@@ -73,8 +73,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
             builder: (BuildContext context, BoxConstraints constraints) {
               double top = constraints.biggest.height;
               return FlexibleSpaceBar(
-                // centerTitle: true,
-                titlePadding: top > 140 && (foundation.kIsWeb || DeviceHelper.isMobile(context)) ? const EdgeInsets.only(left: 170, bottom: 15) : EdgeInsetsDirectional.only(start: 72, bottom: 16),
+                centerTitle: false,
+                titlePadding: top > 140 ? const EdgeInsets.only(left: 170, bottom: 15) : EdgeInsetsDirectional.only(start: 72, bottom: 16),
                 title: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
                 background: _backgroundFlexible(),
               );
