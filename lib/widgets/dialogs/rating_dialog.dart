@@ -74,18 +74,20 @@ class _RatingDialogState extends State<RatingDialog> {
             ),
             const SizedBox(height: 12),
             const Text('Et donnez votre avis :'),
-            TextField(
-              maxLines: widget.maxLines,
-              controller: _textFieldController,
-              keyboardType: TextInputType.multiline,
-              textInputAction: TextInputAction.newline,
-              decoration: InputDecoration(
-                hintText: widget.hintText,
-                border: const OutlineInputBorder(),
-                focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
-                ),
-              )
+            Expanded(
+              child: TextField(
+                maxLines: widget.maxLines,
+                controller: _textFieldController,
+                keyboardType: TextInputType.multiline,
+                textInputAction: TextInputAction.newline,
+                decoration: InputDecoration(
+                  hintText: widget.hintText,
+                  border: const OutlineInputBorder(),
+                  focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Theme.of(context).primaryColor, width: 2.0)
+                  ),
+                )
+              ),
             ),
           ]
         ),
