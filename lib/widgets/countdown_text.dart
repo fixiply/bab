@@ -77,6 +77,7 @@ class CountDownTextState extends State<CountDownText> with WidgetsBindingObserve
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // TODO: implement didChangeAppLifecycleState
     super.didChangeAppLifecycleState(state);
+    if (!mounted) return;
     if (state == AppLifecycleState.paused) {
       if (isTimerRunning) {
         _timerHandler.setEndingTime(_countDownSeconds);
