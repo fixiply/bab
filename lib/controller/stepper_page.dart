@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:another_flushbar/flushbar.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -494,10 +495,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 duration: 0,
                 index: steps.length,
                 onComplete: (int index) {
-                  NotificationService.instance.showNotification(
-                    Uuid().v4().hashCode,
-                    body: 'Le Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.'
-                  );
+                  _notification('Le Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.');
                   steps[index].completed = true;
                 }
               ),
@@ -533,7 +531,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         )
       ),
       onStepContinue: (int index) {
-
       },
     ));
     steps.add(MyStep(
@@ -620,34 +617,44 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   _notification(String message, {Duration? duration}) async {
     if (foundation.kIsWeb) {
-      SystemSound.play(SystemSoundType.alert);
-      Flushbar(
-        icon: Icon(Icons.check, color: Theme.of(context).primaryColor),
-        messageText: Text(message, style: const TextStyle(fontSize: 18.0)),
-        mainButton: TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text(
-            MaterialLocalizations.of(context).closeButtonLabel,
-            style: TextStyle(color: Theme.of(context).primaryColor),
-          ),
-        ),
-        duration: const Duration(seconds: 25),
-        backgroundColor: Colors.white,
-        flushbarPosition: FlushbarPosition.TOP,
-        flushbarStyle: FlushbarStyle.FLOATING,
-        reverseAnimationCurve: Curves.decelerate,
-        forwardAnimationCurve: Curves.elasticOut,
-        showProgressIndicator: true,
-      ).show(context);
+      if (duration != null && duration.inSeconds > 0) {
+        Future.delayed(duration, () {
+          _flushbar(message);// Prints after 1 second.
+        });
+        return;
+      }
+      _flushbar(message);
       return;
     }
     NotificationService.instance.showNotification(
-        Uuid().v4().hashCode,
-        body: message,
-        duration: duration
+      Uuid().v4().hashCode,
+      body: message,
+      duration: duration
     );
+  }
+
+  _flushbar(String message) {
+    AudioPlayer().play(AssetSource('/sounds/notification.mp3'));
+    Flushbar(
+      // icon: Icon(Icons.check, color: Theme.of(context).primaryColor),
+      messageText: Text(message, style: const TextStyle(fontSize: 18.0)),
+      mainButton: TextButton(
+        onPressed: () {
+          Navigator.pop(context);
+        },
+        child: Text(
+          MaterialLocalizations.of(context).closeButtonLabel,
+          style: TextStyle(color: Theme.of(context).primaryColor),
+        ),
+      ),
+      duration: const Duration(seconds: 25),
+      backgroundColor: Colors.white,
+      flushbarPosition: FlushbarPosition.TOP,
+      flushbarStyle: FlushbarStyle.FLOATING,
+      reverseAnimationCurve: Curves.decelerate,
+      forwardAnimationCurve: Curves.elasticOut,
+      showProgressIndicator: true,
+    ).show(context);
   }
   
   _showSnackbar(String message, {SnackBarAction? action}) {

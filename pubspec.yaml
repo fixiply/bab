@@ -32,6 +32,7 @@ dependencies:
 
   another_flushbar: ^1.12.30
   app_settings: ^4.2.0
+  audioplayers: ^5.2.0
   badges: ^3.1.1
   carousel_slider: ^4.2.1
   chat_gpt_sdk: ^2.2.2
@@ -87,8 +88,8 @@ dependencies:
   table_calendar: ^3.0.9
   url_launcher: ^6.1.11
   uuid: ^3.0.7
-  xml: ^6.3.0
   workmanager: ^0.5.2
+  xml: ^6.3.0
 #  dropdown_search: ^5.0.3
 #  flutter_painter: ^1.0.1
 #  syncfusion_flutter_calendar: ^21.1.39
@@ -129,6 +130,7 @@ flutter:
     - assets/terms/
     - assets/images/
     - assets/locales/
+    - assets/sounds/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
