@@ -125,6 +125,7 @@ class NotificationService {
         macOS: DarwinPlatformChannelSpecifics
     );
     if (duration != null && duration.inSeconds > 0) {
+      foundation.debugPrint('showNotification duration: $duration local: ${tz.local} datetime: ${tz.TZDateTime.now(tz.local).add(duration)}');
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id,
         title,
