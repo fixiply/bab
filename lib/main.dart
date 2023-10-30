@@ -89,10 +89,10 @@ Future<void> main() async {
   _configureFirebaseMessaging();
   if (!foundation.kIsWeb) {
     NotificationService.instance.initialize();
+    Workmanager().initialize(
+      callbackDispatcher, // The top level function, aka callbackDispatcher
+    );
   }
-  Workmanager().initialize(
-    callbackDispatcher, // The top level function, aka callbackDispatcher
-  );
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   await dotenv.load(fileName: 'assets/.env');
   runApp(
@@ -191,8 +191,10 @@ class _AppState extends State<MyApp> {
   }
 
   _initialize() async {
-    NotificationService.instance.isAndroidPermissionGranted();
-    NotificationService.instance.requestPermissions();
+    if (!foundation.kIsWeb) {
+      NotificationService.instance.isAndroidPermissionGranted();
+      NotificationService.instance.requestPermissions();
+    }
   }
 
   _authStateChanges() async {

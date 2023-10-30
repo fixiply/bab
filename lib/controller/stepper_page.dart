@@ -118,7 +118,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   @override
   void dispose() {
     // WidgetsBinding.instance.removeObserver(this);
-    NotificationService.instance.cancelAll();
+    if (!foundation.kIsWeb) {
+      NotificationService.instance.cancelAll();
+    }
     super.dispose();
   }
 
