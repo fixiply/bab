@@ -35,11 +35,13 @@ class CustomDrawer<Object> extends Drawer {
             style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return EquipmentsPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return EquipmentsPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
@@ -47,11 +49,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return BrewsPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return BrewsPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
@@ -59,11 +63,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return InventoryPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return InventoryPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isEditor()) ListTile(
@@ -71,11 +77,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return ToolsPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return ToolsPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null) const Divider(height: 10),
@@ -84,11 +92,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return CalendarPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return CalendarPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
@@ -96,11 +106,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return OrdersPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return OrdersPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
@@ -108,11 +120,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return GalleryPage(const []);
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return GalleryPage(const []);
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
@@ -120,11 +134,13 @@ class CustomDrawer<Object> extends Drawer {
             style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return ProductsPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return ProductsPage();
+                }
+              )
+            );
           },
         ),
         if (currentUser != null && currentUser!.isAdmin()) ListTile(
@@ -132,11 +148,13 @@ class CustomDrawer<Object> extends Drawer {
               style: const TextStyle(fontSize: 18)
           ),
           onTap: () {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return CompaniesPage();
-            })).then((value) {
-              Navigator.pop(context);
-            });
+            Navigator.of(context, rootNavigator:true).push( // ensures fullscreen
+              MaterialPageRoute(
+                builder: (BuildContext context) {
+                  return CompaniesPage();
+                }
+              )
+            );
           },
         ),
       ],
