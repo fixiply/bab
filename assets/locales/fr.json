@@ -80,7 +80,7 @@
   "cells": "Cellules",
   "cgu_1": "En cliquant sur l'une des réponses ci-après, j'accepte les ",
   "cgu_2": " et je reconnais avoir lu la ",
-  "chatgpt_description": "Faire une description de la bière souhaitée. Exemple \"Un style Belge double, des saveurs fruités et légèrement malté, un arôme de vanille avec un degré d'alcool à 7%\".\nAjouter le résultat dans une nouvelle recette.",
+  "chatgpt_description": "Faire une description de la bière souhaitée. Exemple «Un style Belge double, des saveurs fruités et légèrement malté, un arôme de vanille avec un degré d'alcool à 7%».\nAjouter le résultat dans une nouvelle recette.",
   "chatgpt_howto": "Comment générer une recette ?",
   "chatgpt_model": "Invente une recette de bière «%s» avec les ingrédients sans les instructions pour un brassin final de %s",
   "chatgpt_search_hint": "Description de la bière",

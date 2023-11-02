@@ -80,7 +80,7 @@
   "cells": "Cells",
   "cgu_1": "By clicking on one of the answers below, I accept the ",
   "cgu_2": " and I acknowledge having read the ",
-  "chatgpt_description": "Write a description of the desired beer. Example \"A double Belgian style, fruity and slightly malty flavors, a vanilla aroma with an alcohol content of 7%\".\nAdd the result to a new recipe.",
+  "chatgpt_description": "Write a description of the desired beer. Example «A double Belgian style, fruity and slightly malty flavors, a vanilla aroma with an alcohol content of 7%».\nAdd the result to a new recipe.",
   "chatgpt_howto": "How to generate a recipe?",
   "chatgpt_model": "Invent a beer recipe «%s» with the ingredients and proportions without instructions for a %s final brew",
   "chatgpt_search_hint": "Description of the beer",
