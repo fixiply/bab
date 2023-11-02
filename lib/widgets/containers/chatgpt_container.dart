@@ -1,17 +1,18 @@
-import 'package:bab/controller/forms/form_receipt_page.dart';
-import 'package:bab/models/receipt_model.dart';
-import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
+import 'package:bab/controller/forms/form_receipt_page.dart';
+import 'package:bab/controller/login_page.dart';
+import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/models/message_model.dart';
+import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/containers/abstract_container.dart';
-import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
+import 'package:bab/widgets/dialogs/delete_dialog.dart';
 
 // External package
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
@@ -40,6 +41,9 @@ class _ChatGPTContainerState extends AbstractContainerState {
   double _volume = 23;
   String topic = 'chatgpt';
 
+  final TextEditingController textEditingController = TextEditingController();
+  final FocusNode focusNode = FocusNode();
+
   @override
   void initState() {
     _openAI = OpenAI.instance.build(
@@ -51,161 +55,178 @@ class _ChatGPTContainerState extends AbstractContainerState {
         enableLog: foundation.kDebugMode
     );
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      showSearchBar();
+    });
     _fetch();
   }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(12.0),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Text('${AppLocalizations.of(context)!.text('mash_volume')} :', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.grey.shade200,
-              ),
-              padding: const EdgeInsets.all(8),
-              child: TextFormField(
-                initialValue: AppLocalizations.of(context)!.volumeFormat(_volume, symbol: false) ?? '',
-                onChanged: (value) => setState(() {
-                  _volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value))!;
-                }),
-                decoration: InputDecoration(
-                  suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
-                  suffixIcon: Tooltip(
-                    message: AppLocalizations.of(context)!.text('final_volume'),
-                    child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+      padding: const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0, bottom: 60),
+      child: FutureBuilder<List<MessageModel>>(
+        future: _messages,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                if (currentUser == null) Align(
+                  child: Text(AppLocalizations.of(context)!.text('log_in_feature'))
+                ),
+                if (currentUser == null)  const SizedBox(height: 4),
+                if (currentUser == null)  Align(
+                  child: TextButton(
+                    child: Text(AppLocalizations.of(context)!.text('login'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                    onPressed: () {
+                      Navigator.push(context, MaterialPageRoute(builder: (context) {
+                        return const LoginPage();
+                      }));
+                    },
+                    style: TextButton.styleFrom(shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4.0),
+                      side: BorderSide(color: Theme.of(context).primaryColor),
+                    )),
+                  )
+                ),
+                if (currentUser == null)  const SizedBox(height: 24),
+                Text(AppLocalizations.of(context)!.text('chatgpt_howto'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(AppLocalizations.of(context)!.text('chatgpt_description')),
+                const SizedBox(height: 8),
+                if (snapshot.data!.isNotEmpty) ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                  separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
+                  itemBuilder: (context, index) {
+                    return _bubble(snapshot.data![index]);
+                  },
+                )
+              ]
+            );
+          }
+          return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+        }
+      )
+    );
+  }
+
+  showSearchBar() async {
+    return showBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.all(8.0),
+          child: Row(
+            children: [
+              Flexible(
+                child: Container(
+                  child: TextField(
+                    onSubmitted: (value) {
+                      _send(textEditingController.text);
+                    },
+                    style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 15),
+                    controller: textEditingController,
+                    decoration: InputDecoration.collapsed(
+                      hintText: '${AppLocalizations.of(context)!.text('chatgpt_search_hint')}...',
+                      hintStyle: TextStyle(color: TextGrey),
+                    ),
+                    focusNode: focusNode,
+                    autofocus: true,
                   ),
-                  border: InputBorder.none
                 ),
-                autovalidateMode: AutovalidateMode.onUserInteraction,
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
               ),
-            ),
-            const SizedBox(height: 20),
-            Text("${AppLocalizations.of(context)!.text('description_beer')} :", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                color: Colors.grey.shade200,
-              ),
-              padding: const EdgeInsets.all(8),
-              child: TextFormField(
-                maxLines: 8, //or null
-                decoration: InputDecoration(
-                  hintText: AppLocalizations.of(context)!.text('description_beer_hint'),
-                  border: InputBorder.none,
-                  // fillColor: FillColor, filled: true
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                child: IconButton(
+                  icon: Icon(Icons.send),
+                  onPressed: () => _send(textEditingController.text),
+                  color: Theme.of(context).primaryColor,
                 ),
-                onEditingComplete: () async {
-                  _send();
-                },
-                onChanged: (value) {
-                  setState(() {
-                    _text = value;
-                  });
-                },
               ),
-            ),
-            const SizedBox(height: 4),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(18)),
-                icon: const Icon(Icons.send, size: 18),
-                label: Text(AppLocalizations.of(context)!.text('send')),
-                onPressed: _text != null ? _send : null,
+            ],
+          )
+        );
+      }
+    );
+  }
+
+  _bubble(MessageModel model) {
+    return Container(
+      child: Column(
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  Text(DateHelper.formatDateTime(context, model.inserted_at)),
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: SecondaryColorLight,
+                    ),
+                    child: Text(model.send ?? '?')
+                  ),
+                ]
               ),
-            ),
-            FutureBuilder<List<MessageModel>>(
-              future: _messages,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  if (snapshot.data!.isEmpty) {
-                    return Container();
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        Text(AppLocalizations.of(context)!.text('answers'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                        const SizedBox(height: 8),
-                        ListView.separated(
-                          shrinkWrap: true,
-                          itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                          physics: const NeverScrollableScrollPhysics(),
-                          separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
-                          itemBuilder: (context, index){
-                            return Container(
-                              padding: const EdgeInsets.all(8.0),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(20),
-                                color: SecondaryColorLight,
-                              ),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Expanded(child: Text(snapshot.data![index].response ?? '')),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      IconButton(
-                                        icon: const Icon(Icons.add_circle_outline),
-                                        tooltip: AppLocalizations.of(context)!.text('new_recipe'),
-                                        onPressed: _new
-                                      ),
-                                      const SizedBox(height: 4),
-                                      Tooltip(message: '${AppLocalizations.of(context)!.text('description')}: ${snapshot.data![index].send}', child: Icon(Icons.help_outline)),
-                                      const SizedBox(height: 4),
-                                      IconButton(
-                                        icon: const Icon(Icons.delete_outline),
-                                        onPressed: () {
-                                          _delete(snapshot.data![index]);
-                                        }
-                                      )
-                                    ],
-                                  ),
-                                ]
-                              )
-                            );
-                          },
-                        )
-                      ]
-                    )
-                  );
-                }
-                if (snapshot.hasError) {
-                  return ErrorContainer(snapshot.error.toString());
-                }
-                return Container();
-              }
-            )
-          ]
-        ),
-      ),
+            ]
+          ),
+          const SizedBox(height: 4),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  CircleAvatar(child: Text(AppLocalizations.of(context)!.text('ai'))),
+                  const SizedBox(width: 12),
+                  Container(
+                    padding: const EdgeInsets.all(8.0),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(8),
+                      color: BlendColor,
+                    ),
+                    child: Text(model.response ?? ''),
+                  ),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.add_circle_outline),
+                        tooltip: AppLocalizations.of(context)!.text('new_recipe'),
+                        onPressed: _new
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.delete_outline),
+                        onPressed: () {
+                          _delete(model);
+                        }
+                      )
+                    ],
+                  ),
+                ]
+              ),
+            ]
+          ),
+        ],
+      )
     );
   }
 
   _fetch() async {
     setState(() {
-      _messages = Database().getMessages(user: currentUser!.uuid, topic: topic);
+      _messages = Database().getMessages(user: currentUser != null ? currentUser!.uuid : null, topic: topic);
     });
   }
 
-  _send() async {
+  _send(String message) async {
     if (currentUser == null) {
       await showDialog(
         context: context,
@@ -219,7 +240,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
     }
     try {
       String prompt = sprintf(AppLocalizations.of(context)!.text('chatgpt_model'),
-        [ _text, _volume, AppLocalizations.of(context)!.liquid.toLowerCase() ]
+        [ message, _volume, AppLocalizations.of(context)!.liquid.toLowerCase() ]
       );
       final request = CompleteText(
         prompt: prompt,
@@ -232,7 +253,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
         if (value != null) {
           Database().add(MessageModel(
             topic: topic,
-            send: _text,
+            send: message,
             response: value.choices.last.text.trim()
           ));
           _fetch();
