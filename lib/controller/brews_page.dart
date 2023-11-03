@@ -82,7 +82,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
               icon: const Icon(Icons.delete_outline),
               tooltip: AppLocalizations.of(context)!.text('delete'),
               onPressed: () {
-                _delete();
+                _deleteAll();
               }
           ),
           if (DeviceHelper.isDesktop) IconButton(
@@ -205,6 +205,52 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
   }
 
   Widget _item(BrewModel model) {
+    if (model.isEditable() && !DeviceHelper.isDesktop) {
+      return Dismissible(
+          key: Key(model.uuid!),
+          child: _card(model),
+          background: Container(
+              color: Colors.red,
+              padding: EdgeInsets.only(left: 15),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        const Icon(Icons.delete, color: Colors.white)
+                      ]
+                  )
+              )
+          ),
+          secondaryBackground: Container(
+              color: Colors.blue,
+              padding: EdgeInsets.only(right: 15),
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        const Icon(Icons.edit, color: Colors.white)
+                      ]
+                  )
+              )
+          ),
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.startToEnd) {
+              return await _delete(model);
+            }
+            if (direction == DismissDirection.endToStart) {
+              _edit(model);
+              return false;
+            }
+            return false;
+          }
+      );
+    }
+    return _card(model);
+  }
+  
+  Widget _card(BrewModel model) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
@@ -284,16 +330,14 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                 });
               },
             ),
-            PopupMenuButton<String>(
+            if (DeviceHelper.isDesktop) PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),
               tooltip: AppLocalizations.of(context)!.text('options'),
               onSelected: (value) async {
                 if (value == 'edit') {
                   _edit(model);
                 } else if (value == 'remove') {
-                  if (await DeleteDialog.model(context, model, forced: true)) {
-                    _fetch();
-                  }
+                  _delete(model);
                 }
               },
               itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -359,7 +403,13 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
     })).then((value) { _fetch(); });
   }
 
-  Future<bool> _delete() async {
+  _delete(BrewModel model) async {
+    if (await DeleteDialog.model(context, model, forced: true)) {
+      _fetch();
+    }
+  }
+
+  Future<bool> _deleteAll() async {
     bool confirm = await showDialog(
       context: context,
       builder: (BuildContext context) {

@@ -142,7 +142,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
               icon: const Icon(Icons.delete_outline),
               tooltip: AppLocalizations.of(context)!.text('delete'),
               onPressed: () {
-                _delete();
+                _deleteAll();
               }
           ),
           IconButton(
@@ -236,6 +236,52 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
   }
 
   Widget _item(EquipmentModel model) {
+    if (model.isEditable() && !DeviceHelper.isDesktop) {
+      return Dismissible(
+          key: Key(model.uuid!),
+          child: _card(model),
+          background: Container(
+              color: Colors.red,
+              padding: EdgeInsets.only(left: 15),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        const Icon(Icons.delete, color: Colors.white)
+                      ]
+                  )
+              )
+          ),
+          secondaryBackground: Container(
+              color: Colors.blue,
+              padding: EdgeInsets.only(right: 15),
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        const Icon(Icons.edit, color: Colors.white)
+                      ]
+                  )
+              )
+          ),
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.startToEnd) {
+              return await _delete(model);
+            }
+            if (direction == DismissDirection.endToStart) {
+              _edit(model);
+              return false;
+            }
+            return false;
+          }
+      );
+    }
+    return _card(model);
+  }
+
+  Widget _card(EquipmentModel model) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: CustomListItem(
@@ -276,7 +322,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
         //     if (model.notes != null ) _text(AppLocalizations.of(context)!.localizedText(model.notes))
         //   ],
         // ),
-        trailing: model.isEditable() ? PopupMenuButton<String>(
+        trailing: model.isEditable() && DeviceHelper.isDesktop ? PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) {
@@ -285,7 +331,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
             } else if (value == 'edit') {
               _edit(model);
             } else if (value == 'remove') {
-              DeleteDialog.model(context, model, forced: true);
+              _delete(model);
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -348,7 +394,13 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
     })).then((value) { _fetch(); });
   }
 
-  Future<bool> _delete() async {
+  _delete(EquipmentModel model) async {
+    if (await DeleteDialog.model(context, model, forced: true)) {
+      _fetch();
+    }
+  }
+
+  Future<bool> _deleteAll() async {
     bool confirm = await showDialog(
         context: context,
         builder: (BuildContext context) {

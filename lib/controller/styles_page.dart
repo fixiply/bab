@@ -210,6 +210,52 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
   }
 
   Widget _item(StyleModel model) {
+    if (model.isEditable() && !DeviceHelper.isDesktop) {
+      return Dismissible(
+          key: Key(model.uuid!),
+          child: _card(model),
+          background: Container(
+              color: Colors.red,
+              padding: EdgeInsets.only(left: 15),
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: <Widget>[
+                        const Icon(Icons.delete, color: Colors.white)
+                      ]
+                  )
+              )
+          ),
+          secondaryBackground: Container(
+              color: Colors.blue,
+              padding: EdgeInsets.only(right: 15),
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: <Widget>[
+                        const Icon(Icons.edit, color: Colors.white)
+                      ]
+                  )
+              )
+          ),
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.startToEnd) {
+              return await _delete(model);
+            }
+            if (direction == DismissDirection.endToStart) {
+              _edit(model);
+              return false;
+            }
+            return false;
+          }
+      );
+    }
+    return _card(model);
+  }
+
+  Widget _card(StyleModel model) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
@@ -247,16 +293,14 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
             if (model.overallimpression != null) _text(AppLocalizations.of(context)!.localizedText(model.overallimpression))
           ]
         ),
-        trailing: model.isEditable() ? PopupMenuButton<String>(
+        trailing: model.isEditable() && DeviceHelper.isDesktop ? PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) async {
             if (value == 'edit') {
               _edit(model);
             } else if (value == 'remove') {
-              if (await DeleteDialog.model(context, model, forced: true)) {
-                _fetch();
-              }
+              _delete(model);
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
@@ -389,6 +433,12 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
     })).then((value) {
       _fetch();
     });
+  }
+
+  _delete(StyleModel model) async {
+    if (await DeleteDialog.model(context, model, forced: true)) {
+      _fetch();
+    }
   }
 
   _showSnackbar(String message) {
