@@ -91,13 +91,18 @@ class _ChatGPTContainerState extends AbstractContainerState {
                     )),
                   )
                 ),
-                if (currentUser == null)  const SizedBox(height: 24),
-                Text(AppLocalizations.of(context)!.text('chatgpt_howto'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text(AppLocalizations.of(context)!.text('chatgpt_description')),
-                const SizedBox(height: 8),
+                if (currentUser == null) const SizedBox(height: 8),
+                ExpansionTile(
+                  initiallyExpanded: snapshot.data!.isEmpty,
+                  childrenPadding: EdgeInsets.all(8.0),
+                  title: Text(AppLocalizations.of(context)!.text('chatgpt_howto'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  children: [
+                    Text(AppLocalizations.of(context)!.text('chatgpt_description')),
+                  ],
+                ),
                 if (snapshot.data!.isNotEmpty) ListView.separated(
                   shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
                   itemCount: snapshot.hasData ? snapshot.data!.length : 0,
                   separatorBuilder: (BuildContext context, int index) => const SizedBox(height: 16),
                   itemBuilder: (context, index) {
@@ -116,11 +121,23 @@ class _ChatGPTContainerState extends AbstractContainerState {
   showSearchBar() async {
     return showBottomSheet(
       context: context,
+      shape: Border(
+        top: BorderSide(width: 1.0, color: Colors.black38),
+      ),
       builder: (BuildContext context) {
         return Padding(
           padding: EdgeInsets.all(8.0),
           child: Row(
             children: [
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 8),
+                child: IconButton(
+                  icon: Icon(Icons.tune),
+                  onPressed: () => _settings(),
+                  color: Theme.of(context).primaryColor,
+                  tooltip: AppLocalizations.of(context)!.text('settings'),
+                ),
+              ),
               Flexible(
                 child: Container(
                   child: TextField(
@@ -133,8 +150,6 @@ class _ChatGPTContainerState extends AbstractContainerState {
                       hintText: '${AppLocalizations.of(context)!.text('chatgpt_search_hint')}...',
                       hintStyle: TextStyle(color: TextGrey),
                     ),
-                    focusNode: focusNode,
-                    autofocus: true,
                   ),
                 ),
               ),
@@ -144,6 +159,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
                   icon: Icon(Icons.send),
                   onPressed: () => _send(textEditingController.text),
                   color: Theme.of(context).primaryColor,
+                  tooltip: AppLocalizations.of(context)!.text('send'),
                 ),
               ),
             ],
@@ -154,64 +170,58 @@ class _ChatGPTContainerState extends AbstractContainerState {
   }
 
   _bubble(MessageModel model) {
-    return Container(
+    return SafeArea(
       child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text(DateHelper.formatDateTime(context, model.inserted_at)),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: SecondaryColorLight,
-                    ),
-                    child: Text(model.send ?? '?')
+              Text(DateHelper.formatDateTime(context, model.inserted_at)),
+              const SizedBox(width: 12),
+              Flexible(
+                child:Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: SecondaryColorLight,
                   ),
-                ]
+                  child: Text(model.send ?? '?')
+                ),
               ),
             ]
           ),
           const SizedBox(height: 4),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Row(
+              CircleAvatar(child: Text(AppLocalizations.of(context)!.text('ai'))),
+              const SizedBox(width: 12),
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(8),
+                    color: BlendColor,
+                  ),
+                  child: Text(model.response ?? ''),
+                )
+              ),
+              Column(
                 mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  CircleAvatar(child: Text(AppLocalizations.of(context)!.text('ai'))),
-                  const SizedBox(width: 12),
-                  Container(
-                    padding: const EdgeInsets.all(8.0),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      color: BlendColor,
-                    ),
-                    child: Text(model.response ?? ''),
+                  IconButton(
+                    icon: const Icon(Icons.add_circle_outline),
+                    tooltip: AppLocalizations.of(context)!.text('new_recipe'),
+                    onPressed: _new
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.add_circle_outline),
-                        tooltip: AppLocalizations.of(context)!.text('new_recipe'),
-                        onPressed: _new
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.delete_outline),
-                        onPressed: () {
-                          _delete(model);
-                        }
-                      )
-                    ],
-                  ),
-                ]
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline),
+                    onPressed: () {
+                      _delete(model);
+                    }
+                  )
+                ],
               ),
             ]
           ),
@@ -227,46 +237,112 @@ class _ChatGPTContainerState extends AbstractContainerState {
   }
 
   _send(String message) async {
-    if (currentUser == null) {
-      await showDialog(
+    if (message.isNotEmpty) {
+      if (currentUser == null) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ConfirmDialog(
+                content: Text(
+                    AppLocalizations.of(context)!.text('logged_in_feature')),
+              );
+            }
+        );
+        return;
+      }
+      try {
+        String prompt = sprintf(
+            AppLocalizations.of(context)!.text('chatgpt_model'),
+            [
+              message,
+              _volume,
+              AppLocalizations.of(context)!.liquid.toLowerCase()
+            ]
+        );
+        final request = CompleteText(
+            prompt: prompt,
+            model: TextDavinci3Model(),
+            maxTokens: 255
+        );
+
+        EasyLoading.show(
+            status: AppLocalizations.of(context)!.text('in_progress'));
+        _openAI.onCompletion(request: request).then((value) {
+          if (value != null) {
+            Database().add(MessageModel(
+                topic: topic,
+                send: message,
+                response: value.choices.last.text.trim()
+            ));
+            _fetch();
+          }
+          EasyLoading.dismiss();
+        }).onError((error, stackTrace) {
+          debugPrint(error.toString());
+          _showSnackbar(error.toString());
+          EasyLoading.dismiss();
+        });
+      } finally {
+        // EasyLoading.dismiss();
+      }
+    }
+  }
+
+  _settings() async {
+    await showDialog(
         context: context,
         builder: (BuildContext context) {
-          return ConfirmDialog(
-            content: Text(AppLocalizations.of(context)!.text('logged_in_feature')),
+          return AlertDialog(
+            title: Text(AppLocalizations.of(context)!.text('settings')),
+            content: Container(
+              height: 100,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${AppLocalizations.of(context)!.text('mash_volume')} :', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).primaryColor)),
+                  Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(12),
+                      color: Colors.grey.shade200,
+                    ),
+                    padding: const EdgeInsets.all(8),
+                    child: TextFormField(
+                      initialValue: AppLocalizations.of(context)!.volumeFormat(_volume, symbol: false) ?? '',
+                      onChanged: (value) => setState(() {
+                        _volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value))!;
+                      }),
+                      decoration: InputDecoration(
+                        suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('final_volume'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
+                        border: InputBorder.none
+                      ),
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    ),
+                  ),
+                ],
+              )
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: Text(MaterialLocalizations.of(context).closeButtonLabel),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
           );
         }
-      );
-      return;
-    }
-    try {
-      String prompt = sprintf(AppLocalizations.of(context)!.text('chatgpt_model'),
-        [ message, _volume, AppLocalizations.of(context)!.liquid.toLowerCase() ]
-      );
-      final request = CompleteText(
-        prompt: prompt,
-        model: TextDavinci3Model(),
-        maxTokens: 255
-      );
-
-      EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
-      _openAI.onCompletion(request: request).then((value) {
-        if (value != null) {
-          Database().add(MessageModel(
-            topic: topic,
-            send: message,
-            response: value.choices.last.text.trim()
-          ));
-          _fetch();
-        }
-        EasyLoading.dismiss();
-      }).onError((error, stackTrace) {
-        debugPrint(error.toString());
-        _showSnackbar(error.toString());
-        EasyLoading.dismiss();
-      });
-    } finally {
-      // EasyLoading.dismiss();
-    }
+    );
   }
 
   _new() async {

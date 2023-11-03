@@ -44,7 +44,7 @@ class _EventPageState extends State<EventPage> {
         leading: IconButton(
           icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
-            Navigator.pop(context);
+            Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
           }
         ),
         actions: <Widget> [
@@ -75,7 +75,7 @@ class _EventPageState extends State<EventPage> {
             leading: IconButton(
               icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
               onPressed:() async {
-                Navigator.pop(context);
+                Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
               }
             ),
             onStretchTrigger: () {
