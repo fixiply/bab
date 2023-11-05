@@ -191,7 +191,7 @@ class Database {
   }
 
   Future<void> publish(CollectionReference collection, {bool push = false}) async {
-    Query query = collection.where('status', isEqualTo: Status.pending.index);
+    Query query = collection.where('status', isEqualTo: constants.Status.pending.index);
     await query.get().then((result) async {
       for (var doc in result.docs) {
         bool canBeUpdated = true;

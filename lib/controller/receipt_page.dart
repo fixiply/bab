@@ -362,7 +362,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                 children: [
                   Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                   const SizedBox(height: 8),
-                  Wrap(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (widget.model.primaryday != null && widget.model.primarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('primary'),

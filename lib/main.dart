@@ -198,7 +198,7 @@ class _AppState extends State<MyApp> {
   }
 
   _authStateChanges() async {
-    FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+    FirebaseAuth.instance.userChanges().listen((User? user) async {
       _loadUser(user);
     });
   }

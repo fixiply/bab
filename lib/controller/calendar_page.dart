@@ -138,8 +138,8 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                                 width: 20,
                                 padding: const EdgeInsets.all(4.0),
                                 decoration: const BoxDecoration(
-                                    color: Colors.redAccent,
-                                    shape: BoxShape.rectangle
+                                  color: constants.TextGrey,
+                                  shape: BoxShape.rectangle
                                 ),
                                 child: Text(events.length.toString(),
                                     textAlign: TextAlign.center,
@@ -152,10 +152,10 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                         return null;
                       },
                       selectedBuilder: (context, day, focusedDay) {
-                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: constants.PrimaryColor);
+                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: Theme.of(context).primaryColor);
                       },
                       todayBuilder: (context, day, focusedDay) {
-                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: constants.TextGrey);
+                        return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: Theme.of(context).primaryColor.withOpacity(0.3));
                       }
                     ),
                   ),
@@ -196,24 +196,25 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   }
 
   List<ListTile> _getEventsForDay(List<Model> data, DateTime day) {
-    List<Model> brews = data.where((element) {
+    List<Model> elements
+    = data.where((element) {
       if (element is BrewModel) {
         if (element.started_at == null || element.started_at == false) {
           return false;
         }
-        if (DateHelper.toDate(element.started_at!) == DateHelper.toDate(day)) {
+        if (DateHelper.toDate(element.started_at!) == DateHelper.toDate(day) ||
+            (element.fermented_at != null && DateHelper.toDate(element.fermented_at!) == DateHelper.toDate(day))) {
           return true;
         }
-        if (element.status != Status.pending &&
-            ((element.finish() == DateHelper.toDate(day)) ||
-            (element.primaryDate() == DateHelper.toDate(day)) ||
-            (element.secondaryDate() == DateHelper.toDate(day)))) {
+        if ((element.finish() == DateHelper.toDate(day)) ||
+            (element.endDatePrimary() == DateHelper.toDate(day)) ||
+            (element.endDateSecondary() == DateHelper.toDate(day))) {
           return true;
         }
       }
       return false;
     }).toList();
-    return brews.map((e) {
+    return elements.map((e) {
       Color color = constants.SecondaryColor;
       String title = '';
       String? subtitle;
@@ -224,15 +225,55 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         color = ColorHelper.fromHex(e.color!) ?? color;
         title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.receipt!.title)}';
         if (e.started_at != null && DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
-          subtitle = 'Démarrage du brassin.';
+          subtitle = 'Début du brassin.';
         }  else if (e.finish() == DateHelper.toDate(day)) {
           subtitle = 'Fin du brassin.';
-        } else if (e.primaryDate() == DateHelper.toDate(day)) {
-          subtitle = 'Fin de la fermentation primaire.';
-        } else if (e.secondaryDate() == DateHelper.toDate(day)) {
-          subtitle = 'Fin de la fermentation secondaire.';
+        } else if (e.fermented_at != null && DateHelper.toDate(e.fermented_at!) == DateHelper.toDate(day)) {
+          subtitle = 'Début de la fermentation primaire.';
+        } else if (e.endDatePrimary() == DateHelper.toDate(day)) {
+          subtitle = 'Début de la fermentation secondaire.';
+        } else if (e.endDateSecondary() == DateHelper.toDate(day)) {
+          subtitle = 'Début de la fermentation tertiaire.';
         }
-        trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: const TextStyle(color: Colors.white));
+        trailing = TextButton(
+          child: Text(AppLocalizations.of(context)!.text('move'), style: TextStyle(color: Colors.white)),
+          onPressed: () async {
+            DateTime? date = await showDatePicker(
+              context: context,
+              initialDate: DateHelper.toDate(day), //get today's date
+              firstDate:DateTime(2000), //DateTime.now() - not to allow to choose before today.
+              lastDate: DateTime(2101)
+            );
+            if (date != null && DateHelper.toDate(day) != DateHelper.toDate(date)) {
+              int days = DateHelper.toDate(date).difference(DateHelper.toDate(day)).inDays;
+              if (days != 0) {
+                if (e.started_at != null && DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
+                  e.started_at = date;
+                } else if (e.fermented_at != null && DateHelper.toDate(e.fermented_at!) == DateHelper.toDate(day)) {
+                  e.fermented_at = date;
+                } else if (e.endDatePrimary() == DateHelper.toDate(day)) {
+                  e.primaryday = e.primaryDay()! + days;
+                } else if (e.endDateSecondary() == DateHelper.toDate(day)) {
+                  e.secondaryday = e.secondaryDay()! + days;
+                } else if (e.endDateTertiary() == DateHelper.toDate(day)) {
+                  e.tertiaryday = e.tertiaryDay()! + days;
+                }
+                Database().update(e).then((value) async {
+                  _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
+                  _fetch();
+                }).onError((e, s) {
+                  _showSnackbar(e.toString());
+                });
+              }
+              debugPrint('old ${day.toUtc()} new ${date.toUtc()} difference ${DateHelper.toDate(date).difference(DateHelper.toDate(day)).inDays}');
+            }
+          },
+          style: TextButton.styleFrom(shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(4.0),
+            side: BorderSide(color: Colors.white),
+          )),
+        );
+        // trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: const TextStyle(color: Colors.white));
         onTap = () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
             return BrewPage(e);

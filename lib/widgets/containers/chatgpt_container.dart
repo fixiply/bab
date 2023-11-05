@@ -176,6 +176,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
+              const SizedBox(width: 50),
               Text(DateHelper.formatDateTime(context, model.inserted_at)),
               const SizedBox(width: 12),
               Flexible(
@@ -190,11 +191,11 @@ class _ChatGPTContainerState extends AbstractContainerState {
               ),
             ]
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 12),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              CircleAvatar(child: Text(AppLocalizations.of(context)!.text('ai'))),
+              CircleAvatar(child: Text(AppLocalizations.of(context)!.text('ai')), radius: 16),
               const SizedBox(width: 12),
               Flexible(
                 child: Container(

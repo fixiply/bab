@@ -320,15 +320,16 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              iconSize: 34,
-              icon: const Icon(Icons.play_circle_outline, color: Colors.redAccent),
-              onPressed: () {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (BuildContext context) {
-                      return StepperPage(model);
-                    })).then((value) {
-                });
-              },
+            iconSize: 34,
+            icon: const Icon(Icons.play_circle_outline, color: Colors.redAccent),
+            tooltip: AppLocalizations.of(context)!.text(model.started_at != null ? 'resume' : 'start'),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (BuildContext context) {
+                    return StepperPage(model);
+                  })).then((value) {
+              });
+            },
             ),
             if (DeviceHelper.isDesktop) PopupMenuButton<String>(
               icon: const Icon(Icons.more_vert),

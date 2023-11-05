@@ -21,7 +21,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  String? _email = foundation.kDebugMode ? RECIPIENT : null;
+  String? _email = foundation.kDebugMode ? GUEST : null;
   late TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController(text: foundation.kDebugMode ? 'mot2passe' : null);
 

@@ -7,6 +7,7 @@ import 'package:bab/utils/app_localizations.dart';
 const String APP_NAME = 'BAB';
 const String BUNDLE_IDENTIFIER = 'com.fixiply.bab';
 const String RECIPIENT = 'contact@beandbrew.com';
+const String GUEST = 'guest@beandbrew.com';
 const String PROJECT_ID = 'beandbrew';
 const String BUCKET = '$PROJECT_ID.appspot.com';
 const NOTIFICATION_TOPIC = 'default';

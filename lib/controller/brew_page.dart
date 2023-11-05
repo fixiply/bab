@@ -318,7 +318,8 @@ class _BrewPageState extends State<BrewPage> {
                 children: [
                   Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                   const SizedBox(height: 8),
-                  Wrap(
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (widget.model.primaryDay() != null && widget.model.receipt!.primarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('primary'),
@@ -388,7 +389,7 @@ class _BrewPageState extends State<BrewPage> {
     ),
     floatingActionButton: AnimatedActionButton(
       backgroundColor: Colors.redAccent,
-      title: AppLocalizations.of(context)!.text(widget.model.status == Status.pending || widget.model.status == Status.stoped ? 'start' : 'resume'),
+      title: AppLocalizations.of(context)!.text(widget.model.started_at != null ? 'resume' : 'start'),
       icon: const Icon(Icons.play_circle_outline),
       onPressed: () {
         Navigator.push(context,
@@ -444,9 +445,6 @@ class _BrewPageState extends State<BrewPage> {
 
   _start() async {
     if (widget.model.inserted_at!.isAfter(DateTime.now())) {
-      setState(() {
-        widget.model.status = widget.model.status == Status.pending || widget.model.status == Status.stoped ? Status.started : Status.stoped;
-      });
       widget.model.started_at = DateTime.now();
       Database().update(widget.model);
     } else {

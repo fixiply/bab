@@ -34,7 +34,7 @@ class BrewDataSource extends EditDataSource {
       DataGridCell<double>(columnName: 'volume', value: e.volume),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
       DataGridCell<double>(columnName: 'abv', value: e.abv),
-      DataGridCell<Status>(columnName: 'status', value: e.status),
+      DataGridCell<DateTime>(columnName: 'started', value: e.started_at),
     ])).toList();
   }
 
@@ -141,8 +141,8 @@ class BrewDataSource extends EditDataSource {
         break;
       case 'status':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Status>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].status = newCellValue;
+            DataGridCell<DateTime>(columnName: column.columnName, value: newCellValue);
+        data[dataRowIndex].started_at = newCellValue;
         break;
     }
     onChanged?.call(data[dataRowIndex], dataRowIndex);
@@ -226,12 +226,12 @@ class BrewDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          columnName: 'status',
+          columnName: 'started_at',
           allowEditing: true,
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('status'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('started'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
     ];

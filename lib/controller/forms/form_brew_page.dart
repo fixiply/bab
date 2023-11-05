@@ -95,9 +95,16 @@ class _FormBrewPageState extends State<FormBrewPage> {
               } else {
                 BrewModel model = widget.model.copy();
                 model.uuid = null;
-                model.status = Status.pending;
                 model.started_at = null;
+                model.fermented_at = null;
                 model.reference = null;
+                model.efficiency = null;
+                model.abv = null;
+                model.og = null;
+                model.fg = null;
+                model.primaryday = null;
+                model.secondaryday = null;
+                model.tertiaryday = null;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormBrewPage(model);
                 })).then((value) {
@@ -226,16 +233,16 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   )
                 ],
               ),
-              if (widget.model.status == Status.pending) DateTimeField(
+              if (widget.model.started_at != null) DateTimeField(
                 context: context,
-                datetime: widget.model.inserted_at,
+                datetime: widget.model.started_at,
                 decoration: FormDecoration(
                     icon: const Icon(Icons.event_available),
-                    labelText: AppLocalizations.of(context)!.text('date'),
+                    labelText: AppLocalizations.of(context)!.text('started'),
                     fillColor: constants.FillColor, filled: true
                 ),
                 onChanged: (value) => setState(() {
-                  widget.model.inserted_at = value;
+                  widget.model.started_at = value;
                 }),
                 validator: (value) {
                   if (value!.isEmpty) {

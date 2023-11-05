@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:math';
 
-import 'package:another_flushbar/flushbar.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -23,10 +20,13 @@ import 'package:bab/widgets/circular_timer.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/ph_container.dart';
 import 'package:bab/widgets/countdown_text.dart';
+import 'package:bab/widgets/custom_stepper.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
 
 // External package
+import 'package:another_flushbar/flushbar.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:uuid/uuid.dart';
@@ -37,32 +37,6 @@ class StepperPage extends StatefulWidget {
 
   @override
   _StepperPageState createState() => _StepperPageState();
-}
-
-class MyStep extends Step {
-  int index;
-  bool completed = false;
-  final void Function(int index)? onStepTapped;
-  final void Function(int index)? onStepCancel;
-  final void Function(int index)? onStepContinue;
-  MyStep({
-    required this.index,
-    required Widget title,
-    Widget? subtitle,
-    required Widget content,
-    Widget? label,
-    StepState state: StepState.indexed,
-    bool isActive: false,
-    this.onStepTapped,
-    this.onStepCancel,
-    this.onStepContinue
-  }) : super(
-    title: title,
-    subtitle: subtitle,
-    content: content,
-    state: state,
-    isActive: isActive
-  );
 }
 
 class Ingredient {
@@ -95,8 +69,6 @@ extension ListParsing on List {
 class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClientMixin<StepperPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
-  int _lastStep = 0;
-  int _currentStep = 0;
 
   Future<List<MyStep>>? _steps;
   late SfRadialGauge _temp;
@@ -126,7 +98,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   @override
   Widget build(BuildContext context) {
-    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
     return WillPopScope(
       onWillPop: () async {
         bool? exitResult = await showDialog(
@@ -161,80 +132,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           future: _steps,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return Stepper(
-                currentStep: _currentStep,
-                onStepCancel: () {
-                  if (_currentStep > 0) {
-                    try {
-                      snapshot.data![_currentStep].onStepCancel?.call(_currentStep);
-                      setState(() {
-                        _currentStep -= 1;
-                      });
-                    } catch (e) {
-                      _showSnackbar(e.toString());
-                    }
-                  }
-                },
-                onStepContinue: () {
-                  if (_currentStep < snapshot.data!.length - 1) {
-                    try {
-                      snapshot.data![_currentStep].onStepContinue?.call(_currentStep);
-                      setState(() {
-                        _currentStep += 1;
-                        if (_currentStep > _lastStep) _lastStep = _currentStep;
-                      });
-                    } catch (e) {
-                      _showSnackbar(e.toString(), action: SnackBarAction(
-                        label: localizations.continueButtonLabel.toUpperCase(),
-                        textColor: Colors.white,
-                        onPressed: () {
-                          setState(() {
-                            _currentStep += 1;
-                            if (_currentStep > _lastStep) _lastStep = _currentStep;
-                          });
-                        },
-                      ));
-                    }
-                  }
-                },
-                onStepTapped: (int index) {
-                  if (index <= _lastStep) {
-                    snapshot.data![_currentStep].onStepTapped?.call(index);
-                    setState(() {
-                      _currentStep = index;
-                    });
-                  }
-                },
-                controlsBuilder: (BuildContext context, ControlsDetails controls) {
-                  return Container(
-                    margin: const EdgeInsets.only(top: 16.0),
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints.tightFor(height: 48.0),
-                      child: Row(
-                        children: <Widget>[
-                          if (_currentStep == snapshot.data!.length - 1) ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(localizations.closeButtonLabel.toUpperCase()),
-                          ),
-                          if (_currentStep < snapshot.data!.length - 1) ElevatedButton(
-                            onPressed: controls.onStepContinue,
-                            child: Text(_currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel.toUpperCase()),
-                          ),
-                          if (_currentStep != 0) TextButton(
-                            onPressed: controls.onStepCancel,
-                            child: Text(
-                              localizations.backButtonTooltip.toUpperCase(),
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                          ),
-                        ],
-                      )
-                    )
-                  );
-                },
-                steps: snapshot.data!
+              return CustomStepper(
+                data: snapshot.data!,
+                currentStep: widget.model.last_step ?? 0,
+                onLastStep: (index) {
+                  widget.model.last_step = index;
+                  Database().update(widget.model, updateAll: false);
+                }
               );
             }
             if (snapshot.hasError) {
@@ -261,69 +165,69 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   _initialize() async {
     _temp = SfRadialGauge(
-        animationDuration: 3500,
-        enableLoadingAnimation: true,
-        axes: <RadialAxis>[
-          RadialAxis(
-            ranges: <GaugeRange>[
-              GaugeRange(
-                startValue: 0,
-                endValue: 10,
-                startWidth: 0.265,
-                sizeUnit: GaugeSizeUnit.factor,
-                endWidth: 0.265,
-                color: const Color.fromRGBO(34, 195, 199, 0.75)),
-              GaugeRange(
-                startValue: 10,
-                endValue: 30,
-                startWidth: 0.265,
-                sizeUnit: GaugeSizeUnit.factor,
-                endWidth: 0.265,
-                color: const Color.fromRGBO(123, 199, 34, 0.75)),
-              GaugeRange(
-                startValue: 30,
-                endValue: 40,
-                startWidth: 0.265,
-                sizeUnit: GaugeSizeUnit.factor,
-                endWidth: 0.265,
-                color: const Color.fromRGBO(238, 193, 34, 0.75)),
-              GaugeRange(
-                startValue: 40,
-                endValue: 70,
-                startWidth: 0.265,
-                sizeUnit: GaugeSizeUnit.factor,
-                endWidth: 0.265,
-                color: const Color.fromRGBO(238, 79, 34, 0.65)),
-              GaugeRange(
-                startValue: 70,
-                endValue: 100,
-                startWidth: 0.265,
-                sizeUnit: GaugeSizeUnit.factor,
-                endWidth: 0.265,
-                color: const Color.fromRGBO(255, 0, 0, 0.65)),
-            ],
-            annotations: <GaugeAnnotation>[
-              GaugeAnnotation(
-                  angle: 90,
-                  positionFactor: 0.35,
-                  widget: Text('Temp.${AppLocalizations.of(context)!.tempMeasure}', style: const TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
-              const GaugeAnnotation(
+      animationDuration: 3500,
+      enableLoadingAnimation: true,
+      axes: <RadialAxis>[
+        RadialAxis(
+          ranges: <GaugeRange>[
+            GaugeRange(
+              startValue: 0,
+              endValue: 10,
+              startWidth: 0.265,
+              sizeUnit: GaugeSizeUnit.factor,
+              endWidth: 0.265,
+              color: const Color.fromRGBO(34, 195, 199, 0.75)),
+            GaugeRange(
+              startValue: 10,
+              endValue: 30,
+              startWidth: 0.265,
+              sizeUnit: GaugeSizeUnit.factor,
+              endWidth: 0.265,
+              color: const Color.fromRGBO(123, 199, 34, 0.75)),
+            GaugeRange(
+              startValue: 30,
+              endValue: 40,
+              startWidth: 0.265,
+              sizeUnit: GaugeSizeUnit.factor,
+              endWidth: 0.265,
+              color: const Color.fromRGBO(238, 193, 34, 0.75)),
+            GaugeRange(
+              startValue: 40,
+              endValue: 70,
+              startWidth: 0.265,
+              sizeUnit: GaugeSizeUnit.factor,
+              endWidth: 0.265,
+              color: const Color.fromRGBO(238, 79, 34, 0.65)),
+            GaugeRange(
+              startValue: 70,
+              endValue: 100,
+              startWidth: 0.265,
+              sizeUnit: GaugeSizeUnit.factor,
+              endWidth: 0.265,
+              color: const Color.fromRGBO(255, 0, 0, 0.65)),
+          ],
+          annotations: <GaugeAnnotation>[
+            GaugeAnnotation(
                 angle: 90,
-                positionFactor: 0.8,
-                widget: Text('  0  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                ),
-              )
-            ],
-            pointers: const <GaugePointer>[
-              NeedlePointer(
-                value: 0,
-                needleStartWidth: 0,
-                needleEndWidth: 3,
-                knobStyle: KnobStyle(knobRadius: 0.05),
-              )
-            ]
-          )
-        ]
+                positionFactor: 0.35,
+                widget: Text('Temp.${AppLocalizations.of(context)!.tempMeasure}', style: const TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
+            const GaugeAnnotation(
+              angle: 90,
+              positionFactor: 0.8,
+              widget: Text('  0  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+              ),
+            )
+          ],
+          pointers: const <GaugePointer>[
+            NeedlePointer(
+              value: 0,
+              needleStartWidth: 0,
+              needleEndWidth: 3,
+              knobStyle: KnobStyle(knobRadius: 0.05),
+            )
+          ]
+        )
+      ]
     );
     setState(() {
       _steps = _generate();
@@ -341,11 +245,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           child: const Text('Démarrage du brassin')
         ),
         onStepContinue: (int index) {
-          if (widget.model.status == Status.pending) {
+          if (widget.model.started_at == null) {
             widget.model.started_at = DateTime.now();
-            widget.model.status = Status.started;
             Database().update(widget.model, updateAll: false);
-            debugPrint('Update ${widget.model.toMap()}');
           }
         },
       ),
@@ -384,7 +286,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: ++_index,
-        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(72.3)}'),
+        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(73)}'),
         content: Container(
           alignment: Alignment.centerLeft,
           padding: const EdgeInsets.all(8.0),
@@ -404,7 +306,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     await _mash(receipt, steps);
     steps.add(MyStep(
       index: ++_index,
-      title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau'),
+      title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(75)}'),
       content: Container(
         alignment: Alignment.centerLeft,
         child: PHContainer(
@@ -451,6 +353,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         index: ++_index,
         title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure «${AppLocalizations.of(context)!.localizedText(receipt.yeasts.first.name)}»'),
         content: Container(),
+        onStepContinue: (int index) {
+          if (widget.model.fermented_at == null) {
+            widget.model.fermented_at = DateTime.now();
+            Database().update(widget.model, updateAll: false);
+          }
+        },
       ));
     });
     steps.add(MyStep(
@@ -468,19 +376,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     for(int i = 0 ; i < receipt.mash!.length ; i++) {
       if (receipt.mash![i].type == mash.Type.infusion) {
         CountDownController controller = CountDownController();
-        steps.add(MyStep(
-          index: ++_index,
-          title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)}'),
-          content: Container(
-            alignment: Alignment.centerLeft,
-            padding: const EdgeInsets.all(8.0),
-            child: SizedBox(
-              width: 140,
-              height: 140,
-              child: _temp,
-            )
-          )
-        ));
         steps.add(MyStep(
           index: ++_index,
           title: Text('Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant ${receipt.mash![i].duration} minutes'),
@@ -657,16 +552,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       forwardAnimationCurve: Curves.elasticOut,
       showProgressIndicator: true,
     ).show(context);
-  }
-  
-  _showSnackbar(String message, {SnackBarAction? action}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 10),
-        action: action,
-      )
-    );
   }
 }
 
