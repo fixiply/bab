@@ -1,21 +1,19 @@
 // Internal package
-import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/receipt_model.dart';
-import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
+import 'package:bab/utils/mash.dart';
 
 extension DoubleParsing on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
 }
 
 class BrewModel<T> extends Model {
-  String? color;
   DateTime? started_at;
   DateTime? fermented_at;
   String? reference;
@@ -42,7 +40,6 @@ class BrewModel<T> extends Model {
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
-    this.color,
     this.started_at,
     this.fermented_at,
     this.reference,
@@ -63,14 +60,11 @@ class BrewModel<T> extends Model {
     this.tertiaryday,
     this.last_step,
     this.notes
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
-    color ??= ColorHelper.random();
-  }
+  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
   @override
   Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
-    this.color = map['color'];
     this.started_at = DateHelper.parse(map['started_at']);
     this.fermented_at = DateHelper.parse(map['fermented_at']);
     this.reference = map['reference'];
@@ -97,7 +91,6 @@ class BrewModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'color': this.color,
       'started_at': started_at,
       'fermented_at': fermented_at,
       'reference': this.reference,
@@ -128,7 +121,6 @@ class BrewModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      color: this.color,
       started_at: this.started_at,
       fermented_at: this.fermented_at,
       reference: this.reference,
@@ -164,6 +156,23 @@ class BrewModel<T> extends Model {
   @override
   String toString() {
     return 'Breaw: $reference, UUID: $uuid';
+  }
+
+  /// Returns the initial brew temperature
+  ///
+  /// The `tgi` argument is relative to the celcius initial grain temperature.
+  ///
+  /// The `weight` argument is relative to the grain weight in kilo.
+  Future<double> initialBrewTemp(double? tgi) async {
+    double? tmf = null;
+    for(Mash item in receipt!.mash!) {
+      if (tmf == null) {
+        tmf = item.temperature;
+        continue;
+      }
+    }
+    double weight = await totalWeight;
+    return Future.value(FormulaHelper.initialBrewTemp(FormulaHelper.ratio(volume, weight), tmf, tgi) ?? 0);
   }
 
   DateTime? get start_fermentation => fermented_at ?? started_at;
@@ -220,16 +229,21 @@ class BrewModel<T> extends Model {
     return null;
   }
 
+  Future<double> get totalWeight async {
+    double weight = 0;
+    for(FermentableModel item in await receipt!.getFermentables()) {
+      if (item.use == Method.mashed) {
+        weight +=  (item.amount! * (volume! / receipt!.volume!)).abs();
+      }
+    }
+    return weight;
+  }
+
   calculate() async {
     abv = null;
     efficiency = null;
     if (receipt != null && tank != null) {
-      double weight = 0;
-      for(FermentableModel item in await receipt!.getFermentables()) {
-        if (item.use == Method.mashed) {
-          weight +=  (item.amount! * (volume! / receipt!.volume!)).abs();
-        }
-      }
+      double weight = await totalWeight;
       mash_water = tank!.mash(weight);
       sparge_water = tank!.sparge(volume!, weight, duration: receipt!.boil!);
       efficiency = FormulaHelper.efficiency(volume, og, receipt!.mass, receipt!.extract);

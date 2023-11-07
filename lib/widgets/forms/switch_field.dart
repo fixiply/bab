@@ -11,11 +11,11 @@ class SwitchField extends FormField<bool> {
   Widget? icon;
 
   SwitchField({Key? key, required BuildContext context, required bool value, this.onChanged, this.hintText, this.icon}) : super(
-      key: key,
-      initialValue: value,
-      builder: (FormFieldState<bool> field) {
-        return field.build(field.context);
-      }
+    key: key,
+    initialValue: value,
+    builder: (FormFieldState<bool> field) {
+      return field.build(field.context);
+    }
   );
 
   @override

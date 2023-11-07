@@ -13,7 +13,6 @@ import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
-import 'package:bab/widgets/forms/color_field.dart';
 import 'package:bab/widgets/forms/datetime_field.dart';
 import 'package:bab/widgets/forms/equipment_field.dart';
 import 'package:bab/widgets/forms/receipt_field.dart';
@@ -254,14 +253,6 @@ class _FormBrewPageState extends State<FormBrewPage> {
               const Divider(height: 10),
               Row(
                 children: [
-                  ColorField(
-                    context: context,
-                    initialValue: widget.model.color,
-                    onChanged: (value) => setState(() {
-                      widget.model.color = value;
-                    })
-                  ),
-                  const SizedBox(width: 12),
                   Expanded(
                     child: TextFormField(
                       // initialValue: widget.model.identifier,

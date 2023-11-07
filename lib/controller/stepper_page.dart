@@ -69,6 +69,8 @@ extension ListParsing on List {
 class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClientMixin<StepperPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
+  double _grainTemp = 20;
+  Future<double>? _initialBrewTemp;
 
   Future<List<MyStep>>? _steps;
   late SfRadialGauge _temp;
@@ -133,11 +135,11 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return CustomStepper(
-                data: snapshot.data!,
+                steps: snapshot.data!,
                 currentStep: widget.model.last_step ?? 0,
                 onLastStep: (index) {
                   widget.model.last_step = index;
-                  Database().update(widget.model, updateAll: false);
+                  Database().update(widget.model, updateLogs: false);
                 }
               );
             }
@@ -151,84 +153,81 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     );
   }
 
-  // @override
-  // void didChangeAppLifecycleState(AppLifecycleState state) {
-  //   // TODO: implement didChangeAppLifecycleState
-  //   super.didChangeAppLifecycleState(state);
-  //   if (state == AppLifecycleState.paused) {
-  //     logger.d('Lifecycle state paused');
-  //   }
-  //   if (state == AppLifecycleState.resumed) {
-  //     logger.d('Lifecycle state resumed');
-  //   }
-  // }
-
   _initialize() async {
     _temp = SfRadialGauge(
-      animationDuration: 3500,
-      enableLoadingAnimation: true,
-      axes: <RadialAxis>[
-        RadialAxis(
-          ranges: <GaugeRange>[
-            GaugeRange(
-              startValue: 0,
-              endValue: 10,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(34, 195, 199, 0.75)),
-            GaugeRange(
-              startValue: 10,
-              endValue: 30,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(123, 199, 34, 0.75)),
-            GaugeRange(
-              startValue: 30,
-              endValue: 40,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(238, 193, 34, 0.75)),
-            GaugeRange(
-              startValue: 40,
-              endValue: 70,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(238, 79, 34, 0.65)),
-            GaugeRange(
-              startValue: 70,
-              endValue: 100,
-              startWidth: 0.265,
-              sizeUnit: GaugeSizeUnit.factor,
-              endWidth: 0.265,
-              color: const Color.fromRGBO(255, 0, 0, 0.65)),
-          ],
-          annotations: <GaugeAnnotation>[
-            GaugeAnnotation(
-                angle: 90,
-                positionFactor: 0.35,
-                widget: Text('Temp.${AppLocalizations.of(context)!.tempMeasure}', style: const TextStyle(color: Color(0xFFF8B195), fontSize: 9))),
-            const GaugeAnnotation(
-              angle: 90,
-              positionFactor: 0.8,
-              widget: Text('  0  ', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-              ),
-            )
-          ],
-          pointers: const <GaugePointer>[
-            NeedlePointer(
-              value: 0,
-              needleStartWidth: 0,
-              needleEndWidth: 3,
-              knobStyle: KnobStyle(knobRadius: 0.05),
-            )
-          ]
-        )
-      ]
+        animationDuration: 3500,
+        enableLoadingAnimation: true,
+        axes: <RadialAxis>[
+          RadialAxis(
+              ranges: <GaugeRange>[
+                GaugeRange(
+                    startValue: 0,
+                    endValue: 10,
+                    startWidth: 0.265,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    endWidth: 0.265,
+                    color: const Color.fromRGBO(34, 195, 199, 0.75)),
+                GaugeRange(
+                    startValue: 10,
+                    endValue: 30,
+                    startWidth: 0.265,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    endWidth: 0.265,
+                    color: const Color.fromRGBO(123, 199, 34, 0.75)),
+                GaugeRange(
+                    startValue: 30,
+                    endValue: 40,
+                    startWidth: 0.265,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    endWidth: 0.265,
+                    color: const Color.fromRGBO(238, 193, 34, 0.75)),
+                GaugeRange(
+                    startValue: 40,
+                    endValue: 70,
+                    startWidth: 0.265,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    endWidth: 0.265,
+                    color: const Color.fromRGBO(238, 79, 34, 0.65)),
+                GaugeRange(
+                    startValue: 70,
+                    endValue: 100,
+                    startWidth: 0.265,
+                    sizeUnit: GaugeSizeUnit.factor,
+                    endWidth: 0.265,
+                    color: const Color.fromRGBO(255, 0, 0, 0.65)),
+              ],
+              annotations: <GaugeAnnotation>[
+                GaugeAnnotation(
+                    angle: 90,
+                    positionFactor: 0.35,
+                    widget: Text(
+                        'Temp.${AppLocalizations.of(context)!.tempMeasure}',
+                        style: const TextStyle(
+                            color: Color(0xFFF8B195), fontSize: 9))),
+                const GaugeAnnotation(
+                  angle: 90,
+                  positionFactor: 0.8,
+                  widget: Text('  0  ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
+                )
+              ],
+              pointers: const <GaugePointer>[
+                NeedlePointer(
+                  value: 0,
+                  needleStartWidth: 0,
+                  needleEndWidth: 3,
+                  knobStyle: KnobStyle(knobRadius: 0.05),
+                )
+              ]
+          )
+        ]
     );
+    _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
+    _fetch();
+  }
+
+  _fetch() async {
     setState(() {
       _steps = _generate();
     });
@@ -247,7 +246,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         onStepContinue: (int index) {
           if (widget.model.started_at == null) {
             widget.model.started_at = DateTime.now();
-            Database().update(widget.model, updateAll: false);
+            Database().update(widget.model, updateLogs: false);
           }
         },
       ),
@@ -286,14 +285,64 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       ),
       MyStep(
         index: ++_index,
-        title: Text('Mettre en chauffe votre cuve à ${AppLocalizations.of(context)!.tempFormat(73)}'),
+        title: RichText(
+          text: TextSpan(
+            text: 'Mettre en chauffe votre cuve',
+            style: DefaultTextStyle.of(context).style,
+            children: [
+              // TextSpan(text:  ' à ${AppLocalizations.of(context)!.tempFormat(_initialBrewTemp)}'),
+              WidgetSpan(
+                child: FutureBuilder<double?>(
+                  future: _initialBrewTemp,
+                  builder: (context, snapshot) {
+                    double initialTemp = 50;
+                    if (snapshot.hasData) {
+                      initialTemp = snapshot.data!;
+                    }
+                    return Text(' à ${AppLocalizations.of(context)!.tempFormat(initialTemp)}');
+                  }
+                )
+              )
+            ],
+          ),
+        ),
         content: Container(
           alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: 140,
-            height: 140,
-            child: _temp,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Température du grain'),
+              SizedBox(
+                width: DeviceHelper.isLargeScreen(context) ? 320: null,
+                child: TextFormField(
+                  initialValue: _grainTemp.toString(),
+                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                  inputFormatters: <TextInputFormatter>[
+                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                  ],
+                  onChanged: (String? value) {
+                    if (value != null) {
+                      _grainTemp = AppLocalizations.of(context)!.decimal(value) ?? 20;
+                      _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
+                      _fetch();
+                    }
+                  },
+                  decoration: FormDecoration(
+                    labelText: AppLocalizations.of(context)!.text('temperature'),
+                    suffixText: AppLocalizations.of(context)!.tempMeasure,
+                    border: InputBorder.none,
+                    fillColor: constants.FillColor, filled: true
+                  )
+                ),
+              ),
+              const SizedBox(height: 6),
+              SizedBox(
+                width: 140,
+                height: 140,
+                child: _temp,
+              )
+            ],
           )
         ),
       ),
@@ -303,10 +352,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         content: Container(),
       )
     ];
-    await _mash(receipt, steps);
+    _mash(receipt, steps);
     steps.add(MyStep(
       index: ++_index,
-      title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(75)}'),
+      title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(78)}'),
       content: Container(
         alignment: Alignment.centerLeft,
         child: PHContainer(
@@ -337,7 +386,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         onSubmitted: (value) {
           widget.model.og = AppLocalizations.of(context)!.decimal(value);
           widget.model.calculate();
-          Database().update(widget.model);
+          Database().update(widget.model, updateLogs: false);
         },
         decoration: FormDecoration(
           icon: const Icon(Icons.colorize_outlined),
@@ -356,7 +405,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         onStepContinue: (int index) {
           if (widget.model.fermented_at == null) {
             widget.model.fermented_at = DateTime.now();
-            Database().update(widget.model, updateAll: false);
+            Database().update(widget.model, updateLogs: false);
           }
         },
       ));

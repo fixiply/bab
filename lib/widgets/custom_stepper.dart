@@ -30,11 +30,11 @@ class MyStep extends Step {
 }
 
 class CustomStepper extends StatefulWidget {
-  List<MyStep> data;
+  List<MyStep> steps;
   int currentStep;
   final void Function(int index)? onLastStep;
 
-  CustomStepper({Key? key, required this.data, this.currentStep = 0, this.onLastStep}): super(key: key);
+  CustomStepper({Key? key, required this.steps, this.currentStep = 0, this.onLastStep}): super(key: key);
   @override
   CustomStepperState createState() => CustomStepperState();
 }
@@ -53,13 +53,12 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
   @override
   Widget build(BuildContext context) {
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
-    debugPrint('currentStep ${widget.currentStep}');
     return Stepper(
       currentStep: _currentStep,
       onStepCancel: () {
         if (_currentStep > 0) {
           try {
-            widget.data[_currentStep].onStepCancel?.call(_currentStep);
+            widget.steps[_currentStep].onStepCancel?.call(_currentStep);
             setState(() {
               _currentStep -= 1;
             });
@@ -69,9 +68,9 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
         }
       },
       onStepContinue: () {
-        if (_currentStep < widget.data.length - 1) {
+        if (_currentStep < widget.steps.length - 1) {
           try {
-            widget.data[_currentStep].onStepContinue?.call(_currentStep);
+            widget.steps[_currentStep].onStepContinue?.call(_currentStep);
             setState(() {
               _currentStep += 1;
               if (_currentStep > _lastStep) {
@@ -95,7 +94,7 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
       },
       onStepTapped: (int index) {
         if (index <= _lastStep) {
-          widget.data[_currentStep].onStepTapped?.call(index);
+          widget.steps[_currentStep].onStepTapped?.call(index);
           setState(() {
             _currentStep = index;
           });
@@ -108,13 +107,13 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
             constraints: const BoxConstraints.tightFor(height: 48.0),
             child: Row(
               children: <Widget>[
-                if (_currentStep == widget.data.length - 1) ElevatedButton(
+                if (_currentStep == widget.steps.length - 1) ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text(localizations.closeButtonLabel.toUpperCase()),
                 ),
-                if (_currentStep < widget.data.length - 1) ElevatedButton(
+                if (_currentStep < widget.steps.length - 1) ElevatedButton(
                   onPressed: controls.onStepContinue,
                   child: Text(_currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel.toUpperCase()),
                 ),
@@ -130,7 +129,7 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
           )
         );
       },
-      steps: widget.data
+      steps: widget.steps
     );
   }
 

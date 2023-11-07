@@ -84,7 +84,6 @@ class FormulaHelper {
     return result;
   }
 
-
   /// Returns the bitterness index, based on the given conditions.
   ///
   /// The `amount` argument is relative to the amount of hops in grams.
@@ -199,6 +198,55 @@ class FormulaHelper {
     }
     double result = volume - mash + (weight * absorption);
     if (foundation.kDebugMode) debugPrint('spargeWater $result=$volume - $mash + ($weight * $absorption');
+    return result;
+  }
+
+  /// Returns the brix to specific gravity
+  ///
+  /// The `number` argument is relative to the brix.
+  static double pH(double? current, double? target, double? volume, Acid? acid, double? concentration) {
+    if (current == null || target == null || volume == null || acid == null || concentration == null) {
+      return 0;
+    }
+    switch(acid) {
+      case Acid.hydrochloric:
+        return (0.02 * volume * (current - target)) / (concentration * 1.25);
+      case Acid.phosphoric:
+        return  (volume * (current - target)) / (10 * (concentration / 100));
+      case Acid.lactic:
+        return concentration * volume * (current - target) / 5.9;
+      case Acid.sulfuric:
+        return concentration * volume * (target - current) / 2;
+    }
+  }
+
+  /// Returns the water/grain ratio.
+  ///
+  /// The `volume` argument is relative to the water volume.
+  ///
+  /// The `weight` argument is relative to the grain weight in kilo.
+  static double? ratio(double? volume,  double? weight) {
+    if (volume == null || weight == null) {
+      return null;
+    }
+    double result = volume / weight;
+    if (foundation.kDebugMode) debugPrint('ratio $result=($volume / $weight)');
+    return result;
+  }
+
+  /// Returns the initial brew temperature
+  ///
+  /// The `ratio` argument is relative to the water/grain ratio.
+  ///
+  /// The `tmf` argument is relative to the celcius temperature of the next mash.
+  ///
+  /// The `tgi` argument is relative to the celcius initial grain temperature.
+  static double? initialBrewTemp(double? ratio, double? tmf, double? tgi) {
+    if (ratio == null || tmf == null || tgi == null) {
+      return null;
+    }
+    double result = 0.41 / ratio * (tmf - tgi) + tmf;
+    if (foundation.kDebugMode) debugPrint('initialBrewTemp $result=(0.41 / $ratio * ($tmf - $tgi) + $tmf)');
     return result;
   }
 
@@ -321,25 +369,6 @@ class FormulaHelper {
       return 0;
     }
     return (number / (258.6 - ((number / 258.2) * 227.1))) + 1;
-  }
-
-  /// Returns the brix to specific gravity
-  ///
-  /// The `number` argument is relative to the brix.
-  static double pH(double? current, double? target, double? volume, Acid? acid, double? concentration) {
-    if (current == null || target == null || volume == null || acid == null || concentration == null) {
-      return 0;
-    }
-    switch(acid) {
-      case Acid.hydrochloric:
-        return (0.02 * volume * (current - target)) / (concentration * 1.25);
-      case Acid.phosphoric:
-        return  (volume * (current - target)) / (10 * (concentration / 100));
-      case Acid.lactic:
-        return concentration * volume * (current - target) / 5.9;
-      case Acid.sulfuric:
-        return concentration * volume * (target - current) / 2;
-    }
   }
 }
 

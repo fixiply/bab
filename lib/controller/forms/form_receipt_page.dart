@@ -23,6 +23,7 @@ import 'package:bab/widgets/custom_slider.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
+import 'package:bab/widgets/forms/color_field.dart';
 import 'package:bab/widgets/forms/beer_style_field.dart';
 import 'package:bab/widgets/forms/image_field.dart';
 import 'package:bab/widgets/forms/ingredients_field.dart';
@@ -233,6 +234,14 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
               ),
               Row(
                 children: [
+                  ColorField(
+                    context: context,
+                    initialValue: widget.model.color,
+                    onChanged: (value) => setState(() {
+                      widget.model.color = value;
+                    })
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
                     child: LocalizedTextField(
                       context: context,
@@ -256,12 +265,15 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   ),
                   const SizedBox(width: 12),
                   SizedBox(
-                    width: 140,
+                    width: 80,
                     child: SwitchField(
                       context: context,
                       value: widget.model.shared!,
-                      icon: null,
-                      hintText: AppLocalizations.of(context)!.text('public'),
+                      icon: Tooltip(
+                        message: AppLocalizations.of(context)!.text('visibility'),
+                        child: Icon(widget.model.shared == true ? Icons.lock_open_outlined : Icons.lock),
+                      ),
+                      // hintText: AppLocalizations.of(context)!.text('share'),
                       onChanged: (value) => widget.model.shared = value,
                     )
                   )

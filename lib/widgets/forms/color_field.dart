@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/helpers/color_helper.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 // External package
 import 'package:flex_color_picker/flex_color_picker.dart';
@@ -47,7 +48,7 @@ class _BeerStyleFieldState extends FormFieldState<String> {
           context,
           // We use the dialogSelectColor, as its starting color.
           ColorHelper.fromHex(widget.initialValue!) ?? Colors.white,
-          title: Text('ColorPicker', style: Theme.of(context).textTheme.titleLarge),
+          title: Text(AppLocalizations.of(context)!.text('color'), style: Theme.of(context).textTheme.titleLarge),
           width: 40,
           height: 40,
           spacing: 0,
@@ -60,11 +61,6 @@ class _BeerStyleFieldState extends FormFieldState<String> {
           pickersEnabled: <ColorPickerType, bool>{
             ColorPickerType.wheel: true,
           },
-          copyPasteBehavior: const ColorPickerCopyPasteBehavior(
-            copyButton: true,
-            pasteButton: true,
-            longPressMenu: true,
-          ),
           actionButtons: const ColorPickerActionButtons(
             okButton: true,
             closeButton: true,

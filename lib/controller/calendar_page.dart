@@ -32,6 +32,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
   DateTime? _rangeEnd;
   DateTime? _selectedDay;
   DateTime _focusedDay = DateTime.now();
+  CalendarFormat _calendarFormat = CalendarFormat.month;
 
   @override
   bool get wantKeepAlive => true;
@@ -98,6 +99,16 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                     selectedDayPredicate: (day) {
                       return isSameDay(_selectedDay, day);
                     },
+                    availableCalendarFormats: {
+                      CalendarFormat.month: AppLocalizations.of(context)!.text('period.month'),
+                      CalendarFormat.week: AppLocalizations.of(context)!.text('period.week'),
+                    },
+                    calendarFormat: _calendarFormat,
+                    onFormatChanged: (format) {
+                      setState(() {
+                        _calendarFormat = format;
+                      });
+                    },
                     rangeStartDay: _rangeStart,
                     rangeEndDay: _rangeEnd,
                     onDaySelected: (selected, focused) {
@@ -116,7 +127,6 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                         _rangeStart = start;
                         _rangeEnd = end;
                       });
-
                       // `start` or `end` could be null
                       if (start != null && end != null) {
                         _selectedEvents.value = _getEventsForRange(snapshot.data!, start, end);
@@ -132,21 +142,36 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                     calendarBuilders: CalendarBuilders(
                       markerBuilder: (BuildContext context, date, events) {
                         if (events.isNotEmpty) {
+                          return Wrap(
+                            children: events.map((e) {
+                              Color color = Theme.of(context).primaryColor;
+                              // debugPrint('event ${e!.tileColor!}');
+                              if (e is ListTile) {
+                                color = e.tileColor ?? color;
+                              }
+                              return Container(
+                                width: 12.0,
+                                height: 12.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle, color: color),
+                              );
+                            }).toList()
+                          );
                           return Align(
-                              alignment: Alignment.bottomRight,
-                              child: Container(
-                                width: 20,
-                                padding: const EdgeInsets.all(4.0),
-                                decoration: const BoxDecoration(
-                                  color: constants.TextGrey,
-                                  shape: BoxShape.rectangle
-                                ),
-                                child: Text(events.length.toString(),
-                                    textAlign: TextAlign.center,
-                                    style: const TextStyle(fontSize: 10,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white)),
-                              )
+                            alignment: Alignment.bottomRight,
+                            child: Container(
+                              width: 20,
+                              padding: const EdgeInsets.all(4.0),
+                              decoration: const BoxDecoration(
+                                color: constants.TextGrey,
+                                shape: BoxShape.rectangle
+                              ),
+                              child: Text(events.length.toString(),
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white)),
+                            )
                           );
                         }
                         return null;
@@ -195,9 +220,8 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
     });
   }
 
-  List<ListTile> _getEventsForDay(List<Model> data, DateTime day) {
-    List<Model> elements
-    = data.where((element) {
+  List<ListTile> _getEventsForDay(List<Model> events, DateTime day) {
+    List<Model> elements = events.where((element) {
       if (element is BrewModel) {
         if (element.started_at == null || element.started_at == false) {
           return false;
@@ -215,14 +239,16 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
       return false;
     }).toList();
     return elements.map((e) {
-      Color color = constants.SecondaryColor;
+      Color color = constants.PrimaryColor;
       String title = '';
       String? subtitle;
       Widget? leading;
       Widget? trailing;
       GestureTapCallback? onTap;
       if (e is BrewModel) {
-        color = ColorHelper.fromHex(e.color!) ?? color;
+        if (e.receipt != null) {
+          color = ColorHelper.fromHex(e.receipt!.color) ?? color;
+        }
         title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.receipt!.title)}';
         if (e.started_at != null && DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
           subtitle = 'Début du brassin.';

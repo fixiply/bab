@@ -17,6 +17,7 @@ import 'package:bab/utils/rating.dart';
 import 'package:flutter/material.dart';
 
 class ReceiptModel<T> extends Model {
+  String? color;
   Status? status;
   dynamic title;
   dynamic text;
@@ -56,6 +57,7 @@ class ReceiptModel<T> extends Model {
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
+    this.color,
     this.status = Status.disabled,
     this.title,
     this.text,
@@ -85,6 +87,7 @@ class ReceiptModel<T> extends Model {
     this.ratings,
     this.country,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
+    color ??= ColorHelper.random();
     cacheFermentables ??= [];
     cacheHops ??= [];
     cacheMisc ??= [];
@@ -96,6 +99,7 @@ class ReceiptModel<T> extends Model {
   @override
   Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
+    this.color = map['color'];
     this.status = Status.values.elementAt(map['status']);
     this.title = LocalizedText.deserialize(map['title']);
     this.text = LocalizedText.deserialize(map['text']);
@@ -130,6 +134,7 @@ class ReceiptModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
+      'color': this.color,
       'status': this.status!.index,
       'title': LocalizedText.serialize(this.title),
       'text': LocalizedText.serialize(this.text),
@@ -168,6 +173,7 @@ class ReceiptModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
+      color: this.color,
       status: this.status,
       title: this.title,
       text: this.text,

@@ -140,12 +140,12 @@ class Database {
   }
 
   //Returns document iD if the record is created, null is updated.
-  Future<String?> update(dynamic d, {bool updateAll = true, BuildContext? context}) async {
+  Future<String?> update(dynamic d, {bool updateLogs = true, BuildContext? context}) async {
     if (d.uuid == null) {
       return add(d);
     }
     try {
-      if (updateAll == true) {
+      if (updateLogs == true) {
         if (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled) {
           d.status = constants.Status.pending;
         }

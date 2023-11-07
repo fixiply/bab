@@ -194,7 +194,7 @@ class Storage {
       if (ClassHelper.hasImage(model)) {
         if (model.image != null && ModelHelper.equals(fromUrl, model.image!.url))  {
           model.image = newImage;
-          await Database().update(model, updateAll: false);
+          await Database().update(model, updateLogs: false);
         }
       } else if (ClassHelper.hasImages(model)) {
         bool found = false;
@@ -206,7 +206,7 @@ class Storage {
           }
         }
         if (found) {
-          await Database().update(model, updateAll: false);
+          await Database().update(model, updateLogs: false);
         }
       }
     }
@@ -238,7 +238,7 @@ class Storage {
         }
         if (changed) {
           try {
-            await Database().update(model, updateAll: false);
+            await Database().update(model, updateLogs: false);
           }
           catch(e) {
             print('[$APP_NAME] Update ERROR: $e');

@@ -128,7 +128,7 @@ class ColorHelper {
   }
 
   static String random() {
-    return Color(Random().nextInt(0xffffffff)).toHex();
+    return Color(Random().nextInt(0xffffffff)).withOpacity(1.0).toHex();
   }
 
   static Color? fromHex(String? value) {
