@@ -232,23 +232,43 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   )
                 ],
               ),
-              if (widget.model.started_at != null) DateTimeField(
-                context: context,
-                datetime: widget.model.started_at,
-                decoration: FormDecoration(
-                    icon: const Icon(Icons.event_available),
-                    labelText: AppLocalizations.of(context)!.text('started'),
-                    fillColor: constants.FillColor, filled: true
-                ),
-                onChanged: (value) => setState(() {
-                  widget.model.started_at = value;
-                }),
-                validator: (value) {
-                  if (value!.isEmpty) {
-                    return AppLocalizations.of(context)!.text('validator_field_required');
-                  }
-                  return null;
-                }
+              if (widget.model.started_at != null) Row(
+                children: [
+                  Expanded(
+                    child: DateTimeField(
+                      context: context,
+                      datetime: widget.model.started_at,
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.event_available),
+                        labelText: AppLocalizations.of(context)!.text('start_brewing'),
+                        fillColor: constants.FillColor, filled: true
+                      ),
+                      onChanged: (value) => setState(() {
+                        widget.model.started_at = value;
+                      }),
+                      validator: (value) {
+                        if (value!.isEmpty) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    )
+                  ),
+                  Expanded(
+                    child: DateTimeField(
+                      context: context,
+                      datetime: widget.model.fermented_at,
+                      decoration: FormDecoration(
+                          icon: const Icon(Icons.event_available),
+                          labelText: AppLocalizations.of(context)!.text('start_fermentation'),
+                          fillColor: constants.FillColor, filled: true
+                      ),
+                      onChanged: (value) => setState(() {
+                        widget.model.fermented_at = value;
+                      })
+                    )
+                  )
+                ]
               ),
               const Divider(height: 10),
               Row(

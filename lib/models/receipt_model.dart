@@ -13,6 +13,7 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
+import 'package:bab/utils/quantity.dart';
 import 'package:bab/utils/rating.dart';
 import 'package:flutter/material.dart';
 
@@ -31,10 +32,10 @@ class ReceiptModel<T> extends Model {
   double? abv;
   double? ibu;
   int? ebc;
-  List<dynamic>? cacheFermentables;
-  List<dynamic>? cacheHops;
-  List<dynamic>? cacheMisc;
-  List<dynamic>? cacheYeasts;
+  List<Quantity>? cacheFermentables;
+  List<Quantity>? cacheHops;
+  List<Quantity>? cacheMisc;
+  List<Quantity>? cacheYeasts;
   List<Mash>? mash;
   int? primaryday;
   double? primarytemp;
@@ -113,10 +114,10 @@ class ReceiptModel<T> extends Model {
     if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['ibu'] != null) this.ibu = map['ibu'].toDouble();
     this.ebc = map['ebc'];
-    this.cacheFermentables = map['fermentables'];
-    this.cacheHops = map['hops'];
-    this.cacheMisc = map['miscellaneous'];
-    this.cacheYeasts = map['yeasts'];
+    this.cacheFermentables = Quantity.deserialize(map['fermentables']);
+    this.cacheHops =  Quantity.deserialize(map['hops']);
+    this.cacheMisc =  Quantity.deserialize(map['miscellaneous']);
+    this.cacheYeasts =  Quantity.deserialize(map['yeasts']);
     this.mash = Mash.deserialize(map['mash']);
     this.primaryday = map['primaryday'];
     if (map['primarytemp'] != null) this.primarytemp = map['primarytemp'].toDouble();
@@ -256,7 +257,7 @@ class ReceiptModel<T> extends Model {
 
   Future<List<FermentableModel>> getFermentables({double? volume, bool forceResizing = false}) async {
     if (_fermentables == null || forceResizing) {
-      _fermentables = await FermentableModel.data(cacheFermentables);
+      _fermentables = await FermentableModel.data(cacheFermentables!);
       resizeFermentales(volume);
     }
     return _fermentables ?? [];
@@ -268,7 +269,7 @@ class ReceiptModel<T> extends Model {
 
   Future<List<hm.HopModel>> gethops({double? volume, hm.Use? use, bool forceResizing = false}) async {
     if (_hops == null|| forceResizing) {
-      _hops = await hm.HopModel.data(cacheHops);
+      _hops = await hm.HopModel.data(cacheHops!);
       resizeHops(volume);
       if (use != null) {
         return _hops!.where((element) => element.use == use).toList();
@@ -283,7 +284,7 @@ class ReceiptModel<T> extends Model {
 
   Future<List<mm.MiscModel>> getMisc({double? volume, mm.Use? use, bool forceResizing = false}) async {
     if (_misc == null || forceResizing) {
-      _misc = await mm.MiscModel.data(cacheMisc);
+      _misc = await mm.MiscModel.data(cacheMisc!);
       resizeMisc(volume);
       if (use != null) {
         return _misc!.where((element) => element.use == use).toList();
@@ -298,7 +299,7 @@ class ReceiptModel<T> extends Model {
 
   Future<List<YeastModel>> getYeasts({double? volume}) async {
     if (_yeasts == null) {
-      _yeasts = await YeastModel.data(cacheYeasts);
+      _yeasts = await YeastModel.data(cacheYeasts!);
       resizeYeasts(volume);
     }
     return _yeasts ?? [];

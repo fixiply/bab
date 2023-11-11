@@ -1,3 +1,4 @@
+import 'package:bab/controller/tables/fields/amount_field.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/misc_model.dart';
@@ -9,6 +10,7 @@ import 'package:bab/controller/tables/fermentables_data_table.dart';
 import 'package:bab/controller/tables/hops_data_table.dart';
 import 'package:bab/controller/tables/misc_data_table.dart';
 import 'package:bab/controller/tables/yeasts_data_table.dart';
+import 'package:bab/controller/tables/fields/amount_field.dart' as amount;
 import 'package:bab/models/model.dart';
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/app_localizations.dart';

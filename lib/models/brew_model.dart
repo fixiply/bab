@@ -3,11 +3,13 @@ import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
+import 'package:bab/utils/quantity.dart';
 
 extension DoubleParsing on double {
   double toPrecision(int n) => double.parse(toStringAsFixed(n));
@@ -216,6 +218,20 @@ class BrewModel<T> extends Model {
       return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
     }
     return null;
+  }
+
+  List<DateTime> dryHop() {
+    List<DateTime> values = [];
+    if (receipt != null) {
+      int? primary = primaryday ?? receipt?.primaryday;
+      for(Quantity item in receipt!.cacheHops!) {
+        if (item.use == Use.dry_hop.index) {
+          int days = (primary ?? 0) - (item.duration ?? 0);
+          values.add(DateHelper.toDate(start_fermentation!.add(Duration(days: days))));
+        }
+      }
+    }
+    return values;
   }
 
   DateTime? finish() {

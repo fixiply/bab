@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bab/models/yeast_model.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/fermentable_model.dart';
-import 'package:bab/models/hop_model.dart' as hp;
+import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/misc_model.dart' as mm;
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -551,7 +552,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   Future<Map<CountDownTextController, Ingredient>> _ingredients(ReceiptModel receipt) async {
     List<Ingredient> list = [];
     Map<CountDownTextController, Ingredient> map = {};
-    list.set(await receipt.gethops(volume: widget.model.volume, use: hp.Use.boil, forceResizing: true), context);
+    list.set(await receipt.gethops(volume: widget.model.volume, use: hm.Use.boil, forceResizing: true), context);
     list.set(await receipt.getMisc(volume: widget.model.volume, use: mm.Use.boil, forceResizing: true), context);
     list.sort((a, b) => b.minutes.compareTo(a.minutes));
     for(Ingredient e in list) {

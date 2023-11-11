@@ -172,9 +172,9 @@ class FermentableModel<T> extends Model {
     return values;
   }
 
-  static Future<List<FermentableModel>> data(data) async {
+  static Future<List<FermentableModel>> data(List<Quantity> data) async {
     List<FermentableModel>? values = [];
-    for(Quantity item in Quantity.deserialize(data)) {
+    for(Quantity item in data) {
       FermentableModel? model = await Database().getFermentable(item.uuid!);
       if (model != null) {
         model.amount = item.amount;

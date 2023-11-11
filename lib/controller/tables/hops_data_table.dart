@@ -154,27 +154,21 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
       onEdit: (DataGridRow row, int rowIndex) {
         _edit(rowIndex);
       },
-      onCellTap: (DataGridCellTapDetails details) async {
-        if (details.column.columnName == 'duration') {
-          DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
-          var value = _dataSource.getValue(dataGridRow, details.column.columnName);
-          var duration = await showDurationPicker(
-            context: context,
-            initialTime: Duration(minutes: value ??  widget.receipt!.boil),
-            maxTime: Duration(minutes: widget.receipt!.boil!),
-            // showOkButton: false,
-            // onComplete: (duration, context) {
-            //   _dataSource.newCellValue = duration.inMinutes;
-            //   _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
-            //   Navigator.pop(context);
-            // }
-          );
-          if (duration != null)  {
-            _dataSource.newCellValue = duration.inMinutes;
-            _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
-          }
-        }
-      },
+      // onCellTap: (DataGridCellTapDetails details) async {
+        // if (details.column.columnName == 'duration') {
+        //   DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
+        //   var value = _dataSource.getValue(dataGridRow, details.column.columnName);
+        //   var duration = await showDurationPicker(
+        //     context: context,
+        //     initialTime: Duration(minutes: value ??  widget.receipt!.boil),
+        //     maxTime: Duration(minutes: widget.receipt!.boil!),
+        //   );
+        //   if (duration != null)  {
+        //     _dataSource.newCellValue = duration.inMinutes;
+        //     _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+        //   }
+        // }
+      // },
       onRemove: (DataGridRow row, int rowIndex) {
         widget.data!.removeAt(rowIndex);
         _dataSource.buildDataGridRows(widget.data!);
@@ -550,7 +544,7 @@ class HopDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
         width: 90,
         columnName: 'duration',
-        allowEditing: false,
+        allowEditing: true,
         label: Container(
             padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,

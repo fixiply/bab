@@ -150,9 +150,9 @@ class MiscModel<T> extends Model {
     return values;
   }
 
-  static Future<List<MiscModel>> data(data) async {
+  static Future<List<MiscModel>> data(List<Quantity> data) async {
     List<MiscModel>? values = [];
-    for(Quantity item in Quantity.deserialize(data)) {
+    for(Quantity item in data) {
       MiscModel? model = await Database().getMisc(item.uuid!);
       if (model != null) {
         model.amount = item.amount;

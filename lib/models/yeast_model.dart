@@ -223,9 +223,9 @@ class YeastModel<T> extends Model {
     return values;
   }
 
-  static Future<List<YeastModel>> data(data) async {
+  static Future<List<YeastModel>> data(List<Quantity> data) async {
     List<YeastModel>? values = [];
-    for(Quantity item in Quantity.deserialize(data)) {
+    for(Quantity item in data) {
       YeastModel? model = await Database().getYeast(item.uuid!);
       if (model != null) {
         model.amount = item.amount;

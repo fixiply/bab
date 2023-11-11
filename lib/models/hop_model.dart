@@ -189,9 +189,9 @@ class HopModel<T> extends Model {
     return values;
   }
 
-  static Future<List<HopModel>> data(data) async {
+  static Future<List<HopModel>> data(List<Quantity> data) async {
     List<HopModel>? values = [];
-    for(Quantity item in Quantity.deserialize(data)) {
+    for(Quantity item in data) {
       HopModel? model = await Database().getHop(item.uuid!);
       if (model != null) {
         model.amount = item.amount;

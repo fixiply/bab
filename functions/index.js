@@ -5,6 +5,8 @@ const functions = require('firebase-functions');
 const moment = require('moment-timezone');
 const nodemailer = require('nodemailer');
 
+const i18next = require('i18next')
+
 admin.initializeApp();
 
 const firestore = admin.firestore();
@@ -25,10 +27,9 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
     .timeZone('Europe/Paris') // Users can choose timezone - default is America/Los_Angeles
     .onRun(async (context) => {
         const currentDate = new Date();
-        const before = admin.firestore.Timestamp.fromMillis(currentDate.setMonth(currentDate.getMonth() - 3))
+        const before = admin.firestore.Timestamp.fromMillis(currentDate.setMonth(currentDate.getMonth() - 2))
         const brews = firestore.collection('brews');
-        const snapshot = await brews.where('status', 'in', [1, 2])
-            .where('started_at', '>=', before)
+        const snapshot = await brews.where('started_at', '>=', before)
             .where('started_at', '<=', admin.firestore.Timestamp.now()).get();
         if (snapshot.empty) {
             console.log('No matching brews.');
@@ -45,27 +46,53 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
                 if (userDoc.exists) {
                     user = userDoc.data();
                 }
+                i18next.init({
+                    // initImmediate: false,
+                    lng: user != null ? user.language : 'fr',
+                    fallbackLng: user != null ? user.language : 'fr',
+                    preload: ['en', 'fr'],
+                    resources: {
+                        fr: {
+                            translation: {
+                                brew: 'Brassin',
+                                end: 'Fin du brassin',
+                                secondary: 'Début de fermentation secondaire',
+                                tertiary: 'Début de fermentation tertiaire',
+                                dryhop: 'Début du houblonnage à cru',
+                            },
+                        },
+                        en: {
+                            translation: {
+                                brew: 'Brew',
+                                end: 'End brew',
+                                secondary: 'Start secondary fermentation',
+                                tertiary: 'Start tertiary fermentation',
+                                dryhop: 'Start dry hopping',
+                            },
+                        },
+                    },
+                });
                 const name = localizedText(receipt.title, user != null ? user.language : null);
-                const title = 'Brassin #' + brew.reference + (name != null ? ' - '+ name : '')
+                const title= i18next.t('brew') + ' #' + brew.reference + (name != null ? ' - '+ name : '')
                 if (receipt.primaryday != null) {
                     started.setDate(started.getDate() + receipt.primaryday);
                     if (isTime(started)) {
-                        const body = receipt.secondaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation primaire.';
-                        await sendToDevice(user, title, body, doc.id, 'brew');
+                        const body = i18next.t(receipt.secondaryday == null ? 'end' : 'secondary');
+                        await sendToDevice(user, title, body + ".", doc.id, 'brew');
                     }
                 }
                 if (receipt.secondaryday != null) {
                     started.setDate(new Date(started.getDate() + receipt.secondaryday));
                     if (isTime(started)) {
-                        const body = receipt.tertiaryday == null ? 'Fin du brassin.' : 'Fin de la fermenation secondaire.';
-                        await sendToDevice(user, title, body, doc.id, 'brew');
+                        const body = i18next.t(receipt.tertiaryday == null ? 'end' : 'tertiary');
+                        await sendToDevice(user, title, body + ".", doc.id, 'brew');
                     }
                 }
                 if (receipt.tertiaryday != null) {
                     started.setDate(started.getDate() + receipt.tertiaryday);
                     if (isTime(started)) {
-                        const body = 'Fin du brassin.';
-                        await sendToDevice(user, title, body, doc.id, 'brew');
+                        const body = i18next.t('end');
+                        await sendToDevice(user, title, body + ".", doc.id, 'brew');
                     }
                 }
             }

@@ -1,4 +1,10 @@
 {
+  "end_brew": "End brew",
+  "start_brewing": "Start brewing",
+  "start_fermentation": "Start fermentation",
+  "start_secondary_fermentation": "Start secondary fermentation",
+  "start_tertiary_fermentation": "Start tertiary fermentation",
+  "start_dry_hopping": "Start dry hopping",
   "% min": "Minimum",
   "about": "About BeAndBrew",
   "about_this_app": "About this app",

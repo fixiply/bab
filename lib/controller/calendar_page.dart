@@ -232,7 +232,8 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         }
         if ((element.finish() == DateHelper.toDate(day)) ||
             (element.endDatePrimary() == DateHelper.toDate(day)) ||
-            (element.endDateSecondary() == DateHelper.toDate(day))) {
+            (element.endDateSecondary() == DateHelper.toDate(day)) ||
+            (element.dryHop().contains(DateHelper.toDate(day)))) {
           return true;
         }
       }
@@ -246,22 +247,26 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
       Widget? trailing;
       GestureTapCallback? onTap;
       if (e is BrewModel) {
+        bool movable = true;
         if (e.receipt != null) {
           color = ColorHelper.fromHex(e.receipt!.color) ?? color;
         }
         title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.receipt!.title)}';
         if (e.started_at != null && DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
-          subtitle = 'Début du brassin.';
+          subtitle = AppLocalizations.of(context)!.text('start_brewing');
         }  else if (e.finish() == DateHelper.toDate(day)) {
-          subtitle = 'Fin du brassin.';
+          subtitle = AppLocalizations.of(context)!.text('end_brew');
         } else if (e.fermented_at != null && DateHelper.toDate(e.fermented_at!) == DateHelper.toDate(day)) {
-          subtitle = 'Début de la fermentation primaire.';
+          subtitle = AppLocalizations.of(context)!.text('start_fermentation');
         } else if (e.endDatePrimary() == DateHelper.toDate(day)) {
-          subtitle = 'Début de la fermentation secondaire.';
+          subtitle = AppLocalizations.of(context)!.text('start_secondary_fermentation');
         } else if (e.endDateSecondary() == DateHelper.toDate(day)) {
-          subtitle = 'Début de la fermentation tertiaire.';
+          subtitle = AppLocalizations.of(context)!.text('start_tertiary_fermentation');
+        } else if (e.dryHop().contains(DateHelper.toDate(day))) {
+          subtitle = AppLocalizations.of(context)!.text('start_dry_hopping');
+          movable = false;
         }
-        trailing = TextButton(
+        trailing = movable ? TextButton(
           child: Text(AppLocalizations.of(context)!.text('move'), style: TextStyle(color: Colors.white)),
           onPressed: () async {
             DateTime? date = await showDatePicker(
@@ -298,7 +303,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
             borderRadius: BorderRadius.circular(4.0),
             side: BorderSide(color: Colors.white),
           )),
-        );
+        ) : null;
         // trailing = Text(AppLocalizations.of(context)!.text(e.status.toString().toLowerCase()), style: const TextStyle(color: Colors.white));
         onTap = () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -332,10 +337,10 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
 
   _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
+      SnackBar(
+          content: Text(message),
+          duration: const Duration(seconds: 10)
+      )
     );
   }
 }

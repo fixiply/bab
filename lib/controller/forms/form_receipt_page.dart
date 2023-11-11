@@ -426,15 +426,15 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '',
                       controller: _primarydayController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (value) {
-                        widget.model.primaryday = int.parse(value);
+                      onChanged: (String? value) {
+                        widget.model.primaryday = value != null && value.isNotEmpty ? int.parse(value) : null;
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.looks_one_outlined),
-                          labelText: AppLocalizations.of(context)!.text('primary_fermentation'),
-                          suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
-                          border: InputBorder.none,
-                          fillColor: constants.FillColor, filled: true
+                        icon: const Icon(Icons.looks_one_outlined),
+                        labelText: AppLocalizations.of(context)!.text('primary_fermentation'),
+                        suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
+                        border: InputBorder.none,
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -447,15 +447,15 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
                       ],
-                      onChanged: (value) {
-                        widget.model.primarytemp = AppLocalizations.of(context)!.decimal(value);
+                      onChanged: (String? value) {
+                        widget.model.primarytemp = value != null && value.isNotEmpty ? AppLocalizations.of(context)!.decimal(value) : null;
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.device_thermostat_outlined),
-                          labelText: AppLocalizations.of(context)!.text('temperature'),
-                          suffixText: AppLocalizations.of(context)!.tempMeasure,
-                          border: InputBorder.none,
-                          fillColor: constants.FillColor, filled: true
+                        icon: const Icon(Icons.device_thermostat_outlined),
+                        labelText: AppLocalizations.of(context)!.text('temperature'),
+                        suffixText: AppLocalizations.of(context)!.tempMeasure,
+                        border: InputBorder.none,
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -469,8 +469,8 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '',
                       controller: _secondarydayController,
                       keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (value) {
-                        widget.model.secondaryday = int.parse(value);
+                      onChanged: (String? value) {
+                        widget.model.secondaryday = value != null && value.isNotEmpty ? int.parse(value) : null;
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.looks_two_outlined),
@@ -490,8 +490,8 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
                       ],
-                      onChanged: (value) {
-                        widget.model.secondarytemp = AppLocalizations.of(context)!.decimal(value);
+                      onChanged: (String? value) {
+                        widget.model.secondarytemp = value != null && value.isNotEmpty ? AppLocalizations.of(context)!.decimal(value) : null;
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.device_thermostat_outlined),
@@ -511,15 +511,15 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                     child: TextFormField(
                       initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.tertiaryday) ?? '',
                       keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (value) {
-                        widget.model.tertiaryday = int.parse(value);
+                      onChanged: (String? value) {
+                        widget.model.tertiaryday = value != null && value.isNotEmpty ? int.parse(value) : null;
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.looks_3_outlined),
-                          labelText: AppLocalizations.of(context)!.text('tertiary_fermentation'),
-                          suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
-                          border: InputBorder.none,
-                          fillColor: constants.FillColor, filled: true
+                        icon: const Icon(Icons.looks_3_outlined),
+                        labelText: AppLocalizations.of(context)!.text('tertiary_fermentation'),
+                        suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
+                        border: InputBorder.none,
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
@@ -531,15 +531,15 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                       inputFormatters: <TextInputFormatter>[
                         FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
                       ],
-                      onChanged: (value) {
-                        widget.model.tertiarytemp = AppLocalizations.of(context)!.decimal(value);
+                      onChanged: (String? value) {
+                        widget.model.tertiarytemp = value != null && value.isNotEmpty ? AppLocalizations.of(context)!.decimal(value) : null;
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.device_thermostat_outlined),
-                          labelText: AppLocalizations.of(context)!.text('temperature'),
-                          suffixText: AppLocalizations.of(context)!.tempMeasure,
-                          border: InputBorder.none,
-                          fillColor: constants.FillColor, filled: true
+                        icon: const Icon(Icons.device_thermostat_outlined),
+                        labelText: AppLocalizations.of(context)!.text('temperature'),
+                        suffixText: AppLocalizations.of(context)!.tempMeasure,
+                        border: InputBorder.none,
+                        fillColor: constants.FillColor, filled: true
                       ),
                     )
                   ),
