@@ -131,7 +131,7 @@ class AppLocalizations {
   }
 
   /// Returns the number format.
-  double? decimal(number) {
+  double? decimal(String? number) {
     if (number == null || number.isEmpty) {
       return null;
     }
@@ -144,7 +144,7 @@ class AppLocalizations {
   }
 
   /// Returns the formatted decimal.
-  String? numberFormat(number, {String pattern = "#0.#", String? symbol}) {
+  String? numberFormat(num? number, {String pattern = "#0.#", String? symbol}) {
     if (number == null) {
       return null;
     }
@@ -152,7 +152,7 @@ class AppLocalizations {
   }
 
   /// Returns the formatted currency.
-  String? currencyFormat(number) {
+  String? currencyFormat(num? number) {
     if (number == null) {
       return null;
     }
@@ -160,7 +160,7 @@ class AppLocalizations {
   }
 
   /// Returns the formatted temperature.
-  String? tempFormat(number) {
+  String? tempFormat(num? number) {
     if (number == null) {
       return null;
     }
@@ -171,7 +171,7 @@ class AppLocalizations {
   }
 
   /// Returns the formatted percent.
-  String? percentFormat(number) {
+  String? percentFormat(num? number) {
     if (number == null) {
       return null;
     }
@@ -181,14 +181,14 @@ class AppLocalizations {
   /// Returns the formatted duration, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in minutes.
-  String? durationFormat(number) {
+  String? durationFormat(num? number) {
     if (number == null) {
       return null;
     }
     if (number >= 2880) {
-      return '${number/1440} ${text('days')}';
+      return '${(number/1440).toInt()} ${text('days')}';
     } else if (number >= 1440) {
-      return '${number/1440} ${text('day')}';
+      return '${(number/1440).toInt()} ${text('day')}';
     }
     return '$number min';
   }
@@ -196,14 +196,17 @@ class AppLocalizations {
   /// Returns the formatted weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in kilogram.
-  String? kiloWeightFormat(number, {bool? symbol = true}) {
+  String? kiloWeightFormat(num? number, {bool? symbol = true}) {
+    if (number == null) {
+      return null;
+    }
     return weightFormat(number * 1000, symbol: symbol);
   }
 
   /// Returns the formatted weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in grams.
-  String? weightFormat(number, {bool? symbol = true}) {
+  String? weightFormat(double? number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
@@ -245,7 +248,7 @@ class AppLocalizations {
   /// Returns the localized weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in grams.
-  double? weight(number, {Unit? unit = Unit.gram}) {
+  double? weight(double? number, {Unit? unit = Unit.gram}) {
     if (number == null) {
       return null;
     }
@@ -266,7 +269,7 @@ class AppLocalizations {
 
 
   /// Returns the localized weight to gram, based on the given conditions.
-  double? gram(number, {Unit? unit = Unit.gram}) {
+  double? gram(double? number, {Unit? unit = Unit.gram}) {
     if (number == null) {
       return null;
     }
@@ -286,7 +289,7 @@ class AppLocalizations {
   /// Returns the formatted volume, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in litter.
-  String? litterVolumeFormat(number, {bool? symbol = true}) {
+  String? litterVolumeFormat(num? number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
@@ -296,7 +299,7 @@ class AppLocalizations {
   /// Returns the formatted volume, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in millimeter.
-  String? volumeFormat(number, {bool? symbol = true}) {
+  String? volumeFormat(double? number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
@@ -319,7 +322,7 @@ class AppLocalizations {
   }
 
   /// Returns the localized volume to litter, based on the given conditions.
-  double? volume(number) {
+  double? volume(double? number) {
     if (number == null) {
       return null;
     }
@@ -332,7 +335,7 @@ class AppLocalizations {
   /// Returns the formatted color, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in ebc color.
-  String? colorFormat(number) {
+  String? colorFormat(num? number) {
     if (number == null) {
       return null;
     }
@@ -343,7 +346,7 @@ class AppLocalizations {
   }
 
   /// Returns the localized volume to litter, based on the given conditions.
-  int? color(number) {
+  int? color(int? number) {
     if (number == null) {
       return null;
     }
@@ -353,15 +356,18 @@ class AppLocalizations {
     return number > maxColor ? maxColor : number;
   }
 
-  int? fromSRM(number) {
-    if (number != null && measure == Measure.imperial) {
-      return ColorHelper.toEBC(number);
+  int? fromSRM(num? number) {
+    if (number != null) {
+      if (measure == Measure.imperial) {
+        return ColorHelper.toEBC(number);
+      }
+      return number.toInt();
     }
-    return number;
+    return null;
   }
 
   /// Returns the formatted gravity.
-  String? gravityFormat(number, {bool? symbol = true}) {
+  String? gravityFormat(double? number, {bool? symbol = true}) {
     switch(gravity) {
       case Gravity.sg:
         if (number == null || number <= 1 || number >= 2) {

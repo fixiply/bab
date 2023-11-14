@@ -89,11 +89,11 @@ class EditSfDataGrid extends SfDataGrid {
           color: Colors.redAccent,
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.end,
             children: <Widget>[
-              const Icon(Icons.delete, color: Colors.white, size: 20),
-              const SizedBox(width: 16.0),
               Text(AppLocalizations.of(context)!.text('delete').toUpperCase(), style: const TextStyle(color: Colors.white, fontSize: 15)),
+              const SizedBox(width: 16.0),
+              const Icon(Icons.delete, color: Colors.white, size: 20),
             ],
           ),
         ),
@@ -108,7 +108,7 @@ class EditSfDataGrid extends SfDataGrid {
           color: Colors.blueAccent,
           padding: const EdgeInsets.only(left: 16.0, right: 16.0),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.start,
             children: <Widget>[
               const Icon(Icons.edit, color: Colors.white, size: 20),
               const SizedBox(width: 16.0),

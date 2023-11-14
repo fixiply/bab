@@ -16,6 +16,7 @@ import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/custom_dismissible.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/search_text.dart';
 
@@ -210,45 +211,16 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
 
   Widget _item(FermentableModel model) {
     if (model.isEditable() && !DeviceHelper.isDesktop) {
-      return Dismissible(
-          key: Key(model.uuid!),
-          child: _card(model),
-          background: Container(
-              color: Colors.red,
-              padding: EdgeInsets.only(left: 15),
-              child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: <Widget>[
-                        const Icon(Icons.delete, color: Colors.white)
-                      ]
-                  )
-              )
-          ),
-          secondaryBackground: Container(
-              color: Colors.blue,
-              padding: EdgeInsets.only(right: 15),
-              child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        const Icon(Icons.edit, color: Colors.white)
-                      ]
-                  )
-              )
-          ),
-          confirmDismiss: (direction) async {
-            if (direction == DismissDirection.startToEnd) {
-              return await _delete(model);
-            }
-            if (direction == DismissDirection.endToStart) {
-              _edit(model);
-              return false;
-            }
-            return false;
-          }
+      return CustomDismissible(
+        context,
+        key: Key(model.uuid!),
+        child: _card(model),
+        onStart: () {
+          _edit(model);
+        },
+        onEnd: () async {
+          await _delete(model);
+        }
       );
     }
     return _card(model);
