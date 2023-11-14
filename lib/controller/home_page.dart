@@ -113,6 +113,9 @@ class _HomeState extends State<HomePage> {
             child: PageView.builder(
               controller: _page,
               onPageChanged: (index) {
+                setState(() {
+                  _selectedIndex = index;
+                });
                 _controller.selectIndex(index);
               },
               itemBuilder: (BuildContext context, int index) {

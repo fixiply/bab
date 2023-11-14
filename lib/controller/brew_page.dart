@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bab/controller/forms/form_brew_page.dart';
@@ -148,7 +147,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
                               if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.volume == null) const TextSpan(text: '-'),
+                              if (widget.model.volume == null) const TextSpan(text: 'NC'),
                             ],
                           ),
                         ),
@@ -169,7 +168,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'mash' : 'mash_water')} : '),
                               if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.mash_water == null) const TextSpan(text: '-'),
+                              if (widget.model.mash_water == null) const TextSpan(text: 'NC'),
                             ],
                           ),
                         ),
@@ -186,7 +185,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'sparge' : 'sparge_water')} : '),
                               if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.mash_water == null) const TextSpan(text: '-'),
+                              if (widget.model.mash_water == null) const TextSpan(text: 'NC'),
                             ],
                           ),
                         ),
@@ -207,7 +206,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'efficiency' : 'mash_efficiency')} : '),
                               if (widget.model.efficiency != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.efficiency == null) const TextSpan(text: '-'),
+                              if (widget.model.efficiency == null) const TextSpan(text: 'NC'),
                             ],
                           ),
                         ),
@@ -224,7 +223,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'alcohol' : 'volume_alcohol')} : '),
                               if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.abv == null) const TextSpan(text: '-')
+                              if (widget.model.abv == null) const TextSpan(text: 'NC')
                             ],
                           ),
                         ),
@@ -408,9 +407,14 @@ class _BrewPageState extends State<BrewPage> {
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
         style: DefaultTextStyle.of(context).style,
-        children: <TextSpan>[
-          TextSpan(text: '$title :', style: const TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: '  $day ${AppLocalizations.of(context)!.text('days').toLowerCase()} ${AppLocalizations.of(context)!.text('to').toLowerCase()} ${AppLocalizations.of(context)!.tempFormat(temp)}'),
+        children: <InlineSpan>[
+          WidgetSpan(
+              child: SizedBox(
+                width: 90,
+                child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              )
+          ),
+          TextSpan(text: '  :  $day ${AppLocalizations.of(context)!.text('days').toLowerCase()} ${AppLocalizations.of(context)!.text('to').toLowerCase()} ${AppLocalizations.of(context)!.tempFormat(temp)}'),
         ],
       ),
     );

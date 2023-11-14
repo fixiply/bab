@@ -57,6 +57,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
     _dataSource = YeastDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
+      allowEditing: widget.allowEditing,
       onChanged: (YeastModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));

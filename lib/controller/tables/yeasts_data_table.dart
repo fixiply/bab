@@ -1,3 +1,4 @@
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -72,6 +73,13 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
     _dataSource = YeastDataSource(context,
         showQuantity: widget.data != null,
         showCheckboxColumn: widget.showCheckboxColumn!,
+        allowEditing: widget.allowEditing,
+        onEdit: (int rowIndex) {
+          _edit(rowIndex);
+        },
+        onRemove: (int rowIndex) {
+          _remove(rowIndex);
+        },
         onChanged: (YeastModel value, int dataRowIndex) {
           var amount = value.amount;
           if (value.form == Yeast.dry || value.form == Yeast.liquid) {
@@ -168,14 +176,11 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
       allowSorting: widget.allowSorting,
       controller: getDataGridController(),
       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-      onEdit: (DataGridRow row, int rowIndex) {
+      onEdit: (int rowIndex) {
         _edit(rowIndex);
       },
-      onRemove: (DataGridRow row, int rowIndex) {
-        widget.data!.removeAt(rowIndex);
-        _dataSource.buildDataGridRows(widget.data!);
-        _dataSource.notifyListeners();
-        widget.onChanged?.call(widget.data!);
+      onRemove: (int rowIndex) {
+        _remove(rowIndex);
       },
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
         if (widget.showCheckboxColumn == true) {
@@ -267,6 +272,13 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
     });
   }
 
+  _remove(int rowIndex) async {
+    widget.data!.removeAt(rowIndex);
+    _dataSource.buildDataGridRows(widget.data!);
+    _dataSource.notifyListeners();
+    widget.onChanged?.call(widget.data!);
+  }
+
   _showSnackbar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -281,8 +293,10 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
 class YeastDataSource extends EditDataSource {
   List<YeastModel> _data = [];
   final void Function(YeastModel value, int dataRowIndex)? onChanged;
+  final void Function(int rowIndex)? onRemove;
+  final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity, showCheckboxColumn: showCheckboxColumn) {
+  YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -290,6 +304,7 @@ class YeastDataSource extends EditDataSource {
   set data(List<YeastModel> data) => _data = data;
 
   List<DataGridRow> getDataRows({List<YeastModel>? data}) {
+    int index = 0;
     List<YeastModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
@@ -301,7 +316,8 @@ class YeastDataSource extends EditDataSource {
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
       if (showQuantity == false) DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
       if (showQuantity == false) DataGridCell<double>(columnName: 'temperature', value: e.temperature),
-      if (showQuantity == false) DataGridCell<double>(columnName: 'cells', value: e.cells)
+      if (showQuantity == false) DataGridCell<double>(columnName: 'cells', value: e.cells),
+      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -394,6 +410,29 @@ class YeastDataSource extends EditDataSource {
               child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
             );
           }
+        }
+        if (e.columnName == 'actions') {
+          return PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: AppLocalizations.of(context)!.text('options'),
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  onEdit?.call(e.value);
+                } else if (value == 'remove') {
+                  onRemove?.call(e.value);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(AppLocalizations.of(context)!.text('replace')),
+                ),
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text(AppLocalizations.of(context)!.text('remove')),
+                ),
+              ]
+          );
         }
         return Container(
           alignment: alignment,
@@ -574,6 +613,13 @@ class YeastDataSource extends EditDataSource {
             alignment: Alignment.centerRight,
             child: Text('\u023B', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
+      ),
+      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+        width: 50,
+        columnName: 'actions',
+        allowSorting: false,
+        allowEditing: false,
+        label: Container()
       ),
     ];
   }

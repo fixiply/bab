@@ -26,80 +26,103 @@ const mailTransport = nodemailer.createTransport({
 exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
     .timeZone('Europe/Paris') // Users can choose timezone - default is America/Los_Angeles
     .onRun(async (context) => {
-        const currentDate = new Date();
-        const before = admin.firestore.Timestamp.fromMillis(currentDate.setMonth(currentDate.getMonth() - 2))
-        const brews = firestore.collection('brews');
-        const snapshot = await brews.where('started_at', '>=', before)
-            .where('started_at', '<=', admin.firestore.Timestamp.now()).get();
-        if (snapshot.empty) {
-            console.log('No matching brews.');
-            return;
-        }
-        snapshot.forEach(async doc => {
-            var user;
-            const brew = doc.data();
-            const started = brew.started_at.toDate();
-            const receiptDoc = await firestore.collection('receipts').doc(brew.receipt).get();
-            if (receiptDoc.exists) {
-                const receipt= receiptDoc.data();
-                const userDoc = await firestore.collection('users').doc(brew.creator).get();
-                if (userDoc.exists) {
-                    user = userDoc.data();
-                }
-                i18next.init({
-                    // initImmediate: false,
-                    lng: user != null ? user.language : 'fr',
-                    fallbackLng: user != null ? user.language : 'fr',
-                    preload: ['en', 'fr'],
-                    resources: {
-                        fr: {
-                            translation: {
-                                brew: 'Brassin',
-                                end: 'Fin du brassin',
-                                secondary: 'Début de fermentation secondaire',
-                                tertiary: 'Début de fermentation tertiaire',
-                                dryhop: 'Début du houblonnage à cru',
-                            },
-                        },
-                        en: {
-                            translation: {
-                                brew: 'Brew',
-                                end: 'End brew',
-                                secondary: 'Start secondary fermentation',
-                                tertiary: 'Start tertiary fermentation',
-                                dryhop: 'Start dry hopping',
-                            },
-                        },
-                    },
-                });
-                const name = localizedText(receipt.title, user != null ? user.language : null);
-                const title= i18next.t('brew') + ' #' + brew.reference + (name != null ? ' - '+ name : '')
-                if (receipt.primaryday != null) {
-                    started.setDate(started.getDate() + receipt.primaryday);
-                    if (isTime(started)) {
-                        const body = i18next.t(receipt.secondaryday == null ? 'end' : 'secondary');
-                        await sendToDevice(user, title, body + ".", doc.id, 'brew');
-                    }
-                }
-                if (receipt.secondaryday != null) {
-                    started.setDate(new Date(started.getDate() + receipt.secondaryday));
-                    if (isTime(started)) {
-                        const body = i18next.t(receipt.tertiaryday == null ? 'end' : 'tertiary');
-                        await sendToDevice(user, title, body + ".", doc.id, 'brew');
-                    }
-                }
-                if (receipt.tertiaryday != null) {
-                    started.setDate(started.getDate() + receipt.tertiaryday);
-                    if (isTime(started)) {
-                        const body = i18next.t('end');
-                        await sendToDevice(user, title, body + ".", doc.id, 'brew');
-                    }
-                }
+            const currentDate = new Date();
+            const before = admin.firestore.Timestamp.fromMillis(currentDate.setMonth(currentDate.getMonth() - 2))
+            const brews = firestore.collection('brews');
+            const snapshot = await brews.where('started_at', '>=', before)
+                .where('started_at', '<=', admin.firestore.Timestamp.now()).get();
+            if (snapshot.empty) {
+                console.log('No matching brews.');
+                return;
             }
-        });
-        return null;
-    }
-);
+            snapshot.forEach(async doc => {
+                var user;
+                const brew = doc.data();
+                if (brew.started_at != null) {
+                    var started = brew.started_at.toDate();
+                    if (brew.fermented_at != null) {
+                        started = brew.fermented_at.toDate();
+                    }
+                    console.log('Brew '+doc.id+' started: '+started);
+                    const receiptDoc = await firestore.collection('receipts').doc(brew.receipt).get();
+                    if (receiptDoc.exists) {
+                        const receipt = receiptDoc.data();
+                        const userDoc = await firestore.collection('users').doc(brew.creator).get();
+                        if (userDoc.exists) {
+                            user = userDoc.data();
+                        }
+                        i18next.init({
+                            // initImmediate: false,
+                            lng: user != null ? user.language : 'fr',
+                            fallbackLng: user != null ? user.language : 'fr',
+                            preload: ['en', 'fr'],
+                            resources: {
+                                fr: {
+                                    translation: {
+                                        brew: 'Brassin',
+                                        end: 'Fin du brassin',
+                                        secondary: 'Début de fermentation secondaire',
+                                        tertiary: 'Début de fermentation tertiaire',
+                                        dryhop: 'Début du houblonnage à cru',
+                                    },
+                                },
+                                en: {
+                                    translation: {
+                                        brew: 'Brew',
+                                        end: 'End brew',
+                                        secondary: 'Start secondary fermentation',
+                                        tertiary: 'Start tertiary fermentation',
+                                        dryhop: 'Start dry hopping',
+                                    },
+                                },
+                            },
+                        });
+                        const name = localizedText(receipt.title, user != null ? user.language : null);
+                        const title = i18next.t('brew') + ' #' + brew.reference + (name != null ? ' - ' + name : '')
+                        if (receipt.primaryday != null) {
+                            started.setDate(started.getDate() + receipt.primaryday);
+                            // console.log('   '+doc.id+' primaryday: '+started);
+                            if (isTime(started)) {
+                                const body = i18next.t(receipt.secondaryday == null ? 'end' : 'secondary');
+                                await sendToDevice(user, title, body + ".", doc.id, 'brew');
+                            } else {
+                                if (receipt.hops != null) {
+                                    for (const item of receipt.hops) {
+                                        if (item.use === 4) { // Dry hppping
+                                            var dryhop = new Date(started.getTime())
+                                            dryhop.setDate(dryhop.getDate() - item.duration);
+                                            // console.log('   '+doc.id+' dryhop: '+dryhop);
+                                            if (isTime(dryhop)) {
+                                                await sendToDevice(user, title, i18next.t('dryhop') + ".", doc.id, 'brew');
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (receipt.secondaryday != null) {
+                            started.setDate(new Date(started.getDate() + receipt.secondaryday));
+                            // console.log('   '+doc.id+' secondaryday: '+started);
+                            if (isTime(started)) {
+                                const body = i18next.t(receipt.tertiaryday == null ? 'end' : 'tertiary');
+                                await sendToDevice(user, title, body + ".", doc.id, 'brew');
+                            }
+                        }
+                        if (receipt.tertiaryday != null) {
+                            started.setDate(started.getDate() + receipt.tertiaryday);
+                            // console.log('   '+doc.id+' tertiaryday: '+started);
+                            if (isTime(started)) {
+                                const body = i18next.t('end');
+                                await sendToDevice(user, title, body + ".", doc.id, 'brew');
+                            }
+                        }
+                    }
+                }
+            });
+            return null;
+        }
+    );
 
 const sendToTopic = async (topic, title, body, id, route) => {
     await messaging.sendToTopic(topic,

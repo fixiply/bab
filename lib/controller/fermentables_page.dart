@@ -59,6 +59,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
     _dataSource = FermentableDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
+      allowEditing: widget.allowEditing,
       onChanged: (FermentableModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -156,7 +157,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
                       }
                     });
                   },
-                  columns: FermentableDataSource.columns(context: context, showQuantity: false),
+                  columns: FermentableDataSource.columns(context: context),
                 );
               }
               return ListView.builder(

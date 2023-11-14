@@ -185,7 +185,7 @@ class _FermentersPageState extends State<FermentersPage> with AutomaticKeepAlive
                       }
                     });
                   },
-                  columns: TankDataSource.columns(context: context, showQuantity: false),
+                  columns: TankDataSource.columns(context: context),
                 );
               }
               return ListView.builder(

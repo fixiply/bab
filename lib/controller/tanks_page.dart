@@ -191,7 +191,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
                       }
                     });
                   },
-                  columns: TankDataSource.columns(context: context, showQuantity: false),
+                  columns: TankDataSource.columns(context: context),
                 );
               }
               return ListView.builder(

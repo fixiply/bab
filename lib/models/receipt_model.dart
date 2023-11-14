@@ -315,7 +315,6 @@ class ReceiptModel<T> extends Model {
       return;
     }
     for(FermentableModel item in fermentables) {
-      debugPrint('resizeFermentales old: ${item.amount} new ${ (item.amount! * (volume / this.volume!)).abs()}');
       item.amount = (item.amount! * (volume / this.volume!)).abs();
     }
     calculate(volume: volume);
@@ -356,10 +355,6 @@ class ReceiptModel<T> extends Model {
     abv = null;
     double mcu = 0.0;
     double extract = 0.0;
-    primaryday = null;
-    primarytemp = null;
-    secondaryday = null;
-    secondarytemp = null;
     for(FermentableModel item in await getFermentables()) {
       if (item.use == Method.mashed) {
         // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
@@ -372,15 +367,15 @@ class ReceiptModel<T> extends Model {
     }
 
     for(YeastModel item in await getYeasts()) {
-      primarytemp = (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
+      primarytemp = primarytemp ?? (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
       switch(item.type ?? Fermentation.hight) {
         case Fermentation.hight:
-          primaryday = 21;
+          primaryday = primaryday ?? 21;
           break;
         case Fermentation.low:
-          primaryday = 14;
-          secondaryday = 21;
-          secondarytemp = 5;
+          primaryday = primaryday ?? 14;
+          secondaryday = secondaryday ?? 21;
+          secondarytemp = secondarytemp ?? 5;
           break;
         case Fermentation.spontaneous:
           break;
@@ -393,9 +388,24 @@ class ReceiptModel<T> extends Model {
 
     for(hm.HopModel item in await gethops()) {
       if (item.use == hm.Use.boil) {
+        if (item.duration != null && boil != null && item.duration! > boil!) {
+          item.duration = boil;
+        }
         double? bitterness = item.ibu(og, boil, volume ?? this.volume);
         if (bitterness != null) {
           ibu = (ibu ?? 0) + bitterness;
+        }
+      } else if (item.use == hm.Use.dry_hop) {
+        if (item.duration != null && primaryday != null && item.duration! > primaryday!) {
+          item.duration = primaryday;
+        }
+      }
+    }
+
+    for(mm.MiscModel item in await getMisc()) {
+      if (item.use == mm.Use.boil) {
+        if (item.duration != null && boil != null && item.duration! > boil!) {
+          item.duration = boil;
         }
       }
     }

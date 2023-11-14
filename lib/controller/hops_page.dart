@@ -58,6 +58,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
     _dataSource = HopDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
+      allowEditing: widget.allowEditing,
       onChanged: (HopModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));

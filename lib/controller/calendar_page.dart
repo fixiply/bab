@@ -242,6 +242,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
     return elements.map((e) {
       Color color = constants.PrimaryColor;
       String title = '';
+      String time = '';
       String? subtitle;
       Widget? leading;
       Widget? trailing;
@@ -251,19 +252,20 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         if (e.receipt != null) {
           color = ColorHelper.fromHex(e.receipt!.color) ?? color;
         }
+        time = TimeOfDay.fromDateTime(e.started_at!).format(context);
         title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.receipt!.title)}';
-        if (e.started_at != null && DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
-          subtitle = AppLocalizations.of(context)!.text('start_brewing');
+        if (DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
+          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_brewing');
         }  else if (e.finish() == DateHelper.toDate(day)) {
-          subtitle = AppLocalizations.of(context)!.text('end_brew');
+          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('end_brew');
         } else if (e.fermented_at != null && DateHelper.toDate(e.fermented_at!) == DateHelper.toDate(day)) {
-          subtitle = AppLocalizations.of(context)!.text('start_fermentation');
+          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_fermentation');
         } else if (e.endDatePrimary() == DateHelper.toDate(day)) {
-          subtitle = AppLocalizations.of(context)!.text('start_secondary_fermentation');
+          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_secondary_fermentation');
         } else if (e.endDateSecondary() == DateHelper.toDate(day)) {
-          subtitle = AppLocalizations.of(context)!.text('start_tertiary_fermentation');
+          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_tertiary_fermentation');
         } else if (e.dryHop().contains(DateHelper.toDate(day))) {
-          subtitle = AppLocalizations.of(context)!.text('start_dry_hopping');
+          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_dry_hopping');
           movable = false;
         }
         trailing = movable ? TextButton(

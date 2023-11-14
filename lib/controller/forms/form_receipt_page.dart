@@ -409,7 +409,10 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 context: context,
                 ingredient: constants.Ingredient.misc,
                 receipt: widget.model,
-                onChanged: (values) => widget.model.miscellaneous = values as List<MiscModel>
+                onChanged: (values) {
+                  widget.model.miscellaneous = values as List<MiscModel>;
+                  _calculate();
+                }
               ),
               const Divider(height: 10),
               MashField(
@@ -591,10 +594,6 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
 
   _calculate() async {
     await widget.model.calculate();
-    _primarydayController.text = widget.model.primaryday != null ? AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '' : '';
-    _primarytempController.text = widget.model.primarytemp != null ? AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '' : '';
-    _secondarydayController.text = widget.model.secondaryday != null ? AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '' : '';
-    _secondarytempController.text = widget.model.secondarytemp != null ? AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '' : '';
   }
 
   _new() async {

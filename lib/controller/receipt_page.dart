@@ -214,7 +214,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.volume == null) const TextSpan(text: 'NC'),
                             ],
                           ),
                         ),
@@ -230,7 +231,8 @@ class _ReceiptPageState extends State<ReceiptPage> {
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'boiling' : 'boiling_time')} : '),
-                              TextSpan(text: AppLocalizations.of(context)!.durationFormat(widget.model.boil), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.boil != null) TextSpan(text: AppLocalizations.of(context)!.durationFormat(widget.model.boil), style: const TextStyle(fontWeight: FontWeight.bold)),
+                              if (widget.model.boil == null) const TextSpan(text: 'NC'),
                             ],
                           ),
                         ),
@@ -412,9 +414,14 @@ class _ReceiptPageState extends State<ReceiptPage> {
       overflow: TextOverflow.ellipsis,
       text: TextSpan(
         style: DefaultTextStyle.of(context).style,
-        children: <TextSpan>[
-          TextSpan(text: '$title :', style: const TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: '  $day ${AppLocalizations.of(context)!.text('days').toLowerCase()} ${AppLocalizations.of(context)!.text('to').toLowerCase()} ${AppLocalizations.of(context)!.tempFormat(temp)}'),
+        children: <InlineSpan>[
+          WidgetSpan(
+            child: SizedBox(
+              width: 90,
+              child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            )
+          ),
+          TextSpan(text: '  :  $day ${AppLocalizations.of(context)!.text('days').toLowerCase()} ${AppLocalizations.of(context)!.text('to').toLowerCase()} ${AppLocalizations.of(context)!.tempFormat(temp)}'),
         ],
       ),
     );

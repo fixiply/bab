@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
+import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/receipt_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
@@ -56,6 +57,10 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
     _dataSource = MashDataSource(context,
       data: widget.data ?? [],
       showCheckboxColumn: widget.showCheckboxColumn!,
+      allowEditing: widget.allowEditing,
+      onRemove: (int rowIndex) {
+        _remove(rowIndex);
+      },
       onChanged: (Mash value, int dataRowIndex) {
         if (widget.data != null) {
           widget.data![dataRowIndex].name = value.name;
@@ -105,7 +110,10 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                 allowSorting: widget.allowSorting,
                 controller: getDataGridController(),
                 verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-                onCellTap: (DataGridCellTapDetails details) async {
+                onRemove: (int rowIndex) {
+                  _remove(rowIndex);
+                },
+                onCellTap: !DeviceHelper.isDesktop ? (DataGridCellTapDetails details) async {
                   if (details.column.columnName == 'duration') {
                     DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
                     var value = _dataSource.getValue(dataGridRow, details.column.columnName);
@@ -125,7 +133,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                       _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
                     }
                   }
-                },
+                } : null,
                 onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                   if (widget.showCheckboxColumn == true) {
                     setState(() {
@@ -140,7 +148,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                     });
                   }
                 },
-                columns: Mash.columns(context: context, showQuantity: widget.data != null),
+                columns: Mash.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
               ),
             )
           )
@@ -170,12 +178,11 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
     widget.onChanged?.call(widget.data!);
   }
 
-  _remove() async {
-    if (widget.allowEditing == false) {
-
-    } else {
-
-    }
+  _remove(int rowIndex) async {
+    widget.data!.removeAt(rowIndex);
+    _dataSource.buildDataGridRows(widget.data!);
+    _dataSource.notifyListeners();
+    widget.onChanged?.call(widget.data!);
   }
 
   _showSnackbar(String message) {

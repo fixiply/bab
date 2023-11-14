@@ -74,7 +74,8 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
                 showSearchBox: true,
               ),
               dropdownDecoratorProps: DropDownDecoratorProps(
-                dropdownSearchDecoration: FormDecoration(
+                  baseStyle: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
+                  dropdownSearchDecoration: FormDecoration(
                   labelText: widget.title ?? AppLocalizations.of(context)!.text('style'),
                 )
               ),

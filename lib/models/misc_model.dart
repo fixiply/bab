@@ -98,7 +98,7 @@ class MiscModel<T> extends Model {
 
   @override
   bool isNumericType(String columnName) {
-    return columnName == 'amount' || columnName == 'time';
+    return columnName == 'amount' || columnName == 'time' || columnName == 'duration';
   }
 
   @override

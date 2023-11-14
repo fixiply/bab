@@ -1,3 +1,4 @@
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -124,12 +125,8 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
                       allowSorting: widget.allowSorting,
                       controller: getDataGridController(),
                       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-                      onRemove: (DataGridRow row, int rowIndex) {
-                        setState(() {
-                          _data!.then((value) => value.removeAt(rowIndex));
-                        });
-                        widget.data!.removeAt(rowIndex);
-                        // widget.onChanged?.call(widget.data!);
+                      onRemove: (int rowIndex) {
+                        _remove(rowIndex);
                       },
                       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
                         if (widget.showCheckboxColumn == true) {
@@ -145,7 +142,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
                           });
                         }
                       },
-                      columns: TankDataSource.columns(context: context, showQuantity: widget.data != null),
+                      columns: TankDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
                     );
                   }
                   if (snapshot.hasError) {
@@ -205,12 +202,11 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
     }
   }
 
-  _remove() async {
-    if (widget.allowEditing == false) {
-
-    } else {
-
-    }
+  _remove(int rowIndex) async {
+    setState(() {
+      _data!.then((value) => value.removeAt(rowIndex));
+    });
+    widget.data!.removeAt(rowIndex);
   }
 
   _showSnackbar(String message) {
@@ -226,8 +222,10 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
 class TankDataSource extends EditDataSource {
   List<EquipmentModel> _data = [];
   final void Function(EquipmentModel value, int dataRowIndex)? onChanged;
+  final void Function(int rowIndex)? onRemove;
+  final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showCheckboxColumn: showCheckboxColumn) {
+  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -235,6 +233,7 @@ class TankDataSource extends EditDataSource {
   set data(List<EquipmentModel> data) => _data = data;
 
   List<DataGridRow> getDataRows({List<EquipmentModel>? data}) {
+    int index = 0;
     List<EquipmentModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
@@ -244,6 +243,7 @@ class TankDataSource extends EditDataSource {
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
       DataGridCell<double>(columnName: 'absorption', value: e.absorption),
       DataGridCell<double>(columnName: 'lost_volume', value: e.lost_volume),
+      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -340,6 +340,29 @@ class TankDataSource extends EditDataSource {
               );
             }
           }
+          if (e.columnName == 'actions') {
+            return PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: AppLocalizations.of(context)!.text('options'),
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  onEdit?.call(e.value);
+                } else if (value == 'remove') {
+                  onRemove?.call(e.value);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(AppLocalizations.of(context)!.text('replace')),
+                ),
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text(AppLocalizations.of(context)!.text('remove')),
+                ),
+              ]
+            );
+          }
           return Container(
             color: color,
             alignment: alignment,
@@ -400,7 +423,7 @@ class TankDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -460,6 +483,13 @@ class TankDataSource extends EditDataSource {
               alignment: Alignment.centerRight,
               child: Text(AppLocalizations.of(context)!.text('lost_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
+      ),
+      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+          width: 50,
+          columnName: 'actions',
+          allowSorting: false,
+          allowEditing: false,
+          label: Container()
       ),
     ];
   }

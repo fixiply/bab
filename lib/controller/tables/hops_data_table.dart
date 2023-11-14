@@ -1,3 +1,4 @@
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -71,6 +72,13 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
     _dataSource = HopDataSource(context,
       showQuantity: widget.data != null,
       showCheckboxColumn: widget.showCheckboxColumn!,
+      allowEditing: widget.allowEditing,
+      onEdit: (int rowIndex) {
+        _edit(rowIndex);
+      },
+      onRemove: (int rowIndex) {
+        _remove(rowIndex);
+      },
       onChanged: (HopModel value, int dataRowIndex) {
         if (widget.data != null) {
           widget.data![dataRowIndex].amount = value.amount;
@@ -151,30 +159,29 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
       allowSorting: widget.allowSorting,
       controller: getDataGridController(),
       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-      onEdit: (DataGridRow row, int rowIndex) {
+      onEdit: (int rowIndex) {
         _edit(rowIndex);
       },
-      // onCellTap: (DataGridCellTapDetails details) async {
-        // if (details.column.columnName == 'duration') {
-        //   DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
-        //   var value = _dataSource.getValue(dataGridRow, details.column.columnName);
-        //   var duration = await showDurationPicker(
-        //     context: context,
-        //     initialTime: Duration(minutes: value ??  widget.receipt!.boil),
-        //     maxTime: Duration(minutes: widget.receipt!.boil!),
-        //   );
-        //   if (duration != null)  {
-        //     _dataSource.newCellValue = duration.inMinutes;
-        //     _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
-        //   }
-        // }
-      // },
-      onRemove: (DataGridRow row, int rowIndex) {
-        widget.data!.removeAt(rowIndex);
-        _dataSource.buildDataGridRows(widget.data!);
-        _dataSource.notifyListeners();
-        widget.onChanged?.call(widget.data!);
+      onRemove: (int rowIndex) {
+        _remove(rowIndex);
       },
+      onCellTap: !DeviceHelper.isDesktop ? (DataGridCellTapDetails details) async {
+        if (details.column.columnName == 'duration') {
+          DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
+          var value = _dataSource.getValue(dataGridRow, details.column.columnName);
+          var use = _dataSource.getValue(dataGridRow, 'use');
+          var duration = await showDurationPicker(
+            context: context,
+            baseUnit: use == Use.dry_hop ? BaseUnit.day: BaseUnit.minute,
+            initialTime: use == Use.dry_hop ? Duration(days: value ?? 5) : Duration(minutes: value ?? widget.receipt!.boil),
+            maxTime: use == Use.dry_hop ? Duration(days: widget.receipt!.primaryday ?? 0) : Duration(minutes: widget.receipt!.boil!),
+          );
+          if (duration != null)  {
+            _dataSource.newCellValue = use == Use.dry_hop ? duration.inDays : duration.inMinutes;
+            _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
+          }
+        }
+      } : null,
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
         if (widget.showCheckboxColumn == true) {
           setState(() {
@@ -258,21 +265,21 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
     });
   }
 
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
+  _remove(int rowIndex) async {
+    widget.data!.removeAt(rowIndex);
+    _dataSource.buildDataGridRows(widget.data!);
+    _dataSource.notifyListeners();
+    widget.onChanged?.call(widget.data!);
   }
 }
 
 class HopDataSource extends EditDataSource {
   List<HopModel> _data = [];
   final void Function(HopModel value, int dataRowIndex)? onChanged;
+  final void Function(int rowIndex)? onRemove;
+  final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity, showCheckboxColumn: showCheckboxColumn) {
+  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -280,6 +287,7 @@ class HopDataSource extends EditDataSource {
   set data(List<HopModel> data) => _data = data;
 
   List<DataGridRow> getDataRows({List<HopModel>? data}) {
+    int index = 0;
     List<HopModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
@@ -291,6 +299,7 @@ class HopDataSource extends EditDataSource {
       DataGridCell<Type>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
       if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
+      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -381,6 +390,29 @@ class HopDataSource extends EditDataSource {
                     style: const TextStyle(fontSize: 16, fontFamily: 'Emoji')))
             );
           }
+        }
+        if (e.columnName == 'actions') {
+          return PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: AppLocalizations.of(context)!.text('options'),
+              onSelected: (value) async {
+                if (value == 'edit') {
+                  onEdit?.call(e.value);
+                } else if (value == 'remove') {
+                  onRemove?.call(e.value);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Text(AppLocalizations.of(context)!.text('replace')),
+                ),
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text(AppLocalizations.of(context)!.text('remove')),
+                ),
+              ]
+          );
         }
         return Container(
           alignment: alignment,
@@ -544,12 +576,19 @@ class HopDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
         width: 90,
         columnName: 'duration',
-        allowEditing: true,
+        allowEditing: DeviceHelper.isDesktop,
         label: Container(
             padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
+      ),
+      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+        width: 50,
+        columnName: 'actions',
+        allowSorting: false,
+        allowEditing: false,
+        label: Container()
       ),
     ];
   }

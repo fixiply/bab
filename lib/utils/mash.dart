@@ -1,3 +1,4 @@
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -94,7 +95,7 @@ class Mash<T> {
     return values;
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
         columnName: 'name',
@@ -124,12 +125,19 @@ class Mash<T> {
       GridColumn(
         width: 90,
         columnName: 'duration',
-        allowEditing: false,
+        allowEditing: DeviceHelper.isDesktop,
         label: Container(
             padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
+      ),
+      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+          width: 50,
+          columnName: 'actions',
+          allowSorting: false,
+          allowEditing: false,
+          label: Container()
       ),
     ];
   }
@@ -138,18 +146,21 @@ class Mash<T> {
 class MashDataSource extends EditDataSource {
   List<Mash> data = [];
   final void Function(Mash value, int dataRowIndex)? onChanged;
+  final void Function(int rowIndex)? onRemove;
   /// Creates the employee data source class with required details.
-  MashDataSource(BuildContext context, {List<Mash>? data, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: false, showCheckboxColumn: showCheckboxColumn) {
+  MashDataSource(BuildContext context, {List<Mash>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
   void buildDataGridRows(List<Mash> data) {
     this.data = data;
+    int index = 0;
     dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Type>(columnName: 'type', value: e.type),
       DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       DataGridCell<int>(columnName: 'duration', value: e.duration),
+      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -186,6 +197,23 @@ class MashDataSource extends EditDataSource {
         } else if (e.value is Enum) {
           alignment = Alignment.center;
           value = AppLocalizations.of(context)!.text(value.toString().toLowerCase());
+        }
+        if (e.columnName == 'actions') {
+          return PopupMenuButton<String>(
+              icon: const Icon(Icons.more_vert),
+              tooltip: AppLocalizations.of(context)!.text('options'),
+              onSelected: (value) async {
+                if (value == 'remove') {
+                  onRemove?.call(e.value);
+                }
+              },
+              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                PopupMenuItem(
+                  value: 'remove',
+                  child: Text(AppLocalizations.of(context)!.text('remove')),
+                ),
+              ]
+          );
         }
         return Container(
           color: color,

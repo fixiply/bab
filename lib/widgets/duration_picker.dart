@@ -4,6 +4,9 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+// Internal package
+import 'package:bab/utils/app_localizations.dart';
+
 const Duration _kDialAnimateDuration = Duration(milliseconds: 200);
 
 const double _kDurationPickerWidthPortrait = 328.0;
@@ -92,13 +95,15 @@ class DialPainter extends CustomPainter {
     String getBaseUnitString() {
       switch (baseUnit) {
         case BaseUnit.millisecond:
-          return 'ms.';
+          return AppLocalizations.of(context)!.text('milliseconds').toLowerCase();
         case BaseUnit.second:
-          return 'sec.';
+          return AppLocalizations.of(context)!.text('seconds').toLowerCase();
         case BaseUnit.minute:
-          return 'min.';
+          return AppLocalizations.of(context)!.text('minutes').toLowerCase();
         case BaseUnit.hour:
-          return 'hr.';
+          return AppLocalizations.of(context)!.text('hours').toLowerCase();
+        case BaseUnit.day:
+          return AppLocalizations.of(context)!.text('days').toLowerCase();
       }
     }
 
@@ -113,6 +118,8 @@ class DialPainter extends CustomPainter {
           return 'h ';
         case BaseUnit.hour:
           return 'd ';
+        default:
+          return '';
       }
     }
 
@@ -128,7 +135,7 @@ class DialPainter extends CustomPainter {
         text: '$secondaryUnits$baseUnits',
         style: Theme.of(context)
             .textTheme
-            .headline2!
+            .displayMedium!
             .copyWith(fontSize: size.shortestSide * 0.15),
       ),
       textDirection: TextDirection.ltr,
@@ -143,7 +150,7 @@ class DialPainter extends CustomPainter {
       textAlign: TextAlign.center,
       text: TextSpan(
         text: getBaseUnitString(), //th: ${theta}',
-        style: Theme.of(context).textTheme.bodyText2,
+        style: Theme.of(context).textTheme.bodyMedium,
       ),
       textDirection: TextDirection.ltr,
     )..layout();
@@ -311,6 +318,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         return duration.inMinutes;
       case BaseUnit.hour:
         return duration.inHours;
+      case BaseUnit.day:
+        return duration.inDays;
     }
   }
 
@@ -326,6 +335,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         return duration.inHours;
       case BaseUnit.hour:
         return duration.inDays;
+      case BaseUnit.day:
+        return 0;
     }
   }
 
@@ -341,6 +352,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         return Duration.minutesPerHour;
       case BaseUnit.hour:
         return Duration.hoursPerDay;
+      default:
+        return 7;
     }
   }
 
@@ -349,6 +362,11 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
     final int baseToSecondaryFactor =
         _getBaseUnitToSecondaryUnitFactor(baseUnit);
 
+    if (baseToSecondaryFactor == 0) {
+      return (_kPiByTwo -
+          baseUnits) / _kTwoPi %
+          _kTwoPi;
+    }
     return (_kPiByTwo -
             (baseUnits % baseToSecondaryFactor) /
                 baseToSecondaryFactor.toDouble() *
@@ -357,8 +375,13 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   double _turningAngleFactor() {
+    final int baseToSecondaryFactor =
+      _getBaseUnitToSecondaryUnitFactor(widget.baseUnit);
+    if (baseToSecondaryFactor == 0) {
+      return _getDurationInBaseUnits(widget.duration, widget.baseUnit).toDouble();
+    }
     return _getDurationInBaseUnits(widget.duration, widget.baseUnit) /
-        _getBaseUnitToSecondaryUnitFactor(widget.baseUnit);
+        baseToSecondaryFactor;
   }
 
   // TODO: Fix snap to mins
@@ -440,9 +463,14 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
   }
 
   int _baseUnitHand() {
+    final int baseToSecondaryFactor =
+      _getBaseUnitToSecondaryUnitFactor(widget.baseUnit);
     // Result is in [0; num base units in secondary unit - 1], even if overall time is >= 1 secondary unit
+    if (baseToSecondaryFactor == 0) {
+      return _getDurationInBaseUnits(widget.duration, widget.baseUnit);
+    }
     return _getDurationInBaseUnits(widget.duration, widget.baseUnit) %
-        _getBaseUnitToSecondaryUnitFactor(widget.baseUnit);
+        baseToSecondaryFactor;
   }
 
   Duration _angleToDuration(double angle) {
@@ -473,6 +501,11 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
           days: baseUnitValue ~/ unitFactor,
           hours: (baseUnitValue % unitFactor.toDouble()).toInt(),
         );
+      case BaseUnit.day:
+        return Duration(
+          hours: 0,
+          days: (baseUnitValue).toInt(),
+        );
     }
   }
 
@@ -486,6 +519,8 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         return duration.inMinutes.toString();
       case BaseUnit.hour:
         return duration.inHours.toString();
+      case BaseUnit.day:
+        return duration.inDays.toString();
     }
   }
 
@@ -582,6 +617,13 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         const int length = factor ~/ interval;
         baseUnitMarkerValues =
             List.generate(length, (index) => Duration(hours: index * interval));
+        break;
+      case BaseUnit.day:
+        const int interval = 1;
+        const int factor = 7;
+        const int length = factor ~/ interval;
+        baseUnitMarkerValues =
+            List.generate(length, (index) => Duration(days: index * interval));
         break;
     }
 
@@ -705,6 +747,7 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
   }
 
   void _handleOk() {
+    debugPrint('handleOk $_selectedDuration');
     Navigator.pop(context, _selectedDuration);
   }
 
@@ -903,4 +946,5 @@ enum BaseUnit {
   second,
   minute,
   hour,
+  day,
 }

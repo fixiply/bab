@@ -1,3 +1,4 @@
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -72,6 +73,13 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
     _dataSource = FermentableDataSource(context,
       showQuantity: widget.data != null,
       showCheckboxColumn: widget.showCheckboxColumn!,
+      allowEditing: widget.allowEditing,
+      onEdit: (int rowIndex) {
+        _edit(rowIndex);
+      },
+      onRemove: (int rowIndex) {
+        _remove(rowIndex);
+      },
       onChanged: (FermentableModel value, int dataRowIndex) {
         if (widget.data != null) {
           widget.data![dataRowIndex].amount = value.amount;
@@ -152,14 +160,11 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
       allowSorting: widget.allowSorting,
       controller: getDataGridController(),
       verticalScrollPhysics: const NeverScrollableScrollPhysics(),
-      onEdit: (DataGridRow row, int rowIndex) {
+      onEdit: (int rowIndex) {
         _edit(rowIndex);
       },
-      onRemove: (DataGridRow row, int rowIndex) {
-        widget.data!.removeAt(rowIndex);
-        _dataSource.buildDataGridRows(widget.data!);
-        _dataSource.notifyListeners();
-        widget.onChanged?.call(widget.data!);
+      onRemove: (int rowIndex) {
+        _remove(rowIndex);
       },
       onSelectionChanged: (List<DataGridRow> addedRows, List<DataGridRow> removedRows) {
         if (widget.showCheckboxColumn == true) {
@@ -175,7 +180,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
           });
         }
       },
-      columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null),
+      columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
       tableSummaryRows: FermentableDataSource.summaries(context: context, showQuantity: widget.data != null),
     );
   }
@@ -243,21 +248,21 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
     });
   }
 
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10)
-        )
-    );
+  _remove(int rowIndex) async {
+    widget.data!.removeAt(rowIndex);
+    _dataSource.buildDataGridRows(widget.data!);
+    _dataSource.notifyListeners();
+    widget.onChanged?.call(widget.data!);
   }
 }
 
 class FermentableDataSource extends EditDataSource {
   List<FermentableModel> _data = [];
   final void Function(FermentableModel value, int dataRowIndex)? onChanged;
+  final void Function(int rowIndex)? onRemove;
+  final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn, this.onChanged}) : super(context, showQuantity: showQuantity, showCheckboxColumn: showCheckboxColumn) {
+  FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -265,6 +270,7 @@ class FermentableDataSource extends EditDataSource {
   set data(List<FermentableModel> data) => _data = data;
 
   List<DataGridRow> getDataRows({List<FermentableModel>? data}) {
+    int index = 0;
     List<FermentableModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
@@ -275,6 +281,7 @@ class FermentableDataSource extends EditDataSource {
       if (showQuantity == true) DataGridCell<Method>(columnName: 'method', value: e.use),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
       DataGridCell<int>(columnName: 'color', value: e.ebc),
+      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -375,6 +382,29 @@ class FermentableDataSource extends EditDataSource {
             );
           }
         }
+        if (e.columnName == 'actions') {
+          return PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.text('options'),
+            onSelected: (value) async {
+              if (value == 'edit') {
+                onEdit?.call(e.value);
+              } else if (value == 'remove') {
+                onRemove?.call(e.value);
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem(
+                value: 'edit',
+                child: Text(AppLocalizations.of(context)!.text('replace')),
+              ),
+              PopupMenuItem(
+                value: 'remove',
+                child: Text(AppLocalizations.of(context)!.text('remove')),
+              ),
+            ]
+          );
+        }
         return Container(
           color: color,
           alignment: alignment,
@@ -458,7 +488,7 @@ class FermentableDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -530,6 +560,13 @@ class FermentableDataSource extends EditDataSource {
               alignment: Alignment.center,
               child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
+      ),
+      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+        width: 50,
+        columnName: 'actions',
+        allowSorting: false,
+        allowEditing: false,
+        label: Container()
       ),
     ];
   }

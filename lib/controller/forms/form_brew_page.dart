@@ -169,7 +169,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
                                 if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.mash_water == null) const TextSpan(text: '-'),
+                                if (widget.model.mash_water == null) const TextSpan(text: 'NC'),
                               ],
                             ),
                           ),
@@ -186,7 +186,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
                                 if (widget.model.sparge_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.sparge_water == null) const TextSpan(text: '-')
+                                if (widget.model.sparge_water == null) const TextSpan(text: 'NC')
                               ],
                             ),
                           ),
@@ -206,7 +206,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency ?? 0), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.efficiency != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.efficiency == null) const TextSpan(text: 'NC'),
                               ],
                             ),
                           ),
@@ -222,8 +223,8 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
-                                TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv ?? 0), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              ],
+                                if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.abv == null) const TextSpan(text: 'NC')                              ],
                             ),
                           ),
                         ),

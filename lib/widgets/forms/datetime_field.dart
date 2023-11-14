@@ -55,7 +55,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime?> {
       onTap: () async {
         DateTime? pickedDate = await showDatePicker(
             context: context,
-            initialDate: DateTime.now(),
+            initialDate: widget.initialValue ?? DateTime.now(),
             firstDate: DateTime(2000),
             //DateTime.now() - not to allow to choose before today.
             lastDate: DateTime(2100)
@@ -63,7 +63,7 @@ class _DateTimeFieldState extends FormFieldState<DateTime?> {
         if (widget.hour == true) {
           if (pickedDate != null) {
             TimeOfDay? pickedTime = await showTimePicker(
-              initialTime: TimeOfDay.now(),
+              initialTime: widget.initialValue != null ? TimeOfDay.fromDateTime(widget.initialValue!) : TimeOfDay.now(),
               context: context,
             );
             if (pickedTime != null) {

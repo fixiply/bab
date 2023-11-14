@@ -57,6 +57,7 @@ class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<
     _dataSource = MiscDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
+      allowEditing: widget.allowEditing,
       onChanged: (MiscModel value, int dataRowIndex) {
         Database().update(value).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));

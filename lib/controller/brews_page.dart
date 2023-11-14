@@ -127,12 +127,12 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
                   selectionMode: SelectionMode.multiple,
                   source: _dataSource,
                   controller: getDataGridController(),
-                  onEdit: (DataGridRow row, int rowIndex) {
+                  onEdit: (int rowIndex) {
                     _data!.then((value) async {
                       _edit(value.elementAt(rowIndex));
                     });
                   },
-                  onRemove: (DataGridRow row, int rowIndex) {
+                  onRemove: (int rowIndex) {
                     _data!.then((value) async {
                       if (await DeleteDialog.model(
                           context, value.elementAt(rowIndex), forced: true)) {

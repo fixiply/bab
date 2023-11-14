@@ -10,8 +10,8 @@ import 'package:bab/utils/constants.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class EditSfDataGrid extends SfDataGrid {
-  final void Function(DataGridRow row, int rowIndex)? onRemove;
-  final void Function(DataGridRow row, int rowIndex)? onEdit;
+  final void Function(int rowIndex)? onRemove;
+  final void Function(int rowIndex)? onEdit;
   EditSfDataGrid(BuildContext context, {
     required EditDataSource source,
     required List<GridColumn> columns,
@@ -79,11 +79,11 @@ class EditSfDataGrid extends SfDataGrid {
       );
     } : null,
     gridLinesVisibility: GridLinesVisibility.horizontal,
-    allowSwiping: true,
+    allowSwiping: !DeviceHelper.isDesktop && allowEditing == true,
     endSwipeActionsBuilder: (BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
         onTap: () {
-          onRemove?.call(row, rowIndex);
+          onRemove?.call(rowIndex);
         },
         child: Container(
           color: Colors.redAccent,
@@ -102,7 +102,7 @@ class EditSfDataGrid extends SfDataGrid {
     startSwipeActionsBuilder: (BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
         onTap: () {
-          onEdit?.call(row, rowIndex);
+          onEdit?.call(rowIndex);
         },
         child: Container(
           color: Colors.blueAccent,
