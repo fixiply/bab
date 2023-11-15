@@ -6,10 +6,12 @@ import 'package:flutter/material.dart';
 import 'package:bab/controller/register_page.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/custom_checkbox.dart';
 import 'package:bab/widgets/dialogs/markdown_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 // External package
+import 'package:email_validator/email_validator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -25,10 +27,11 @@ class _LoginPageState extends State<LoginPage> {
   late TextEditingController _emailController;
   final TextEditingController _passwordController = TextEditingController(text: foundation.kDebugMode ? 'mot2passe' : null);
 
-  bool passwordVisible = false;
+  bool _rememberMe = false;
+  bool _passwordVisible = false;
   void togglePassword() {
     setState(() {
-      passwordVisible = !passwordVisible;
+      _passwordVisible = !_passwordVisible;
     });
   }
 
@@ -120,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
               ),
               TextFormField(
                 controller: _passwordController,
-                obscureText: !passwordVisible,
+                obscureText: !_passwordVisible,
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
                   focusedBorder: OutlineInputBorder(
@@ -130,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
                   contentPadding: const EdgeInsets.all(12),
                   suffixIcon: IconButton(
                     color: TextGrey,
-                    icon: Icon(passwordVisible
+                    icon: Icon(_passwordVisible
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined, size: 24, color: Theme.of(context).primaryColor),
                     onPressed: togglePassword,
@@ -150,15 +153,35 @@ class _LoginPageState extends State<LoginPage> {
                 }
               ),
               const SizedBox(height: 6),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: InkWell(
-                  hoverColor: Colors.white,
-                  child: Text(AppLocalizations.of(context)!.text('forgot_password'), style: TextStyle(color: Theme.of(context).primaryColor)),
-                  onTap: () {
-
-                  },
-                ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (foundation.kIsWeb) Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      CustomCheckbox(
+                        checked: _rememberMe,
+                        onChanged: (value) {
+                          setState(() {
+                            _rememberMe = value;
+                          });
+                        },
+                      ),
+                      SizedBox(
+                        width: 12,
+                      ),
+                      Text(AppLocalizations.of(context)!.text('remember_me')),
+                    ],
+                  ),
+                  InkWell(
+                    hoverColor: Colors.white,
+                    child: Text(AppLocalizations.of(context)!.text('forgot_password'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                    onTap: EmailValidator.validate(_emailController.text ?? '') ? () async {
+                      FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+                      _showSnackbar(AppLocalizations.of(context)!.text('password_reset'));
+                    } : null,
+                  ),
+                ],
               ),
               const SizedBox(height: 18),
               Align(
@@ -224,14 +247,23 @@ class _LoginPageState extends State<LoginPage> {
 
   _initialize() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? value = prefs.getString(SIGN_IN_KEY);
-    if (value != null) {
-      _emailController.text = value;
+    String? email = prefs.getString(SIGN_IN_KEY);
+    if (email != null) {
+      _emailController.text = email;
+    }
+    bool? remember = prefs.getBool(REMEMBER_ME);
+    if (remember != null) {
+      setState(() {
+        _rememberMe = remember;
+      });
     }
   }
 
   _signInWithEmailAndPassword() async {
     try {
+      if (foundation.kIsWeb && !_rememberMe) {
+        await FirebaseAuth.instance.setPersistence(Persistence.SESSION);
+      }
       final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
@@ -264,11 +296,11 @@ class _LoginPageState extends State<LoginPage> {
 
   _showSnackbar(String message, {SnackBarAction? action}) {
     ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10),
-          action: action
-        )
+      SnackBar(
+        content: Text(message),
+        duration: const Duration(seconds: 10),
+        action: action
+      )
     );
   }
 }

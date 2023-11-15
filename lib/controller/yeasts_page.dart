@@ -179,7 +179,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('new'),
+          title: AppLocalizations.of(context)!.text('new_yeast'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )

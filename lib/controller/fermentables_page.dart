@@ -181,7 +181,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('new'),
+          title: AppLocalizations.of(context)!.text('new_fermentable'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )

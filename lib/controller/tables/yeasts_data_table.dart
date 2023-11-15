@@ -91,6 +91,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                 rate: value.pitchingRate(widget.receipt!.og));
             if (widget.data != null) {
               widget.data![dataRowIndex].amount = amount;
+              widget.data![dataRowIndex].unit = value.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
             }
           }
           widget.onChanged?.call(widget.data ?? [ value ]);
@@ -237,6 +238,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
               );
               if (amount != null) {
                 model.amount = amount.truncateToDouble();
+                model.unit = model.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
               }
               widget.data!.add(model);
             }
@@ -263,6 +265,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
       if (values != null && values!.isNotEmpty) {
         if (widget.data != null && widget.data!.isNotEmpty) {
           values.first.amount = widget.data![rowIndex].amount;
+          values.first.unit = values.first.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
           widget.data![rowIndex] = values.first;
           _dataSource.buildDataGridRows(widget.data!);
           _dataSource.notifyListeners();
@@ -567,22 +570,22 @@ class YeastDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          columnName: 'type',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        columnName: 'type',
+        allowEditing: showQuantity == false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
-          columnName: 'form',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        columnName: 'form',
+        allowEditing: showQuantity == false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       if (showQuantity == false) GridColumn(
         width: 90,

@@ -180,7 +180,7 @@ class YeastModel<T> extends Model {
   }
 
   @override
-  List<Enums>? isEnumType(String columnName) {
+  List<Enums> isEnumType(String columnName) {
     if (columnName == 'type') {
       return Fermentation.values;
     } else if (columnName == 'form') {
@@ -188,7 +188,7 @@ class YeastModel<T> extends Model {
     } else if (columnName == 'unit') {
       return [ Unit.gram, Unit.milliliter, Unit.packages ];
     }
-    return null;
+    return [];
   }
 
   static dynamic serialize(dynamic data) {

@@ -68,6 +68,7 @@ class _AmountFieldState extends FormFieldState<Unit> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('value ${value}');
     return Container(
       padding: const EdgeInsets.all(4.0),
       alignment: Alignment.centerLeft,
@@ -104,7 +105,7 @@ class _AmountFieldState extends FormFieldState<Unit> {
           if (widget.enums != null && widget.enums!.isNotEmpty) const SizedBox(width: 2),
           if (widget.enums != null && widget.enums!.isNotEmpty) Flexible(
             child: DropdownButton<Enum>(
-              value: value!.unit,
+              value: widget.enums!.contains(value!.unit) ? value!.unit : null,
               isDense: true,
               isExpanded: true,
               style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),

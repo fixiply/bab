@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:bab/models/yeast_model.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';

@@ -179,7 +179,7 @@ class _MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('new'),
+          title: AppLocalizations.of(context)!.text('new_misc'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )

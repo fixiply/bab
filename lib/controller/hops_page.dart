@@ -180,7 +180,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('new'),
+          title: AppLocalizations.of(context)!.text('new_hop'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )

@@ -16,6 +16,7 @@ const NOTIFICATION_TOPIC_DEBUG = 'debug';
 const String EDITION_MODE_KEY = 'edition_mode';
 const String EDIT_KEY = 'edit';
 const String SIGN_IN_KEY = 'sign_in_email';
+const String REMEMBER_ME = 'remember_me';
 
 const String channelId = 'high_importance_channel';
 
