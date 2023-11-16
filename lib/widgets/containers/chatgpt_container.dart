@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
@@ -13,12 +14,14 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/containers/abstract_container.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
+import 'package:bab/widgets/form_decoration.dart';
 
 // External package
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:sprintf/sprintf.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 
 class ChatGPTContainer extends AbstractContainer {
@@ -34,27 +37,20 @@ class ChatGPTContainer extends AbstractContainer {
 
 
 class _ChatGPTContainerState extends AbstractContainerState {
-  late OpenAI _openAI;
-  final _formKey = GlobalKey<FormState>();
+  OpenAI? _openAI;
+  String? _openAI_api_key;
   Future<List<MessageModel>>? _messages;
-  String? _text;
   double _volume = 23;
   String topic = 'chatgpt';
+  String openAI_url = 'https://platform.openai.com/account/api-keys';
 
   final TextEditingController textEditingController = TextEditingController();
   final FocusNode focusNode = FocusNode();
 
   @override
   void initState() {
-    _openAI = OpenAI.instance.build(
-        token: dotenv.env["OPEN_AI_API_KEY"],
-        baseOption: HttpSetup(
-            receiveTimeout: const Duration(seconds: 20),
-            connectTimeout: const Duration(seconds: 20)
-        ),
-        enableLog: foundation.kDebugMode
-    );
     super.initState();
+    _initialize();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       showSearchBar();
     });
@@ -97,7 +93,84 @@ class _ChatGPTContainerState extends AbstractContainerState {
                   childrenPadding: EdgeInsets.all(8.0),
                   title: Text(AppLocalizations.of(context)!.text('chatgpt_howto'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                   children: [
-                    Text(AppLocalizations.of(context)!.text('chatgpt_description')),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        if (currentUser != null && !currentUser!.isAdmin()) TextButton(
+                          child: Text(AppLocalizations.of(context)!.text(currentUser!.openAI_api_key != null ? 'change_openai_key' : 'generate_openai_key' ), style: TextStyle(color: Theme.of(context).primaryColor)),
+                          onPressed: () async {
+                            bool confirm = await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return ConfirmDialog(
+                                  title: AppLocalizations.of(context)!.text('generate_openai_key'),
+                                  content: SizedBox(
+                                    width: 420,
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      children: [
+                                        Text(AppLocalizations.of(context)!.text('open_openAI_api_key')),
+                                        RichText(
+                                          textAlign: TextAlign.left,
+                                          text: TextSpan(
+                                            text: 'URL - ',
+                                            style: DefaultTextStyle.of(context).style,
+                                            children: <TextSpan>[
+                                              TextSpan(
+                                                text: openAI_url,
+                                                // style: DefaultTextStyle.of(context).style.copyWith(color: Theme.of(context).primaryColor),
+                                                style: TextStyle(color: Theme.of(context).primaryColor),
+                                                recognizer: TapGestureRecognizer()..onTap = () async {
+                                                  final Uri url = Uri.parse(openAI_url);
+                                                  if (!await launchUrl(url)) {
+                                                    throw Exception('Could not launch $openAI_url');
+                                                  }
+                                                }
+                                              ),
+                                            ]
+                                          )
+                                        ),
+                                        const SizedBox(height: 8),
+                                        TextFormField(
+                                          initialValue: _openAI_api_key,
+                                          autofocus: true,
+                                          decoration: FormDecoration(
+                                            icon: const Icon(Icons.security),
+                                            labelText: AppLocalizations.of(context)!.text('secret_key'),
+                                            border: InputBorder.none,
+                                            fillColor: FillColor, filled: true
+                                          ),
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              _openAI_api_key = value;
+                                            });
+                                          },
+                                        ),
+                                        const Divider(height: 32),
+                                        Image.asset('assets/images/openAI_api_key.png')
+                                      ],
+                                    ),
+                                  ),
+                                );
+                              }
+                            );
+                            if (confirm) {
+                              currentUser!.openAI_api_key = _openAI_api_key;
+                              Database().update(currentUser);
+                              _initOpenAI();
+                            }
+                          },
+                          style: TextButton.styleFrom(shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4.0),
+                            side: BorderSide(color: Theme.of(context).primaryColor),
+                          )),
+                        ),
+                        if (currentUser != null && !currentUser!.isAdmin()) const SizedBox(height: 8),
+                        Text(AppLocalizations.of(context)!.text('chatgpt_description')),
+                      ],
+                    )
                   ],
                 ),
                 if (snapshot.data!.isNotEmpty) ListView.separated(
@@ -116,6 +189,34 @@ class _ChatGPTContainerState extends AbstractContainerState {
         }
       )
     );
+  }
+
+  _initialize() async {
+    if (currentUser != null) {
+      _openAI_api_key = currentUser!.openAI_api_key;
+      if (_openAI_api_key == null && currentUser!.isAdmin()) {
+        _openAI_api_key = dotenv.env["OPEN_AI_API_KEY"];
+      }
+    }
+    _initOpenAI();
+  }
+
+  _initOpenAI() async {
+    if (_openAI_api_key != null) {
+      try {
+        _openAI = OpenAI.instance.build(
+            token: _openAI_api_key,
+            baseOption: HttpSetup(
+                receiveTimeout: const Duration(seconds: 20),
+                connectTimeout: const Duration(seconds: 20)
+            ),
+            enableLog: foundation.kDebugMode
+        );
+      }
+      catch(e) {
+        _showSnackbar(e.toString());
+      }
+    }
   }
 
   showSearchBar() async {
@@ -244,8 +345,18 @@ class _ChatGPTContainerState extends AbstractContainerState {
             context: context,
             builder: (BuildContext context) {
               return ConfirmDialog(
-                content: Text(
-                    AppLocalizations.of(context)!.text('logged_in_feature')),
+                content: Text(AppLocalizations.of(context)!.text('logged_in_feature')),
+              );
+            }
+        );
+        return;
+      }
+      if (_openAI == null) {
+        await showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return ConfirmDialog(
+                content: Text(AppLocalizations.of(context)!.text('logged_in_feature')),
               );
             }
         );
@@ -266,9 +377,8 @@ class _ChatGPTContainerState extends AbstractContainerState {
             maxTokens: 255
         );
 
-        EasyLoading.show(
-            status: AppLocalizations.of(context)!.text('in_progress'));
-        _openAI.onCompletion(request: request).then((value) {
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+          _openAI!.onCompletion(request: request).then((value) {
           if (value != null) {
             Database().add(MessageModel(
                 topic: topic,
@@ -278,9 +388,9 @@ class _ChatGPTContainerState extends AbstractContainerState {
             _fetch();
           }
           EasyLoading.dismiss();
-        }).onError((error, stackTrace) {
-          debugPrint(error.toString());
-          _showSnackbar(error.toString());
+        }).onError((e, s) {
+          debugPrint(e.toString());
+          _showSnackbar(e.toString());
           EasyLoading.dismiss();
         });
       } finally {

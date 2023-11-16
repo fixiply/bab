@@ -102,7 +102,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                   controller: _controller,
                   padding: const EdgeInsets.all(4),
                   gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: MediaQuery.of(context).size.width / (DeviceHelper.isLargeScreen(context) ? 3 : 2),
+                    maxCrossAxisExtent: MediaQuery.of(context).size.width / getDeviceAxisCount(),
                     childAspectRatio: 3 / 2,
                     crossAxisSpacing: 4.0,
                     mainAxisSpacing: 4.0
@@ -151,6 +151,16 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
       return DeviceHelper.landscapeOrientation(context);
     }
     return DeviceHelper.isDesktop || DeviceHelper.isTablette(context);
+  }
+
+  int getDeviceAxisCount() {
+    if (DeviceHelper.isLargeScreen(context)) {
+      return 3;
+    }
+    if (!DeviceHelper.isMobile(context)) {
+      return 2;
+    }
+    return DeviceHelper.landscapeOrientation(context) ? 3 : 2;
   }
 
   Widget _item(EventModel model, bool grid) {

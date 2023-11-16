@@ -17,6 +17,8 @@ class EventModel<T> extends Model {
   String? page;
   List<String>? widgets;
   List<ImageModel>? images;
+  bool? logged_out;
+  List<String>? countries;
 
   EventModel({
     String? uuid,
@@ -34,12 +36,15 @@ class EventModel<T> extends Model {
     this.page,
     this.widgets,
     this.images,
+    this.logged_out,
+    this.countries,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     top_left ??= TextFormat();
     top_right ??= TextFormat();
     bottom_left ??= TextFormat();
     widgets ??= [];
     images ??= [];
+    countries ??= [];
   }
 
   @override
@@ -56,6 +61,8 @@ class EventModel<T> extends Model {
     this.page = map['page'];
     if (map.containsKey('widgets')) this.widgets = map['widgets'].cast<String>();
     this.images = ImageModel.deserialize(map['images']);
+    if (map.containsKey('logged_out')) this.logged_out = map['logged_out'];
+    if (map.containsKey('countries')) this.countries = map['countries'];
   }
 
   @override
@@ -73,6 +80,8 @@ class EventModel<T> extends Model {
       'page': this.page,
       'widgets': this.widgets,
       'images': ImageModel.serialize(this.images),
+      'logged_out': this.logged_out,
+      'countries': this.countries,
     });
     return map;
   }
@@ -94,6 +103,8 @@ class EventModel<T> extends Model {
       page: this.page,
       widgets: this.widgets,
       images: this.images,
+      logged_out: this.logged_out,
+      countries: this.countries,
     );
   }
 

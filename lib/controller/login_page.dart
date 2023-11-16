@@ -186,22 +186,22 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 18),
               Align(
                 alignment: Alignment.centerLeft,
-                child:Text.rich(
+                child: Text.rich(
                   TextSpan(
                     text:  AppLocalizations.of(context)!.text('cgu_1'),
                     style: regular14pt.copyWith(color: TextGrey),
                     children: <TextSpan>[
                       TextSpan(
-                          text: AppLocalizations.of(context)!.text('terms_of_use'),
-                          style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
-                          recognizer: TapGestureRecognizer()..onTap = () {
-                            showDialog(
-                                context: context,
-                                builder: (context) {
-                                  return const MarkdownDialog(filename: TERMS_CONDITIONS);
-                                }
-                            );
-                          }
+                        text: AppLocalizations.of(context)!.text('terms_of_use'),
+                        style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
+                        recognizer: TapGestureRecognizer()..onTap = () {
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return const MarkdownDialog(filename: TERMS_CONDITIONS);
+                              }
+                          );
+                        }
                       ),
                       TextSpan(
                         text: AppLocalizations.of(context)!.text('cgu_2'),

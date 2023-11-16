@@ -22,6 +22,7 @@ class UserModel<T> {
   List<Adress>? addresses;
   List<PaymentModel>? payments;
   List<Device>? devices;
+  String? openAI_api_key;
 
   UserModel({
     this.uuid,
@@ -36,7 +37,8 @@ class UserModel<T> {
     this.language,
     this.addresses,
     this.payments,
-    this.devices
+    this.devices,
+    this.openAI_api_key
   }) {
     inserted_at ??= DateTime.now();
     addresses ??= [];
@@ -69,6 +71,7 @@ class UserModel<T> {
     this.addresses = Adress.deserialize(map['addresses']);
     this.payments = PaymentModel.deserialize(map['payments']);
     this.devices = Device.deserialize(map['devices']);
+    this.openAI_api_key = map['openAI_api_key'];
   }
 
   Map<String, dynamic> toMap({bool persist : false}) {
@@ -84,6 +87,7 @@ class UserModel<T> {
       'addresses': Adress.serialize(this.addresses),
       'payments': PaymentModel.serialize(this.payments),
       'devices': Device.serialize(this.devices),
+      'openAI_api_key': this.openAI_api_key,
     };
     if (persist == true) {
       map.addAll({'uuid': this.uuid});
@@ -106,6 +110,7 @@ class UserModel<T> {
       addresses: this.addresses,
       payments: this.payments,
       devices: this.devices,
+      openAI_api_key: this.openAI_api_key,
     );
   }
 
