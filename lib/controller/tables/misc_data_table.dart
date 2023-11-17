@@ -7,7 +7,7 @@ import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/fields/amount_field.dart' as amount;
 import 'package:bab/models/misc_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -33,7 +33,7 @@ class MiscDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   final void Function(List<MiscModel> value)? onChanged;
   MiscDataTable({Key? key,
     this.data,
@@ -468,24 +468,26 @@ class MiscDataSource extends EditDataSource {
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<amount.Unit>(columnName: column.columnName, value: newCellValue);
+        double? value;
         switch(newCellValue.unit) {
           case Unit.gram:
-            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue.amount);
+            value = AppLocalizations.of(context)!.gram(newCellValue.amount);
             break;
           case Unit.kilo:
-            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue.amount * 1000);
+            value = AppLocalizations.of(context)!.gram(newCellValue.amount * 1000);
             break;
           case Unit.milliliter:
-            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.volume(newCellValue.amount);
+            value = AppLocalizations.of(context)!.volume(newCellValue.amount);
             break;
           case Unit.liter:
-            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.volume(newCellValue.amount * 1000);
+            value = AppLocalizations.of(context)!.volume(newCellValue.amount * 1000);
             break;
           default:
-            data[rowColumnIndex.rowIndex].amount = newCellValue.amount;
+            value = newCellValue.amount;
         }
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
+            DataGridCell<amount.Unit>(columnName: column.columnName, value: amount.Unit(value, newCellValue.unit));
+        data[rowColumnIndex.rowIndex].amount = value;
         data[rowColumnIndex.rowIndex].unit = newCellValue.unit;
         break;
       case 'name':

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -10,16 +10,16 @@ import 'package:bab/widgets/form_decoration.dart';
 // External package
 import 'package:dropdown_search/dropdown_search.dart';
 
-class ReceiptField extends FormField<ReceiptModel> {
+class ReceiptField extends FormField<RecipeModel> {
   final String? title;
-  final void Function(ReceiptModel? value)? onChanged;
+  final void Function(RecipeModel? value)? onChanged;
   @override
   final FormFieldValidator<dynamic>? validator;
 
-  ReceiptField({Key? key, required BuildContext context, ReceiptModel? initialValue, this.title, this.onChanged, this.validator}) : super(
+  ReceiptField({Key? key, required BuildContext context, RecipeModel? initialValue, this.title, this.onChanged, this.validator}) : super(
       key: key,
       initialValue: initialValue,
-      builder: (FormFieldState<ReceiptModel> field) {
+      builder: (FormFieldState<RecipeModel> field) {
         return field.build(field.context);
       }
   );
@@ -28,9 +28,9 @@ class ReceiptField extends FormField<ReceiptModel> {
   _BeerStyleFieldState createState() => _BeerStyleFieldState();
 }
 
-class _BeerStyleFieldState extends FormFieldState<ReceiptModel> {
+class _BeerStyleFieldState extends FormFieldState<RecipeModel> {
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-  Future<List<ReceiptModel>>? _receipts;
+  Future<List<RecipeModel>>? _receipts;
 
   @override
   ReceiptField get widget => super.widget as ReceiptField;
@@ -42,7 +42,7 @@ class _BeerStyleFieldState extends FormFieldState<ReceiptModel> {
   }
 
   @override
-  void didChange(ReceiptModel? value) {
+  void didChange(RecipeModel? value) {
     widget.onChanged?.call(value);
     super.didChange(value);
     _fetch();
@@ -57,15 +57,15 @@ class _BeerStyleFieldState extends FormFieldState<ReceiptModel> {
         fillColor: FillColor,
         filled: true,
       ),
-      child: FutureBuilder<List<ReceiptModel>>(
+      child: FutureBuilder<List<RecipeModel>>(
         future: _receipts,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
-            return DropdownSearch<ReceiptModel>(
+            return DropdownSearch<RecipeModel>(
               key: _key,
               selectedItem: widget.initialValue != null ? snapshot.data!.singleWhere((element) => element == widget.initialValue) : null,
               compareFn: (item1, item2) => item1.uuid == item2.uuid,
-              itemAsString: (ReceiptModel model) => AppLocalizations.of(context)!.localizedText(model.title),
+              itemAsString: (RecipeModel model) => AppLocalizations.of(context)!.localizedText(model.title),
               asyncItems: (String filter) async {
                 return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.title).contains(filter)).toList();
               },

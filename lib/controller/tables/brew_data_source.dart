@@ -1,5 +1,5 @@
 import 'package:bab/models/equipment_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -29,7 +29,7 @@ class BrewDataSource extends EditDataSource {
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       DataGridCell<String>(columnName: 'reference', value: e.reference),
       DataGridCell<DateTime>(columnName: 'inserted_at', value: e.inserted_at),
-      DataGridCell<ReceiptModel>(columnName: 'receipt', value: e.receipt),
+      DataGridCell<RecipeModel>(columnName: 'receipt', value: e.receipt),
       DataGridCell<EquipmentModel>(columnName: 'tank', value: e.tank),
       DataGridCell<double>(columnName: 'volume', value: e.volume),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
@@ -84,7 +84,7 @@ class BrewDataSource extends EditDataSource {
             if (e.columnName == 'inserted_at') {
               value = AppLocalizations.of(context)!.dateFormat(e.value);
             } else value = AppLocalizations.of(context)!.datetimeFormat(e.value);
-          } else if (e.value is ReceiptModel) {
+          } else if (e.value is RecipeModel) {
             value = AppLocalizations.of(context)!.localizedText(e.value.title);
           } else if (e.value is EquipmentModel) {
             value = e.value.name;
@@ -186,7 +186,7 @@ class BrewDataSource extends EditDataSource {
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('receipt'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              child: Text(AppLocalizations.of(context)!.text('recipe'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
       GridColumn(

@@ -17,7 +17,7 @@ import 'package:bab/utils/quantity.dart';
 import 'package:bab/utils/rating.dart';
 import 'package:flutter/material.dart';
 
-class ReceiptModel<T> extends Model {
+class RecipeModel<T> extends Model {
   String? color;
   Status? status;
   dynamic title;
@@ -53,7 +53,7 @@ class ReceiptModel<T> extends Model {
   List<mm.MiscModel>? _misc;
   List<YeastModel>? _yeasts;
 
-  ReceiptModel({
+  RecipeModel({
     String? uuid,
     DateTime? inserted_at,
     DateTime? updated_at,
@@ -168,8 +168,8 @@ class ReceiptModel<T> extends Model {
     return map;
   }
 
-  ReceiptModel copy() {
-    return ReceiptModel(
+  RecipeModel copy() {
+    return RecipeModel(
       uuid: uuid,
       inserted_at: inserted_at,
       updated_at: updated_at,
@@ -213,7 +213,7 @@ class ReceiptModel<T> extends Model {
   // ignore: hash_and_equals
   @override
   bool operator ==(other) {
-    return (other is ReceiptModel && other.uuid == uuid || other is String && other == uuid);
+    return (other is RecipeModel && other.uuid == uuid || other is String && other == uuid);
   }
 
   @override

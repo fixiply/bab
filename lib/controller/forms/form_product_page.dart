@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/company_model.dart';
 import 'package:bab/models/product_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -33,7 +33,7 @@ class _FormProductPageState extends State<FormProductPage> {
   bool _modified = false;
 
   Future<List<CompanyModel>>? _companies;
-  Future<List<ReceiptModel>>? _receipts;
+  Future<List<RecipeModel>>? _receipts;
 
   @override
   void initState() {
@@ -153,7 +153,7 @@ class _FormProductPageState extends State<FormProductPage> {
                 }
               ),
               const Divider(height: 10),
-              if (widget.model.product == Product.article) FutureBuilder<List<ReceiptModel>>(
+              if (widget.model.product == Product.article) FutureBuilder<List<RecipeModel>>(
                 future: _receipts,
                 builder: (context, snapshot) {
                   if (snapshot.data != null) {
@@ -162,9 +162,9 @@ class _FormProductPageState extends State<FormProductPage> {
                       style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.receipt_outlined),
-                        labelText: AppLocalizations.of(context)!.text('receipt'),
+                        labelText: AppLocalizations.of(context)!.text('recipe'),
                       ),
-                      items: snapshot.data!.map((ReceiptModel model) {
+                      items: snapshot.data!.map((RecipeModel model) {
                         return DropdownMenuItem<String>(
                           value: model.uuid,
                           child: Text(AppLocalizations.of(context)!.localizedText(model.title)));

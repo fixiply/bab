@@ -5,7 +5,7 @@ import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
@@ -19,7 +19,7 @@ class BrewModel<T> extends Model {
   DateTime? started_at;
   DateTime? fermented_at;
   String? reference;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   EquipmentModel? tank;
   EquipmentModel? fermenter;
   double? volume;

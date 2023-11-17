@@ -1,7 +1,7 @@
 // Internal package
 import 'package:bab/models/event_model.dart';
 import 'package:bab/models/image_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/helpers/class_helper.dart';
 import 'package:bab/utils/database.dart';
@@ -14,8 +14,8 @@ class ModelHelper {
     for(EventModel model in events) {
       list.add(model);
     }
-    List<ReceiptModel> coupons = await Database().getReceipts(all: true);
-    for(ReceiptModel model in coupons) {
+    List<RecipeModel> coupons = await Database().getReceipts(all: true);
+    for(RecipeModel model in coupons) {
       list.add(model);
     }
     List<StyleModel> articles = await Database().getStyles();

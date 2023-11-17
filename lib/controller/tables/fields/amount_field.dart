@@ -68,7 +68,6 @@ class _AmountFieldState extends FormFieldState<Unit> {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('value ${value}');
     return Container(
       padding: const EdgeInsets.all(4.0),
       alignment: Alignment.centerLeft,

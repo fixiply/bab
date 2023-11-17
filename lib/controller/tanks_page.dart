@@ -7,7 +7,7 @@ import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/tanks_data_table.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/equipment_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -29,7 +29,7 @@ class TanksPage extends StatefulWidget {
   bool allowEditing;
   bool showCheckboxColumn;
   bool loadMore;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   TanksPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.receipt}) : super(key: key);
 
   @override

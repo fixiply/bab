@@ -391,27 +391,27 @@ class TankDataSource extends EditDataSource {
       case 'volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
+        _data[dataRowIndex].volume = newCellValue;
         break;
       case 'size':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].mash_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
+        _data[dataRowIndex].mash_volume = newCellValue;
         break;
       case 'efficiency':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].efficiency = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
+        _data[dataRowIndex].efficiency = newCellValue;
         break;
       case 'absorption':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].absorption = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
+        _data[dataRowIndex].absorption = newCellValue;
         break;
       case 'lost_volume':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[dataRowIndex].lost_volume = AppLocalizations.of(context)!.gram(newCellValue * 1000, unit: Unit.kilo);
+        _data[dataRowIndex].lost_volume = newCellValue;
         break;
     }
     onChanged?.call(_data[dataRowIndex], dataRowIndex);

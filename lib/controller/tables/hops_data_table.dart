@@ -6,7 +6,7 @@ import 'package:bab/controller/hops_page.dart';
 import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/models/hop_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -32,7 +32,7 @@ class HopsDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   final void Function(List<HopModel> value)? onChanged;
   HopsDataTable({Key? key,
     this.data,
@@ -449,9 +449,10 @@ class HopDataSource extends EditDataSource {
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
+        double? value = AppLocalizations.of(context)!.gram(newCellValue);
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue);
+            DataGridCell<double>(columnName: column.columnName, value: value);
+        data[rowColumnIndex.rowIndex].amount = value;
         break;
       case 'name':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =

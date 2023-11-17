@@ -15,7 +15,7 @@ import 'package:bab/models/misc_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/product_model.dart';
 import 'package:bab/models/purchase_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/models/user_model.dart';
 import 'package:bab/models/yeast_model.dart';
@@ -80,7 +80,7 @@ class Database {
       return purchases;
     } else if (o is Rating) {
       return ratings;
-    } else if (o is ReceiptModel) {
+    } else if (o is RecipeModel) {
       return receipts;
     } else if (o is StyleModel) {
       return styles;
@@ -271,10 +271,10 @@ class Database {
     return list;
   }
 
-  Future<ReceiptModel?> getReceipt(String uuid) async {
+  Future<RecipeModel?> getReceipt(String uuid) async {
     DocumentSnapshot snapshot = await receipts.doc(uuid).get();
     if (snapshot.exists) {
-      ReceiptModel model = ReceiptModel();
+      RecipeModel model = RecipeModel();
       model.uuid = snapshot.id;
       await model.fromMap(snapshot.data() as Map<String, dynamic>);
       return model;
@@ -282,8 +282,8 @@ class Database {
     return null;
   }
 
-  Future<List<ReceiptModel>> getReceipts({String? searchText, String? user, bool? myData, bool all = false, bool ordered = true}) async {
-    List<ReceiptModel> list = [];
+  Future<List<RecipeModel>> getReceipts({String? searchText, String? user, bool? myData, bool all = false, bool ordered = true}) async {
+    List<RecipeModel> list = [];
     Query query = receipts;
     if (all == false) {
       if (myData == false || user == null) {
@@ -305,7 +305,7 @@ class Database {
           }
         }
         if (canBeAdded) {
-          ReceiptModel model = ReceiptModel();
+          RecipeModel model = RecipeModel();
           model.uuid = doc.id;
           await model.fromMap(doc.data() as Map<String, dynamic>);
           list.add(model);

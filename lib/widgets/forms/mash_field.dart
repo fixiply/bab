@@ -3,14 +3,14 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/controller/tables/fermentables_data_table.dart';
 import 'package:bab/controller/tables/mash_data_table.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/mash.dart';
 import 'package:bab/widgets/form_decoration.dart';
 
 class MashField extends FormField<List<Mash>> {
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   final void Function(List<Mash> value)? onChanged;
 
   MashField({Key? key, required BuildContext context, List<Mash>? data, this.receipt, this.onChanged}) : super(

@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bab/controller/forms/form_brew_page.dart';
-import 'package:bab/controller/forms/form_receipt_page.dart';
+import 'package:bab/controller/forms/form_recipe_page.dart';
 import 'package:bab/controller/tables/fermentables_data_table.dart';
 import 'package:bab/controller/tables/hops_data_table.dart';
 import 'package:bab/controller/tables/mash_data_table.dart';
@@ -15,7 +15,7 @@ import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/misc_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/abv.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -36,15 +36,15 @@ import 'package:bab/widgets/paints/gradient_slider_track_shape.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class ReceiptPage extends StatefulWidget {
-  ReceiptModel model;
-  ReceiptPage(this.model);
+class RecipePage extends StatefulWidget {
+  RecipeModel model;
+  RecipePage(this.model);
 
   @override
-  _ReceiptPageState createState() => _ReceiptPageState();
+  _RecipePageState createState() => _RecipePageState();
 }
 
-class _ReceiptPageState extends State<ReceiptPage> {
+class _RecipePageState extends State<RecipePage> {
   Key _key = UniqueKey();
 
   // Edition mode
@@ -427,9 +427,9 @@ class _ReceiptPageState extends State<ReceiptPage> {
     );
   }
 
-  _edit(ReceiptModel model) {
+  _edit(RecipeModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormReceiptPage(model);
+      return FormRecipePage(model);
     })).then((value) {
       if (value != null) {
         setState(() {

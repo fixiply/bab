@@ -199,7 +199,6 @@ class EmployeeDataSource extends DataGridSource {
   @override
   Widget? buildEditWidget(DataGridRow dataGridRow,
       RowColumnIndex rowColumnIndex, GridColumn column, CellSubmit submitCell) {
-    debugPrint('buildEditWidget');
     // Text going to display on editable widget
     final String displayText = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value?.toString() ?? '';
@@ -215,7 +214,6 @@ class EmployeeDataSource extends DataGridSource {
   @override
   Future<void> onCellSubmit(DataGridRow dataGridRow,
       RowColumnIndex rowColumnIndex, GridColumn column) async {
-    debugPrint('onCellSubmit');
     final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
     dataGridCell.columnName == column.columnName).value ?? '';
 

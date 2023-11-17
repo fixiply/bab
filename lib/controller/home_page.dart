@@ -81,7 +81,7 @@ class _HomeState extends State<HomePage> {
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.sports_bar_outlined),
-            label: AppLocalizations.of(context)!.text('receipts'),
+            label: AppLocalizations.of(context)!.text('recipes'),
           ),
           BottomNavigationBarItem(
             icon: const Icon(Icons.style_outlined),
@@ -222,7 +222,7 @@ class _HomeState extends State<HomePage> {
         ),
         if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
           icon: Icons.sports_bar_outlined,
-          label: AppLocalizations.of(context)!.text('receipts'),
+          label: AppLocalizations.of(context)!.text('recipes'),
         ),
         if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
           icon: Icons.style_outlined,

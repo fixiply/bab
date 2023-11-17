@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/mash.dart';
@@ -22,7 +22,7 @@ class MashDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   final void Function(List<Mash>? value)? onChanged;
   MashDataTable({Key? key,
     this.data,

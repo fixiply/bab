@@ -10,7 +10,7 @@ import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/misc_model.dart' as mm;
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
@@ -234,7 +234,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   }
 
   Future<List<MyStep>> _generate() async {
-    ReceiptModel receipt = widget.model.receipt!.copy();
+    RecipeModel receipt = widget.model.receipt!.copy();
     List<MyStep> steps = [
       MyStep(
         index: ++_index,
@@ -421,7 +421,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     return steps;
   }
 
-  _mash(ReceiptModel receipt, List<MyStep> steps) {
+  _mash(RecipeModel receipt, List<MyStep> steps) {
     for(int i = 0 ; i < receipt.mash!.length ; i++) {
       if (receipt.mash![i].type == mash.Type.infusion) {
         CountDownController controller = CountDownController();
@@ -462,7 +462,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     }
   }
 
-  _boil(ReceiptModel receipt, List<MyStep> steps) async {
+  _boil(RecipeModel receipt, List<MyStep> steps) async {
     Map<CountDownTextController, Ingredient> ingredients = await _ingredients(receipt);
     steps.add(MyStep(
       index: ++_index,
@@ -538,7 +538,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ]
       ),
       onStepTapped: (int index) {
-        debugPrint('onStepTapped');
       },
       onStepContinue: (int index) {
         if (!steps[index].completed) {
@@ -548,7 +547,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     ));
   }
 
-  Future<Map<CountDownTextController, Ingredient>> _ingredients(ReceiptModel receipt) async {
+  Future<Map<CountDownTextController, Ingredient>> _ingredients(RecipeModel receipt) async {
     List<Ingredient> list = [];
     Map<CountDownTextController, Ingredient> map = {};
     list.set(await receipt.gethops(volume: widget.model.volume, use: hm.Use.boil, forceResizing: true), context);

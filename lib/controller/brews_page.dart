@@ -266,7 +266,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.receipt != null) TextSpan(text: '${AppLocalizations.of(context)!.text('receipt')} : '),
+                  if (model.receipt != null) TextSpan(text: '${AppLocalizations.of(context)!.text('recipe')} : '),
                   if (model.receipt != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.receipt!.title), style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),

@@ -196,7 +196,7 @@ class AppLocalizations {
   /// Returns the formatted weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in kilogram.
-  String? kiloWeightFormat(num? number, {bool? symbol = true}) {
+  String? kiloWeightFormat(double? number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }

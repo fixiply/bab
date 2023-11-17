@@ -317,7 +317,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
               ReceiptField(
                 context: context,
                 initialValue: widget.model.receipt,
-                title: AppLocalizations.of(context)!.text('receipt'),
+                title: AppLocalizations.of(context)!.text('recipe'),
                 onChanged: (value) => widget.model.receipt = value
               ),
               const Divider(height: 10),

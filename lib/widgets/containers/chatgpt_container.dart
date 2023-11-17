@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
-import 'package:bab/controller/forms/form_receipt_page.dart';
+import 'package:bab/controller/forms/form_recipe_page.dart';
 import 'package:bab/controller/login_page.dart';
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/models/message_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -457,9 +457,9 @@ class _ChatGPTContainerState extends AbstractContainerState {
   }
 
   _new() async {
-    ReceiptModel newModel = ReceiptModel();
+    RecipeModel newModel = RecipeModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormReceiptPage(newModel);
+      return FormRecipePage(newModel);
     })).then((value) {
       _fetch();
     });

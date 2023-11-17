@@ -12,14 +12,14 @@ import 'package:bab/controller/tables/misc_data_table.dart';
 import 'package:bab/controller/tables/yeasts_data_table.dart';
 import 'package:bab/controller/tables/fields/amount_field.dart' as amount;
 import 'package:bab/models/model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/form_decoration.dart';
 
 class IngredientsField extends FormField<List<Model>> {
   final Ingredient ingredient;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   bool allowEditing;
   final void Function(List<Model> value)? onChanged;
 

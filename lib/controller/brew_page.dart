@@ -14,7 +14,7 @@ import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/misc_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/changes_notifier.dart';
@@ -427,7 +427,7 @@ class _BrewPageState extends State<BrewPage> {
         if (!mounted) return;
         debugPrint('changesProvider ${changesProvider.model}');
         setState(() {
-          widget.model.receipt = changesProvider.model as ReceiptModel;
+          widget.model.receipt = changesProvider.model as RecipeModel;
           _key = UniqueKey();
         });
       }

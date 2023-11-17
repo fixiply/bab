@@ -5,7 +5,7 @@ import 'package:bab/controller/forms/form_address_page.dart';
 import 'package:bab/controller/payments_page.dart';
 import 'package:bab/models/basket_model.dart';
 import 'package:bab/models/product_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/utils/adress.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -259,7 +259,7 @@ class _BasketPageState extends State<BasketPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                FutureBuilder<ReceiptModel?>(
+                FutureBuilder<RecipeModel?>(
                   future: Database().getReceipt(snapshot1.data.receipt!),
                   builder: (BuildContext context, AsyncSnapshot snapshot2) {
                     if (snapshot2.hasData) {

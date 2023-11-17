@@ -298,7 +298,6 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                   _showSnackbar(e.toString());
                 });
               }
-              debugPrint('old ${day.toUtc()} new ${date.toUtc()} difference ${DateHelper.toDate(date).difference(DateHelper.toDate(day)).inDays}');
             }
           },
           style: TextButton.styleFrom(shape: RoundedRectangleBorder(

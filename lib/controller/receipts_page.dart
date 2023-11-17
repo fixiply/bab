@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/forms/form_receipt_page.dart';
-import 'package:bab/controller/receipt_page.dart';
+import 'package:bab/controller/forms/form_recipe_page.dart';
+import 'package:bab/controller/recipe_page.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/utils/abv.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -38,7 +38,7 @@ class ReceiptsPage extends StatefulWidget {
 
 class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClientMixin<ReceiptsPage> {
   TextEditingController _searchQueryController = TextEditingController();
-  Future<List<ReceiptModel>>? _receipts;
+  Future<List<RecipeModel>>? _receipts;
   List<StyleModel> _styles = [];
   List<Category> _categories = [];
 
@@ -92,7 +92,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
       drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
       body: RefreshIndicator(
         onRefresh: () => _fetch(),
-        child: FutureBuilder<List<ReceiptModel>>(
+        child: FutureBuilder<List<RecipeModel>>(
           future: _receipts,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -161,13 +161,13 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
                       color: Colors.white,
                       padding: const EdgeInsets.symmetric(vertical: 6.0),
                       child: Center(
-                        child: Text(snapshot.data!.isEmpty ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'receipts': 'receipt')}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+                        child: Text(snapshot.data!.isEmpty ? AppLocalizations.of(context)!.text('no_result') : '${snapshot.data!.length} ${AppLocalizations.of(context)!.text(snapshot.data!.length > 1 ? 'recipes': 'recipe')}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
                       )
                     )
                   ),
                   SliverList(
                     delegate: SliverChildBuilderDelegate((BuildContext context, int index) {
-                      ReceiptModel model = snapshot.data![index];
+                      RecipeModel model = snapshot.data![index];
                       return _item(model);
                     }, childCount: snapshot.data!.length)
                   )
@@ -202,7 +202,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     );
   }
 
-  Widget _item(ReceiptModel model) {
+  Widget _item(RecipeModel model) {
     if (model.isEditable() && !DeviceHelper.isDesktop) {
       return CustomDismissible(
         context,
@@ -219,7 +219,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     return _card(model);
   }
 
-  Widget _card(ReceiptModel model) {
+  Widget _card(RecipeModel model) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
@@ -295,7 +295,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
         ) : null,
         onTap: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return ReceiptPage(model);
+            return RecipePage(model);
           }));
         },
         onLongPress: model.isEditable() ? () {
@@ -345,7 +345,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   }
 
   _fetch() async {
-    List<ReceiptModel> list = await Database().getReceipts(user: currentUser?.uuid, myData: _my_receips, ordered: true);
+    List<RecipeModel> list = await Database().getReceipts(user: currentUser?.uuid, myData: _my_receips, ordered: true);
     _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
     if (mounted == true) {
       Category.populate(  _categories, _styles, AppLocalizations.of(context)!.locale);
@@ -355,10 +355,10 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     }
   }
 
-  Future<List<ReceiptModel>> _filter<T>(List<ReceiptModel> list) async {
-    List<ReceiptModel>? values = [];
+  Future<List<RecipeModel>> _filter<T>(List<RecipeModel> list) async {
+    List<RecipeModel>? values = [];
     String? search =  _searchQueryController.text;
-    for (ReceiptModel model in list) {
+    for (RecipeModel model in list) {
       _setFilter(model);
       if (search.isNotEmpty) {
         if (!(AppLocalizations.of(context)!.localizedText(model.title).toLowerCase().contains(search.toLowerCase()))) {
@@ -387,7 +387,7 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
     return values;
   }
 
-  _setFilter(ReceiptModel model) {
+  _setFilter(RecipeModel model) {
     if (model.ibu != null && (_ibu.min == 0.0 || model.ibu! < _ibu.min))  _ibu.min = model.ibu!;
     if (model.ibu != null && (_ibu.max == 0.0 || model.ibu! > _ibu.max)) _ibu.max = model.ibu!;
     if (model.abv != null && (_abv.min == 0.0 || model.abv! < _abv.min)) _abv.min = model.abv!;
@@ -395,23 +395,23 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   }
 
   _new() async {
-    ReceiptModel newModel = ReceiptModel();
+    RecipeModel newModel = RecipeModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormReceiptPage(newModel);
+      return FormRecipePage(newModel);
     })).then((value) {
       _fetch();
     });
   }
 
-  _edit(ReceiptModel model) {
+  _edit(RecipeModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormReceiptPage(model.copy());
+      return FormRecipePage(model.copy());
     })).then((value) {
       _fetch();
     });
   }
 
-  _delete(ReceiptModel model) async {
+  _delete(RecipeModel model) async {
     if (await DeleteDialog.model(context, model, forced: true)) {
       _fetch();
     }

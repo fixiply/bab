@@ -6,7 +6,7 @@ import 'package:bab/controller/fermentables_page.dart';
 import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/models/fermentable_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
@@ -33,7 +33,7 @@ class FermentablesDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   final void Function(List<FermentableModel>? value)? onChanged;
   FermentablesDataTable({Key? key,
     this.data,
@@ -441,9 +441,10 @@ class FermentableDataSource extends EditDataSource {
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
+        double? value = AppLocalizations.of(context)!.gram(newCellValue, unit: Unit.kilo);
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        _data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue, unit: Unit.kilo);
+            DataGridCell<double>(columnName: column.columnName, value: value);
+        _data[rowColumnIndex.rowIndex].amount = value;
         break;
       case 'name':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =

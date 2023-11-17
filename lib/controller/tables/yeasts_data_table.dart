@@ -7,7 +7,7 @@ import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/fields/amount_field.dart' as amount;
 import 'package:bab/controller/yeasts_page.dart';
 import 'package:bab/helpers/formula_helper.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
@@ -33,7 +33,7 @@ class YeastsDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   final void Function(List<YeastModel> value)? onChanged;
   YeastsDataTable({Key? key,
     this.data,
@@ -466,26 +466,26 @@ class YeastDataSource extends EditDataSource {
   Future<void> onCellSubmit(DataGridRow dataGridRow, RowColumnIndex rowColumnIndex, GridColumn column) async {
     final dynamic oldValue = dataGridRow.getCells().firstWhere((DataGridCell dataGridCell) =>
       dataGridCell.columnName == column.columnName).value ?? '';
-    debugPrint('onCellSubmit $oldValue $newCellValue');
     if (oldValue == newCellValue) {
       return;
     }
-    debugPrint('OK');
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<amount.Unit>(columnName: column.columnName, value: newCellValue);
+        double? value;
         switch(newCellValue.unit) {
           case Unit.gram:
-            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.gram(newCellValue.amount);
+            value = AppLocalizations.of(context)!.gram(newCellValue.amount);
             break;
           case Unit.milliliter:
-            data[rowColumnIndex.rowIndex].amount = AppLocalizations.of(context)!.volume(newCellValue.amount);
+            value = AppLocalizations.of(context)!.volume(newCellValue.amount);
             break;
           default:
-            data[rowColumnIndex.rowIndex].amount = newCellValue.amount;
+            value = newCellValue.amount;
         }
+        dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
+            DataGridCell<amount.Unit>(columnName: column.columnName, value: amount.Unit(value, newCellValue.unit));
+        data[rowColumnIndex.rowIndex].amount = value;
         data[rowColumnIndex.rowIndex].unit = newCellValue.unit;
         break;
       case 'name':

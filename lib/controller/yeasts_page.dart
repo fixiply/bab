@@ -6,7 +6,7 @@ import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/yeasts_data_table.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/helpers/import_helper.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
@@ -28,7 +28,7 @@ class YeastsPage extends StatefulWidget {
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   SelectionMode selectionMode;
   YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 

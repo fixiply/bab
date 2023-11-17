@@ -10,7 +10,7 @@ import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/misc_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/abv.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -37,15 +37,15 @@ import 'package:bab/widgets/paints/gradient_slider_track_shape.dart';
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
 
-class FormReceiptPage extends StatefulWidget {
-  final ReceiptModel model;
-  FormReceiptPage(this.model);
+class FormRecipePage extends StatefulWidget {
+  final RecipeModel model;
+  FormRecipePage(this.model);
 
   @override
-  _FormReceiptPageState createState() => _FormReceiptPageState();
+  _FormRecipePageState createState() => _FormRecipePageState();
 }
 
-class _FormReceiptPageState extends State<FormReceiptPage> {
+class _FormRecipePageState extends State<FormRecipePage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
@@ -69,7 +69,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('receipt')),
+        title: Text(AppLocalizations.of(context)!.text('recipe')),
         elevation: 0,
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
@@ -112,12 +112,12 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                   });
                 }
               } else {
-                ReceiptModel model = widget.model.copy();
+                RecipeModel model = widget.model.copy();
                 model.uuid = null;
                 model.title = null;
                 model.status = constants.Status.disabled;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FormReceiptPage(model);
+                  return FormRecipePage(model);
                 })).then((value) {
                   Navigator.pop(context);
                 });
@@ -166,7 +166,7 @@ class _FormReceiptPageState extends State<FormReceiptPage> {
                 initiallyExpanded: true,
                 backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
-                title: Text(AppLocalizations.of(context)!.text('profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                title: Text(AppLocalizations.of(context)!.text('recipe_based_estimate'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
                   Row(
                     children: [

@@ -7,7 +7,7 @@ import 'package:bab/controller/tables/fermentables_data_table.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/helpers/import_helper.dart';
 import 'package:bab/models/fermentable_model.dart';
-import 'package:bab/models/receipt_model.dart';
+import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
@@ -30,7 +30,7 @@ class FermentablesPage extends StatefulWidget {
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
-  ReceiptModel? receipt;
+  RecipeModel? receipt;
   SelectionMode selectionMode;
   FermentablesPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 

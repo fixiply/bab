@@ -747,7 +747,6 @@ class DurationPickerDialogState extends State<DurationPickerDialog> {
   }
 
   void _handleOk() {
-    debugPrint('handleOk $_selectedDuration');
     Navigator.pop(context, _selectedDuration);
   }
 
