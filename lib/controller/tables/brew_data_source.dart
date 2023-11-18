@@ -29,7 +29,7 @@ class BrewDataSource extends EditDataSource {
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
       DataGridCell<String>(columnName: 'reference', value: e.reference),
       DataGridCell<DateTime>(columnName: 'inserted_at', value: e.inserted_at),
-      DataGridCell<RecipeModel>(columnName: 'receipt', value: e.receipt),
+      DataGridCell<RecipeModel>(columnName: 'recipe', value: e.recipe),
       DataGridCell<EquipmentModel>(columnName: 'tank', value: e.tank),
       DataGridCell<double>(columnName: 'volume', value: e.volume),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
@@ -114,10 +114,10 @@ class BrewDataSource extends EditDataSource {
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].reference = newCellValue;
         break;
-      case 'receipt':
+      case 'recipe':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].receipt = newCellValue;
+        data[dataRowIndex].recipe = newCellValue;
         break;
       case 'tank':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
@@ -181,7 +181,7 @@ class BrewDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          columnName: 'receipt',
+          columnName: 'recipe',
           allowEditing: false,
           label: Container(
               padding: const EdgeInsets.all(8.0),

@@ -33,7 +33,7 @@ class YeastsDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   final void Function(List<YeastModel> value)? onChanged;
   YeastsDataTable({Key? key,
     this.data,
@@ -47,7 +47,7 @@ class YeastsDataTable extends StatefulWidget {
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.singleDeselect,
-    this.receipt,
+    this.recipe,
     this.onChanged}) : super(key: key);
 
   @override
@@ -84,11 +84,11 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
           var amount = value.amount;
           if (value.form == Yeast.dry || value.form == Yeast.liquid) {
             amount ??= FormulaHelper.yeast(
-                widget.receipt!.og,
-                widget.receipt!.volume,
+                widget.recipe!.og,
+                widget.recipe!.volume,
                 form: value.form!,
                 cells: value.cells!,
-                rate: value.pitchingRate(widget.receipt!.og));
+                rate: value.pitchingRate(widget.recipe!.og));
             if (widget.data != null) {
               widget.data![dataRowIndex].amount = amount;
               widget.data![dataRowIndex].unit = value.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
@@ -230,11 +230,11 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
           if (widget.data != null) {
             for(YeastModel model in values) {
               double? amount = FormulaHelper.yeast(
-                  widget.receipt!.og,
-                  widget.receipt!.volume,
+                  widget.recipe!.og,
+                  widget.recipe!.volume,
                   form: model.form!,
                   cells: model.cells!,
-                  rate: model.pitchingRate(widget.receipt!.og)
+                  rate: model.pitchingRate(widget.recipe!.og)
               );
               if (amount != null) {
                 model.amount = amount.truncateToDouble();

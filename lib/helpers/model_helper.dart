@@ -14,8 +14,8 @@ class ModelHelper {
     for(EventModel model in events) {
       list.add(model);
     }
-    List<RecipeModel> coupons = await Database().getReceipts(all: true);
-    for(RecipeModel model in coupons) {
+    List<RecipeModel> recipes = await Database().getRecipes(all: true);
+    for(RecipeModel model in recipes) {
       list.add(model);
     }
     List<StyleModel> articles = await Database().getStyles();

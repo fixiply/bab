@@ -29,8 +29,8 @@ class TanksPage extends StatefulWidget {
   bool allowEditing;
   bool showCheckboxColumn;
   bool loadMore;
-  RecipeModel? receipt;
-  TanksPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.receipt}) : super(key: key);
+  RecipeModel? recipe;
+  TanksPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.recipe}) : super(key: key);
 
   @override
   _TanksPageState createState() => _TanksPageState();

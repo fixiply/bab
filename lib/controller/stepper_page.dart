@@ -234,7 +234,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   }
 
   Future<List<MyStep>> _generate() async {
-    RecipeModel receipt = widget.model.receipt!.copy();
+    RecipeModel recipe = widget.model.recipe!.copy();
     List<MyStep> steps = [
       MyStep(
         index: ++_index,
@@ -256,7 +256,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         content: Container(
           alignment: Alignment.centerLeft,
           child: FutureBuilder<List<FermentableModel>>(
-            future: receipt.getFermentables(volume: widget.model.volume, forceResizing: true),
+            future: recipe.getFermentables(volume: widget.model.volume, forceResizing: true),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Column(
@@ -352,7 +352,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         content: Container(),
       )
     ];
-    _mash(receipt, steps);
+    _mash(recipe, steps);
     steps.add(MyStep(
       index: ++_index,
       title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(78)}'),
@@ -364,7 +364,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         )
       ),
     ));
-    await _boil(receipt, steps);
+    await _boil(recipe, steps);
     steps.add(MyStep(
       index: ++_index,
       title: const Text('Faire un whirlpool'),
@@ -397,10 +397,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
       ),
     ));
-    await receipt.getYeasts(volume: widget.model.volume).then((values) {
+    await recipe.getYeasts(volume: widget.model.volume).then((values) {
       steps.add(MyStep(
         index: ++_index,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(receipt.yeasts.first.amount)} de levure «${AppLocalizations.of(context)!.localizedText(receipt.yeasts.first.name)}»'),
+        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(recipe.yeasts.first.amount)} de levure «${AppLocalizations.of(context)!.localizedText(recipe.yeasts.first.name)}»'),
         content: Container(),
         onStepContinue: (int index) {
           if (widget.model.fermented_at == null) {
@@ -421,13 +421,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     return steps;
   }
 
-  _mash(RecipeModel receipt, List<MyStep> steps) {
-    for(int i = 0 ; i < receipt.mash!.length ; i++) {
-      if (receipt.mash![i].type == mash.Type.infusion) {
+  _mash(RecipeModel recipe, List<MyStep> steps) {
+    for(int i = 0 ; i < recipe.mash!.length ; i++) {
+      if (recipe.mash![i].type == mash.Type.infusion) {
         CountDownController controller = CountDownController();
         steps.add(MyStep(
           index: ++_index,
-          title: Text('Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} pendant ${receipt.mash![i].duration} minutes'),
+          title: Text('Palier «${recipe.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(recipe.mash![i].temperature)} pendant ${recipe.mash![i].duration} minutes'),
           content: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(8.0),
@@ -441,13 +441,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 duration: 0,
                 index: steps.length,
                 onComplete: (int index) {
-                  _notification('Le Palier «${receipt.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(receipt.mash![i].temperature)} est terminé.');
+                  _notification('Le Palier «${recipe.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(recipe.mash![i].temperature)} est terminé.');
                   steps[index].completed = true;
                 }
               ),
               onTap: () {
                 if (!controller.isStarted) {
-                  controller.restart(duration: receipt.mash![i].duration! * 60);
+                  controller.restart(duration: recipe.mash![i].duration! * 60);
                 }
               },
             )
@@ -462,8 +462,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     }
   }
 
-  _boil(RecipeModel receipt, List<MyStep> steps) async {
-    Map<CountDownTextController, Ingredient> ingredients = await _ingredients(receipt);
+  _boil(RecipeModel recipe, List<MyStep> steps) async {
+    Map<CountDownTextController, Ingredient> ingredients = await _ingredients(recipe);
     steps.add(MyStep(
       index: ++_index,
       title: Text('Mettre en ébullition votre cuve'),
@@ -481,7 +481,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     ));
     steps.add(MyStep(
       index: ++_index,
-      title: Text('Commencer le houblonnage pendant ${AppLocalizations.of(context)!.durationFormat(receipt.boil)}'),
+      title: Text('Commencer le houblonnage pendant ${AppLocalizations.of(context)!.durationFormat(recipe.boil)}'),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -505,7 +505,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               ),
               onTap: () {
                 if (!_boilController.isStarted) {
-                  var secondes = receipt.boil! * 60;
+                  var secondes = recipe.boil! * 60;
                   _boilController.restart(duration: secondes);
                   ingredients.forEach((key, value) {
                     Duration duration = Duration(seconds: secondes - (value.minutes * 60));
@@ -528,7 +528,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               mainAxisSize: MainAxisSize.min,
               children: ingredients.entries.map((e) {
                 return CountDownText(
-                  duration: Duration(minutes: receipt.boil! - e.value.minutes),
+                  duration: Duration(minutes: recipe.boil! - e.value.minutes),
                   map: e.value.map!,
                   controller: e.key,
                 );
@@ -547,11 +547,11 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     ));
   }
 
-  Future<Map<CountDownTextController, Ingredient>> _ingredients(RecipeModel receipt) async {
+  Future<Map<CountDownTextController, Ingredient>> _ingredients(RecipeModel recipe) async {
     List<Ingredient> list = [];
     Map<CountDownTextController, Ingredient> map = {};
-    list.set(await receipt.gethops(volume: widget.model.volume, use: hm.Use.boil, forceResizing: true), context);
-    list.set(await receipt.getMisc(volume: widget.model.volume, use: mm.Use.boil, forceResizing: true), context);
+    list.set(await recipe.gethops(volume: widget.model.volume, use: hm.Use.boil, forceResizing: true), context);
+    list.set(await recipe.getMisc(volume: widget.model.volume, use: mm.Use.boil, forceResizing: true), context);
     list.sort((a, b) => b.minutes.compareTo(a.minutes));
     for(Ingredient e in list) {
       CountDownTextController controller = CountDownTextController(); 

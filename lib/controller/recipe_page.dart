@@ -391,7 +391,7 @@ class _RecipePageState extends State<RecipePage> {
             )
           ]
         )),
-        SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
+        SliverToBoxAdapter(child: CarouselContainer(recipe: widget.model.uuid)),
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -442,7 +442,7 @@ class _RecipePageState extends State<RecipePage> {
 
   _new() async {
     BrewModel newModel = BrewModel(
-      receipt: widget.model,
+      recipe: widget.model,
       volume: widget.model.volume
     );
     Navigator.push(context, MaterialPageRoute(builder: (context) {

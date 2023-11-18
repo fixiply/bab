@@ -28,9 +28,9 @@ class MiscPage extends StatefulWidget {
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   SelectionMode selectionMode;
-  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
+  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   @override
   _MiscPageState createState() => _MiscPageState();

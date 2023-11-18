@@ -12,9 +12,9 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:parallax_animation/parallax_area.dart';
 
 class Parallax2Container extends AbstractContainer {
-  Parallax2Container({String? company, String? receipt, int? product}) : super(
+  Parallax2Container({String? company, String? recipe, int? product}) : super(
       company: company,
-      receipt: receipt,
+      recipe: recipe,
       product: product
   );
 

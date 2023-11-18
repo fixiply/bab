@@ -13,9 +13,9 @@ import 'package:expandable_text/expandable_text.dart';
 
 class ListContainer extends AbstractContainer {
 
-  ListContainer({String? company, String? receipt, int? product}) : super(
+  ListContainer({String? company, String? recipe, int? product}) : super(
     company: company,
-    receipt: receipt,
+    recipe: recipe,
     product: product
   );
   @override

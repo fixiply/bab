@@ -32,7 +32,7 @@ class HopsDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   final void Function(List<HopModel> value)? onChanged;
   HopsDataTable({Key? key,
     this.data,
@@ -46,7 +46,7 @@ class HopsDataTable extends StatefulWidget {
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.multiple,
-    this.receipt,
+    this.recipe,
     this.onChanged}) : super(key: key);
 
   @override
@@ -173,8 +173,8 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
           var duration = await showDurationPicker(
             context: context,
             baseUnit: use == Use.dry_hop ? BaseUnit.day: BaseUnit.minute,
-            initialTime: use == Use.dry_hop ? Duration(days: value ?? 5) : Duration(minutes: value ?? widget.receipt!.boil),
-            maxTime: use == Use.dry_hop ? Duration(days: widget.receipt!.primaryday ?? 0) : Duration(minutes: widget.receipt!.boil!),
+            initialTime: use == Use.dry_hop ? Duration(days: value ?? 5) : Duration(minutes: value ?? widget.recipe!.boil),
+            maxTime: use == Use.dry_hop ? Duration(days: widget.recipe!.primaryday ?? 0) : Duration(minutes: widget.recipe!.boil!),
           );
           if (duration != null)  {
             _dataSource.newCellValue = use == Use.dry_hop ? duration.inDays : duration.inMinutes;
@@ -228,7 +228,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
         if (values != null) {
           if (widget.data != null) {
             for (HopModel model in values) {
-              model.duration = widget.receipt?.boil;
+              model.duration = widget.recipe?.boil;
               widget.data!.add(model);
             }
             _dataSource.buildDataGridRows(widget.data!);

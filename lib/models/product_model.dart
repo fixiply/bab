@@ -14,7 +14,7 @@ class ProductModel<T> extends Model {
   Status? status;
   Product? product;
   String? company;
-  String? receipt;
+  String? recipe;
   dynamic title;
   dynamic subtitle;
   double? price;
@@ -35,7 +35,7 @@ class ProductModel<T> extends Model {
     this.status = Status.publied,
     this.product = Product.article,
     this.company,
-    this.receipt,
+    this.recipe,
     this.title,
     this.subtitle,
     this.price,
@@ -59,7 +59,7 @@ class ProductModel<T> extends Model {
     this.status = Status.values.elementAt(map['status']);
     this.product = Product.values.elementAt(map['product']);
     this.company = map['company'];
-    this.receipt = map['receipt'];
+    this.recipe = map['recipe'];
     this.title = LocalizedText.deserialize(map['title']);
     this.subtitle = LocalizedText.deserialize(map['subtitle']);
     if (map['price'] != null) this.price = map['price'].toDouble();
@@ -80,7 +80,7 @@ class ProductModel<T> extends Model {
       'status': this.status!.index,
       'product': this.product!.index,
       'company': this.company,
-      'receipt': this.receipt,
+      'recipe': this.recipe,
       'title': LocalizedText.serialize(this.title),
       'subtitle': LocalizedText.serialize(this.subtitle),
       'price': this.price,
@@ -105,7 +105,7 @@ class ProductModel<T> extends Model {
       status: this.status,
       product: this.product,
       company: this.company,
-      receipt: this.receipt,
+      recipe: this.recipe,
       title: this.title,
       subtitle: this.subtitle,
       price: this.price,

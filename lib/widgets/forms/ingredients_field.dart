@@ -19,11 +19,11 @@ import 'package:bab/widgets/form_decoration.dart';
 
 class IngredientsField extends FormField<List<Model>> {
   final Ingredient ingredient;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   bool allowEditing;
   final void Function(List<Model> value)? onChanged;
 
-  IngredientsField({Key? key, required BuildContext context, required this.ingredient, this.receipt, this.allowEditing = false, this.onChanged}) : super(
+  IngredientsField({Key? key, required BuildContext context, required this.ingredient, this.recipe, this.allowEditing = false, this.onChanged}) : super(
       key: key,
       builder: (FormFieldState<List<dynamic>> field) {
         return field.build(field.context);
@@ -77,7 +77,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
     switch(widget.ingredient) {
       case Ingredient.fermentable:
         return FutureBuilder<List<FermentableModel>>(
-          future: widget.receipt!.getFermentables(),
+          future: widget.recipe!.getFermentables(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return FermentablesDataTable(
@@ -88,7 +88,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
-                receipt: widget.receipt,
+                recipe: widget.recipe,
                 onChanged: (List<FermentableModel>? values) {
                   didChange(values);
                 }
@@ -99,7 +99,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
         );
       case Ingredient.misc:
         return FutureBuilder<List<MiscModel>>(
-          future: widget.receipt!.getMisc(),
+          future: widget.recipe!.getMisc(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return MiscDataTable(key: _datatableKey,
@@ -109,7 +109,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
-                receipt: widget.receipt,
+                recipe: widget.recipe,
                 onChanged: (List<MiscModel>? values) {
                   didChange(values);
                 }
@@ -120,7 +120,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
         );
       case Ingredient.yeast:
         return FutureBuilder<List<YeastModel>>(
-          future: widget.receipt!.getYeasts(),
+          future: widget.recipe!.getYeasts(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return YeastsDataTable(key: _datatableKey,
@@ -130,7 +130,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
-                receipt: widget.receipt,
+                recipe: widget.recipe,
                 onChanged: (List<YeastModel>? values) {
                   didChange(values);
                 }
@@ -141,7 +141,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
         );
       case Ingredient.hops:
         return FutureBuilder<List<HopModel>>(
-          future: widget.receipt!.gethops(),
+          future: widget.recipe!.gethops(),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return HopsDataTable(key: _datatableKey,
@@ -151,7 +151,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
-                receipt: widget.receipt,
+                recipe: widget.recipe,
                 onChanged: (List<HopModel>? values) {
                   didChange(values);
                 }

@@ -45,7 +45,7 @@ class Database {
   final products = firestore.collection("products");
   final purchases = firestore.collection("purchases");
   final ratings = firestore.collection("ratings");
-  final receipts = firestore.collection("receipts");
+  final recipes = firestore.collection("recipes");
   final styles = firestore.collection("styles");
   final users = firestore.collection("users");
   final yeasts = firestore.collection("yeasts");
@@ -81,7 +81,7 @@ class Database {
     } else if (o is Rating) {
       return ratings;
     } else if (o is RecipeModel) {
-      return receipts;
+      return recipes;
     } else if (o is StyleModel) {
       return styles;
     } else if (o is UserModel) {
@@ -93,10 +93,14 @@ class Database {
   }
 
   Future<void> copy(String from, String to) async {
-    await firestore.collection(from).get().then((result) async {
-      result.docs.forEach((doc) async {
-        await firestore.collection(to).add(doc.data());
-      });
+    await firestore.collection(to).get().then((result) async {
+      if (result.size == 0) {
+        await firestore.collection(from).get().then((result) async {
+          result.docs.forEach((doc) async {
+            await firestore.collection(to).doc(doc.id).set(doc.data());
+          });
+        });
+      }
     });
   }
 
@@ -271,8 +275,8 @@ class Database {
     return list;
   }
 
-  Future<RecipeModel?> getReceipt(String uuid) async {
-    DocumentSnapshot snapshot = await receipts.doc(uuid).get();
+  Future<RecipeModel?> getRecipe(String uuid) async {
+    DocumentSnapshot snapshot = await recipes.doc(uuid).get();
     if (snapshot.exists) {
       RecipeModel model = RecipeModel();
       model.uuid = snapshot.id;
@@ -282,9 +286,9 @@ class Database {
     return null;
   }
 
-  Future<List<RecipeModel>> getReceipts({String? searchText, String? user, bool? myData, bool all = false, bool ordered = true}) async {
+  Future<List<RecipeModel>> getRecipes({String? searchText, String? user, bool? myData, bool all = false, bool ordered = true}) async {
     List<RecipeModel> list = [];
-    Query query = receipts;
+    Query query = recipes;
     if (all == false) {
       if (myData == false || user == null) {
         query = query.where('shared', isEqualTo: true);
@@ -401,7 +405,7 @@ class Database {
     return null;
   }
 
-  Future<List<ProductModel>> getProducts({Product? product, String? company, String? receipt, bool ordered = false}) async {
+  Future<List<ProductModel>> getProducts({Product? product, String? company, String? recipe, bool ordered = false}) async {
     List<ProductModel> list = [];
     Query query = products;
     if (product != null) {
@@ -410,8 +414,8 @@ class Database {
     if (company != null) {
       query = query.where('company', isEqualTo: company);
     }
-    if (receipt != null) {
-      query = query.where('receipt', isEqualTo: receipt);
+    if (recipe != null) {
+      query = query.where('recipe', isEqualTo: recipe);
     }
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {

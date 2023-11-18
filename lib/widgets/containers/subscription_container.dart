@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 // External package
 
 class SubscriptionContainer extends AbstractContainer {
-  SubscriptionContainer({String? company, String? receipt, int? product}) : super(
+  SubscriptionContainer({String? company, String? recipe, int? product}) : super(
       company: company,
-      receipt: receipt,
+      recipe: recipe,
       product: product
   );
 

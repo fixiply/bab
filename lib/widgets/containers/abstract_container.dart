@@ -11,9 +11,9 @@ import 'package:bab/widgets/modal_bottom_sheet.dart';
 
 class AbstractContainer extends StatefulWidget {
   final String? company;
-  final String? receipt;
+  final String? recipe;
   final int? product;
-  AbstractContainer({this.company, this.receipt, this.product});
+  AbstractContainer({this.company, this.recipe, this.product});
 
   @override
   AbstractContainerState createState() => AbstractContainerState();
@@ -70,7 +70,7 @@ class AbstractContainerState extends State<AbstractContainer> {
   fetch() async {
     Product product = widget.product != null ? Product.values.elementAt(widget.product!) : Product.article;
     setState(() {
-      products = Database().getProducts(product: product, company: widget.company, receipt: widget.receipt, ordered: true);
+      products = Database().getProducts(product: product, company: widget.company, recipe: widget.recipe, ordered: true);
     });
     calculate();
   }

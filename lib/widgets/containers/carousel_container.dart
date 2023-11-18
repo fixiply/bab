@@ -13,9 +13,9 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
 class CarouselContainer extends AbstractContainer {
-  CarouselContainer({String? company, String? receipt, int? product}) : super(
+  CarouselContainer({String? company, String? recipe, int? product}) : super(
       company: company,
-      receipt: receipt,
+      recipe: recipe,
       product: product
   );
 

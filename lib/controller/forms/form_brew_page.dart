@@ -15,7 +15,7 @@ import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
 import 'package:bab/widgets/forms/datetime_field.dart';
 import 'package:bab/widgets/forms/equipment_field.dart';
-import 'package:bab/widgets/forms/receipt_field.dart';
+import 'package:bab/widgets/forms/recipe_field.dart';
 import 'package:bab/widgets/forms/switch_field.dart';
 import 'package:bab/widgets/forms/text_input_field.dart';
 
@@ -314,11 +314,11 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 ]
               ),
               const Divider(height: 10),
-              ReceiptField(
+              RecipeField(
                 context: context,
-                initialValue: widget.model.receipt,
+                initialValue: widget.model.recipe,
                 title: AppLocalizations.of(context)!.text('recipe'),
-                onChanged: (value) => widget.model.receipt = value
+                onChanged: (value) => widget.model.recipe = value
               ),
               const Divider(height: 10),
               EquipmentField(

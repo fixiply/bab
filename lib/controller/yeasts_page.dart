@@ -28,9 +28,9 @@ class YeastsPage extends StatefulWidget {
   bool showCheckboxColumn;
   bool showQuantity;
   bool loadMore;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   SelectionMode selectionMode;
-  YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.receipt, this.selectionMode : SelectionMode.multiple}) : super(key: key);
+  YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   @override
   _YeastsPageState createState() => _YeastsPageState();

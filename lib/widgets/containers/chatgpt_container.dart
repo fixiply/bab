@@ -25,9 +25,9 @@ import 'package:url_launcher/url_launcher.dart';
 
 
 class ChatGPTContainer extends AbstractContainer {
-  ChatGPTContainer({String? company, String? receipt, int? product}) : super(
+  ChatGPTContainer({String? company, String? recipe, int? product}) : super(
     company: company,
-    receipt: receipt,
+    recipe: recipe,
     product: product
   );
 

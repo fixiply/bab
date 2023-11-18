@@ -106,7 +106,7 @@ class _BrewPageState extends State<BrewPage> {
             )
           ],
         ),
-        if (widget.model.receipt != null) SliverToBoxAdapter(
+        if (widget.model.recipe != null) SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
             child: RichText(
@@ -115,8 +115,8 @@ class _BrewPageState extends State<BrewPage> {
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style.copyWith(fontSize: 20),
                 children: [
-                  TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.receipt!.title), style: const TextStyle(fontWeight: FontWeight.w600)),
-                  if (widget.model.receipt!.style != null) TextSpan(text: '  -  ${AppLocalizations.of(context)!.localizedText(widget.model.receipt!.style!.name)}'),
+                  TextSpan(text: AppLocalizations.of(context)!.localizedText(widget.model.recipe!.title), style: const TextStyle(fontWeight: FontWeight.w600)),
+                  if (widget.model.recipe!.style != null) TextSpan(text: '  -  ${AppLocalizations.of(context)!.localizedText(widget.model.recipe!.style!.name)}'),
                 ]
               )
             )
@@ -238,7 +238,7 @@ class _BrewPageState extends State<BrewPage> {
         SliverList(
           delegate: SliverChildListDelegate([
             FutureBuilder<List<FermentableModel>>(
-              future: widget.model.receipt!.getFermentables(volume: widget.model.volume),
+              future: widget.model.recipe!.getFermentables(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -254,7 +254,7 @@ class _BrewPageState extends State<BrewPage> {
               }
             ),
             FutureBuilder<List<HopModel>>(
-              future: widget.model.receipt!.gethops(volume: widget.model.volume),
+              future: widget.model.recipe!.gethops(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -270,7 +270,7 @@ class _BrewPageState extends State<BrewPage> {
               }
             ),
             FutureBuilder<List<YeastModel>>(
-              future: widget.model.receipt!.getYeasts(volume: widget.model.volume),
+              future: widget.model.recipe!.getYeasts(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -286,7 +286,7 @@ class _BrewPageState extends State<BrewPage> {
             }
             ),
             FutureBuilder<List<MiscModel>>(
-              future: widget.model.receipt!.getMisc(volume: widget.model.volume),
+              future: widget.model.recipe!.getMisc(volume: widget.model.volume),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -301,10 +301,10 @@ class _BrewPageState extends State<BrewPage> {
                 return Container();
               }
             ),
-            if (widget.model.receipt!.mash != null && widget.model.receipt!.mash!.isNotEmpty) Padding(
+            if (widget.model.recipe!.mash != null && widget.model.recipe!.mash!.isNotEmpty) Padding(
               padding: const EdgeInsets.all(8.0),
               child: MashDataTable(
-                data: widget.model.receipt!.mash,
+                data: widget.model.recipe!.mash,
                 title: Text(AppLocalizations.of(context)!.text('mash'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
@@ -320,22 +320,22 @@ class _BrewPageState extends State<BrewPage> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      if (widget.model.primaryDay() != null && widget.model.receipt!.primarytemp != null) _fermentation(
+                      if (widget.model.primaryDay() != null && widget.model.recipe!.primarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('primary'),
                         widget.model.primaryDay()!,
-                        widget.model.receipt!.primarytemp!,
+                        widget.model.recipe!.primarytemp!,
                       ),
                       const SizedBox(width: 12),
-                      if (widget.model.secondaryDay() != null && widget.model.receipt!.secondarytemp != null) _fermentation(
+                      if (widget.model.secondaryDay() != null && widget.model.recipe!.secondarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('secondary'),
                         widget.model.secondaryDay()!,
-                        widget.model.receipt!.secondarytemp!,
+                        widget.model.recipe!.secondarytemp!,
                       ),
                       const SizedBox(width: 12),
-                      if (widget.model.tertiaryDay() != null && widget.model.receipt!.tertiarytemp != null) _fermentation(
+                      if (widget.model.tertiaryDay() != null && widget.model.recipe!.tertiarytemp != null) _fermentation(
                         AppLocalizations.of(context)!.text('tertiary'),
                         widget.model.tertiaryDay()!,
-                        widget.model.receipt!.tertiarytemp!,
+                        widget.model.recipe!.tertiarytemp!,
                       ),
                     ],
                   )
@@ -344,7 +344,7 @@ class _BrewPageState extends State<BrewPage> {
             )
           ])
         ),
-        SliverToBoxAdapter(child: CarouselContainer(receipt: widget.model.uuid)),
+        SliverToBoxAdapter(child: CarouselContainer(recipe: widget.model.uuid)),
         if (widget.model.notes != null) SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
@@ -423,11 +423,11 @@ class _BrewPageState extends State<BrewPage> {
   _initialize() async {
     final changesProvider = Provider.of<ChangesNotifier>(context, listen: false);
     changesProvider.addListener(() {
-      if (changesProvider.model == widget.model.receipt) {
+      if (changesProvider.model == widget.model.recipe) {
         if (!mounted) return;
         debugPrint('changesProvider ${changesProvider.model}');
         setState(() {
-          widget.model.receipt = changesProvider.model as RecipeModel;
+          widget.model.recipe = changesProvider.model as RecipeModel;
           _key = UniqueKey();
         });
       }
@@ -477,7 +477,7 @@ class _BrewPageState extends State<BrewPage> {
                       Container(
                         padding: const EdgeInsets.only(left: 30),
                         child: Image.asset('assets/images/beer_1.png',
-                            color: ColorHelper.color(widget.model.receipt!.ebc) ?? Colors.white,
+                            color: ColorHelper.color(widget.model.recipe!.ebc) ?? Colors.white,
                             colorBlendMode: BlendMode.modulate
                         ),
                       ),
@@ -503,9 +503,9 @@ class _BrewPageState extends State<BrewPage> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
-                                if (widget.model.receipt!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.receipt!.ebc)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
-                                if (widget.model.receipt!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.receipt!.ibu)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
-                                if (widget.model.receipt!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.receipt!.abv)!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                                if (widget.model.recipe!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.recipe!.ebc)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
+                                if (widget.model.recipe!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.recipe!.ibu)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
+                                if (widget.model.recipe!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.recipe!.abv)!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                               ],
                             ),
                           ),

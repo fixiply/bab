@@ -33,7 +33,7 @@ class FermentablesDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   final void Function(List<FermentableModel>? value)? onChanged;
   FermentablesDataTable({Key? key,
     this.data,
@@ -47,7 +47,7 @@ class FermentablesDataTable extends StatefulWidget {
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.multiple,
-    this.receipt,
+    this.recipe,
     this.onChanged}) : super(key: key);
 
   @override

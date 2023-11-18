@@ -11,12 +11,12 @@ class CarouselBuilder extends JsonWidgetBuilder {
   static const type = 'carousel';
 
   String? company;
-  String? receipt;
+  String? recipe;
   int? product;
 
   CarouselBuilder({
     this.company,
-    this.receipt,
+    this.recipe,
     this.product,
   }) : super(numSupportedChildren: 1);
 
@@ -29,7 +29,7 @@ class CarouselBuilder extends JsonWidgetBuilder {
     }
     return CarouselBuilder(
       company: map['company'],
-      receipt: map['receipt'],
+      recipe: map['recipe'],
       product: map['product'],
     );
   }
@@ -43,7 +43,7 @@ class CarouselBuilder extends JsonWidgetBuilder {
   }) {
     return CarouselContainer(
       company: company,
-      receipt: receipt,
+      recipe: recipe,
       product: product
     );
   }

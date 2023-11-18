@@ -10,10 +10,10 @@ import 'package:bab/utils/mash.dart';
 import 'package:bab/widgets/form_decoration.dart';
 
 class MashField extends FormField<List<Mash>> {
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   final void Function(List<Mash> value)? onChanged;
 
-  MashField({Key? key, required BuildContext context, List<Mash>? data, this.receipt, this.onChanged}) : super(
+  MashField({Key? key, required BuildContext context, List<Mash>? data, this.recipe, this.onChanged}) : super(
       key: key,
       initialValue: data,
       builder: (FormFieldState<List<dynamic>> field) {
@@ -52,7 +52,7 @@ class _MashFieldState extends FormFieldState<List<Mash>> {
           allowEditing: true,
           color: FillColor,
           showCheckboxColumn: false,
-          receipt: widget.receipt,
+          recipe: widget.recipe,
           onChanged: (List<Mash>? value) {
             didChange(value);
           }

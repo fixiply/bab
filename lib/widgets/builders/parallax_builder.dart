@@ -12,12 +12,12 @@ class ParallaxBuilder extends JsonWidgetBuilder {
   static const type = 'parallax';
 
   String? company;
-  String? receipt;
+  String? recipe;
   int? product;
 
   ParallaxBuilder({
     this.company,
-    this.receipt,
+    this.recipe,
     this.product,
   }) : super(numSupportedChildren: 1);
 
@@ -30,7 +30,7 @@ class ParallaxBuilder extends JsonWidgetBuilder {
     }
     return ParallaxBuilder(
       company: map['company'],
-      receipt: map['receipt'],
+      recipe: map['recipe'],
       product: map['product'],
     );
   }
@@ -44,7 +44,7 @@ class ParallaxBuilder extends JsonWidgetBuilder {
   }) {
     return ParallaxContainer(
       company: company,
-      receipt: receipt,
+      recipe: recipe,
       product: product
     );
   }

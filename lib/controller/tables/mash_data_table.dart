@@ -22,7 +22,7 @@ class MashDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   final void Function(List<Mash>? value)? onChanged;
   MashDataTable({Key? key,
     this.data,
@@ -33,7 +33,7 @@ class MashDataTable extends StatefulWidget {
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.multiple,
-    this.receipt,
+    this.recipe,
     this.onChanged}) : super(key: key);
 
   @override
@@ -119,8 +119,8 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                     var value = _dataSource.getValue(dataGridRow, details.column.columnName);
                     var duration = await showDurationPicker(
                       context: context,
-                      initialTime: Duration(minutes: value ??  widget.receipt!.boil),
-                      maxTime: Duration(minutes: widget.receipt!.boil!),
+                      initialTime: Duration(minutes: value ??  widget.recipe!.boil),
+                      maxTime: Duration(minutes: widget.recipe!.boil!),
                         // showOkButton: false,
                         // onComplete: (duration, context) {
                         //   _dataSource.newCellValue = duration.inMinutes;
@@ -171,7 +171,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
 
   _add() async {
     setState(() {
-      widget.data!.insert(0, Mash(name: AppLocalizations.of(context)!.text(Bearing.mash_in.toString().toLowerCase()), duration: widget.receipt!.boil));
+      widget.data!.insert(0, Mash(name: AppLocalizations.of(context)!.text(Bearing.mash_in.toString().toLowerCase()), duration: widget.recipe!.boil));
     });
     _dataSource.buildDataGridRows(widget.data!);
     _dataSource.notifyListeners();

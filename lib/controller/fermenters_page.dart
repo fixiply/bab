@@ -28,8 +28,8 @@ class FermentersPage extends StatefulWidget {
   bool allowEditing;
   bool showCheckboxColumn;
   bool loadMore;
-  RecipeModel? receipt;
-  FermentersPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.receipt}) : super(key: key);
+  RecipeModel? recipe;
+  FermentersPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.recipe}) : super(key: key);
 
   @override
   _FermentersPageState createState() => _FermentersPageState();

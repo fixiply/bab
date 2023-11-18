@@ -227,11 +227,11 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: ListTile(
         contentPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-        leading: model.receipt != null && model.receipt!.ebc != null && model.receipt!.ebc! >= 0 ? Stack(
+        leading: model.recipe != null && model.recipe!.ebc != null && model.recipe!.ebc! >= 0 ? Stack(
           children: [
             SizedBox(
               child: Image.asset('assets/images/beer_1.png',
-                color: ColorHelper.color(model.receipt!.ebc!) ?? Colors.white,
+                color: ColorHelper.color(model.recipe!.ebc!) ?? Colors.white,
                 colorBlendMode: BlendMode.modulate
               ),
               width: 30,
@@ -266,8 +266,8 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
               text: TextSpan(
                 style: DefaultTextStyle.of(context).style,
                 children: <TextSpan>[
-                  if (model.receipt != null) TextSpan(text: '${AppLocalizations.of(context)!.text('recipe')} : '),
-                  if (model.receipt != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.receipt!.title), style: const TextStyle(fontWeight: FontWeight.bold)),
+                  if (model.recipe != null) TextSpan(text: '${AppLocalizations.of(context)!.text('recipe')} : '),
+                  if (model.recipe != null) TextSpan(text: AppLocalizations.of(context)!.localizedText(model.recipe!.title), style: const TextStyle(fontWeight: FontWeight.bold)),
                 ],
               ),
             ),

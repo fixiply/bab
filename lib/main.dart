@@ -206,6 +206,7 @@ class _AppState extends State<MyApp> {
   _loadUser(User? user) async {
     UserModel? model;
     if (user != null && user.emailVerified) {
+      // Database().copy('receipts', 'recipes');
       model = await Database().getUser(user.uid);
       if (model != null) {
         model.user = user;

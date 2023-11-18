@@ -260,7 +260,7 @@ class _BasketPageState extends State<BasketPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 FutureBuilder<RecipeModel?>(
-                  future: Database().getReceipt(snapshot1.data.receipt!),
+                  future: Database().getRecipe(snapshot1.data.recipe!),
                   builder: (BuildContext context, AsyncSnapshot snapshot2) {
                     if (snapshot2.hasData) {
                       return RichText(

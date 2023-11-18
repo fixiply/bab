@@ -16,7 +16,7 @@ import 'package:bab/controller/ingredients_page.dart';
 import 'package:bab/controller/inventory_page.dart';
 import 'package:bab/controller/orders_page.dart';
 import 'package:bab/controller/products_page.dart';
-import 'package:bab/controller/receipts_page.dart';
+import 'package:bab/controller/recipes_page.dart';
 import 'package:bab/controller/styles_page.dart';
 import 'package:bab/controller/tools_page.dart';
 import 'package:bab/helpers/device_helper.dart';
@@ -295,7 +295,7 @@ class _HomeState extends State<HomePage> {
             onGenerateRoute: (RouteSettings settings) {
               return MaterialPageRoute(
                 fullscreenDialog: true,
-                builder: (_) => ReceiptsPage(),
+                builder: (_) => RecipesPage(),
               );
             }
         ),

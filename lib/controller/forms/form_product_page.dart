@@ -33,13 +33,13 @@ class _FormProductPageState extends State<FormProductPage> {
   bool _modified = false;
 
   Future<List<CompanyModel>>? _companies;
-  Future<List<RecipeModel>>? _receipts;
+  Future<List<RecipeModel>>? _recipes;
 
   @override
   void initState() {
     super.initState();
     _companies = Database().getCompanies(ordered: true);
-    _receipts = Database().getReceipts(ordered: true);
+    _recipes = Database().getRecipes(ordered: true);
   }
 
   @override
@@ -154,11 +154,11 @@ class _FormProductPageState extends State<FormProductPage> {
               ),
               const Divider(height: 10),
               if (widget.model.product == Product.article) FutureBuilder<List<RecipeModel>>(
-                future: _receipts,
+                future: _recipes,
                 builder: (context, snapshot) {
                   if (snapshot.data != null) {
                     return DropdownButtonFormField<String>(
-                      value: snapshot.data!.contains(widget.model.receipt) ? widget.model.receipt : null,
+                      value: snapshot.data!.contains(widget.model.recipe) ? widget.model.recipe : null,
                       style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                       decoration: FormDecoration(
                         icon: const Icon(Icons.receipt_outlined),
@@ -171,7 +171,7 @@ class _FormProductPageState extends State<FormProductPage> {
                       }).toList(),
                       onChanged: (value) =>
                         setState(() {
-                          widget.model.receipt = value;
+                          widget.model.recipe = value;
                         }
                       ),
                     );

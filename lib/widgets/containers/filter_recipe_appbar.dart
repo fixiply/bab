@@ -12,7 +12,7 @@ import 'package:bab/widgets/paints/gradient_range_slider_thumb_shape.dart';
 
 // External package
 
-class FilterReceiptAppBar extends StatefulWidget {
+class FilterRecipeAppBar extends StatefulWidget {
   IBU ibu;
   ABV abv;
   ColorHelper cu;
@@ -29,7 +29,7 @@ class FilterReceiptAppBar extends StatefulWidget {
   final Function(Category value)? onCategoryChanged;
   final Function()? onReset;
 
-  FilterReceiptAppBar({Key? key,
+  FilterRecipeAppBar({Key? key,
     required this.ibu,
     required this.abv,
     required this.cu,
@@ -52,10 +52,10 @@ class FilterReceiptAppBar extends StatefulWidget {
   }
 
   @override
-  _FilterReceiptAppBarState createState() => _FilterReceiptAppBarState();
+  _FilterRecipeAppBarState createState() => _FilterRecipeAppBarState();
 }
 
-class _FilterReceiptAppBarState extends State<FilterReceiptAppBar> with SingleTickerProviderStateMixin {
+class _FilterRecipeAppBarState extends State<FilterRecipeAppBar> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool changed = false;
 

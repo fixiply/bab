@@ -11,12 +11,12 @@ class ListBuilder extends JsonWidgetBuilder {
   static const type = 'list';
 
   String? company;
-  String? receipt;
+  String? recipe;
   int? product;
 
   ListBuilder({
     this.company,
-    this.receipt,
+    this.recipe,
     this.product,
   }) : super(numSupportedChildren: 1);
 
@@ -29,7 +29,7 @@ class ListBuilder extends JsonWidgetBuilder {
     }
     return ListBuilder(
       company: map['company'],
-      receipt: map['receipt'],
+      recipe: map['recipe'],
       product: map['product'],
     );
   }
@@ -43,7 +43,7 @@ class ListBuilder extends JsonWidgetBuilder {
   }) {
     return ListContainer(
       company: company,
-      receipt: receipt,
+      recipe: recipe,
       product: product
     );
   }

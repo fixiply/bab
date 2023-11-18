@@ -16,7 +16,7 @@ import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/error_container.dart';
-import 'package:bab/widgets/containers/filter_receipt_appbar.dart';
+import 'package:bab/widgets/containers/filter_recipe_appbar.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
@@ -29,16 +29,16 @@ import 'package:expandable_text/expandable_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 
-class ReceiptsPage extends StatefulWidget {
-  ReceiptsPage({Key? key}) : super(key: key);
+class RecipesPage extends StatefulWidget {
+  RecipesPage({Key? key}) : super(key: key);
 
   @override
-  _ReceiptsPageState createState() => _ReceiptsPageState();
+  _RecipesPageState createState() => _RecipesPageState();
 }
 
-class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClientMixin<ReceiptsPage> {
+class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClientMixin<RecipesPage> {
   TextEditingController _searchQueryController = TextEditingController();
-  Future<List<RecipeModel>>? _receipts;
+  Future<List<RecipeModel>>? _recipes;
   List<StyleModel> _styles = [];
   List<Category> _categories = [];
 
@@ -93,12 +93,12 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
       body: RefreshIndicator(
         onRefresh: () => _fetch(),
         child: FutureBuilder<List<RecipeModel>>(
-          future: _receipts,
+          future: _recipes,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               return CustomScrollView(
                 slivers: [
-                  FilterReceiptAppBar(
+                  FilterRecipeAppBar(
                     ibu: _ibu,
                     abv: _abv,
                     cu: _cu,
@@ -345,12 +345,12 @@ class _ReceiptsPageState extends State<ReceiptsPage> with AutomaticKeepAliveClie
   }
 
   _fetch() async {
-    List<RecipeModel> list = await Database().getReceipts(user: currentUser?.uuid, myData: _my_receips, ordered: true);
+    List<RecipeModel> list = await Database().getRecipes(user: currentUser?.uuid, myData: _my_receips, ordered: true);
     _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
     if (mounted == true) {
       Category.populate(  _categories, _styles, AppLocalizations.of(context)!.locale);
       setState(() {
-        _receipts = _filter(list);
+        _recipes = _filter(list);
       });
     }
   }

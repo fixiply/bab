@@ -19,7 +19,7 @@ class BrewModel<T> extends Model {
   DateTime? started_at;
   DateTime? fermented_at;
   String? reference;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   EquipmentModel? tank;
   EquipmentModel? fermenter;
   double? volume;
@@ -45,7 +45,7 @@ class BrewModel<T> extends Model {
     this.started_at,
     this.fermented_at,
     this.reference,
-    this.receipt,
+    this.recipe,
     this.tank,
     this.fermenter,
     this.volume,
@@ -70,7 +70,7 @@ class BrewModel<T> extends Model {
     this.started_at = DateHelper.parse(map['started_at']);
     this.fermented_at = DateHelper.parse(map['fermented_at']);
     this.reference = map['reference'];
-    if (map['receipt'] != null) this.receipt = await Database().getReceipt(map['receipt']);
+    if (map['recipe'] != null) this.recipe = await Database().getRecipe(map['recipe']);
     if (map['tank'] != null) this.tank = await Database().getEquipment(map['tank']);
     if (map['fermenter'] != null) this.fermenter = await Database().getEquipment(map['fermenter']);
     if (map['volume'] != null) this.volume = map['volume'].toDouble();
@@ -96,7 +96,7 @@ class BrewModel<T> extends Model {
       'started_at': started_at,
       'fermented_at': fermented_at,
       'reference': this.reference,
-      'receipt': this.receipt != null ? this.receipt!.uuid : null,
+      'recipe': this.recipe != null ? this.recipe!.uuid : null,
       'tank': this.tank != null ? this.tank!.uuid : null,
       'fermenter': this.fermenter != null ? this.fermenter!.uuid : null,
       'volume': this.volume,
@@ -126,7 +126,7 @@ class BrewModel<T> extends Model {
       started_at: this.started_at,
       fermented_at: this.fermented_at,
       reference: this.reference,
-      receipt: this.receipt?.copy(),
+      recipe: this.recipe?.copy(),
       tank: this.tank,
       fermenter: this.fermenter,
       volume: this.volume,
@@ -167,7 +167,7 @@ class BrewModel<T> extends Model {
   /// The `weight` argument is relative to the grain weight in kilo.
   Future<double> initialBrewTemp(double? tgi) async {
     double? tmf = null;
-    for(Mash item in receipt!.mash!) {
+    for(Mash item in recipe!.mash!) {
       if (tmf == null) {
         tmf = item.temperature;
         continue;
@@ -180,11 +180,11 @@ class BrewModel<T> extends Model {
   DateTime? get start_fermentation => fermented_at ?? started_at;
 
   int? primaryDay() {
-    return primaryday ?? receipt?.primaryday;
+    return primaryday ?? recipe?.primaryday;
   }
 
   DateTime? endDatePrimary() {
-    int? primary = primaryday ?? receipt?.primaryday;
+    int? primary = primaryday ?? recipe?.primaryday;
     if (primary != null) {
       return DateHelper.toDate(start_fermentation!.add(Duration(days: primary)));
     }
@@ -192,13 +192,13 @@ class BrewModel<T> extends Model {
   }
 
   int? secondaryDay() {
-    return secondaryday ?? receipt?.secondaryday;
+    return secondaryday ?? recipe?.secondaryday;
   }
 
   DateTime? endDateSecondary() {
-    int? secondary = secondaryday ?? receipt?.secondaryday;
+    int? secondary = secondaryday ?? recipe?.secondaryday;
     if (secondary != null) {
-      int? primary = primaryday ?? receipt?.primaryday;
+      int? primary = primaryday ?? recipe?.primaryday;
       int days = (primary ?? 0) + secondary;
       return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
     }
@@ -206,14 +206,14 @@ class BrewModel<T> extends Model {
   }
 
   int? tertiaryDay() {
-    return tertiaryday ?? receipt?.tertiaryday;
+    return tertiaryday ?? recipe?.tertiaryday;
   }
 
   DateTime? endDateTertiary() {
-    int? secondary = secondaryday ?? receipt?.secondaryday;
-    int? tertiary = tertiaryday ?? receipt?.tertiaryday;
+    int? secondary = secondaryday ?? recipe?.secondaryday;
+    int? tertiary = tertiaryday ?? recipe?.tertiaryday;
     if (secondary != null && tertiary != null) {
-      int? primary = primaryday ?? receipt?.primaryday;
+      int? primary = primaryday ?? recipe?.primaryday;
       int days = (primary ?? 0) + (secondary ?? 0) + (tertiary ?? 0);
       return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
     }
@@ -222,9 +222,9 @@ class BrewModel<T> extends Model {
 
   List<DateTime> dryHop() {
     List<DateTime> values = [];
-    if (receipt != null) {
-      int? primary = primaryday ?? receipt?.primaryday;
-      for(Quantity item in receipt!.cacheHops!) {
+    if (recipe != null) {
+      int? primary = primaryday ?? recipe?.primaryday;
+      for(Quantity item in recipe!.cacheHops!) {
         if (item.use == Use.dry_hop.index) {
           int days = (primary ?? 0) - (item.duration ?? 0);
           values.add(DateHelper.toDate(start_fermentation!.add(Duration(days: days))));
@@ -235,9 +235,9 @@ class BrewModel<T> extends Model {
   }
 
   DateTime? finish() {
-    int? primary = primaryday ?? receipt?.primaryday;
-    int? secondary = secondaryday ?? receipt?.secondaryday;
-    int? tertiary = tertiaryday ?? receipt?.tertiaryday;
+    int? primary = primaryday ?? recipe?.primaryday;
+    int? secondary = secondaryday ?? recipe?.secondaryday;
+    int? tertiary = tertiaryday ?? recipe?.tertiaryday;
     if (primary != null || secondary != null || tertiary != null) {
       int days = (primary ?? 0) + (secondary ?? 0) + (tertiary ?? 0);
       return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
@@ -247,9 +247,9 @@ class BrewModel<T> extends Model {
 
   Future<double> get totalWeight async {
     double weight = 0;
-    for(FermentableModel item in await receipt!.getFermentables()) {
+    for(FermentableModel item in await recipe!.getFermentables()) {
       if (item.use == Method.mashed) {
-        weight +=  (item.amount! * (volume! / receipt!.volume!)).abs();
+        weight +=  (item.amount! * (volume! / recipe!.volume!)).abs();
       }
     }
     return weight;
@@ -258,11 +258,11 @@ class BrewModel<T> extends Model {
   calculate() async {
     abv = null;
     efficiency = null;
-    if (receipt != null && tank != null) {
+    if (recipe != null && tank != null) {
       double weight = await totalWeight;
       mash_water = tank!.mash(weight);
-      sparge_water = tank!.sparge(volume!, weight, duration: receipt!.boil!);
-      efficiency = FormulaHelper.efficiency(volume, og, receipt!.mass, receipt!.extract);
+      sparge_water = tank!.sparge(volume!, weight, duration: recipe!.boil!);
+      efficiency = FormulaHelper.efficiency(volume, og, recipe!.mass, recipe!.extract);
     } else {
       mash_water = null;
       sparge_water = null;

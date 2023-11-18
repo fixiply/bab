@@ -307,7 +307,7 @@ class RecipeModel<T> extends Model {
 
   @override
   String toString() {
-    return 'Receipt: $title, UUID: $uuid';
+    return 'Recipe: $title, UUID: $uuid';
   }
 
   resizeFermentales(double? volume) {

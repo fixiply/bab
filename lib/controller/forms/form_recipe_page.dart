@@ -378,7 +378,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
               IngredientsField(
                 context: context,
                 ingredient: constants.Ingredient.fermentable,
-                receipt: widget.model,
+                recipe: widget.model,
                 onChanged: (values) {
                   widget.model.fermentables = values as List<FermentableModel>;
                   _calculate();
@@ -388,7 +388,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
               IngredientsField(
                 context: context,
                 ingredient: constants.Ingredient.hops,
-                receipt: widget.model,
+                recipe: widget.model,
                 onChanged: (values) {
                   widget.model.hops = values as List<hm.HopModel>;
                   _calculate();
@@ -398,7 +398,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
               IngredientsField(
                 context: context,
                 ingredient: constants.Ingredient.yeast,
-                receipt: widget.model,
+                recipe: widget.model,
                 onChanged: (values) {
                   widget.model.yeasts = values as List<YeastModel>;
                   _calculate();
@@ -408,7 +408,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
               IngredientsField(
                 context: context,
                 ingredient: constants.Ingredient.misc,
-                receipt: widget.model,
+                recipe: widget.model,
                 onChanged: (values) {
                   widget.model.miscellaneous = values as List<MiscModel>;
                   _calculate();
@@ -418,7 +418,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
               MashField(
                 context: context,
                 data: widget.model.mash,
-                receipt: widget.model,
+                recipe: widget.model,
                 onChanged: (values) => widget.model.mash = values,
               ),
               const Divider(height: 10),
@@ -598,7 +598,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
 
   _new() async {
     BrewModel newModel = BrewModel(
-        receipt: widget.model,
+        recipe: widget.model,
         volume: widget.model.volume
     );
     Navigator.push(context, MaterialPageRoute(builder: (context) {

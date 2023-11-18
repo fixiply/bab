@@ -10,13 +10,13 @@ import 'package:bab/widgets/form_decoration.dart';
 // External package
 import 'package:dropdown_search/dropdown_search.dart';
 
-class ReceiptField extends FormField<RecipeModel> {
+class RecipeField extends FormField<RecipeModel> {
   final String? title;
   final void Function(RecipeModel? value)? onChanged;
   @override
   final FormFieldValidator<dynamic>? validator;
 
-  ReceiptField({Key? key, required BuildContext context, RecipeModel? initialValue, this.title, this.onChanged, this.validator}) : super(
+  RecipeField({Key? key, required BuildContext context, RecipeModel? initialValue, this.title, this.onChanged, this.validator}) : super(
       key: key,
       initialValue: initialValue,
       builder: (FormFieldState<RecipeModel> field) {
@@ -25,15 +25,15 @@ class ReceiptField extends FormField<RecipeModel> {
   );
 
   @override
-  _BeerStyleFieldState createState() => _BeerStyleFieldState();
+  _RecipeFieldState createState() => _RecipeFieldState();
 }
 
-class _BeerStyleFieldState extends FormFieldState<RecipeModel> {
+class _RecipeFieldState extends FormFieldState<RecipeModel> {
   final GlobalKey<FormFieldState> _key = GlobalKey<FormFieldState>();
-  Future<List<RecipeModel>>? _receipts;
+  Future<List<RecipeModel>>? _recipes;
 
   @override
-  ReceiptField get widget => super.widget as ReceiptField;
+  RecipeField get widget => super.widget as RecipeField;
 
   @override
   void initState() {
@@ -58,7 +58,7 @@ class _BeerStyleFieldState extends FormFieldState<RecipeModel> {
         filled: true,
       ),
       child: FutureBuilder<List<RecipeModel>>(
-        future: _receipts,
+        future: _recipes,
         builder: (context, snapshot) {
           if (snapshot.data != null) {
             return DropdownSearch<RecipeModel>(
@@ -101,7 +101,7 @@ class _BeerStyleFieldState extends FormFieldState<RecipeModel> {
 
   _fetch() async {
     setState(() {
-      _receipts = Database().getReceipts(user: currentUser?.uuid, myData: true, ordered: true);
+      _recipes = Database().getRecipes(user: currentUser?.uuid, myData: true, ordered: true);
     });
   }
 }

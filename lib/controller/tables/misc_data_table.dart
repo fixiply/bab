@@ -33,7 +33,7 @@ class MiscDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  RecipeModel? receipt;
+  RecipeModel? recipe;
   final void Function(List<MiscModel> value)? onChanged;
   MiscDataTable({Key? key,
     this.data,
@@ -47,7 +47,7 @@ class MiscDataTable extends StatefulWidget {
     this.color,
     this.showCheckboxColumn = true,
     this.selectionMode = SelectionMode.multiple,
-    this.receipt,
+    this.recipe,
     this.onChanged}) : super(key: key);
 
   @override
@@ -181,8 +181,8 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
           var value = _dataSource.getValue(dataGridRow, details.column.columnName);
           var duration = await showDurationPicker(
             context: context,
-            initialTime: Duration(minutes: value ??  widget.receipt!.boil),
-            maxTime: Duration(minutes: widget.receipt!.boil!),
+            initialTime: Duration(minutes: value ??  widget.recipe!.boil),
+            maxTime: Duration(minutes: widget.recipe!.boil!),
               // showOkButton: false,
               // onComplete: (duration, context) {
               //   _dataSource.newCellValue = duration.inMinutes;

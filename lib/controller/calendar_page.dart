@@ -249,11 +249,11 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
       GestureTapCallback? onTap;
       if (e is BrewModel) {
         bool movable = true;
-        if (e.receipt != null) {
-          color = ColorHelper.fromHex(e.receipt!.color) ?? color;
+        if (e.recipe != null) {
+          color = ColorHelper.fromHex(e.recipe!.color) ?? color;
         }
         time = TimeOfDay.fromDateTime(e.started_at!).format(context);
-        title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.receipt!.title)}';
+        title = '#${e.reference!} - ${AppLocalizations.of(context)!.localizedText(e.recipe!.title)}';
         if (DateHelper.toDate(e.started_at!) == DateHelper.toDate(day)) {
           subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_brewing');
         }  else if (e.finish() == DateHelper.toDate(day)) {
