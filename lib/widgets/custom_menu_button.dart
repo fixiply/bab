@@ -42,7 +42,6 @@ abstract class _CustomMenuButton extends PopupMenuButton {
         if (!DeviceHelper.isDesktop) const PopupMenuDivider(height: 5),
         PopupMenuItem(
           child: PopupMenuButton(
-            padding: EdgeInsets.zero,
             child: Text(AppLocalizations.of(context)!.text('languages')),
             onSelected: (value) async {
               Provider.of<LocaleNotifier>(context, listen: false).set(value);
@@ -66,7 +65,6 @@ abstract class _CustomMenuButton extends PopupMenuButton {
         if (measures) const PopupMenuDivider(height: 5),
         if (measures) PopupMenuItem(
           child: PopupMenuButton(
-            padding: EdgeInsets.zero,
             child: Text(AppLocalizations.of(context)!.text('measuring_systems')),
             onSelected: (value) async {
               final provider = Provider.of<ValuesNotifier>(context, listen: false);

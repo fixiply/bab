@@ -19,7 +19,7 @@ import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/filter_style_appbar.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
 import 'package:bab/widgets/custom_drawer.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:bab/widgets/search_text.dart';
@@ -46,7 +46,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
   IBU _ibu = IBU();
   ABV _abv = ABV();
   ColorHelper _cu = ColorHelper();
-  List<Fermentation> _selectedFermentations = [];
+  // List<Fermentation> _selectedFermentations = [];
   List<Category> _selectedCategories = [];
 
   @override
@@ -81,34 +81,23 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
               _fetch();
             },
           ),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             filtered: false,
             archived: false,
             measures: true,
+            importLabel: currentUser != null && currentUser!.isAdmin() ? '${AppLocalizations.of(context)!.text('import')} BJCP' : null,
             onSelected: (value) async {
-              if (value == 'import') {
+              if (value == Menu.imported && currentUser != null && currentUser!.isAdmin()) {
                 ImportHelper.styles(context, () {
                   _fetch();
                 });
               } else if (value is Measure) {
                 _clear();
-                // setState(() {
-                //   AppLocalizations.of(context)!.measure = value;
-                // });
-              }
-            },
-            joints: (List<PopupMenuEntry> items) {
-              if (currentUser != null && currentUser!.isAdmin()) {
-                items.add(const PopupMenuDivider(height: 5));
-                items.add(PopupMenuItem(
-                  value: 'import',
-                  child: Text('${AppLocalizations.of(context)!.text('import')} BJCP'),
-                ));
               }
             }
-            )
+          )
         ]
       ),
       drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
@@ -124,7 +113,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
                     cu: _cu,
                     ibu: _ibu,
                     abv: _abv,
-                    selectedFermentations: _selectedFermentations,
+                    // selectedFermentations: _selectedFermentations,
                     categories: _categories,
                     selectedCategories: _selectedCategories,
                     onColorChanged: (start, end) {
@@ -148,16 +137,16 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
                       });
                       _fetch();
                     },
-                    onFermentationChanged: (value) {
-                      setState(() {
-                        if (_selectedFermentations.contains(value)) {
-                          _selectedFermentations.remove(value);
-                        } else {
-                          _selectedFermentations.add(value);
-                        }
-                      });
-                      _fetch();
-                    },
+                    // onFermentationChanged: (value) {
+                    //   setState(() {
+                    //     if (_selectedFermentations.contains(value)) {
+                    //       _selectedFermentations.remove(value);
+                    //     } else {
+                    //       _selectedFermentations.add(value);
+                    //     }
+                    //   });
+                    //   _fetch();
+                    // },
                     onCategoryChanged: (value) {
                       setState(() {
                         if (_selectedCategories.contains(value)) {
@@ -337,7 +326,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
       _cu.clear();
       _ibu.clear();
       _abv.clear();
-      _selectedFermentations.clear();
+      // _selectedFermentations.clear();
     });
     _fetch();
   }
@@ -369,11 +358,11 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
       if (model.ibumax != null && _ibu.end != null && _ibu.end! < model.ibumax!) continue;
       if (model.abvmin != null && _abv.start != null && _abv.start! > model.abvmin!) continue;
       if (model.abvmax != null && _abv.end != null && _abv.end! < model.abvmax!) continue;
-      if (_selectedFermentations.isNotEmpty) {
-        if (!_selectedFermentations.contains(model.fermentation)) {
-          continue;
-        }
-      }
+      // if (_selectedFermentations.isNotEmpty) {
+      //   if (!_selectedFermentations.contains(model.fermentation)) {
+      //     continue;
+      //   }
+      // }
       if (_selectedCategories.isNotEmpty) {
         var result = _selectedCategories.where((element) => element.styles!.contains(model));
         if (result.isEmpty) {

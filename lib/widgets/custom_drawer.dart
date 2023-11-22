@@ -30,7 +30,7 @@ class CustomDrawer<Object> extends Drawer {
             child: Image.asset('assets/images/white_logo_transparent_background.png'),
           )
         ),
-        if (currentUser != null && currentUser!.isEditor()) ListTile(
+        if (currentUser != null) ListTile(
           title: Text(AppLocalizations.of(context)!.text('equipments'),
             style: const TextStyle(fontSize: 18)
           ),
@@ -44,7 +44,7 @@ class CustomDrawer<Object> extends Drawer {
             );
           },
         ),
-        if (currentUser != null && currentUser!.isEditor()) ListTile(
+        if (currentUser != null) ListTile(
           title: Text(AppLocalizations.of(context)!.text('brews'),
               style: const TextStyle(fontSize: 18)
           ),
@@ -58,7 +58,7 @@ class CustomDrawer<Object> extends Drawer {
             );
           },
         ),
-        if (currentUser != null && currentUser!.isEditor()) ListTile(
+        if (currentUser != null) ListTile(
           title: Text(AppLocalizations.of(context)!.text('inventory'),
               style: const TextStyle(fontSize: 18)
           ),
@@ -72,7 +72,7 @@ class CustomDrawer<Object> extends Drawer {
             );
           },
         ),
-        if (currentUser != null && currentUser!.isEditor()) ListTile(
+        if (currentUser != null) ListTile(
           title: Text(AppLocalizations.of(context)!.text('tools'),
               style: const TextStyle(fontSize: 18)
           ),

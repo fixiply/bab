@@ -224,22 +224,10 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      _showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
       credential.user!.sendEmailVerification();
       debugPrint('createUserWithEmailAndPassword ${credential.user!.uid}');
-      UserModel user = UserModel(
-        full_name: _fullNameController.text,
-        email: _emailController.text.trim(),
-        user: credential.user,
-        language: AppLocalizations.of(context)!.currentLanguage
-      );
-      Database().set(credential.user!.uid, user).then((value) async {
-        if (value == true) {
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-          await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
-          _showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
-          Navigator.pop(context);
-        }
-      });
+      await FirebaseAuth.instance.signOut();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         _showSnackbar(AppLocalizations.of(context)!.text('weak_password'));

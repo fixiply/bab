@@ -363,7 +363,7 @@ class Database {
     return null;
   }
 
-  Future<List<StyleModel>> getStyles({List<constants.Fermentation>? fermentations, String? name, String? number, bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({String? name, String? number, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
     if (name != null) {
@@ -375,17 +375,10 @@ class Database {
     query = query.orderBy('updated_at', descending: true);
     await query.get().then((result) {
       for (var doc in result.docs) {
-        bool canBeAdded = true;
-        if (fermentations != null && fermentations.isNotEmpty) {
-          constants.Fermentation fermentation = constants.Fermentation.values.elementAt(doc['fermentation']);
-          canBeAdded = fermentations.contains(fermentation);
-        }
-        if (canBeAdded) {
-          StyleModel model = StyleModel();
-          model.uuid = doc.id;
-          model.fromMap(doc.data() as Map<String, dynamic>);
-          list.add(model);
-        }
+        StyleModel model = StyleModel();
+        model.uuid = doc.id;
+        model.fromMap(doc.data() as Map<String, dynamic>);
+        list.add(model);
       }
     });
     if (ordered == true) {

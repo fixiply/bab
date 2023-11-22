@@ -19,6 +19,7 @@ import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/filter_recipe_appbar.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
 import 'package:bab/widgets/custom_drawer.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/image_animate_rotate.dart';
@@ -46,7 +47,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
   ABV _abv = ABV();
   bool _my_receips = true;
   ColorHelper _cu = ColorHelper();
-  List<Fermentation> _selectedFermentations = [];
+  // List<Fermentation> _selectedFermentations = [];
   List<Category> _selectedCategories = [];
 
   @override
@@ -80,7 +81,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
               _fetch();
             },
           ),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             filtered: false,
@@ -103,7 +104,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
                     abv: _abv,
                     cu: _cu,
                     my_receips: _my_receips,
-                    selectedFermentations: _selectedFermentations,
+                    // selectedFermentations: _selectedFermentations,
                     categories: _categories,
                     selectedCategories: _selectedCategories,
                     onColorChanged: (start, end) {
@@ -133,17 +134,17 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
                       });
                       _fetch();
                     },
-                    onFermentationChanged: (value) {
-                      setState(() {
-                        if (_selectedFermentations.contains(value)) {
-                          _selectedFermentations.remove(value);
-                          _selectedCategories.clear();
-                        } else {
-                          _selectedFermentations.add(value);
-                        }
-                      });
-                      _fetch();
-                    },
+                    // onFermentationChanged: (value) {
+                    //   setState(() {
+                    //     if (_selectedFermentations.contains(value)) {
+                    //       _selectedFermentations.remove(value);
+                    //       _selectedCategories.clear();
+                    //     } else {
+                    //       _selectedFermentations.add(value);
+                    //     }
+                    //   });
+                    //   _fetch();
+                    // },
                     onCategoryChanged: (value) {
                       setState(() {
                         if (_selectedCategories.contains(value)) {
@@ -329,7 +330,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
       _cu.clear();
       _ibu.clear();
       _abv.clear();
-      _selectedFermentations.clear();
+      // _selectedFermentations.clear();
       _selectedCategories.clear();
     });
     _fetch();
@@ -346,7 +347,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
 
   _fetch() async {
     List<RecipeModel> list = await Database().getRecipes(user: currentUser?.uuid, myData: _my_receips, ordered: true);
-    _styles  = await Database().getStyles(fermentations: _selectedFermentations, ordered: true);
+    _styles  = await Database().getStyles(ordered: true);
     if (mounted == true) {
       Category.populate(  _categories, _styles, AppLocalizations.of(context)!.locale);
       setState(() {
@@ -371,11 +372,11 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
       if (model.ibu != null && _ibu.end != null && _ibu.end! < model.ibu!) continue;
       if (model.abv != null && _abv.start != null && _abv.start! > model.abv!) continue;
       if (model.abv != null && _abv.end != null && _abv.end! < model.abv!) continue;
-      if (_selectedFermentations.isNotEmpty) {
-        if (!_styles.contains(model.style)) {
-          continue;
-        }
-      }
+      // if (_selectedFermentations.isNotEmpty) {
+      //   if (!_styles.contains(model.style)) {
+      //     continue;
+      //   }
+      // }
       if (_selectedCategories.isNotEmpty) {
         var result = _selectedCategories.where((element) => element.styles!.contains(model.style));
         if (result.isEmpty) {

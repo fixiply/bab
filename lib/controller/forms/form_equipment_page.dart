@@ -8,6 +8,7 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
@@ -95,7 +96,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
               }
             }
           ),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             measures: true,

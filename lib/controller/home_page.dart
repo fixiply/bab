@@ -232,15 +232,15 @@ class _HomeState extends State<HomePage> {
           icon: Icons.science_outlined,
           label: AppLocalizations.of(context)!.text('ingredients'),
         ),
-        if (currentUser != null && currentUser!.isEditor()) SidebarXItem(
+        if (currentUser != null) SidebarXItem(
           icon: Icons.takeout_dining_outlined,
           label: AppLocalizations.of(context)!.text('equipments'),
         ),
-        if (currentUser != null && currentUser!.isEditor()) SidebarXItem(
+        if (currentUser != null) SidebarXItem(
           icon: Icons.outdoor_grill_outlined,
           label: AppLocalizations.of(context)!.text('brews'),
         ),
-        if (currentUser != null && currentUser!.isEditor()) SidebarXItem(
+        if (currentUser != null) SidebarXItem(
           icon: Icons.inventory_outlined,
           label: AppLocalizations.of(context)!.text('inventory'),
         ),
@@ -317,7 +317,7 @@ class _HomeState extends State<HomePage> {
               );
             }
         ),
-        if (isLargeScreen && user != null && user.isEditor()) Navigator(
+        if (isLargeScreen && user != null) Navigator(
             key: GlobalKey(),
             onGenerateRoute: (RouteSettings settings) {
               return MaterialPageRoute(
@@ -326,7 +326,7 @@ class _HomeState extends State<HomePage> {
               );
             }
         ),
-        if (isLargeScreen && user != null && user.isEditor()) Navigator(
+        if (isLargeScreen && user != null) Navigator(
             key: GlobalKey(),
             onGenerateRoute: (RouteSettings settings) {
               return MaterialPageRoute(
@@ -335,7 +335,7 @@ class _HomeState extends State<HomePage> {
               );
             }
         ),
-        if (isLargeScreen && user != null && user.isEditor()) Navigator(
+        if (isLargeScreen && user != null) Navigator(
             key: GlobalKey(),
             onGenerateRoute: (RouteSettings settings) {
               return MaterialPageRoute(

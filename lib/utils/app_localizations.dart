@@ -367,8 +367,8 @@ class AppLocalizations {
   }
 
   /// Returns the formatted gravity.
-  String? gravityFormat(double? number, {bool? symbol = true}) {
-    switch(gravity) {
+  String? gravityFormat(double? number, {Gravity? gravity, bool? symbol = true}) {
+    switch(gravity ?? this.gravity) {
       case Gravity.sg:
         if (number == null || number <= 1 || number >= 2) {
           return '1.xxx';

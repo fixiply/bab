@@ -25,6 +25,7 @@ import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/carousel_container.dart';
 import 'package:bab/widgets/containers/ratings_container.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/custom_slider.dart';
 import 'package:bab/widgets/paints/bezier_clipper.dart';
@@ -88,7 +89,7 @@ class _RecipePageState extends State<RecipePage> {
                 _edit(widget.model);
               },
             ),
-            CustomMenuButton(
+            CustomMenuAnchor(
               context: context,
               publish: false,
               filtered: false,
@@ -215,7 +216,7 @@ class _RecipePageState extends State<RecipePage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
                               if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.volume == null) const TextSpan(text: 'NC'),
+                              if (widget.model.volume == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                             ],
                           ),
                         ),
@@ -232,7 +233,7 @@ class _RecipePageState extends State<RecipePage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'boiling' : 'boiling_time')} : '),
                               if (widget.model.boil != null) TextSpan(text: AppLocalizations.of(context)!.durationFormat(widget.model.boil), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.boil == null) const TextSpan(text: 'NC'),
+                              if (widget.model.boil == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                             ],
                           ),
                         ),

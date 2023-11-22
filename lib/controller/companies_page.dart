@@ -9,6 +9,7 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 
@@ -43,7 +44,7 @@ class _CompaniesPageState extends State<CompaniesPage> with AutomaticKeepAliveCl
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             filtered: false,

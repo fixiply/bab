@@ -8,6 +8,7 @@ import 'package:bab/controller/tables/yeasts_data_table.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
@@ -52,7 +53,7 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
           backgroundColor: Colors.white,
           actions: [
             BasketButton(),
-            CustomMenuButton(
+            CustomMenuAnchor(
               context: context,
               publish: false,
               filtered: false,

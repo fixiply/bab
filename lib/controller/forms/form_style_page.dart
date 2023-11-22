@@ -8,6 +8,7 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
@@ -91,7 +92,7 @@ class _FormStylePageState extends State<FormStylePage> {
               }
             }
           ),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             measures: true,
@@ -158,45 +159,18 @@ class _FormStylePageState extends State<FormStylePage> {
                 ]
               ),
               const Divider(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: LocalizedTextField(
-                      context: context,
-                      initialValue: widget.model.category,
-                      textCapitalization: TextCapitalization.sentences,
-                      onChanged: (value) => widget.model.category = value,
-                      decoration: FormDecoration(
-                          icon: const Icon(Icons.category),
-                          labelText: AppLocalizations.of(context)!.text('category'),
-                          border: InputBorder.none,
-                          fillColor: FillColor, filled: true
-                      ),
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                    )
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: DropdownButtonFormField<Fermentation>(
-                      value: widget.model.fermentation,
-                      style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.aspect_ratio),
-                        labelText: AppLocalizations.of(context)!.text('fermentation'),
-                        fillColor: FillColor,
-                        filled: true,
-                      ),
-                      items: Fermentation.values.map((Fermentation display) {
-                        return DropdownMenuItem<Fermentation>(
-                            value: display,
-                            child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
-                      }).toList(),
-                      onChanged: (value) {
-                        widget.model.fermentation = value;
-                      }
-                    )
-                  ),
-                ]
+              LocalizedTextField(
+                context: context,
+                initialValue: widget.model.category,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (value) => widget.model.category = value,
+                decoration: FormDecoration(
+                    icon: const Icon(Icons.category),
+                    labelText: AppLocalizations.of(context)!.text('category'),
+                    border: InputBorder.none,
+                    fillColor: FillColor, filled: true
+                ),
+                autovalidateMode: AutovalidateMode.onUserInteraction,
               ),
               const Divider(height: 10),
               FormField(

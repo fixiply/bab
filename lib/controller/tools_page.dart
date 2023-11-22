@@ -1,10 +1,13 @@
+import 'package:bab/widgets/containers/unit_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
-import 'package:bab/widgets/containers/empty_container.dart';
+import 'package:bab/widgets/containers/abv_container.dart';
+import 'package:bab/widgets/containers/ph_container.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
@@ -14,8 +17,35 @@ class ToolsPage extends StatefulWidget {
   _ToolsPageState createState() => _ToolsPageState();
 }
 
+extension ListExpanded on List {
+  bool isExpanded(int n) {
+    for (Map element in this) {
+      if (element.containsKey(n)) {
+        return element[n];
+      }
+    }
+    return false;
+  }
+
+  void set(int n, bool b) {
+    bool found = false;
+    for (Map element in this) {
+      if (element.containsKey(n)) {
+        element[n] = b;
+        found = true;
+      }
+    }
+    if (!found) {
+      add({n: b});
+    }
+  }
+}
+
 class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixin<ToolsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  final List<Map<int, bool>> _first =  [];
+  final List<Map<int, bool>> _second =  [];
 
   @override
   bool get wantKeepAlive => true;
@@ -32,7 +62,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
         backgroundColor: Colors.white,
         actions: [
           BasketButton(),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             filtered: false,
@@ -40,7 +70,115 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
           )
         ],
       ),
-      body: EmptyContainer(message: 'En construction')
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Text('Générale', style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ExpansionPanelList(
+              expandedHeaderPadding: EdgeInsets.zero,
+              expansionCallback: (int index, bool isExpanded) {
+                setState(() {
+                  _first.set(index, isExpanded);
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _first.isExpanded(0),
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text('ABV - Alcool par volume'),
+                      subtitle: Text('Estimation du volume d\'alcool de votre bière et calcul d\'atténuation de la densité lors de la fermentation.'),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.all(18),
+                    child: ABVContainer(
+                      showTitle: false,
+                    )
+                  )
+                ),
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _first.isExpanded(1),
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text('Convertisseurs d\'unités'),
+                      subtitle: Text('Covertir les unités utilisées dans le brassage (couleur, densité, température et pression).'),
+                    );
+                  },
+                    body: Container(
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.all(18),
+                      child: UnitContainer(
+                        showTitle: false,
+                      )
+                    )
+                )
+              ]
+            ),
+            const SizedBox(height: 20),
+            Text('Tout grain', style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ExpansionPanelList(
+              expandedHeaderPadding: EdgeInsets.zero,
+              expansionCallback: (int index, bool isExpanded) {
+                setState(() {
+                  _second.set(index, isExpanded);
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _second.isExpanded(0),
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text('Efficacité de l\'empâtage'),
+                      subtitle: Text('Calcul le pourcentage de sucres disponibles extraits des grains.'),
+                    );
+                  },
+                  body: Container()
+                ),
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _second.isExpanded(1),
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text('Eau d\'empâtage et de rincage'),
+                      subtitle: Text('Calcul la quantité d\'eau et de rinçage requise pour votre brassin.'),
+                    );
+                  },
+                  body: Container()
+                ),
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _second.isExpanded(2),
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text('Ajustement du pH de l\'eau'),
+                      subtitle: Text('Calcul la quantité d\'acide pour atteindre le pH souhaité.'),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.all(18),
+                    child: PHContainer(
+                      showTitle: false,
+                      showVolume: true,
+                      target: 5.4,
+                    )
+                  )
+                )
+              ]
+            ),
+          ]
+        )
+      )
     );
   }
 

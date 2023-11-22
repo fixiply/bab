@@ -9,6 +9,7 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
@@ -122,7 +123,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
               }
             }
           ),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             measures: true,
@@ -154,7 +155,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 initiallyExpanded: true,
                 backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
-                title: Text(AppLocalizations.of(context)!.text('profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                title: Text(AppLocalizations.of(context)!.text('brew_profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
                   Row(
                     children: [
@@ -169,7 +170,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_water')} : '),
                                 if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.mash_water == null) const TextSpan(text: 'NC'),
+                                if (widget.model.mash_water == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                               ],
                             ),
                           ),
@@ -186,7 +187,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('sparge_water')} : '),
                                 if (widget.model.sparge_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.sparge_water == null) const TextSpan(text: 'NC')
+                                if (widget.model.sparge_water == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable'))
                               ],
                             ),
                           ),
@@ -207,7 +208,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
                                 if (widget.model.efficiency != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.efficiency == null) const TextSpan(text: 'NC'),
+                                if (widget.model.efficiency == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                               ],
                             ),
                           ),
@@ -224,7 +225,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                               children: <TextSpan>[
                                 TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
                                 if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: const TextStyle(fontWeight: FontWeight.bold)),
-                                if (widget.model.abv == null) const TextSpan(text: 'NC')                              ],
+                                if (widget.model.abv == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable'))                              ],
                             ),
                           ),
                         ),

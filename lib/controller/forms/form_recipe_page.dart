@@ -1,5 +1,3 @@
-import 'package:bab/widgets/duration_picker.dart';
-import 'package:bab/widgets/forms/duration_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -7,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:bab/controller/forms/form_brew_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/brew_model.dart';
-import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/fermentable_model.dart' as fm;
 import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/misc_model.dart';
 import 'package:bab/models/recipe_model.dart';
@@ -18,13 +16,15 @@ import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/custom_slider.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
-import 'package:bab/widgets/forms/color_field.dart';
 import 'package:bab/widgets/forms/beer_style_field.dart';
+import 'package:bab/widgets/forms/color_field.dart';
+import 'package:bab/widgets/forms/duration_field.dart';
 import 'package:bab/widgets/forms/image_field.dart';
 import 'package:bab/widgets/forms/ingredients_field.dart';
 import 'package:bab/widgets/forms/localized_text_field.dart';
@@ -134,7 +134,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
               }
             }
           ),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             filtered: false,
@@ -166,7 +166,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                 initiallyExpanded: true,
                 backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
-                title: Text(AppLocalizations.of(context)!.text('recipe_based_estimate'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                title: Text(AppLocalizations.of(context)!.text('recipe_profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
                   Row(
                     children: [
@@ -187,6 +187,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                       Expanded(
                         child: CustomSlider(AppLocalizations.of(context)!.text('abv'), widget.model.abv ?? 0, 0, MAX_ABV, 0.1,
                           onFormatted: (double value) {
+                            if (value == 0) return AppLocalizations.of(context)!.text('not_applicable');
                             return AppLocalizations.of(context)!.numberFormat(value, pattern: "#0.#'%'");
                           },
                         )
@@ -224,6 +225,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                       Expanded(
                         child: CustomSlider(AppLocalizations.of(context)!.text('ibu'), widget.model.ibu ?? 0, 0, MAX_IBU, 0.1,
                           onFormatted: (double value) {
+                            if (value == 0) return AppLocalizations.of(context)!.text('not_applicable');
                             return AppLocalizations.of(context)!.numberFormat(value);
                           },
                         )
@@ -263,6 +265,36 @@ class _FormRecipePageState extends State<FormRecipePage> {
                       }
                     ),
                   ),
+                ]
+              ),
+              const Divider(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<Method>(
+                      value: widget.model.method,
+                      style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
+                      decoration: FormDecoration(
+                        icon: const Icon(Icons.grain),
+                        labelText: AppLocalizations.of(context)!.text('method'),
+                        fillColor: constants.FillColor,
+                        filled: true,
+                      ),
+                      items: Method.values.map((Method display) {
+                        return DropdownMenuItem<Method>(
+                            value: display,
+                            child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                      }).toList(),
+                      onChanged: (value) => widget.model.method = value,
+                      autovalidateMode: AutovalidateMode.onUserInteraction,
+                      validator: (value) {
+                        if (value == null) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
+                    ),
+                  ),
                   const SizedBox(width: 12),
                   SizedBox(
                     width: 80,
@@ -276,7 +308,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                       // hintText: AppLocalizations.of(context)!.text('share'),
                       onChanged: (value) => widget.model.shared = value,
                     )
-                  )
+                  ),
                 ]
               ),
               const Divider(height: 10),
@@ -380,7 +412,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                 ingredient: constants.Ingredient.fermentable,
                 recipe: widget.model,
                 onChanged: (values) {
-                  widget.model.fermentables = values as List<FermentableModel>;
+                  widget.model.fermentables = values as List<fm.FermentableModel>;
                   _calculate();
                 },
               ),

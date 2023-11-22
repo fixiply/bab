@@ -1,7 +1,7 @@
 // Internal package
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
-import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/fermentable_model.dart' as fm;
 import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/image_model.dart';
@@ -17,7 +17,12 @@ import 'package:bab/utils/quantity.dart';
 import 'package:bab/utils/rating.dart';
 import 'package:flutter/material.dart';
 
+enum Method with Enums { all_grain,  extract, partial;
+  List<Enum> get enums => [ all_grain,  extract, partial ];
+}
+
 class RecipeModel<T> extends Model {
+  Method? method;
   String? color;
   Status? status;
   dynamic title;
@@ -48,7 +53,7 @@ class RecipeModel<T> extends Model {
   List<Rating>? ratings;
   String? country;
 
-  List<FermentableModel>? _fermentables;
+  List<fm.FermentableModel>? _fermentables;
   List<hm.HopModel>? _hops;
   List<mm.MiscModel>? _misc;
   List<YeastModel>? _yeasts;
@@ -58,6 +63,7 @@ class RecipeModel<T> extends Model {
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
+    this.method = Method.all_grain,
     this.color,
     this.status = Status.disabled,
     this.title,
@@ -100,6 +106,7 @@ class RecipeModel<T> extends Model {
   @override
   Future fromMap(Map<String, dynamic> map) async {
     super.fromMap(map);
+    if (map.containsKey('method')) this.method = Method.values.elementAt(map['method']);
     this.color = map['color'];
     this.status = Status.values.elementAt(map['status']);
     this.title = LocalizedText.deserialize(map['title']);
@@ -135,6 +142,7 @@ class RecipeModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
+      'method': this.method!.index,
       'color': this.color,
       'status': this.status!.index,
       'title': LocalizedText.serialize(this.title),
@@ -149,7 +157,7 @@ class RecipeModel<T> extends Model {
       'abv': this.abv,
       'ibu': this.ibu,
       'ebc': this.ebc,
-      'fermentables': FermentableModel.quantities(this._fermentables),
+      'fermentables': fm.FermentableModel.quantities(this._fermentables),
       'hops': hm.HopModel.quantities(this._hops),
       'miscellaneous': mm.MiscModel.quantities(this._misc),
       'yeasts': YeastModel.quantities(this._yeasts),
@@ -174,6 +182,7 @@ class RecipeModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
+      method: this.method,
       color: this.color,
       status: this.status,
       title: this.title,
@@ -237,7 +246,7 @@ class RecipeModel<T> extends Model {
 
   double get mass {
     double mass = 0;
-    for(FermentableModel item in fermentables) {
+    for(fm.FermentableModel item in fermentables) {
       mass += (item.amount ?? 0);
     }
     return mass;
@@ -245,19 +254,19 @@ class RecipeModel<T> extends Model {
 
   double get extract {
     double extract = 0;
-    for(FermentableModel item in fermentables) {
+    for(fm.FermentableModel item in fermentables) {
       extract += (item.efficiency ?? 0) / fermentables.length;
     }
     return extract;
   }
 
-  set fermentables(List<FermentableModel>data) => _fermentables = data;
+  set fermentables(List<fm.FermentableModel>data) => _fermentables = data;
 
-  List<FermentableModel> get fermentables => _fermentables ?? [];
+  List<fm.FermentableModel> get fermentables => _fermentables ?? [];
 
-  Future<List<FermentableModel>> getFermentables({double? volume, bool forceResizing = false}) async {
+  Future<List<fm.FermentableModel>> getFermentables({double? volume, bool forceResizing = false}) async {
     if (_fermentables == null || forceResizing) {
-      _fermentables = await FermentableModel.data(cacheFermentables!);
+      _fermentables = await fm.FermentableModel.data(cacheFermentables!);
       resizeFermentales(volume);
     }
     return _fermentables ?? [];
@@ -314,7 +323,7 @@ class RecipeModel<T> extends Model {
     if (volume == null || volume == this.volume) {
       return;
     }
-    for(FermentableModel item in fermentables) {
+    for(fm.FermentableModel item in fermentables) {
       item.amount = (item.amount! * (volume / this.volume!)).abs();
     }
     calculate(volume: volume);
@@ -355,8 +364,8 @@ class RecipeModel<T> extends Model {
     abv = null;
     double mcu = 0.0;
     double extract = 0.0;
-    for(FermentableModel item in await getFermentables()) {
-      if (item.use == Method.mashed) {
+    for(fm.FermentableModel item in await getFermentables()) {
+      if (item.use == fm.Method.mashed) {
         // double volume = EquipmentModel.preBoilVolume(null, widget.model.volume);
         extract += (item.extract(efficiency) ?? 0);
         mcu += ColorHelper.mcu(item.ebc, item.amount, volume ?? this.volume);

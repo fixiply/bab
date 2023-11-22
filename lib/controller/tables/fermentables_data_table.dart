@@ -1,12 +1,12 @@
 import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
+import 'package:bab/models/fermentable_model.dart';
 // Internal package
 import 'package:bab/controller/fermentables_page.dart';
 import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
-import 'package:bab/models/fermentable_model.dart';
-import 'package:bab/models/recipe_model.dart';
+import 'package:bab/models/recipe_model.dart' as rm;
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
@@ -33,7 +33,7 @@ class FermentablesDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  RecipeModel? recipe;
+  rm.RecipeModel? recipe;
   final void Function(List<FermentableModel>? value)? onChanged;
   FermentablesDataTable({Key? key,
     this.data,

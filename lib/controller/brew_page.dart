@@ -23,6 +23,7 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/carousel_container.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/paints/bezier_clipper.dart';
 import 'package:bab/widgets/paints/circle_clipper.dart';
@@ -97,7 +98,7 @@ class _BrewPageState extends State<BrewPage> {
                   _edit(widget.model);
                 },
               ),
-            CustomMenuButton(
+            CustomMenuAnchor(
               context: context,
               publish: false,
               filtered: false,
@@ -147,7 +148,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'volume' : 'mash_volume')} : '),
                               if (widget.model.volume != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.volume), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.volume == null) const TextSpan(text: 'NC'),
+                              if (widget.model.volume == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                             ],
                           ),
                         ),
@@ -168,7 +169,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'mash' : 'mash_water')} : '),
                               if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.mash_water == null) const TextSpan(text: 'NC'),
+                              if (widget.model.mash_water == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                             ],
                           ),
                         ),
@@ -185,7 +186,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'sparge' : 'sparge_water')} : '),
                               if (widget.model.mash_water != null) TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.mash_water == null) const TextSpan(text: 'NC'),
+                              if (widget.model.mash_water == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                             ],
                           ),
                         ),
@@ -206,7 +207,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'efficiency' : 'mash_efficiency')} : '),
                               if (widget.model.efficiency != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.efficiency), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.efficiency == null) const TextSpan(text: 'NC'),
+                              if (widget.model.efficiency == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
                             ],
                           ),
                         ),
@@ -223,7 +224,7 @@ class _BrewPageState extends State<BrewPage> {
                             children: <TextSpan>[
                               TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'alcohol' : 'volume_alcohol')} : '),
                               if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: const TextStyle(fontWeight: FontWeight.bold)),
-                              if (widget.model.abv == null) const TextSpan(text: 'NC')
+                              if (widget.model.abv == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable'))
                             ],
                           ),
                         ),

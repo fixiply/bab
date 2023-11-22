@@ -5,7 +5,6 @@ import 'package:bab/utils/localized_text.dart';
 
 class StyleModel<T> extends Model {
   Status? status;
-  Fermentation? fermentation;
   dynamic name;
   String? number;
   dynamic category;
@@ -32,7 +31,6 @@ class StyleModel<T> extends Model {
     DateTime? updated_at,
     String? creator,
     this.status = Status.publied,
-    this.fermentation = Fermentation.hight,
     this.name,
     this.number,
     this.category,
@@ -58,7 +56,6 @@ class StyleModel<T> extends Model {
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.status = Status.values.elementAt(map['status']);
-    this.fermentation = Fermentation.values.elementAt(map['fermentation']);
     this.name = LocalizedText.deserialize(map['name']);
     this.number = map['number'];
     this.category = LocalizedText.deserialize(map['category']);
@@ -85,7 +82,6 @@ class StyleModel<T> extends Model {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,
-      'fermentation': this.fermentation!.index,
       'name': LocalizedText.serialize(this.name),
       'number': this.number,
       'category': LocalizedText.serialize(this.category),
@@ -116,7 +112,6 @@ class StyleModel<T> extends Model {
       updated_at: updated_at,
       creator: creator,
       status: this.status,
-      fermentation: this.fermentation,
       name: this.name,
       number: this.number,
       category: this.category,

@@ -111,7 +111,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data!.isEmpty) {
-                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
+                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_brew'));
               }
               if (_showList) {
                 if (widget.loadMore) {

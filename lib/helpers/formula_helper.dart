@@ -351,6 +351,16 @@ class FormulaHelper {
     return 1 + (number / (258.6 - ( (number / 258.2) * 227.1)));
   }
 
+  /// Returns the plato gravity to brix
+  ///
+  /// The `number` argument is relative to the plato gravity.
+  static double convertPlatoToBrix(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number * 1.04;
+  }
+
   /// Returns the specific gravity to brix
   ///
   /// The `number` argument is relative to the specific gravity.
@@ -369,6 +379,16 @@ class FormulaHelper {
       return 0;
     }
     return (number / (258.6 - ((number / 258.2) * 227.1))) + 1;
+  }
+
+  /// Returns the brix to plato gravity
+  ///
+  /// The `number` argument is relative to the brix.
+  static double convertBrixToPlato(double? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number / 1.04;
   }
 }
 

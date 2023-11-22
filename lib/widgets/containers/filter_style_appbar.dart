@@ -57,7 +57,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
   void initState() {
     super.initState();
     _tabController = TabController(
-      length: 4,
+      length: 3,
       vsync: this,
     );
   }
@@ -77,7 +77,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
           tabs: [
             Tab(icon: Icon(Icons.tune, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('flavor'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
             Tab(icon: Icon(Icons.palette_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('color'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
-            Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
+            // Tab(icon: Icon(Icons.bubble_chart_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
             Tab(icon: Icon(Icons.style_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('style'), style: TextStyle(fontSize: 12, color: Theme.of(context).primaryColor))),
           ],
         ),
@@ -88,7 +88,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
             children: [
               _flavor(),
               _color(),
-              _fermentation(),
+              // _fermentation(),
               _styles()
             ],
           ),

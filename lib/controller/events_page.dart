@@ -17,7 +17,7 @@ import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/image_container.dart';
 import 'package:bab/widgets/containers/shimmer_container.dart';
 import 'package:bab/widgets/custom_drawer.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/search_text.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
@@ -64,7 +64,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
         backgroundColor: Colors.white,
         actions: <Widget> [
           BasketButton(),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: currentUser != null && currentUser!.isAdmin(),
             filtered: currentUser != null && currentUser!.isAdmin(),
@@ -157,7 +157,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
     if (DeviceHelper.isLargeScreen(context)) {
       return 3;
     }
-    if (!DeviceHelper.isMobile(context)) {
+    if (DeviceHelper.isMobile(context)) {
       return 2;
     }
     return DeviceHelper.landscapeOrientation(context) ? 3 : 2;

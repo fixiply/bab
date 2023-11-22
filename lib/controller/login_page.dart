@@ -269,6 +269,7 @@ class _LoginPageState extends State<LoginPage> {
         password: _passwordController.text.trim(),
       );
       if (!credential.user!.emailVerified) {
+        FirebaseAuth.instance.signOut();
         _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
           action: SnackBarAction(
             textColor: Colors.white,

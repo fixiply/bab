@@ -10,8 +10,8 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/basket_button.dart';
-import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/days.dart';
 
@@ -71,7 +71,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
             },
           ),
           BasketButton(),
-          CustomMenuButton(
+          CustomMenuAnchor(
             context: context,
             publish: false,
             filtered: false,
@@ -85,9 +85,6 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
           future: _data,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              if (snapshot.data!.isEmpty) {
-                return EmptyContainer(message: AppLocalizations.of(context)!.text('no_result'));
-              }
               return Column(
                 children: [
                   TableCalendar(

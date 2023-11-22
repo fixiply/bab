@@ -2,7 +2,7 @@
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/equipment_model.dart';
-import 'package:bab/models/fermentable_model.dart';
+import 'package:bab/models/fermentable_model.dart' as fm;
 import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/recipe_model.dart';
@@ -247,8 +247,8 @@ class BrewModel<T> extends Model {
 
   Future<double> get totalWeight async {
     double weight = 0;
-    for(FermentableModel item in await recipe!.getFermentables()) {
-      if (item.use == Method.mashed) {
+    for(fm.FermentableModel item in await recipe!.getFermentables()) {
+      if (item.use == fm.Method.mashed) {
         weight +=  (item.amount! * (volume! / recipe!.volume!)).abs();
       }
     }

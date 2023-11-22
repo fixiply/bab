@@ -8,10 +8,15 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/form_decoration.dart';
 
+@immutable
 class PHContainer extends StatefulWidget {
+  bool showTitle;
+  bool showVolume;
   double? target;
   double? volume;
-  PHContainer({this.target, this.volume});
+
+  PHContainer({this.showTitle : true, this.showVolume : false, this.target, this.volume});
+
   @override
   State<StatefulWidget> createState() {
     return _PHContainerState();
@@ -20,21 +25,42 @@ class PHContainer extends StatefulWidget {
 
 class _PHContainerState extends State<PHContainer> {
 
-  Acid? _acid;
+  Acid? _acid = Acid.hydrochloric;
   double? _current;
   double? _quantity;
   double? _concentration = 10;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        const Text('Ajustement du pH'),
-        SizedBox(
-          width: DeviceHelper.isLargeScreen(context) ? 320: null,
-          child: Row(
+    return SizedBox(
+      width: DeviceHelper.isLargeScreen(context) ? 320: null,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (widget.showTitle) const Text('Ajustement du pH'),
+          if (widget.showVolume) TextFormField(
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+            ],
+            onChanged: (value) {
+              widget.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
+              _calculate();
+            },
+            decoration: FormDecoration(
+              labelText: AppLocalizations.of(context)!.text('mash_volume'),
+              suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+              suffixIcon: Tooltip(
+                message: AppLocalizations.of(context)!.text('final_volume'),
+                child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+              ),
+              border: InputBorder.none,
+              fillColor: BlendColor, filled: true
+            )
+          ),
+          const SizedBox(height: 6),
+          Row(
             children: [
               Expanded(
                 child: TextFormField(
@@ -74,16 +100,14 @@ class _PHContainerState extends State<PHContainer> {
               )
             ]
           ),
-        ),
-        const SizedBox(height: 6),
-        SizedBox(
-          width: DeviceHelper.isLargeScreen(context) ? 320: null,
-          child:Row(
+          const SizedBox(height: 6),
+          Row(
             children: [
               Expanded(
                 flex: 2,
                 child: DropdownButtonFormField<Acid>(
                   isExpanded: true,
+                  value: _acid,
                   style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                   onChanged: (value) {
                     _acid = value;
@@ -120,21 +144,22 @@ class _PHContainerState extends State<PHContainer> {
                 )
               )
             ]
-          )
-        ),
-        if (_quantity != null && _quantity! > 0) SizedBox(
-          width: 312,
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.only(top: 10.0),
-            child: Text('Quantité d\'acide : ${AppLocalizations.of(context)!.numberFormat(_quantity)} ml', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
-          )
-        ),
-      ]
+          ),
+          if (_quantity != null && _quantity! > 0) SizedBox(
+            width: 312,
+            child: Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.only(top: 10.0),
+              child: Text('Quantité d\'acide : ${AppLocalizations.of(context)!.numberFormat(_quantity)} ml', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+            )
+          ),
+        ]
+      )
     );
   }
 
   _calculate() async {
+    debugPrint('current: $_current target: ${widget.target} volume: ${widget.volume} acid: $_acid concentration: $_concentration');
     setState(() {
       _quantity = FormulaHelper.pH(_current, widget.target, widget.volume, _acid, _concentration);
     });

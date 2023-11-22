@@ -230,3 +230,26 @@ exports.updates = functions.https.onRequest(async (req, res) => {
     });
     return true;
 });
+
+exports.createUser = functions.auth.user().onCreate((user) => {
+    firestore.collection("users").doc(user.uid).set({
+        inserted_at: new Date(),
+        updated_at: new Date(),
+        name: user.displayName,
+        email: user.email,
+        role: 2,
+        verified: false
+    }).then(() => {
+        console.log("User #" + user.uid + " successfully written!");
+    }).catch((error) => {
+        console.error("Error writing user: ", error);
+    });
+});
+
+exports.deleteUser = functions.auth.user().onDelete((user) => {
+    firestore.collection("users").doc(user.uid).delete().then(() => {
+        console.log("User #" + user.uid + " successfully deleted!");
+    }).catch((error) => {
+        console.error("Error removing user: ", error);
+    });
+});

@@ -206,7 +206,6 @@ class _AppState extends State<MyApp> {
   _loadUser(User? user) async {
     UserModel? model;
     if (user != null && user.emailVerified) {
-      // Database().copy('receipts', 'recipes');
       model = await Database().getUser(user.uid);
       if (model != null) {
         model.user = user;
@@ -222,7 +221,6 @@ class _AppState extends State<MyApp> {
           }
         }
         logger.d('[$APP_NAME] User "${user.email}" is signed in with "${model.role}".');
-        debugPrint('[$APP_NAME] User "${user.email}" is signed in with "${model.role}".');
       }
     }
     Provider.of<UserNotifier>(context, listen: false).set(model);
@@ -286,7 +284,6 @@ class _AppState extends State<MyApp> {
     if (!DeviceHelper.isDesktop) {
       await FirebaseMessaging.instance.subscribeToTopic(foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC);
       logger.d('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
-      debugPrint('[$APP_NAME] Firebase messaging subscribe from "${foundation.kDebugMode ? NOTIFICATION_TOPIC_DEBUG : NOTIFICATION_TOPIC}"');
       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
         showNotification(message);
       });
