@@ -6,15 +6,15 @@ import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
-import 'package:bab/utils/mash.dart';
+import 'package:bab/utils/fermentation.dart';
 import 'package:bab/widgets/duration_picker.dart';
 
 // External package
 import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-class MashDataTable extends StatefulWidget {
-  List<Mash>? data;
+class FermentationDataTable extends StatefulWidget {
+  List<Fermentation>? data;
   Widget? title;
   bool allowEditing;
   bool allowSorting;
@@ -23,8 +23,8 @@ class MashDataTable extends StatefulWidget {
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
   RecipeModel? recipe;
-  final void Function(List<Mash>? value)? onChanged;
-  MashDataTable({Key? key,
+  final void Function(List<Fermentation>? value)? onChanged;
+  FermentationDataTable({Key? key,
     this.data,
     this.title,
     this.allowEditing = true,
@@ -37,16 +37,16 @@ class MashDataTable extends StatefulWidget {
     this.onChanged}) : super(key: key);
 
   @override
-  MashDataTableState createState() => MashDataTableState();
+  FermentationDataTableState createState() => FermentationDataTableState();
 }
 
-class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveClientMixin {
+class FermentationDataTableState extends State<FermentationDataTable> with AutomaticKeepAliveClientMixin {
   late MashDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
   double dataRowHeight = 30;
-  List<Mash> _selected = [];
+  List<Fermentation> _selected = [];
 
-  List<Mash> get selected => _selected;
+  List<Fermentation> get selected => _selected;
 
   @override
   bool get wantKeepAlive => true;
@@ -61,12 +61,11 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
       onRemove: (int rowIndex) {
         _remove(rowIndex);
       },
-      onChanged: (Mash value, int dataRowIndex) {
+      onChanged: (Fermentation value, int dataRowIndex) {
         if (widget.data != null) {
           widget.data![dataRowIndex].name = value.name;
-          widget.data![dataRowIndex].type = value.type;
-          widget.data![dataRowIndex].temperature = value.temperature;
           widget.data![dataRowIndex].duration = value.duration;
+          widget.data![dataRowIndex].temperature = value.temperature;
         }
         widget.onChanged?.call(widget.data ?? [value]);
       }
@@ -147,7 +146,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                     });
                   }
                 },
-                columns: Mash.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+                columns: Fermentation.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
               ),
             )
           )
@@ -158,7 +157,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
 
   DataGridController getDataGridController() {
     List<DataGridRow> rows = [];
-    for(Mash model in _selected) {
+    for(Fermentation model in _selected) {
       int index = _dataSource.data.indexOf(model);
       if (index != -1) {
         rows.add(_dataSource.dataGridRows[index]);
@@ -170,7 +169,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
 
   _add() async {
     setState(() {
-      widget.data!.add(Mash(name: AppLocalizations.of(context)!.text(Bearing.mash_in.toString().toLowerCase()), duration: widget.recipe!.boil));
+      widget.data!.add(Fermentation(name: '${AppLocalizations.of(context)!.text('fermentation')} ${widget.data!.length + 1}', duration: 10, temperature: 18));
     });
     _dataSource.buildDataGridRows(widget.data!);
     _dataSource.notifyListeners();

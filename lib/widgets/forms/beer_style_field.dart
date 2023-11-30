@@ -63,7 +63,7 @@ class _BeerStyleFieldState extends FormFieldState<StyleModel> {
           if (snapshot.data != null) {
             return DropdownSearch<StyleModel>(
               key: _key,
-              selectedItem: widget.initialValue != null ? snapshot.data!.singleWhere((element) => element == widget.initialValue) : null,
+              selectedItem: widget.initialValue != null ? snapshot.data!.where((element) => element == widget.initialValue).firstOrNull : null,
               compareFn: (item1, item2) => item1.uuid == item2.uuid,
               itemAsString: (StyleModel model) => AppLocalizations.of(context)!.localizedText(model.name),
               asyncItems: (String filter) async {

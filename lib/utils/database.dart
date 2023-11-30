@@ -146,7 +146,7 @@ class Database {
   //Returns document iD if the record is created, null is updated.
   Future<String?> update(dynamic d, {bool updateLogs = true, BuildContext? context}) async {
     if (d.uuid == null) {
-      return add(d);
+      return add(d, ignoreAuth: !updateLogs);
     }
     try {
       if (updateLogs == true) {
@@ -472,9 +472,14 @@ class Database {
     return null;
   }
 
-  Future<List<FermentableModel>> getFermentables({String? name, String? searchText, bool ordered = false}) async {
+  Future<List<FermentableModel>> getFermentables({String? user, String? name, String? searchText, bool ordered = false}) async {
     List<FermentableModel> list = [];
     Query query = fermentables;
+    if (user != null && user.isNotEmpty) {
+      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+    } else {
+      query = query.where('creator', isNull: true);
+    }
     if (name != null) {
       query = query.where('name', isEqualTo: name);
     }
@@ -514,9 +519,14 @@ class Database {
     return null;
   }
 
-  Future<List<HopModel>> getHops({String? name, String? searchText, bool ordered = false}) async {
+  Future<List<HopModel>> getHops({String? user, String? name, String? searchText, bool ordered = false}) async {
     List<HopModel> list = [];
     Query query = hops;
+    if (user != null && user.isNotEmpty) {
+      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+    } else {
+      query = query.where('creator', isNull: true);
+    }
     if (name != null) {
       query = query.where('name', isEqualTo: name);
     }
@@ -556,9 +566,14 @@ class Database {
     return null;
   }
 
-  Future<List<MiscModel>> getMiscellaneous({String? name, String? searchText, bool ordered = false}) async {
+  Future<List<MiscModel>> getMiscellaneous({String? user, String? name, String? searchText, bool ordered = false}) async {
     List<MiscModel> list = [];
     Query query = miscellaneous;
+    if (user != null && user.isNotEmpty) {
+      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+    } else {
+      query = query.where('creator', isNull: true);
+    }
     if (name != null) {
       query = query.where('name', isEqualTo: name);
     }
@@ -598,9 +613,14 @@ class Database {
     return null;
   }
 
-  Future<List<YeastModel>> getYeasts({String? name, String? reference, String? laboratory, String? searchText, bool ordered = false}) async {
+  Future<List<YeastModel>> getYeasts({String? user, String? name, String? reference, String? laboratory, String? searchText, bool ordered = false}) async {
     List<YeastModel> list = [];
     Query query = yeasts;
+    if (user != null && user.isNotEmpty) {
+      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+    } else {
+      query = query.where('creator', isNull: true);
+    }
     if (name != null) {
       query = query.where('name', isEqualTo: name);
     }
@@ -715,9 +735,14 @@ class Database {
     return null;
   }
 
-  Future<List<EquipmentModel>> getEquipments({Equipment? type, String? searchText, bool ordered = false}) async {
+  Future<List<EquipmentModel>> getEquipments({String? user, Equipment? type, String? searchText, bool ordered = false}) async {
     List<EquipmentModel> list = [];
     Query query = equipments;
+    if (user != null && user.isNotEmpty) {
+      query = query.where('creator', isEqualTo: user);
+    } else {
+      query = query.where('creator', isNull: true);
+    }
     if (type != null) {
       query = query.where('type', isEqualTo: type.index);
     }

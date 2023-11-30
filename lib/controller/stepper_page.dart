@@ -53,14 +53,19 @@ class Ingredient {
 extension ListParsing on List {
   void set(Iterable<dynamic> iterable, BuildContext context) {
     for(dynamic item in iterable) {
-      Ingredient? boil = this.cast<Ingredient?>().firstWhere((e) => e!.minutes == item.duration, orElse: () => null);
-      if (boil != null) {
-        boil.map![AppLocalizations.of(context)!.localizedText(item.name)] = AppLocalizations.of(context)!.weightFormat(item.amount)!;
-      } else {
-        add(Ingredient(
-          minutes: item.duration!,
-          map: { AppLocalizations.of(context)!.localizedText(item.name): AppLocalizations.of(context)!.weightFormat(item.amount)! },
-        ));
+      if (item.amount != null) {
+        String? text = AppLocalizations.of(context)!.measurementFormat(item.amount, item.measurement);
+        if (text != null) {
+          Ingredient? boil = this.cast<Ingredient?>().firstWhere((e) => e!.minutes == item.duration, orElse: () => null);
+          if (boil != null) {
+            boil.map![AppLocalizations.of(context)!.localizedText(item.name)] = text;
+          } else {
+            add(Ingredient(
+              minutes: item.duration!,
+              map: { AppLocalizations.of(context)!.localizedText(item.name): text},
+            ));
+          }
+        }
       }
     }
   }
@@ -263,7 +268,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: snapshot.data!.map((e) {
-                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.kiloWeightFormat(e.amount)} de «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
+                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.kiloWeightFormat(e.amount)} «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
                   }).toList()
                 );
               }
@@ -400,7 +405,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     await recipe.getYeasts(volume: widget.model.volume).then((values) {
       steps.add(MyStep(
         index: ++_index,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(recipe.yeasts.first.amount)} de levure «${AppLocalizations.of(context)!.localizedText(recipe.yeasts.first.name)}»'),
+        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(recipe.yeasts.first.amount)} levure «${AppLocalizations.of(context)!.localizedText(recipe.yeasts.first.name)}»'),
         content: Container(),
         onStepContinue: (int index) {
           if (widget.model.fermented_at == null) {
@@ -512,7 +517,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                     key.start(duration);
                     String text = '';
                     value.map!.forEach((k, v) {
-                      text += '${text.isNotEmpty ? '\n' : ''}Ajoutez $v de «$k»';
+                      text += '${text.isNotEmpty ? '\n' : ''}Ajoutez $v «$k»';
                     });
                     _notification(text, duration: duration);
                   });

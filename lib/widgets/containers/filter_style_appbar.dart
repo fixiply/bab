@@ -17,13 +17,13 @@ class FilterStyleAppBar extends StatefulWidget {
   IBU ibu;
   ABV abv;
   RangeValues? srm_values;
-  List<Fermentation>? selectedFermentations = [];
+  List<Style>? selectedFermentations = [];
   List<Category>? categories;
   List<Category>? selectedCategories = [];
   final Function(double start, double end)? onColorChanged;
   final Function(double start, double end)? onIBUChanged;
   final Function(double start, double end)? onAlcoholChanged;
-  final Function(Fermentation value)? onFermentationChanged;
+  final Function(Style value)? onFermentationChanged;
   final Function(Category value)? onCategoryChanged;
   final Function()? onReset;
 
@@ -251,7 +251,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
         spacing: 2.0,
         runSpacing: 4.0,
         direction: Axis.vertical,
-        children: Fermentation.values.map((e) {
+        children: Style.values.map((e) {
           return FilterChip(
             selected: widget.selectedFermentations!.contains(e),
             padding: EdgeInsets.zero,

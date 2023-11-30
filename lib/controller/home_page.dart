@@ -27,7 +27,6 @@ import 'package:bab/models/user_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
-import 'package:bab/utils/edition_notifier.dart';
 import 'package:bab/utils/user_notifier.dart';
 
 // External package
@@ -133,13 +132,6 @@ class _HomeState extends State<HomePage> {
 
   _initialize() async {
     _generateItems();
-    final provider = Provider.of<ValuesNotifier>(context, listen: false);
-    provider.addListener(() {
-      setState(() {
-        AppLocalizations.of(context)!.measure = provider.measure;
-        AppLocalizations.of(context)!.gravity = provider.gravity;
-      });
-    });
     final userNotifier = Provider.of<UserNotifier>(context, listen: false);
     userNotifier.addListener(() {
       _generateItems();

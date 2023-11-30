@@ -10,7 +10,6 @@ import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -41,7 +40,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _initialize();
+      _applyChange();
     });
   }
 
@@ -124,17 +123,10 @@ class _FormBrewPageState extends State<FormBrewPage> {
             }
           ),
           CustomMenuAnchor(
-            context: context,
-            publish: false,
-            measures: true,
-            filtered: false,
-            archived: false,
+            showMeasures: true,
             onSelected: (value) {
-              if (value is constants.Measure) {
-                // setState(() {
-                //   AppLocalizations.of(context)!.measure = value;
-                // });
-                _initialize();
+              if (value is constants.Unit) {
+                _applyChange(unit: value);
               }
             },
           )
@@ -155,7 +147,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 initiallyExpanded: true,
                 backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
-                title: Text(AppLocalizations.of(context)!.text('brew_profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                title: Text(AppLocalizations.of(context)!.text('specific_profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
                   Row(
                     children: [
@@ -350,9 +342,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
               ),
               const Divider(height: 10),
               TextFormField(
-                // key: UniqueKey(),
-                // initialValue: AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '',
-                controller:  _volumeController,
+                controller: _volumeController,
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 inputFormatters: <TextInputFormatter>[
                   FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
@@ -506,9 +496,9 @@ class _FormBrewPageState extends State<FormBrewPage> {
     }
   }
 
-  _initialize() async {
+  _applyChange({constants.Unit? unit}) async {
     bool modified = _modified;
-    _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '';
+    _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, unit: unit, symbol: false) ?? '';
     if (widget.model.reference != null) _identifierController.text = widget.model.reference!;
     await _generate();
     _modified = modified ? true : false;

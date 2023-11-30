@@ -11,7 +11,6 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/paints/gradient_range_slider_thumb_shape.dart';
 import 'package:bab/widgets/paints/gradient_range_slider_track_shape.dart';
 
@@ -26,13 +25,38 @@ class StylePage extends StatefulWidget {
   _StylePageState createState() => _StylePageState();
 }
 
+extension ListExpanded on List {
+  bool isExpanded(int n) {
+    for (Map element in this) {
+      if (element.containsKey(n)) {
+        return element[n];
+      }
+    }
+    return true;
+  }
+
+  void set(int n, bool b) {
+    bool found = false;
+    for (Map element in this) {
+      if (element.containsKey(n)) {
+        element[n] = b;
+        found = true;
+      }
+    }
+    if (!found) {
+      add({n: b});
+    }
+  }
+}
+
 class _StylePageState extends State<StylePage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
-  // Edition mode
-  bool _expanded = true;
+
+  final List<Map<int, bool>> _expands =  [];
 
   @override
   Widget build(BuildContext context) {
+    int index = 0;
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,
@@ -56,13 +80,7 @@ class _StylePageState extends State<StylePage> {
                 _edit(widget.model);
               },
             ),
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-            measures: true,
-          )
+          CustomMenuAnchor()
         ],
       ),
       body: SingleChildScrollView(
@@ -167,12 +185,12 @@ class _StylePageState extends State<StylePage> {
               expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  _expanded = !isExpanded;
+                  _expands.set(index, isExpanded);
                 });
               },
               children: [
                 if (widget.model.overallimpression != null) ExpansionPanel(
-                  isExpanded: _expanded,
+                  isExpanded: _expands.isExpanded(index++),
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
@@ -194,7 +212,7 @@ class _StylePageState extends State<StylePage> {
                   ),
                 ),
                 if (widget.model.aroma != null) ExpansionPanel(
-                  isExpanded: _expanded,
+                  isExpanded: _expands.isExpanded(index++),
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
@@ -216,7 +234,7 @@ class _StylePageState extends State<StylePage> {
                   ),
                 ),
                 if (widget.model.flavor != null) ExpansionPanel(
-                  isExpanded: _expanded,
+                  isExpanded: _expands.isExpanded(index++),
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
@@ -238,7 +256,7 @@ class _StylePageState extends State<StylePage> {
                   ),
                 ),
                 if (widget.model.mouthfeel != null) ExpansionPanel(
-                  isExpanded: _expanded,
+                  isExpanded: _expands.isExpanded(index++),
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(
@@ -260,7 +278,7 @@ class _StylePageState extends State<StylePage> {
                   ),
                 ),
                 if (widget.model.comments != null) ExpansionPanel(
-                  isExpanded: _expanded,
+                  isExpanded: _expands.isExpanded(index++),
                   canTapOnHeader: true,
                   headerBuilder: (context, isExpanded) {
                     return ListTile(

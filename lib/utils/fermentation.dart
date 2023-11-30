@@ -12,61 +12,48 @@ import 'package:bab/utils/localized_text.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
-enum Bearing with Enums { protein, amylolytique, mash_in, mash_out;
-  List<Enum> get enums => [ protein, amylolytique, mash_in, mash_out];
-}
-
-enum Type with Enums { infusion, temperature, decoction;
-  List<Enum> get enums => [ infusion, temperature, decoction ];
-}
-
-class Mash<T> {
+class Fermentation<T> {
   dynamic name;
-  Type? type;
-  double? temperature;
   int? duration;
+  double? temperature;
 
-  Mash({
+  Fermentation({
     this.name,
-    this.type = Type.infusion,
-    this.temperature = 65.0,
-    this.duration
+    this.duration = 10,
+    this.temperature = 18.0,
   });
 
   void fromMap(Map<String, dynamic> map) {
     this.name = LocalizedText.deserialize(map['name']);
-    this.type = Type.values.elementAt(map['type']);
-    if (map['temperature'] != null) this.temperature = map['temperature'].toDouble();
     this.duration = map['duration'];
+    if (map['temperature'] != null) this.temperature = map['temperature'].toDouble();
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'name': LocalizedText.serialize(this.name),
-      'type': this.type!.index,
+      'duration': this.duration,
       'temperature': this.temperature,
-      'duration': this.duration
     };
     return map;
   }
 
-  Mash copy() {
-    return Mash(
+  Fermentation copy() {
+    return Fermentation(
       name: this.name,
-      type: this.type,
-      temperature: this.temperature,
       duration: this.duration,
+      temperature: this.temperature,
     );
   }
 
   @override
   String toString() {
-    return 'Mash: $name';
+    return 'Fermentation: $name';
   }
 
   static dynamic serialize(dynamic data) {
     if (data != null) {
-      if (data is Mash) {
+      if (data is Fermentation) {
         return data.toMap();
       }
       if (data is List) {
@@ -80,15 +67,15 @@ class Mash<T> {
     return null;
   }
 
-  static List<Mash> deserialize(dynamic data) {
-    List<Mash> values = [];
+  static List<Fermentation> deserialize(dynamic data) {
+    List<Fermentation> values = [];
     if (data != null) {
       if (data is List) {
         for(final value in data) {
           values.addAll(deserialize(value));
         }
       } else {
-        Mash model = Mash();
+        Fermentation model = Fermentation();
         model.fromMap(data);
         values.add(model);
       }
@@ -107,11 +94,13 @@ class Mash<T> {
         )
       ),
       GridColumn(
-        columnName: 'type',
+        width: 90,
+        columnName: 'duration',
+        allowEditing: DeviceHelper.isDesktop,
         label: Container(
             padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            alignment: Alignment.centerRight,
+            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
       GridColumn(
@@ -121,16 +110,6 @@ class Mash<T> {
             padding: const EdgeInsets.all(8.0),
             alignment: Alignment.centerRight,
             child: Text(AppLocalizations.of(context)!.text('temperature'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-        )
-      ),
-      GridColumn(
-        width: 90,
-        columnName: 'duration',
-        allowEditing: DeviceHelper.isDesktop,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
       if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
@@ -145,22 +124,21 @@ class Mash<T> {
 }
 
 class MashDataSource extends EditDataSource {
-  List<Mash> data = [];
-  final void Function(Mash value, int dataRowIndex)? onChanged;
+  List<Fermentation> data = [];
+  final void Function(Fermentation value, int dataRowIndex)? onChanged;
   final void Function(int rowIndex)? onRemove;
   /// Creates the employee data source class with required details.
-  MashDataSource(BuildContext context, {List<Mash>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  MashDataSource(BuildContext context, {List<Fermentation>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
-  void buildDataGridRows(List<Mash> data) {
+  void buildDataGridRows(List<Fermentation> data) {
     this.data = data;
     int index = 0;
     dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
-      DataGridCell<Type>(columnName: 'type', value: e.type),
-      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       DataGridCell<int>(columnName: 'duration', value: e.duration),
+      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
@@ -180,7 +158,12 @@ class MashDataSource extends EditDataSource {
               submitCell();
             },
             itemBuilder: (BuildContext context) {
-              return ['Mash In', 'Mash Out'].map<PopupMenuItem<String>>((String value) {
+              return [
+                AppLocalizations.of(context)!.text('primary'),
+                AppLocalizations.of(context)!.text('secondary'),
+                AppLocalizations.of(context)!.text('tertiary'),
+                'Cold Crash'
+              ].map<PopupMenuItem<String>>((String value) {
                 return new PopupMenuItem(
                     child: new Text(value), value: value);
               }).toList();
@@ -204,14 +187,6 @@ class MashDataSource extends EditDataSource {
   }
 
   @override
-  List<Enums>? isEnumType(String columnName) {
-    if (columnName == 'type') {
-      return Type.values;
-    }
-    return null;
-  }
-
-  @override
   DataGridRowAdapter buildRow(DataGridRow row) {
     return DataGridRowAdapter(
       cells: row.getCells().map<Widget>((e) {
@@ -225,7 +200,7 @@ class MashDataSource extends EditDataSource {
           if (e.columnName == 'temperature') {
             value = AppLocalizations.of(context)!.tempFormat(e.value);
           } else if (e.columnName == 'duration') {
-            value = AppLocalizations.of(context)!.durationFormat(e.value);
+            value = AppLocalizations.of(context)!.durationFormat(e.value * 1440);
           } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
           alignment = Alignment.centerRight;
         } else if (e.value is Enum) {
@@ -234,19 +209,19 @@ class MashDataSource extends EditDataSource {
         }
         if (e.columnName == 'actions') {
           return PopupMenuButton<String>(
-              icon: const Icon(Icons.more_vert),
-              tooltip: AppLocalizations.of(context)!.text('options'),
-              onSelected: (value) async {
-                if (value == 'remove') {
-                  onRemove?.call(e.value);
-                }
-              },
-              itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                PopupMenuItem(
-                  value: 'remove',
-                  child: Text(AppLocalizations.of(context)!.text('remove')),
-                ),
-              ]
+            icon: const Icon(Icons.more_vert),
+            tooltip: AppLocalizations.of(context)!.text('options'),
+            onSelected: (value) async {
+              if (value == 'remove') {
+                onRemove?.call(e.value);
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem(
+                value: 'remove',
+                child: Text(AppLocalizations.of(context)!.text('remove')),
+              ),
+            ]
           );
         }
         return Container(
@@ -277,20 +252,15 @@ class MashDataSource extends EditDataSource {
         }
         else data[dataRowIndex].name = newCellValue;
         break;
-      case 'type':
+      case 'duration':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].type = newCellValue as Type;
+            DataGridCell<int>(columnName: column.columnName, value: newCellValue);
+        data[dataRowIndex].duration = newCellValue as int;
         break;
       case 'temperature':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].temperature = newCellValue as double;
-        break;
-      case 'duration':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<int>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].duration = newCellValue as int;
         break;
     }
     onChanged?.call(data[dataRowIndex], rowColumnIndex.rowIndex);

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -8,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class ImageModel<T> {
   String? url;
+  Uint8List? bytes;
   String? name;
   DateTime? updated_at;
   TextFormat? left;
@@ -17,8 +21,9 @@ class ImageModel<T> {
   Rect? rect;
   Reference? reference;
 
-  ImageModel(
-    this.url, {
+  ImageModel({
+    this.url,
+    this.bytes,
     this.name,
     this.updated_at,
     this.left,
@@ -34,6 +39,8 @@ class ImageModel<T> {
   }
 
   void fromMap(Map<String, dynamic> map) {
+    this.url = map['url'];
+    if (map['bytes'] != null) this.bytes = base64.decode(map['bytes']);
     if (map.containsKey('rect')) {
       this.rect = fromRect(map['rect']);
     }
@@ -41,7 +48,8 @@ class ImageModel<T> {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
-      'url': this.url
+      'url': this.url,
+      'bytes': this.bytes != null ? base64.encode(this.bytes!) : null,
     };
     if (rect != null) map.addAll({'rect': toRect(rect!)});
     return map;
@@ -49,7 +57,8 @@ class ImageModel<T> {
 
   ImageModel copy() {
     return ImageModel(
-      this.url,
+      url: this.url,
+      bytes: this.bytes,
       name: this.name,
       updated_at: this.updated_at,
       left: this.left,
@@ -106,9 +115,9 @@ class ImageModel<T> {
   static dynamic fromJson(dynamic data) {
     if (data != null) {
       if (data is String) {
-        return ImageModel(data);
+        return ImageModel(url: data);
       } else if (data is Map<String, dynamic>) {
-        ImageModel model = ImageModel(data['url']);
+        ImageModel model = ImageModel();
         model.fromMap(data);
         return model;
       }

@@ -145,21 +145,30 @@ class _PHContainerState extends State<PHContainer> {
               )
             ]
           ),
-          if (_quantity != null && _quantity! > 0) SizedBox(
-            width: 312,
-            child: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Text('Quantité d\'acide : ${AppLocalizations.of(context)!.numberFormat(_quantity)} ml', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+          Container(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Table(
+              columnWidths: const <int, TableColumnWidth>{
+                0: IntrinsicColumnWidth(),
+                1: FixedColumnWidth(10),
+              },
+              children: [
+                if (_quantity != null && _quantity! > 0) TableRow(
+                  children: [
+                    TableCell(child:  Text('Quantité d\'acide', style: const TextStyle(fontSize: 18))),
+                    TableCell(child:  Text(':', style: const TextStyle(fontSize: 18))),
+                    TableCell(child: Text(AppLocalizations.of(context)!.numberFormat(_quantity, symbol: 'ml') ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
+                  ]
+                ),
+              ]
             )
-          ),
+          )
         ]
       )
     );
   }
 
   _calculate() async {
-    debugPrint('current: $_current target: ${widget.target} volume: ${widget.volume} acid: $_acid concentration: $_concentration');
     setState(() {
       _quantity = FormulaHelper.pH(_current, widget.target, widget.volume, _acid, _concentration);
     });

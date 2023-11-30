@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bab/controller/forms/form_brew_page.dart';
 import 'package:bab/controller/stepper_page.dart';
 import 'package:bab/controller/tables/fermentables_data_table.dart';
+import 'package:bab/controller/tables/fermentation_data_table.dart';
 import 'package:bab/controller/tables/hops_data_table.dart';
 import 'package:bab/controller/tables/mash_data_table.dart';
 import 'package:bab/controller/tables/misc_data_table.dart';
@@ -19,12 +20,10 @@ import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/changes_notifier.dart';
 import 'package:bab/utils/constants.dart' as constants;
-import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/carousel_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/paints/bezier_clipper.dart';
 import 'package:bab/widgets/paints/circle_clipper.dart';
 
@@ -94,16 +93,13 @@ class _BrewPageState extends State<BrewPage> {
             if (constants.currentUser != null && (constants.currentUser!.isAdmin() || widget.model.creator == constants.currentUser!.uuid))
               IconButton(
                 icon: const Icon(Icons.edit_note),
+                tooltip: AppLocalizations.of(context)!.text('remove'),
                 onPressed: () {
                   _edit(widget.model);
                 },
               ),
             CustomMenuAnchor(
-              context: context,
-              publish: false,
-              filtered: false,
-              archived: false,
-              measures: true,
+              showMeasures: true,
             )
           ],
         ),
@@ -310,37 +306,12 @@ class _BrewPageState extends State<BrewPage> {
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                  const SizedBox(height: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.model.primaryDay() != null && widget.model.recipe!.primarytemp != null) _fermentation(
-                        AppLocalizations.of(context)!.text('primary'),
-                        widget.model.primaryDay()!,
-                        widget.model.recipe!.primarytemp!,
-                      ),
-                      const SizedBox(width: 12),
-                      if (widget.model.secondaryDay() != null && widget.model.recipe!.secondarytemp != null) _fermentation(
-                        AppLocalizations.of(context)!.text('secondary'),
-                        widget.model.secondaryDay()!,
-                        widget.model.recipe!.secondarytemp!,
-                      ),
-                      const SizedBox(width: 12),
-                      if (widget.model.tertiaryDay() != null && widget.model.recipe!.tertiarytemp != null) _fermentation(
-                        AppLocalizations.of(context)!.text('tertiary'),
-                        widget.model.tertiaryDay()!,
-                        widget.model.recipe!.tertiarytemp!,
-                      ),
-                    ],
-                  )
-                ]
+            if (widget.model.recipe!.fermentation != null && widget.model.recipe!.fermentation!.isNotEmpty) Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FermentationDataTable(
+                data: widget.model.recipe!.fermentation,
+                title: Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             )
           ])
@@ -426,7 +397,6 @@ class _BrewPageState extends State<BrewPage> {
     changesProvider.addListener(() {
       if (changesProvider.model == widget.model.recipe) {
         if (!mounted) return;
-        debugPrint('changesProvider ${changesProvider.model}');
         setState(() {
           widget.model.recipe = changesProvider.model as RecipeModel;
           _key = UniqueKey();
@@ -446,15 +416,6 @@ class _BrewPageState extends State<BrewPage> {
         });
       }
     });
-  }
-
-  _start() async {
-    if (widget.model.inserted_at!.isAfter(DateTime.now())) {
-      widget.model.started_at = DateTime.now();
-      Database().update(widget.model);
-    } else {
-      _showSnackbar(AppLocalizations.of(context)!.text('brew_start_error'));
-    }
   }
 
   _backgroundFlexible() {

@@ -34,10 +34,10 @@ class HopsPage extends StatefulWidget {
   HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode: SelectionMode.multiple}) : super(key: key);
 
   @override
-  _HopsPageState createState() => _HopsPageState();
+  HopsPageState createState() => HopsPageState();
 }
 
-class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<HopsPage> {
+class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<HopsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late HopDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
@@ -61,7 +61,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
       showCheckboxColumn: widget.showCheckboxColumn,
       allowEditing: widget.allowEditing,
       onChanged: (HopModel value, int dataRowIndex) {
-        Database().update(value).then((value) async {
+        Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
           _showSnackbar(e.toString());
@@ -69,7 +69,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
       }
     );
     _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
-    _fetch();
+    fetch();
   }
 
   @override
@@ -80,17 +80,33 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
       appBar: AppBar(
         title: SearchText(
           _searchQueryController,
-          () {  _fetch(); }
+          () {  fetch(); }
         ),
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
-        leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-          onPressed:() async {
-            Navigator.pop(context, selected);
-          }
+        leading: widget.showCheckboxColumn == true ? Row(
+          children: [
+            Flexible(
+              child: IconButton(
+                  icon: const Icon(Icons.check),
+                  tooltip: AppLocalizations.of(context)!.text('validate'),
+                  onPressed: selected.isNotEmpty ? () async {
+                    Navigator.pop(context, selected);
+                  } : null
+              ),
+            ),
+            Flexible(
+                child: IconButton(
+                    icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+                    tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                    onPressed:() async {
+                      Navigator.pop(context, []);
+                    }
+                )
+            )
+          ]
         ) : null,
         actions: [
           if (_showList && widget.allowEditing) IconButton(
@@ -107,7 +123,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
             tooltip: AppLocalizations.of(context)!.text('import'),
             onPressed: () {
               ImportHelper.hops(context, () {
-                _fetch();
+                fetch();
               });
             }
           ),
@@ -122,7 +138,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => _fetch(),
+        onRefresh: () => fetch(),
         child: FutureBuilder<List<HopModel>>(
           future: _data,
           builder: (context, snapshot) {
@@ -293,9 +309,9 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
     );
   }
 
-  _fetch() async {
+  fetch() async {
     setState(() {
-      _data = Database().getHops(searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getHops(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -303,18 +319,18 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
     HopModel newModel = HopModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormHopPage(newModel);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _edit(HopModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormHopPage(model);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _delete(HopModel model) async {
     if (await DeleteDialog.model(context, model, forced: true)) {
-      _fetch();
+      fetch();
     }
   }
 
@@ -341,7 +357,7 @@ class _HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<
       } finally {
         EasyLoading.dismiss();
       }
-      _fetch();
+      fetch();
       return true;
     }
     return false;

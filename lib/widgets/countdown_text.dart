@@ -128,8 +128,8 @@ class CountDownTextState extends State<CountDownText> with WidgetsBindingObserve
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            SizedBox(width: 30, child: index == 1 ? Icon(_countDownSeconds < 0 ? Icons.check_box_outlined : Icons.check_box_outline_blank_outlined, color: _countDownSeconds < 0 ? Theme.of(context).primaryColor : Colors.black54) : null),
-            Flexible(child: Text('Ajoutez ${e.value} de «${e.key}»' + (_countDownSeconds > 0 && index == 1 ? ' dans $hours:$minutes:$seconds' : ''))),
+            SizedBox(width: 30, child: Icon(_countDownSeconds < 0 ? Icons.check_box_outlined : Icons.check_box_outline_blank_outlined, color: _countDownSeconds < 0 ? Theme.of(context).primaryColor : Colors.black54)),
+            Flexible(child: Text('Ajoutez ${e.value} «${e.key}»' + (_countDownSeconds > 0 && index == 1 ? ' dans $hours:$minutes:$seconds' : ''))),
           ],
         );
       }).toList()

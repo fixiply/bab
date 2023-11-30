@@ -268,20 +268,22 @@ class _LoginPageState extends State<LoginPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
       if (!credential.user!.emailVerified) {
-        FirebaseAuth.instance.signOut();
         _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
           action: SnackBarAction(
             textColor: Colors.white,
             label: AppLocalizations.of(context)!.text('resend'),
-            onPressed: () {
-              credential.user!.sendEmailVerification();
+            onPressed: () async {
+              await credential.user!.sendEmailVerification();
             }
           ),
+          onClosed: () async {
+            await FirebaseAuth.instance.signOut();
+          }
         );
       } else {
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
         Navigator.pop(context);
       }
     } on FirebaseAuthException catch (e) {
@@ -295,14 +297,14 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  _showSnackbar(String message, {SnackBarAction? action}) {
+  _showSnackbar(String message, {SnackBarAction? action, VoidCallback? onClosed}) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
         duration: const Duration(seconds: 10),
-        action: action
+        action: action,
       )
-    );
+    ).closed.then((value) => onClosed?.call());
   }
 }
 

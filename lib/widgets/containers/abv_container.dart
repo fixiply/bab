@@ -23,7 +23,7 @@ class _ABVContainerState extends State<ABVContainer> {
 
   double? _og;
   double? _fg;
-  String? _abv;
+  double? _abv;
 
   @override
   Widget build(BuildContext context) {
@@ -67,12 +67,22 @@ class _ABVContainerState extends State<ABVContainer> {
                 fillColor: BlendColor, filled: true
             )
           ),
-          if (_abv != null && _abv!.isNotEmpty) SizedBox(
-            width: 312,
-            child: Container(
-              alignment: Alignment.center,
-              padding: const EdgeInsets.only(top: 10.0),
-              child: Text('Volume d\'alcool estimé : $_abv%', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold))
+          Container(
+            padding: const EdgeInsets.only(top: 10.0),
+            child: Table(
+              columnWidths: const <int, TableColumnWidth>{
+                0: IntrinsicColumnWidth(),
+                1: FixedColumnWidth(10),
+              },
+              children: [
+                if (_abv != null && _abv! > 0) TableRow(
+                  children: [
+                    TableCell(child:  Text('Volume d\'alcool estimé', style: const TextStyle(fontSize: 18))),
+                    TableCell(child:  Text(':', style: const TextStyle(fontSize: 18))),
+                    TableCell(child: Text(AppLocalizations.of(context)!.numberFormat(_abv, symbol: '%') ?? '', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)))
+                  ]
+                ),
+              ]
             )
           ),
         ]
@@ -82,7 +92,7 @@ class _ABVContainerState extends State<ABVContainer> {
 
   _calculate() async {
     setState(() {
-      _abv = AppLocalizations.of(context)!.numberFormat(FormulaHelper.abv(_og, _fg));
+      _abv = FormulaHelper.abv(_og, _fg);
     });
   }
 }

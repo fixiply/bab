@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/basket_page.dart';
+import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/basket_notifier.dart';
 
 // External package
@@ -43,14 +44,16 @@ class _BasketButtonState extends State<BasketButton> with SingleTickerProviderSt
         _baskets.toString(),
         style: const TextStyle(color: Colors.white),
       ) : null,
-      child: IconButton(
-        padding: EdgeInsets.only(top: 8),
-        icon: const Icon(Icons.shopping_cart_outlined),
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return BasketPage();
-          }));
-        },
+      child: Center(
+        child: IconButton(
+          icon: const Icon(Icons.shopping_cart_outlined),
+          tooltip: AppLocalizations.of(context)!.text('basket'),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return BasketPage();
+            }));
+          },
+        ),
       ),
     );
   }

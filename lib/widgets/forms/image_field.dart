@@ -16,10 +16,11 @@ import 'package:image_picker/image_picker.dart';
 class ImageField extends FormField<ImageModel> {
   final double? width;
   final double? height;
+  final bool? memory;
 
   final void Function(ImageModel? value)? onChanged;
 
-  ImageField({Key? key, required BuildContext context, this.onChanged, ImageModel? image, this.width = 256, this.height = 144, bool crop = false}) : super(
+  ImageField({Key? key, required BuildContext context, this.onChanged, ImageModel? image, this.width = 256, this.height = 144, this.memory = false, bool crop = false}) : super(
     key: key,
     initialValue: image,
     builder: (FormFieldState<ImageModel> field) {
@@ -38,6 +39,13 @@ class ImageField extends FormField<ImageModel> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if (memory == true) IconButton(
+                    icon:const Icon(Icons.close),
+                    onPressed: () async {
+                      image!.bytes = null;
+                      state.didChange(image);
+                    }
+                  ),
                   if (crop) Tooltip(
                     message: AppLocalizations.of(context)!.text('crop'),
                     child: IconButton(
@@ -111,15 +119,28 @@ class _ImageFieldState extends FormFieldState<ImageModel> {
     }
   }
 
-  _showPicker() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      List<ImageModel> images = [];
-      if (widget.initialValue != null) {
-        images.add(widget.initialValue!);
+  _showPicker() async {
+    if (widget.memory == true) {
+      final pickedFile = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          maxWidth: 640,
+          // maxHeight: 480,
+          imageQuality: 80
+      );
+      if (pickedFile != null) {
+        widget.initialValue!.bytes = await pickedFile.readAsBytes();
+        didChange(widget.initialValue);
       }
-      return GalleryPage(images, only: true);
-    })).then((result) {
-      didChange(result);
-    });
+    } else {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        List<ImageModel> images = [];
+        if (widget.initialValue != null) {
+          images.add(widget.initialValue!);
+        }
+        return GalleryPage(images, only: true);
+      })).then((result) {
+        didChange(result);
+      });
+    }
   }
 }

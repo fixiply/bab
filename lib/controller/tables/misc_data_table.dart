@@ -305,7 +305,7 @@ class MiscDataSource extends EditDataSource {
     List<MiscModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<amount.Unit>(columnName: 'amount', value: amount.Unit(e.amount, e.unit)),
+      if (showQuantity == true) DataGridCell<amount.Amount>(columnName: 'amount', value: amount.Amount(e.amount, e.measurement)),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Misc>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
@@ -326,9 +326,9 @@ class MiscDataSource extends EditDataSource {
       newCellValue = value;
       return amount.AmountField(
         value: value.copy(),
-        enums: isEnumType('unit'),
-        onChanged: (unit) {
-          newCellValue = unit;
+        enums: isEnumType('measurement'),
+        onChanged: (measurement) {
+          newCellValue = measurement;
           /// Call [CellSubmit] callback to fire the canSubmitCell and
           /// onCellSubmit to commit the new value in single place.
           submitCell();
@@ -387,8 +387,8 @@ class MiscDataSource extends EditDataSource {
         if (e.value is LocalizedText) {
           value = e.value?.get(AppLocalizations.of(context)!.locale);
           alignment = Alignment.centerLeft;
-        } else if (e.value is amount.Unit) {
-          value = AppLocalizations.of(context)!.numberFormat(e.value.amount, symbol: (e.value.unit?.symbol != null ? ' ' + e.value.unit?.symbol : null));
+        } else if (e.value is amount.Amount) {
+          value = AppLocalizations.of(context)!.numberFormat(e.value.amount, symbol: (e.value.measurement?.symbol != null ? ' ' + e.value.measurement?.symbol : null));
           alignment = Alignment.centerRight;
         } else if (e.value is num) {
           if (e.columnName == 'duration') {
@@ -469,26 +469,26 @@ class MiscDataSource extends EditDataSource {
     switch(column.columnName) {
       case 'amount':
         double? value;
-        switch(newCellValue.unit) {
-          case Unit.gram:
+        switch(newCellValue.measurement) {
+          case Measurement.gram:
             value = AppLocalizations.of(context)!.gram(newCellValue.amount);
             break;
-          case Unit.kilo:
+          case Measurement.kilo:
             value = AppLocalizations.of(context)!.gram(newCellValue.amount * 1000);
             break;
-          case Unit.milliliter:
+          case Measurement.milliliter:
             value = AppLocalizations.of(context)!.volume(newCellValue.amount);
             break;
-          case Unit.liter:
+          case Measurement.liter:
             value = AppLocalizations.of(context)!.volume(newCellValue.amount * 1000);
             break;
           default:
             value = newCellValue.amount;
         }
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<amount.Unit>(columnName: column.columnName, value: amount.Unit(value, newCellValue.unit));
+            DataGridCell<amount.Amount>(columnName: column.columnName, value: amount.Amount(value, newCellValue.measurement));
         data[rowColumnIndex.rowIndex].amount = value;
-        data[rowColumnIndex.rowIndex].unit = newCellValue.unit;
+        data[rowColumnIndex.rowIndex].measurement = newCellValue.measurement;
         break;
       case 'name':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =

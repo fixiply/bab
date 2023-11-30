@@ -5,14 +5,14 @@ import 'package:flutter/material.dart';
 class Quantity<T> {
   String? uuid;
   double? amount;
-  Unit? unit;
+  Measurement? measurement;
   int? duration;
   int? use;
 
   Quantity({
     this.uuid,
     this.amount,
-    this.unit = Unit.units,
+    this.measurement = Measurement.units,
     this.duration,
     this.use,
   });
@@ -20,16 +20,17 @@ class Quantity<T> {
   void fromMap(Map<String, dynamic> map) {
     this.uuid = map['uuid'];
     if (map['amount'] != null) this.amount = map['amount'].toDouble();
-    if (map.containsKey('unit')) this.unit = Unit.values.elementAt(map['unit']);
+    if (map.containsKey('measurement')) this.measurement = Measurement.values.elementAt(map['measurement']);
+    else if (map.containsKey('unit')) this.measurement = Measurement.values.elementAt(map['unit']);
     this.duration = map['duration'];
-    this.use = map['use'];
+    if (map.containsKey('use')) this.use = map['use'];
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = {
       'uuid': this.uuid,
       'amount': this.amount,
-      'unit': this.unit!.index,
+      'measurement': this.measurement!.index,
       'duration': this.duration,
       'use': this.use,
     };
@@ -40,7 +41,7 @@ class Quantity<T> {
     return Quantity(
       uuid: this.uuid,
       amount: this.amount,
-      unit: this.unit,
+      measurement: this.measurement,
       duration: this.duration,
       use: this.use,
     );

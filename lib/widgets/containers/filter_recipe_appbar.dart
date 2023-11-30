@@ -18,14 +18,14 @@ class FilterRecipeAppBar extends StatefulWidget {
   ColorHelper cu;
   bool my_receips;
   RangeValues? srm_values;
-  List<Fermentation>? selectedFermentations = [];
+  List<Style>? selectedFermentations = [];
   List<Category>? categories;
   List<Category>? selectedCategories = [];
   final Function(double start, double end)? onColorChanged;
   final Function(bool value)? onMyChanged;
   final Function(double start, double end)? onIBUChanged;
   final Function(double start, double end)? onAlcoholChanged;
-  final Function(Fermentation value)? onFermentationChanged;
+  final Function(Style value)? onFermentationChanged;
   final Function(Category value)? onCategoryChanged;
   final Function()? onReset;
 
@@ -284,7 +284,7 @@ class _FilterRecipeAppBarState extends State<FilterRecipeAppBar> with SingleTick
         spacing: 2.0,
         runSpacing: 4.0,
         direction: Axis.vertical,
-        children: Fermentation.values.map((e) {
+        children: Style.values.map((e) {
           return FilterChip(
             selected: widget.selectedFermentations!.contains(e),
             padding: EdgeInsets.zero,

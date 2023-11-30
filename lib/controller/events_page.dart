@@ -65,10 +65,9 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
         actions: <Widget> [
           BasketButton(),
           CustomMenuAnchor(
-            context: context,
-            publish: currentUser != null && currentUser!.isAdmin(),
-            filtered: currentUser != null && currentUser!.isAdmin(),
-            archived: _archived,
+            showPublish: currentUser != null && currentUser!.isAdmin(),
+            showFilters: currentUser != null && currentUser!.isAdmin(),
+            isArchived: _archived,
             onSelected: (value) async {
               if (value == 1) {
                 await Database().publishAll();

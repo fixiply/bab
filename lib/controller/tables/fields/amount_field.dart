@@ -7,14 +7,14 @@ import 'package:bab/utils/constants.dart' as constants;
 import 'package:intl/intl.dart';
 
 
-class AmountField extends FormField<Unit> {
+class AmountField extends FormField<Amount> {
   final List<constants.Enums>? enums;
-  final void Function(Unit? value)? onChanged;
+  final void Function(Amount? value)? onChanged;
 
-  AmountField({Key? key, required Unit value, this.enums, this.onChanged}) : super(
+  AmountField({Key? key, required Amount value, this.enums, this.onChanged}) : super(
       key: key,
       initialValue: value,
-      builder: (FormFieldState<Unit> field) {
+      builder: (FormFieldState<Amount> field) {
         return field.build(field.context);
       }
   );
@@ -23,18 +23,18 @@ class AmountField extends FormField<Unit> {
   _AmountFieldState createState() => _AmountFieldState();
 }
 
-class Unit {
+class Amount {
   double? amount;
-  Enum? unit;
-  Unit(
+  Enum? measurement;
+  Amount(
     this.amount,
-    this.unit
+    this.measurement
   );
 
   // ignore: hash_and_equals
   @override
   bool operator ==(other) {
-    return (other is Unit && other.amount == amount && other.unit == unit);
+    return (other is Amount && other.amount == amount && other.measurement == measurement);
   }
 
   @override
@@ -43,25 +43,25 @@ class Unit {
 
   @override
   String toString() {
-    return 'class: $amount $unit';
+    return 'class: $amount $measurement';
   }
 
-  Unit copy() {
-    return Unit(
+  Amount copy() {
+    return Amount(
       amount,
-      unit
+      measurement
     );
   }
 }
 
-class _AmountFieldState extends FormFieldState<Unit> {
+class _AmountFieldState extends FormFieldState<Amount> {
   TextEditingController _textController = TextEditingController();
 
   @override
   AmountField get widget => super.widget as AmountField;
 
   @override
-  void didChange(Unit? value) {
+  void didChange(Amount? value) {
     widget.onChanged?.call(value);
     super.didChange(value);
   }
@@ -104,12 +104,12 @@ class _AmountFieldState extends FormFieldState<Unit> {
           if (widget.enums != null && widget.enums!.isNotEmpty) const SizedBox(width: 2),
           if (widget.enums != null && widget.enums!.isNotEmpty) Flexible(
             child: DropdownButton<Enum>(
-              value: widget.enums!.contains(value!.unit) ? value!.unit : null,
+              value: widget.enums!.contains(value!.measurement) ? value!.measurement : null,
               isDense: true,
               isExpanded: true,
               style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
               onChanged: (Enum? e) async {
-                value!.unit = e;
+                value!.measurement = e;
                 didChange(value);
               },
               items: widget.enums!.map<DropdownMenuItem<Enum>>((Enum e) {
@@ -118,7 +118,7 @@ class _AmountFieldState extends FormFieldState<Unit> {
                   child: LayoutBuilder(
                     builder: (BuildContext ctx, BoxConstraints constraints) {
                       String text = AppLocalizations.of(context)!.text(e.toString().toLowerCase());
-                      if (constraints.maxWidth < 32 && e is constants.Unit) {
+                      if (constraints.maxWidth < 32 && e is constants.Measurement) {
                         text = e.symbol ?? '';
                       }
                       return Text(text);

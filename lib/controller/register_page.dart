@@ -3,10 +3,8 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/login_page.dart';
-import 'package:bab/models/user_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
-import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/dialogs/markdown_dialog.dart';
 
 // External package
@@ -226,6 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
       _showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
       credential.user!.sendEmailVerification();
+      credential.user!.updateDisplayName(_fullNameController.text);
       debugPrint('createUserWithEmailAndPassword ${credential.user!.uid}');
       await FirebaseAuth.instance.signOut();
     } on FirebaseAuthException catch (e) {

@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/models/equipment_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 
@@ -16,6 +17,9 @@ final snackBarKeyB = GlobalKey<ScaffoldMessengerState>();
 final snackBarKeyC = GlobalKey<ScaffoldMessengerState>();
 
 class BluetoothPage extends StatefulWidget {
+  EquipmentModel model;
+  BluetoothPage(this.model);
+
   @override
   _BluetoothPageState createState() => _BluetoothPageState();
 }

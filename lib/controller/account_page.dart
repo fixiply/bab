@@ -6,7 +6,7 @@ import 'package:bab/controller/about_page.dart';
 import 'package:bab/controller/address_page.dart';
 import 'package:bab/controller/devices_page.dart';
 import 'package:bab/controller/login_page.dart';
-import 'package:bab/controller/payments_page.dart';
+import 'package:bab/controller/information_page.dart';
 import 'package:bab/controller/purchases_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
@@ -14,7 +14,6 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 
 // External package
@@ -40,12 +39,7 @@ class _AccountPageState extends State<AccountPage> {
         backgroundColor: Colors.white,
         actions: [
           BasketButton(),
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-          )
+          CustomMenuAnchor()
         ]
       ),
       drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
@@ -105,11 +99,11 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                   if (currentUser != null) ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.credit_card),
-                    title: Text(AppLocalizations.of(context)!.text('payment_methods')),
+                    leading: const Icon(Icons.email_outlined),
+                    title: Text(AppLocalizations.of(context)!.text('my_information')),
                     onTap: () {
                       Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        return PaymentsPage();
+                        return InformationPage();
                       }));
                     },
                   ),
@@ -150,7 +144,7 @@ class _AccountPageState extends State<AccountPage> {
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.cancel),
                     title: Text(AppLocalizations.of(context)!.text('logout')),
-                    subtitle: Text(currentUser!.user!.email!),
+                    subtitle: Text(FirebaseAuth.instance.currentUser!.email!),
                     onTap: () async {
                       bool confirm = await showDialog(
                         context: context,

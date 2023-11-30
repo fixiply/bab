@@ -33,10 +33,10 @@ class YeastsPage extends StatefulWidget {
   YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   @override
-  _YeastsPageState createState() => _YeastsPageState();
+  YeastsPageState createState() => YeastsPageState();
 }
 
-class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMixin<YeastsPage> {
+class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMixin<YeastsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late YeastDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
@@ -60,7 +60,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
       showCheckboxColumn: widget.showCheckboxColumn,
       allowEditing: widget.allowEditing,
       onChanged: (YeastModel value, int dataRowIndex) {
-        Database().update(value).then((value) async {
+        Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
           _showSnackbar(e.toString());
@@ -68,7 +68,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
       }
     );
     _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
-    _fetch();
+    fetch();
   }
 
   @override
@@ -79,17 +79,33 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
       appBar: AppBar(
         title: SearchText(
           _searchQueryController,
-          () {  _fetch(); }
+          () {  fetch(); }
         ),
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
-        leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-          onPressed:() async {
-            Navigator.pop(context, selected);
-          }
+        leading: widget.showCheckboxColumn == true ? Row(
+          children: [
+            Flexible(
+              child: IconButton(
+                  icon: const Icon(Icons.check),
+                  tooltip: AppLocalizations.of(context)!.text('validate'),
+                  onPressed: selected.isNotEmpty ? () async {
+                    Navigator.pop(context, selected);
+                  } : null
+              ),
+            ),
+            Flexible(
+                child: IconButton(
+                    icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+                    tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                    onPressed:() async {
+                      Navigator.pop(context, []);
+                    }
+                )
+            )
+          ]
         ) : null,
         actions: [
           if (_showList && widget.allowEditing) IconButton(
@@ -106,7 +122,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
             tooltip: AppLocalizations.of(context)!.text('import'),
             onPressed: () {
               ImportHelper.yeasts(context, () {
-                _fetch();
+                fetch();
               });
             }
           ),
@@ -121,7 +137,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => _fetch(),
+        onRefresh: () => fetch(),
         child: FutureBuilder<List<YeastModel>>(
           future: _data,
           builder: (context, snapshot) {
@@ -301,9 +317,9 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
   }
 
 
-  _fetch() async {
+  fetch() async {
     setState(() {
-      _data = Database().getYeasts(searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getYeasts(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -311,18 +327,18 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
     YeastModel newModel = YeastModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormYeastPage(newModel);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _edit(YeastModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormYeastPage(model);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _delete(YeastModel model) async {
     if (await DeleteDialog.model(context, model, forced: true)) {
-      _fetch();
+      fetch();
     }
   }
 
@@ -349,7 +365,7 @@ class _YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMi
       } finally {
         EasyLoading.dismiss();
       }
-      _fetch();
+      fetch();
       return true;
     }
     return false;

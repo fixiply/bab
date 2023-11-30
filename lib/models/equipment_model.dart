@@ -16,7 +16,6 @@ extension DoubleParsing on double {
 }
 
 class EquipmentModel<T> extends Model {
-  Status? status;
   String? reference;
   String? name;
   Equipment? type;
@@ -40,7 +39,6 @@ class EquipmentModel<T> extends Model {
     String? creator,
     bool? isEdited,
     bool? isSelected,
-    this.status = Status.publied,
     this.reference,
     this.name,
     this.type,
@@ -60,7 +58,6 @@ class EquipmentModel<T> extends Model {
   @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
-    this.status = Status.values.elementAt(map['status']);
     this.reference = map['reference'];
     this.name = map['name'];
     this.type = Equipment.values.elementAt(map['type']);
@@ -81,7 +78,6 @@ class EquipmentModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'status': this.status!.index,
       'reference': this.reference,
       'name': this.name,
       'type': this.type!.index,
@@ -106,7 +102,6 @@ class EquipmentModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      status: this.status,
       reference: this.reference,
       name: this.name,
       type: this.type,

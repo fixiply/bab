@@ -1,4 +1,3 @@
-import 'package:bab/utils/edition_notifier.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -14,9 +13,25 @@ import 'package:provider/provider.dart';
 
 enum Menu {settings, options, publish, archived, hidden, imported}
 
-abstract class _CustomMenuAnchor extends MenuAnchor {
-  _CustomMenuAnchor({Key? key, required BuildContext context, bool publish = false, bool filtered = false, bool archived = false, bool hidden = false, bool measures = false, String? importLabel, PopupMenuItemSelected? onSelected}) : super(
-      key: key,
+
+class CustomMenuAnchor extends StatefulWidget {
+  bool showPublish;
+  bool showFilters;
+  bool isArchived;
+  bool isHidden;
+  bool showMeasures;
+  String? importLabel;
+  PopupMenuItemSelected? onSelected;
+
+  CustomMenuAnchor({Key? key, this.showPublish = false, this.showFilters = false, this.isArchived = false, this.isHidden = false, this.showMeasures = false, this.importLabel, this.onSelected}): super(key: key);
+  @override
+  CustomMenuAnchorState createState() => CustomMenuAnchorState();
+}
+
+class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
+  @override
+  Widget build(BuildContext context) {
+    return MenuAnchor(
       menuChildren: [
         if (!DeviceHelper.isDesktop) MenuItemButton(
           child: Text(AppLocalizations.of(context)!.text('alert_settings')),
@@ -28,100 +43,101 @@ abstract class _CustomMenuAnchor extends MenuAnchor {
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('english')),
               value: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
-              onChanged: (value) => Provider.of<LocaleNotifier>(context, listen: false).set(const Locale('en', 'US'))
+              onChanged: (value) {
+                Provider.of<LocaleNotifier>(context, listen: false).setLocale(const Locale('en', 'US'));
+                widget.onSelected?.call(const Locale('en', 'US'));
+              }
             ),
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('french')),
               value: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
-                onChanged: (value) => Provider.of<LocaleNotifier>(context, listen: false).set(const Locale('fr', 'FR'))
+              onChanged: (value) {
+                Provider.of<LocaleNotifier>(context, listen: false).setLocale(const Locale('fr', 'FR'));
+                widget.onSelected?.call(const Locale('fr', 'FR'));
+              }
             ),
           ]
         ),
-        if (measures) SubmenuButton(
+        if (widget.showMeasures) SubmenuButton(
           child: Text(AppLocalizations.of(context)!.text('measuring_systems')),
           menuChildren: <Widget>[
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('metric')),
-              value: Measure.metric == AppLocalizations.of(context)!.measure,
+              value: Unit.metric == AppLocalizations.of(context)!.unit,
               onChanged: (value) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.measure = Measure.metric;
-                onSelected?.call(provider.measure);
+                Provider.of<LocaleNotifier>(context, listen: false).setUnit(Unit.metric);
+                widget.onSelected?.call(Unit.metric);
               }
             ),
             CheckboxMenuButton(
-              child: Text(AppLocalizations.of(context)!.text('imperial')),
-              value: Measure.imperial == AppLocalizations.of(context)!.measure,
+              child: Text(AppLocalizations.of(context)!.text('us_standard')),
+              value: Unit.us == AppLocalizations.of(context)!.unit,
               onChanged: (value) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.measure = Measure.imperial;
-                onSelected?.call(provider.measure);
+                Provider.of<LocaleNotifier>(context, listen: false).setUnit(Unit.us);
+                widget.onSelected?.call(Unit.us);
               }
             ),
           ]
         ),
-        if (measures) SubmenuButton(
+        if (widget.showMeasures) SubmenuButton(
           child: Text(AppLocalizations.of(context)!.text('gravity_units')),
           menuChildren: <Widget>[
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('gravity')),
               value: Gravity.sg == AppLocalizations.of(context)!.gravity,
               onChanged: (value) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.gravity = Gravity.sg;
-                onSelected?.call(provider.gravity);
+                Provider.of<LocaleNotifier>(context, listen: false).setGravity(Gravity.sg);
+                widget.onSelected?.call(Gravity.sg);
               }
             ),
             CheckboxMenuButton(
               child: Text('Plato °P'),
               value: Gravity.plato == AppLocalizations.of(context)!.gravity,
               onChanged: (value) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.gravity = Gravity.plato;
-                onSelected?.call(provider.gravity);
+                Provider.of<LocaleNotifier>(context, listen: false).setGravity(Gravity.plato);
+                widget.onSelected?.call(Gravity.plato);
               }
             ),
             CheckboxMenuButton(
               child: Text('Brix °Bx'),
               value: Gravity.brix == AppLocalizations.of(context)!.gravity,
               onChanged: (value) {
-                final provider = Provider.of<ValuesNotifier>(context, listen: false);
-                provider.gravity = Gravity.brix;
-                onSelected?.call(provider.gravity);
+                Provider.of<LocaleNotifier>(context, listen: false).setGravity(Gravity.brix);
+                widget.onSelected?.call(Gravity.brix);
               }
             ),
           ]
         ),
-        if (publish) MenuItemButton(
-          child: Text(AppLocalizations.of(context)!.text('publish_everything')),
-          onPressed: () async {
-            await Database().publishAll();
-            onSelected?.call(Menu.publish);
-          }
+        if (widget.showPublish) MenuItemButton(
+            child: Text(AppLocalizations.of(context)!.text('publish_everything')),
+            onPressed: () async {
+              await Database().publishAll();
+              widget.onSelected?.call(Menu.publish);
+            }
         ),
-        if (filtered) SubmenuButton(
+        if (widget.showFilters) SubmenuButton(
           child: Text(AppLocalizations.of(context)!.text('filtered')),
           menuChildren: <Widget>[
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('archives')),
-              value: archived,
+              value: widget.isArchived,
               onChanged: (value) {
-                onSelected?.call(Menu.archived);
+                widget.onSelected?.call(Menu.archived);
               }
             ),
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('hidden')),
-              value: hidden,
+              value: widget.isHidden,
               onChanged: (value) {
-                onSelected?.call(Menu.hidden);
+                widget.onSelected?.call(Menu.hidden);
               }
             ),
           ]
         ),
-        if (importLabel != null && importLabel.isNotEmpty) MenuItemButton(
-          child: Text(importLabel),
+        if (widget.importLabel != null && widget.importLabel!.isNotEmpty) MenuItemButton(
+          child: Text(widget.importLabel!),
           onPressed: () async {
-            onSelected?.call(Menu.imported);
+            widget.onSelected?.call(Menu.imported);
           }
         ),
       ],
@@ -138,19 +154,6 @@ abstract class _CustomMenuAnchor extends MenuAnchor {
           },
         );
       }
-  );
-}
-
-class CustomMenuAnchor<Object> extends _CustomMenuAnchor {
-  CustomMenuAnchor({Key? key, required BuildContext context, bool publish = false,  bool filtered = false, bool archived = false, bool hidden = false, bool measures = false, String? importLabel, PopupMenuItemSelected? onSelected}) : super(
-    key: key,
-    context: context,
-    publish: publish,
-    filtered: filtered,
-    archived: archived,
-    hidden: hidden,
-    measures: measures,
-    importLabel: importLabel,
-    onSelected: onSelected,
-  );
+    );
+  }
 }

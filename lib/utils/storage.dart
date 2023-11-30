@@ -54,7 +54,7 @@ class Storage {
           }
         }
         if (canBeAdded) {
-          ImageModel model = ImageModel(null, name: ref.name, reference: ref);
+          ImageModel model = ImageModel(name: ref.name, reference: ref);
           values.add(model);
         }
       });
@@ -72,7 +72,7 @@ class Storage {
 
   Future<ImageModel> fromURL(String url) async {
     Reference ref = await refFromURL(url);
-    return ImageModel(url, name: ref.name, reference: ref);
+    return ImageModel(url: url, name: ref.name, reference: ref);
   }
 
   Future<String?> getUrl(Reference ref) async {
@@ -188,7 +188,7 @@ class Storage {
 
   /// Remplace dans tous les modèles l'url de l'image
   Future replace(String fromUrl, String toUrl) async {
-    ImageModel newImage = ImageModel(toUrl);
+    ImageModel newImage = ImageModel(url: toUrl);
     List<dynamic> models = await ModelHelper.models(fromUrl);
     for(dynamic model in models) {
       if (ClassHelper.hasImage(model)) {
@@ -295,7 +295,7 @@ class Storage {
           }
         }
         if (!found) {
-          ImageModel model = ImageModel(url, name: ref.name, reference: ref);
+          ImageModel model = ImageModel(url: url, name: ref.name, reference: ref);
           list.add(model);
         }
       });

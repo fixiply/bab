@@ -61,58 +61,59 @@ class _EquipmentFieldState extends FormFieldState<EquipmentModel> {
         filled: true,
       ),
       child: FutureBuilder<List<EquipmentModel>>(
-          future: _equipments,
-          builder: (context, snapshot) {
-            if (snapshot.data != null) {
-              return DropdownSearch<EquipmentModel>(
-                key: _key,
-                selectedItem: widget.initialValue != null ? snapshot.data!.singleWhere((element) => element == widget.initialValue) : null,
-                compareFn: (item1, item2) => item1.uuid == item2.uuid,
-                itemAsString: (EquipmentModel model) => AppLocalizations.of(context)!.localizedText(model.name),
-                asyncItems: (String filter) async {
-                  return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
-                },
-                popupProps: const PopupProps.menu(
-                  showSelectedItems: true,
-                  showSearchBox: true,
-                ),
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                    dropdownSearchDecoration: FormDecoration(
-                      labelText: widget.title ?? AppLocalizations.of(context)!.text('equipment'),
-                    )
-                ),
-                onChanged: (value) async {
-                  didChange(value);
-                },
-                autoValidateMode: AutovalidateMode.onUserInteraction,
-                validator: widget.validator,
-              );
-            }
-            return Align(
-              alignment: Alignment.centerLeft,
-              child: TextButton(
-                onPressed: () {
-                  EquipmentModel newModel = EquipmentModel(
-                    type: widget.type
-                  );
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FormEquipmentPage(
-                      newModel, widget.type,
-                      title: AppLocalizations.of(context)!.text(widget.type == Equipment.fermenter ? 'fermenter' : 'tank'),
-                    );
-                  })).then((value) { _fetch(); });
-                },
-                child: Text(AppLocalizations.of(context)!.text(widget.type == Equipment.fermenter ? 'add_fermenter' : 'add_tank')),
-              )
+        future: _equipments,
+        builder: (context, snapshot) {
+          if (snapshot.data != null) {
+            snapshot.data!.where((element) => element == widget.initialValue);
+            return DropdownSearch<EquipmentModel>(
+              key: _key,
+              selectedItem: widget.initialValue != null ? snapshot.data!.where((element) => element == widget.initialValue).firstOrNull : null,
+              compareFn: (item1, item2) => item1.uuid == item2.uuid,
+              itemAsString: (EquipmentModel model) => AppLocalizations.of(context)!.localizedText(model.name),
+              asyncItems: (String filter) async {
+                return snapshot.data!.where((element) => AppLocalizations.of(context)!.localizedText(element.name).contains(filter)).toList();
+              },
+              popupProps: const PopupProps.menu(
+                showSelectedItems: true,
+                showSearchBox: true,
+              ),
+              dropdownDecoratorProps: DropDownDecoratorProps(
+                  dropdownSearchDecoration: FormDecoration(
+                    labelText: widget.title ?? AppLocalizations.of(context)!.text('equipment'),
+                  )
+              ),
+              onChanged: (value) async {
+                didChange(value);
+              },
+              autoValidateMode: AutovalidateMode.onUserInteraction,
+              validator: widget.validator,
             );
           }
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton(
+              onPressed: () {
+                EquipmentModel newModel = EquipmentModel(
+                  type: widget.type
+                );
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormEquipmentPage(
+                    newModel, widget.type,
+                    title: AppLocalizations.of(context)!.text(widget.type == Equipment.fermenter ? 'fermenter' : 'tank'),
+                  );
+                })).then((value) { _fetch(); });
+              },
+              child: Text(AppLocalizations.of(context)!.text(widget.type == Equipment.fermenter ? 'add_fermenter' : 'add_tank')),
+            )
+          );
+        }
       ),
     );
   }
 
   _fetch() async {
     setState(() {
-      _equipments = Database().getEquipments(type: widget.type, ordered: true);
+      _equipments = Database().getEquipments(user: currentUser?.uuid, type: widget.type, ordered: true);
     });
   }
 }

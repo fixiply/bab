@@ -9,7 +9,6 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -72,7 +71,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
             icon: const Icon(Icons.save),
             onPressed: _modified == true ? () {
               if (_formKey.currentState!.validate()) {
-                Database().update(widget.model, context: context).then((value) async {
+                Database().update(widget.model, context: context, updateLogs: !currentUser!.isAdmin()).then((value) async {
                   Navigator.pop(context, widget.model);
                 }).onError((e,s) {
                   _showSnackbar(e.toString());
@@ -90,21 +89,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
               }
             }
           ),
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            measures: true,
-            filtered: false,
-            archived: false,
-            onSelected: (value) {
-              if (value is Measure) {
-                // setState(() {
-                //   AppLocalizations.of(context)!.measure = value;
-                // });
-                _initialize();
-              }
-            },
-          )
+          CustomMenuAnchor()
         ]
       ),
       body: SingleChildScrollView(
@@ -168,7 +153,7 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   ]
               ),
               const Divider(height: 10),
-              DropdownButtonFormField<Fermentation>(
+              DropdownButtonFormField<Style>(
                 value: widget.model.type,
                 style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
                 decoration: FormDecoration(
@@ -177,8 +162,8 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   fillColor: FillColor,
                   filled: true,
                 ),
-                items: Fermentation.values.map((Fermentation display) {
-                  return DropdownMenuItem<Fermentation>(
+                items: Style.values.map((Style display) {
+                  return DropdownMenuItem<Style>(
                       value: display,
                       child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
                 }).toList(),

@@ -4,6 +4,7 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/quantity.dart';
+import 'package:flutter/foundation.dart';
 
 enum Misc with Enums { spice, fining, water_agent, herb, flavor, other;
   List<Enum> get enums => [ spice, fining, water_agent, herb, flavor, other ];
@@ -18,12 +19,11 @@ extension DoubleParsing on double {
 }
 
 class MiscModel<T> extends Model {
-  Status? status;
   dynamic name;
   Misc? type;
   Use? use;
   double? amount;
-  Unit? unit;
+  Measurement? measurement;
   int? duration;
   dynamic notes;
 
@@ -34,12 +34,11 @@ class MiscModel<T> extends Model {
     String? creator,
     bool? isEdited,
     bool? isSelected,
-    this.status = Status.publied,
     this.name,
     this.type = Misc.flavor,
-    this.use = Use.mash,
+    this.use = Use.boil,
     this.amount,
-    this.unit,
+    this.measurement,
     this.duration,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -47,7 +46,6 @@ class MiscModel<T> extends Model {
   @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
-    this.status = Status.values.elementAt(map['status']);
     this.name = LocalizedText.deserialize(map['name']);
     this.type = Misc.values.elementAt(map['type']);
     this.notes = LocalizedText.deserialize(map['notes']);
@@ -57,7 +55,6 @@ class MiscModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'status': this.status!.index,
       'name': LocalizedText.serialize(this.name),
       'type': this.type!.index,
       'notes': LocalizedText.serialize(this.notes),
@@ -71,12 +68,11 @@ class MiscModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      status: this.status,
       name: this.name,
       type: this.type,
       use: this.use,
       amount: this.amount,
-      unit: this.unit,
+      measurement: this.measurement,
       duration: this.duration,
       notes: this.notes,
     );
@@ -113,7 +109,7 @@ class MiscModel<T> extends Model {
     } else  if (columnName == 'use') {
       return Use.values;
     } else if (columnName == 'unit') {
-      return [ Unit.gram, Unit.kilo, Unit.milliliter, Unit.liter, Unit.units ];
+      return [ Measurement.gram, Measurement.kilo, Measurement.milliliter, Measurement.liter, Measurement.units ];
     }
     return null;
   }
@@ -156,7 +152,7 @@ class MiscModel<T> extends Model {
       MiscModel? model = await Database().getMisc(item.uuid!);
       if (model != null) {
         model.amount = item.amount;
-        model.unit = Unit.units;
+        model.measurement = Measurement.units;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
         values.add(model);
@@ -176,7 +172,7 @@ class MiscModel<T> extends Model {
           Quantity model = Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
-          if (item.unit != null) model.unit = item.unit;
+          if (item.measurement != null) model.measurement = item.measurement;
           model.duration = item.duration;
           model.use = item.use?.index;
           values.add(Quantity.serialize(model));

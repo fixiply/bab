@@ -15,14 +15,13 @@ extension DoubleParsing on double {
 }
 
 class YeastModel<T> extends Model {
-  Status? status;
   dynamic name;
   String? reference;
   String? laboratory;
-  Fermentation? type;
+  Style? type;
   Yeast? form;
   double? amount;
-  Unit? unit;
+  Measurement? measurement;
   double? cells;
   double? tempmin;
   double? tempmax;
@@ -37,14 +36,13 @@ class YeastModel<T> extends Model {
     String? creator,
     bool? isEdited,
     bool? isSelected,
-    this.status = Status.publied,
     this.name,
     this.reference,
     this.laboratory,
-    this.type = Fermentation.hight,
+    this.type = Style.hight,
     this.form = Yeast.dry,
     this.amount,
-    this.unit,
+    this.measurement,
     this.cells,
     this.tempmin,
     this.tempmax,
@@ -56,14 +54,12 @@ class YeastModel<T> extends Model {
   @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
-    this.status = Status.values.elementAt(map['status']);
     this.name = LocalizedText.deserialize(map['name']);
     this.name = LocalizedText.deserialize(map['name']);
     this.reference = map['product'];
     this.laboratory = map['laboratory'];
-    this.type = Fermentation.values.elementAt(map['type']);
+    this.type = Style.values.elementAt(map['type']);
     this.form = Yeast.values.elementAt(map['form']);
-    // if (map['amount'] != null) this.amount = map['amount'].toDouble();
     if (map['cells'] != null) this.cells = map['cells'].toDouble();
     if (map['min_temp'] != null) this.tempmin = map['min_temp'].toDouble();
     if (map['max_temp'] != null) this.tempmax = map['max_temp'].toDouble();
@@ -76,13 +72,11 @@ class YeastModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'status': this.status!.index,
       'name': LocalizedText.serialize(this.name),
       'product': this.reference,
       'laboratory': this.laboratory,
       'type': this.type!.index,
       'form': this.form!.index,
-      // 'amount': this.amount,
       'cells': this.cells,
       'min_temp': this.tempmin,
       'max_temp': this.tempmax,
@@ -99,14 +93,13 @@ class YeastModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      status: this.status,
       name: this.name,
       reference: this.reference,
       laboratory: this.laboratory,
       type: this.type,
       form: this.form,
       amount: this.amount,
-      unit: this.unit,
+      measurement: this.measurement,
       cells: this.cells,
       tempmin: this.tempmin,
       tempmax: this.tempmax,
@@ -149,11 +142,11 @@ class YeastModel<T> extends Model {
   /// The `og` argument is relative to the original gravity 1.xxx.
   double pitchingRate(double? og) {
     if (og != null) {
-      if (type == Fermentation.low) {
+      if (type == Style.low) {
         if (og < 1.060) {
           return 1.50;
         } else return 2.0;
-      } else if (type == Fermentation.hight) {
+      } else if (type == Style.hight) {
         if (og < 1.060) {
           return 0.75;
         } else return 1.0;
@@ -182,11 +175,11 @@ class YeastModel<T> extends Model {
   @override
   List<Enums> isEnumType(String columnName) {
     if (columnName == 'type') {
-      return Fermentation.values;
+      return Style.values;
     } else if (columnName == 'form') {
       return Yeast.values;
-    } else if (columnName == 'unit') {
-      return [ Unit.gram, Unit.milliliter, Unit.packages ];
+    } else if (columnName == 'measurement') {
+      return [ Measurement.gram, Measurement.milliliter, Measurement.packages ];
     }
     return [];
   }
@@ -229,7 +222,7 @@ class YeastModel<T> extends Model {
       YeastModel? model = await Database().getYeast(item.uuid!);
       if (model != null) {
         model.amount = item.amount;
-        model.unit = item.unit ?? (model.form == Yeast.liquid ? Unit.milliliter : Unit.gram);
+        model.measurement = item.measurement ?? (model.form == Yeast.liquid ? Measurement.milliliter : Measurement.gram);
         values.add(model);
       }
     }
@@ -247,7 +240,7 @@ class YeastModel<T> extends Model {
           Quantity model = Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
-          if (item.unit != null) model.unit = item.unit;
+          if (item.measurement != null) model.measurement = item.measurement;
           values.add(Quantity.serialize(model));
         }
         return values;

@@ -8,7 +8,6 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -60,7 +59,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
             icon: const Icon(Icons.save),
             onPressed: _modified == true ? () {
               if (_formKey.currentState!.validate()) {
-                Database().update(widget.model, context: context).then((value) async {
+                Database().update(widget.model, context: context, updateLogs: !currentUser!.isAdmin()).then((value) async {
                   Navigator.pop(context, widget.model);
                 }).onError((e,s) {
                   _showSnackbar(e.toString());
@@ -78,13 +77,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
               }
             }
           ),
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            measures: false,
-            filtered: false,
-            archived: false,
-          )
+          CustomMenuAnchor()
         ]
       ),
       body: SingleChildScrollView(

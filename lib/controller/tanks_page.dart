@@ -1,10 +1,11 @@
+import 'package:bab/widgets/containers/image_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/bluetooth_page.dart';
 import 'package:bab/controller/forms/form_equipment_page.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
-import 'package:bab/controller/tables/tanks_data_table.dart';
+import 'package:bab/controller/tables/equipments_data_table.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/recipe_model.dart';
@@ -27,13 +28,14 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 class TanksPage extends StatefulWidget {
   bool allowEditing;
+  bool allowAdding;
   bool showCheckboxColumn;
   bool loadMore;
   RecipeModel? recipe;
-  TanksPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.loadMore = false, this.recipe}) : super(key: key);
+  TanksPage({Key? key, this.allowEditing = false, this.allowAdding = false, this.showCheckboxColumn = false, this.loadMore = false, this.recipe}) : super(key: key);
 
   @override
-  _TanksPageState createState() => _TanksPageState();
+  TanksPageState createState() => TanksPageState();
 }
 
 class CustomListItem extends StatelessWidget {
@@ -84,7 +86,7 @@ class CustomListItem extends StatelessWidget {
   }
 }
 
-class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin<TanksPage> {
+class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin<TanksPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late TankDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
@@ -106,7 +108,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
     _dataSource = TankDataSource(context,
       showCheckboxColumn: widget.showCheckboxColumn,
       onChanged: (EquipmentModel value, int dataRowIndex) {
-        Database().update(value).then((value) async {
+        Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
           _showSnackbar(e.toString());
@@ -114,7 +116,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
       }
     );
     _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
-    _fetch();
+    fetch();
   }
 
   @override
@@ -125,17 +127,33 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
       appBar: AppBar(
         title: SearchText(
           _searchQueryController,
-          () {  _fetch(); }
+          () {  fetch(); }
         ),
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
-        leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-          onPressed:() async {
-            Navigator.pop(context, selected);
-          }
+        leading: widget.showCheckboxColumn == true ? Row(
+          children: [
+            Flexible(
+              child: IconButton(
+                  icon: const Icon(Icons.check),
+                  tooltip: AppLocalizations.of(context)!.text('validate'),
+                  onPressed: selected.isNotEmpty ? () async {
+                    Navigator.pop(context, selected);
+                  } : null
+              ),
+            ),
+            Flexible(
+                  child: IconButton(
+                      icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+                      tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                      onPressed:() async {
+                        Navigator.pop(context, []);
+                      }
+                  )
+              )
+          ]
         ) : null,
         actions: [
           if (_showList && widget.allowEditing) IconButton(
@@ -157,7 +175,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => _fetch(),
+        onRefresh: () => fetch(),
         child: FutureBuilder<List<EquipmentModel>>(
           future: _data,
           builder: (context, snapshot) {
@@ -216,7 +234,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
       floatingActionButton: Visibility(
         visible: currentUser != null,
         child: AnimatedActionButton(
-          title: AppLocalizations.of(context)!.text('add'),
+          title: AppLocalizations.of(context)!.text('add_tank'),
           icon: const Icon(Icons.add),
           onPressed: _new,
         )
@@ -258,59 +276,47 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: CustomListItem(
         weight: 100,
-        leading: CustomImage.network(model.image!.url, height: 100, width: 70, emptyImage: Image.asset('assets/images/logo.jpg', fit: BoxFit.fill)),
+        leading: Padding(padding: EdgeInsets.all(4),child:ImageContainer(model.image, height: 100, width: 70, emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.fill))),
         title: Text(AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        subtitle: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12),
-            backgroundColor: (model.isSelected == true ? Theme.of(context).primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.12)),
-          ),
-          child: Text(AppLocalizations.of(context)!.text('to_connect'),
-            style: const TextStyle(color: Colors.white),
-          ),
-          onPressed: DeviceHelper.isAndroid || DeviceHelper.isIOS ? () async {
-            Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return BluetoothPage();
-            }));
-          } : null,
+        subtitle: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (model.mash_volume != null) RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')} : '),
+                  TextSpan(text: AppLocalizations.of(context)!.litterVolumeFormat(model.mash_volume), style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+            if (model.efficiency != null) RichText(
+              textAlign: TextAlign.left,
+              overflow: TextOverflow.ellipsis,
+              text: TextSpan(
+                style: DefaultTextStyle.of(context).style,
+                children: <TextSpan>[
+                  TextSpan(text: '${AppLocalizations.of(context)!.text('mash_efficiency')} : '),
+                  TextSpan(text: AppLocalizations.of(context)!.percentFormat(model.efficiency), style: const TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+            ),
+          ],
         ),
-        // subtitle: Column(
-        //   mainAxisAlignment: MainAxisAlignment.start,
-        //   crossAxisAlignment: CrossAxisAlignment.start,
-        //   children: [
-        //     RichText(
-        //       textAlign: TextAlign.left,
-        //       overflow: TextOverflow.ellipsis,
-        //       text: TextSpan(
-        //         style: DefaultTextStyle.of(context).style,
-        //         children: <TextSpan>[
-        //           if (model.volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('tank_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.volume)}'),
-        //           if (model.volume != null || model.mash_volume != null) const TextSpan(text: '  -  '),
-        //           if (model.mash_volume != null) TextSpan(text: '${AppLocalizations.of(context)!.text('mash_volume')}: ${AppLocalizations.of(context)!.litterVolumeFormat(model.mash_volume)}'),
-        //         ],
-        //       ),
-        //     ),
-        //     if (model.efficiency != null ) Text('${AppLocalizations.of(context)!.text('mash_efficiency')}: ${AppLocalizations.of(context)!.percentFormat(model.efficiency)}'),
-        //     if (model.notes != null ) _text(AppLocalizations.of(context)!.localizedText(model.notes))
-        //   ],
-        // ),
         trailing: model.isEditable() && DeviceHelper.isDesktop ? PopupMenuButton<String>(
           icon: const Icon(Icons.more_vert),
           tooltip: AppLocalizations.of(context)!.text('options'),
           onSelected: (value) {
-            if (value == 'connect') {
-              _edit(model);
-            } else if (value == 'edit') {
+            if (value == 'edit') {
               _edit(model);
             } else if (value == 'remove') {
               _delete(model);
             }
           },
           itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-            PopupMenuItem(
-              value: 'connect',
-              child: Text(AppLocalizations.of(context)!.text('connect')),
-            ),
             PopupMenuItem(
               value: 'edit',
               child: Text(AppLocalizations.of(context)!.text('edit')),
@@ -320,6 +326,13 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
               child: Text(AppLocalizations.of(context)!.text('remove')),
             ),
           ]
+        ) : DeviceHelper.isAndroid ||  DeviceHelper.isIOS ? IconButton(
+          icon: const Icon(Icons.bluetooth_outlined),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) {
+              return BluetoothPage(model);
+            }));
+          },
         ) : null,
         onLongPress: model.isEditable() ? () {
           _edit(model);
@@ -347,29 +360,51 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
     );
   }
 
-  _fetch() async {
+  fetch() async {
+    String? user = currentUser != null ? !currentUser!.isAdmin() && !widget.showCheckboxColumn ? currentUser?.uuid : null : null;
     setState(() {
-      _data = Database().getEquipments(type: Equipment.tank, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getEquipments(user: user, type: Equipment.tank, searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
   _new() {
-    EquipmentModel newModel = EquipmentModel(type: Equipment.tank);
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormEquipmentPage(newModel, Equipment.tank);
-    })).then((value) { _fetch(); });
+    if (widget.allowAdding == true && (currentUser != null && !currentUser!.isAdmin())) {
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return TanksPage(showCheckboxColumn: true);
+      })).then((values) async {
+        if (values != null) {
+          for (EquipmentModel model in values) {
+            EquipmentModel newModel = model.copy();
+            newModel.uuid = null;
+            await Database().add(newModel);
+          }
+          fetch();
+        }
+      });
+    } else {
+      EquipmentModel newModel = EquipmentModel(type: Equipment.tank);
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return FormEquipmentPage(newModel, Equipment.tank);
+      })).then((value) { fetch(); });
+    }
   }
 
   _edit(EquipmentModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormEquipmentPage(model, Equipment.tank);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _delete(EquipmentModel model) async {
     if (await DeleteDialog.model(context, model, forced: true)) {
-      _fetch();
+      fetch();
     }
+  }
+
+  _connect(EquipmentModel model) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) {
+      return BluetoothPage(model);
+    }));
   }
 
   Future<bool> _deleteAll() async {
@@ -395,7 +430,7 @@ class _TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixi
       } finally {
         EasyLoading.dismiss();
       }
-      _fetch();
+      fetch();
       return true;
     }
     return false;

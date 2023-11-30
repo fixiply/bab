@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bab/controller/forms/form_brew_page.dart';
 import 'package:bab/controller/forms/form_recipe_page.dart';
 import 'package:bab/controller/tables/fermentables_data_table.dart';
+import 'package:bab/controller/tables/fermentation_data_table.dart';
 import 'package:bab/controller/tables/hops_data_table.dart';
 import 'package:bab/controller/tables/mash_data_table.dart';
 import 'package:bab/controller/tables/misc_data_table.dart';
@@ -26,7 +26,6 @@ import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/carousel_container.dart';
 import 'package:bab/widgets/containers/ratings_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/custom_slider.dart';
 import 'package:bab/widgets/paints/bezier_clipper.dart';
 import 'package:bab/widgets/paints/circle_clipper.dart';
@@ -85,16 +84,13 @@ class _RecipePageState extends State<RecipePage> {
             BasketButton(),
             if (widget.model.isEditable()) IconButton(
               icon: const Icon(Icons.edit_note),
+              tooltip: AppLocalizations.of(context)!.text('edit'),
               onPressed: () {
                 _edit(widget.model);
               },
             ),
             CustomMenuAnchor(
-              context: context,
-              publish: false,
-              filtered: false,
-              archived: false,
-              measures: true,
+              showMeasures: true,
             )
           ],
         ),
@@ -357,37 +353,12 @@ class _RecipePageState extends State<RecipePage> {
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                  const SizedBox(height: 8),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (widget.model.primaryday != null && widget.model.primarytemp != null) _fermentation(
-                        AppLocalizations.of(context)!.text('primary'),
-                        widget.model.primaryday!,
-                        widget.model.primarytemp!,
-                      ),
-                      const SizedBox(width: 12),
-                      if (widget.model.secondaryday != null && widget.model.secondarytemp != null) _fermentation(
-                        AppLocalizations.of(context)!.text('secondary'),
-                        widget.model.secondaryday!,
-                        widget.model.secondarytemp!,
-                      ),
-                      const SizedBox(width: 12),
-                      if (widget.model.tertiaryday != null && widget.model.tertiarytemp != null) _fermentation(
-                        AppLocalizations.of(context)!.text('tertiary'),
-                        widget.model.tertiaryday!,
-                        widget.model.tertiarytemp!,
-                      ),
-                    ],
-                  )
-                ]
+            if (widget.model.fermentation != null && widget.model.fermentation!.isNotEmpty) Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: FermentationDataTable(
+                  data: widget.model.fermentation,
+                  title: Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                  allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             )
           ]

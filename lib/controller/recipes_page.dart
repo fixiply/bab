@@ -20,7 +20,6 @@ import 'package:bab/widgets/containers/filter_recipe_appbar.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:bab/widgets/search_text.dart';
@@ -81,13 +80,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
               _fetch();
             },
           ),
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-            measures: true,
-          )
+          CustomMenuAnchor()
         ]
       ),
       drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,

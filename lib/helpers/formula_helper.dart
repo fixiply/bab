@@ -250,10 +250,31 @@ class FormulaHelper {
     return result;
   }
 
+  /// Returns the water/grain ratio.
+  ///
+  /// The `volume` argument is relative to the water volume.
+  ///
+  /// The `co2` argument is relative to the grain weight in kilo.
+  ///
+  /// The `temperature` argument is relative to the grain weight in kilo.
+  ///
+  /// The `attenuation` argument is relative to the grain weight in kilo.
+  static double? primingSugar(double? volume,  double? co2, {double? temperature = 18, double? attenuation = 0.5}) {
+    if (volume == null || co2 == null || temperature == null || attenuation == null) {
+      return null;
+    }
+    double residual = 1.7 - 0.059 * temperature + 0.00086 * sqrt(temperature);
+    double result = (3.9 * volume * (co2 - residual)) / attenuation;
+    if (foundation.kDebugMode) debugPrint('priming $result=(3.9 * $volume * ($co2 - $residual)) / $attenuation');
+    // double result = (volume * co2 * (temperature + 17.8) * 10) / attenuation;
+    // if (foundation.kDebugMode) debugPrint('priming $result=($volume * $co2 * ($temperature + 17.8)  * 10) / $attenuation');
+    return result;
+  }
+
   /// Returns the gallon to liter conversion
   ///
   /// The `number` argument is relative to the volume in gallon.
-  static double convertGallonToLiter(double? number) {
+  static double convertGallonToLiter(num? number) {
     if (number == null) {
       return 0;
     }
@@ -263,17 +284,27 @@ class FormulaHelper {
   /// Returns the liter to gallon conversion
   ///
   /// The `number` argument is relative to the volume in liters.
-  static double convertLiterToGallon(double? number) {
+  static double convertLiterToGallon(num? number) {
     if (number == null) {
       return 0;
     }
     return number / 3.785;
   }
 
+  /// Returns the millimeter to once conversion
+  ///
+  /// The `number` argument is relative to the number in millimeter.
+  static double convertMillimeterToOnce(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number / 29.574;
+  }
+
   /// Returns the gram to ounce conversion
   ///
   /// The `number` argument is relative to the weight in grams.
-  static double convertGramToOunce(double? number) {
+  static double convertGramToOunce(num? number) {
     if (number == null) {
       return 0;
     }
@@ -283,7 +314,7 @@ class FormulaHelper {
   /// Returns the ounce to gram conversion
   ///
   /// The `number` argument is relative to the weight in ounce.
-  static double convertOunceToGram(double? number) {
+  static double convertOunceToGram(num? number) {
     if (number == null) {
       return 0;
     }
@@ -294,7 +325,7 @@ class FormulaHelper {
   /// Returns the ounce to livre conversion
   ///
   /// The `number` argument is relative to the weight in ounce.
-  static double convertOunceToLivre(double? number) {
+  static double convertOunceToLivre(num? number) {
     if (number == null) {
       return 0;
     }
@@ -304,7 +335,7 @@ class FormulaHelper {
   /// Returns the livre to ounce conversion
   ///
   /// The `number` argument is relative to the weight in livre.
-  static double convertLivreToOunce(double? number) {
+  static double convertLivreToOunce(num? number) {
     if (number == null) {
       return 0;
     }
@@ -314,7 +345,7 @@ class FormulaHelper {
   /// Returns the farenheit to celcius conversion
   ///
   /// The `number` argument is relative to the farenheit.
-  static double convertFarenheitToCelcius(double? number) {
+  static double convertFarenheitToCelcius(num? number) {
     if (number == null) {
       return 0;
     }
@@ -324,7 +355,7 @@ class FormulaHelper {
   /// Returns the celcius to farenheit conversion
   ///
   /// The `number` argument is relative to the celcius.
-  static double convertCelciusToFarenheit(double? number) {
+  static double convertCelciusToFarenheit(num? number) {
     if (number == null) {
       return 0;
     }
@@ -334,7 +365,7 @@ class FormulaHelper {
   /// Returns the specific gravity to plato gravity
   ///
   /// The `number` argument is relative to the specific gravity.
-  static double convertSGToPlato(double? number) {
+  static double convertSGToPlato(num? number) {
     if (number == null) {
       return 0;
     }
@@ -344,7 +375,7 @@ class FormulaHelper {
   /// Returns the plato gravity to specific gravity
   ///
   /// The `number` argument is relative to the plato gravity.
-  static double convertPlatoToSG(double? number) {
+  static double convertPlatoToSG(num? number) {
     if (number == null) {
       return 0;
     }
@@ -354,7 +385,7 @@ class FormulaHelper {
   /// Returns the plato gravity to brix
   ///
   /// The `number` argument is relative to the plato gravity.
-  static double convertPlatoToBrix(double? number) {
+  static double convertPlatoToBrix(num? number) {
     if (number == null) {
       return 0;
     }
@@ -364,7 +395,7 @@ class FormulaHelper {
   /// Returns the specific gravity to brix
   ///
   /// The `number` argument is relative to the specific gravity.
-  static double convertSGToBrix(double? number) {
+  static double convertSGToBrix(num? number) {
     if (number == null) {
       return 0;
     }
@@ -374,7 +405,7 @@ class FormulaHelper {
   /// Returns the brix to specific gravity
   ///
   /// The `number` argument is relative to the brix.
-  static double convertBrixToSG(double? number) {
+  static double convertBrixToSG(num? number) {
     if (number == null) {
       return 0;
     }
@@ -384,11 +415,72 @@ class FormulaHelper {
   /// Returns the brix to plato gravity
   ///
   /// The `number` argument is relative to the brix.
-  static double convertBrixToPlato(double? number) {
+  static double convertBrixToPlato(num? number) {
     if (number == null) {
       return 0;
     }
     return number / 1.04;
+  }
+
+  /// Returns the bar to psi pressure
+  ///
+  /// The `number` argument is relative to the bar.
+  static double convertBarToPSI(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number * 14.504;
+    ;
+  }
+
+  /// Returns the bar to Pascal pressure
+  ///
+  /// The `number` argument is relative to the bar.
+  static double convertBarToPascal(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number * 100000;
+  }
+
+  /// Returns the psi to bar pressure
+  ///
+  /// The `number` argument is relative to the psi.
+  static double convertPSIToBar(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number / 14.504;
+  }
+
+  /// Returns the psi to Pascal pressure
+  ///
+  /// The `number` argument is relative to the psi.
+  static double convertPSIToPascal(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number * 6895;
+  }
+
+  /// Returns the Pascal to bar pressure
+  ///
+  /// The `number` argument is relative to the Pascal.
+  static double convertPascalToBar(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number / 100000;
+  }
+
+  /// Returns the Pascal to psi pressure
+  ///
+  /// The `number` argument is relative to the Pascal.
+  static double convertPascalToPSI(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number / 6895;
   }
 }
 

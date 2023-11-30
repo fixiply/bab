@@ -42,7 +42,7 @@ mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   }
 }
 
-enum Unit with Enums {
+enum Measurement with Enums {
   gram(symbol: 'g'),
   kilo(symbol: 'kg'),
   milliliter(symbol: 'ml'),
@@ -50,14 +50,14 @@ enum Unit with Enums {
   packages(),
   units();
 
-  const Unit({
+  const Measurement({
     this.symbol
   });
   final String? symbol;
 
   List<Enum> get enums => [ gram, kilo, milliliter, liter, packages, units];
 }
-enum Fermentation with Enums { hight, low, spontaneous;
+enum Style with Enums { hight, low, spontaneous;
   List<Enum> get enums => [ hight, low, spontaneous ];
 }
 enum Ingredient with Enums { fermentable, hops, yeast, misc;
@@ -76,8 +76,9 @@ enum Role with Enums { admin, editor, customer;
 enum Acid { hydrochloric, phosphoric, lactic, sulfuric }
 enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size }
 enum Status { pending, publied, disabled }
-enum Measure { metric, imperial }
+enum Unit { metric, us }
 enum Gravity { sg, plato, brix }
+enum Pressure { psi, bar, pascal}
 
 //Colors
 const Color PrimaryColor = Color(0xFF008351);

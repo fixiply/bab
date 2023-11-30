@@ -11,7 +11,6 @@ import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_image.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 
 class ProductsPage extends StatefulWidget {
@@ -45,12 +44,7 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-          )
+          CustomMenuAnchor()
         ],
       ),
       body: RefreshIndicator(

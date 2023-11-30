@@ -130,9 +130,9 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
                   return ErrorContainer(snapshot.error.toString());
                 }
                 return Center(
-                    child: ImageAnimateRotate(
-                      child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
-                    )
+                  child: ImageAnimateRotate(
+                    child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+                  )
                 );
               }
             ) : _dataGrid(widget.data!)
@@ -174,7 +174,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
             context: context,
             baseUnit: use == Use.dry_hop ? BaseUnit.day: BaseUnit.minute,
             initialTime: use == Use.dry_hop ? Duration(days: value ?? 5) : Duration(minutes: value ?? widget.recipe!.boil),
-            maxTime: use == Use.dry_hop ? Duration(days: widget.recipe!.primaryday ?? 0) : Duration(minutes: widget.recipe!.boil!),
+            maxTime: use == Use.dry_hop ? Duration(days: widget.recipe!.primaryDay ?? 0) : Duration(minutes: widget.recipe!.boil!),
           );
           if (duration != null)  {
             _dataSource.newCellValue = use == Use.dry_hop ? duration.inDays : duration.inMinutes;

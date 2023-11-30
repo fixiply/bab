@@ -3,7 +3,6 @@ import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/fermentable_model.dart' as fm;
 import 'package:bab/models/hop_model.dart' as hm;
-import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/image_model.dart';
 import 'package:bab/models/misc_model.dart' as mm;
 import 'package:bab/models/model.dart';
@@ -11,11 +10,12 @@ import 'package:bab/models/style_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
+import 'package:bab/utils/fermentation.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
 import 'package:bab/utils/quantity.dart';
 import 'package:bab/utils/rating.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 
 enum Method with Enums { all_grain,  extract, partial;
   List<Enum> get enums => [ all_grain,  extract, partial ];
@@ -24,7 +24,6 @@ enum Method with Enums { all_grain,  extract, partial;
 class RecipeModel<T> extends Model {
   Method? method;
   String? color;
-  Status? status;
   dynamic title;
   dynamic text;
   bool? shared;
@@ -42,12 +41,7 @@ class RecipeModel<T> extends Model {
   List<Quantity>? cacheMisc;
   List<Quantity>? cacheYeasts;
   List<Mash>? mash;
-  int? primaryday;
-  double? primarytemp;
-  int? secondaryday;
-  double? secondarytemp;
-  int? tertiaryday;
-  double? tertiarytemp;
+  List<Fermentation>? fermentation;
   dynamic notes;
   ImageModel? image;
   List<Rating>? ratings;
@@ -65,7 +59,6 @@ class RecipeModel<T> extends Model {
     String? creator,
     this.method = Method.all_grain,
     this.color,
-    this.status = Status.disabled,
     this.title,
     this.text,
     this.shared = false,
@@ -83,12 +76,7 @@ class RecipeModel<T> extends Model {
     this.cacheMisc,
     this.cacheYeasts,
     this.mash,
-    this.primaryday,
-    this.primarytemp,
-    this.secondaryday,
-    this.secondarytemp,
-    this.tertiaryday,
-    this.tertiarytemp,
+    this.fermentation,
     this.notes,
     this.image,
     this.ratings,
@@ -99,7 +87,11 @@ class RecipeModel<T> extends Model {
     cacheHops ??= [];
     cacheMisc ??= [];
     cacheYeasts ??= [];
-    mash ??= [];
+    mash ??= [
+      Mash(name: 'Mash In', type: Type.infusion, duration: 60, temperature: 65),
+      Mash(name: 'Mash Out', type: Type.temperature, duration: 10, temperature: 75)
+    ];
+    fermentation ??= [];
     ratings ??= [];
   }
 
@@ -108,7 +100,6 @@ class RecipeModel<T> extends Model {
     super.fromMap(map);
     if (map.containsKey('method')) this.method = Method.values.elementAt(map['method']);
     this.color = map['color'];
-    this.status = Status.values.elementAt(map['status']);
     this.title = LocalizedText.deserialize(map['title']);
     this.text = LocalizedText.deserialize(map['text']);
     if (map.containsKey('shared')) this.shared = map['shared'];
@@ -126,12 +117,7 @@ class RecipeModel<T> extends Model {
     this.cacheMisc =  Quantity.deserialize(map['miscellaneous']);
     this.cacheYeasts =  Quantity.deserialize(map['yeasts']);
     this.mash = Mash.deserialize(map['mash']);
-    this.primaryday = map['primaryday'];
-    if (map['primarytemp'] != null) this.primarytemp = map['primarytemp'].toDouble();
-    this.secondaryday = map['secondaryday'];
-    if (map['secondarytemp'] != null) this.secondarytemp = map['secondarytemp'].toDouble();
-    this.tertiaryday = map['tertiaryday'];
-    if (map['tertiarytemp'] != null) this.tertiarytemp = map['tertiarytemp'].toDouble();
+    if (map['fermentation'] != null) this.fermentation = Fermentation.deserialize(map['fermentation']);
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
     this.ratings = Rating.deserialize(map['ratings']);
@@ -144,7 +130,6 @@ class RecipeModel<T> extends Model {
     map.addAll({
       'method': this.method!.index,
       'color': this.color,
-      'status': this.status!.index,
       'title': LocalizedText.serialize(this.title),
       'text': LocalizedText.serialize(this.text),
       'shared': this.shared,
@@ -162,12 +147,7 @@ class RecipeModel<T> extends Model {
       'miscellaneous': mm.MiscModel.quantities(this._misc),
       'yeasts': YeastModel.quantities(this._yeasts),
       'mash': Mash.serialize(this.mash),
-      'primaryday': this.primaryday,
-      'primarytemp': this.primarytemp,
-      'secondaryday': this.secondaryday,
-      'secondarytemp': this.secondarytemp,
-      'tertiaryday': this.tertiaryday,
-      'tertiarytemp': this.tertiarytemp,
+      'fermentation': Fermentation.serialize(this.fermentation),
       'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
       'ratings': Rating.serialize(this.ratings),
@@ -184,7 +164,6 @@ class RecipeModel<T> extends Model {
       creator: creator,
       method: this.method,
       color: this.color,
-      status: this.status,
       title: this.title,
       text: this.text,
       shared: this.shared,
@@ -202,12 +181,7 @@ class RecipeModel<T> extends Model {
       cacheMisc: this.cacheMisc,
       cacheYeasts: this.cacheYeasts,
       mash: this.mash,
-      primaryday: this.primaryday,
-      primarytemp: this.primarytemp,
-      secondaryday: this.secondaryday,
-      secondarytemp: this.secondarytemp,
-      tertiaryday: this.tertiaryday,
-      tertiarytemp: this.tertiarytemp,
+      fermentation: this.fermentation,
       notes: this.notes,
       image: this.image,
       ratings: this.ratings,
@@ -258,6 +232,10 @@ class RecipeModel<T> extends Model {
       extract += (item.efficiency ?? 0) / fermentables.length;
     }
     return extract;
+  }
+
+  int? get primaryDay {
+    return fermentation!.first.duration!;
   }
 
   set fermentables(List<fm.FermentableModel>data) => _fermentables = data;
@@ -333,7 +311,7 @@ class RecipeModel<T> extends Model {
     if (volume == null || volume == this.volume) {
       return;
     }
-    for(HopModel item in hops) {
+    for(hm.HopModel item in hops) {
       item.amount = (item.amount! * (volume / this.volume!)).abs();
     }
     calculate(volume: volume);
@@ -375,19 +353,30 @@ class RecipeModel<T> extends Model {
       og = FormulaHelper.og(extract, volume ?? this.volume);
     }
 
+    int? primaryday;
     for(YeastModel item in await getYeasts()) {
-      primarytemp = primarytemp ?? (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
-      switch(item.type ?? Fermentation.hight) {
-        case Fermentation.hight:
-          primaryday = primaryday ?? 21;
-          break;
-        case Fermentation.low:
-          primaryday = primaryday ?? 14;
-          secondaryday = secondaryday ?? 21;
-          secondarytemp = secondarytemp ?? 5;
-          break;
-        case Fermentation.spontaneous:
-          break;
+      if (fermentation!.isEmpty) {
+        double primarytemp = (((item.tempmin ?? 0) + (item.tempmax ?? 0)) / 2).roundToDouble();
+        double? secondarytemp;
+        int? secondaryday;
+        switch (item.type ?? Style.hight) {
+          case Style.hight:
+            primaryday = primaryday ?? 21;
+            break;
+          case Style.low:
+            primaryday = primaryday ?? 14;
+            secondaryday = secondaryday ?? 21;
+            secondarytemp = secondarytemp ?? 5;
+            break;
+          case Style.spontaneous:
+            break;
+        }
+        if (primaryday != null) {
+          fermentation!.add(Fermentation(name: 'Primary', duration: primaryday, temperature: primarytemp));
+        }
+        if (secondaryday != null && secondarytemp != null) {
+          fermentation!.add(Fermentation(name: 'Secondary', duration: secondaryday, temperature: secondarytemp));
+        }
       }
       double? density =  item.density(og);
       if (density != null) {

@@ -1,14 +1,15 @@
-import 'package:bab/utils/constants.dart';
-import 'package:bab/widgets/dialogs/rating_dialog.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/rating.dart';
+import 'package:bab/widgets/dialogs/rating_dialog.dart';
 
 // External package
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RatingsContainer extends StatefulWidget {
   dynamic model;
@@ -59,7 +60,7 @@ class _RatingsContainerState extends State<RatingsContainer> {
                             return RatingDialog(
                                 Rating(
                                   creator: currentUser!.uuid,
-                                  name: currentUser!.full_name,
+                                  name: FirebaseAuth.instance.currentUser!.displayName ,
                                   rating: 0
                                 ),
                                 title: widget.model.title,
@@ -157,7 +158,7 @@ class _RatingsContainerState extends State<RatingsContainer> {
                            return RatingDialog(
                                Rating(
                                    creator: currentUser!.uuid,
-                                   name: currentUser!.full_name,
+                                   name: FirebaseAuth.instance.currentUser!.displayName,
                                    rating: 0
                                ),
                                title: widget.model.title,

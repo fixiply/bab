@@ -7,6 +7,7 @@ import 'package:bab/models/hop_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/recipe_model.dart';
 import 'package:bab/utils/database.dart';
+import 'package:bab/utils/fermentation.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
 import 'package:bab/utils/quantity.dart';
@@ -179,12 +180,13 @@ class BrewModel<T> extends Model {
 
   DateTime? get start_fermentation => fermented_at ?? started_at;
 
+  /*
   int? primaryDay() {
-    return primaryday ?? recipe?.primaryday;
+    return primaryday ?? recipe?.primaryDay;
   }
 
   DateTime? endDatePrimary() {
-    int? primary = primaryday ?? recipe?.primaryday;
+    int? primary = primaryday ?? recipe?.primaryDay;
     if (primary != null) {
       return DateHelper.toDate(start_fermentation!.add(Duration(days: primary)));
     }
@@ -219,11 +221,12 @@ class BrewModel<T> extends Model {
     }
     return null;
   }
+  */
 
   List<DateTime> dryHop() {
     List<DateTime> values = [];
     if (recipe != null) {
-      int? primary = primaryday ?? recipe?.primaryday;
+      int? primary = primaryday ?? recipe?.primaryDay;
       for(Quantity item in recipe!.cacheHops!) {
         if (item.use == Use.dry_hop.index) {
           int days = (primary ?? 0) - (item.duration ?? 0);
@@ -234,15 +237,24 @@ class BrewModel<T> extends Model {
     return values;
   }
 
-  DateTime? finish() {
-    int? primary = primaryday ?? recipe?.primaryday;
-    int? secondary = secondaryday ?? recipe?.secondaryday;
-    int? tertiary = tertiaryday ?? recipe?.tertiaryday;
-    if (primary != null || secondary != null || tertiary != null) {
-      int days = (primary ?? 0) + (secondary ?? 0) + (tertiary ?? 0);
-      return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
+  List<DateTime> fermentable() {
+    List<DateTime> values = [];
+    if (recipe != null) {
+      int days = 0;
+      for(Fermentation item in recipe!.fermentation!) {
+        days += item.duration!;
+        values.add(DateHelper.toDate(start_fermentation!.add(Duration(days: days))));
+      }
     }
-    return null;
+    return values;
+  }
+
+  DateTime? finish() {
+    int days = 0;
+    for (Fermentation fermentation in recipe!.fermentation!) {
+      days += fermentation.duration!;
+    }
+    return days > 0 ? DateHelper.toDate(start_fermentation!.add(Duration(days: days))) : null;
   }
 
   Future<double> get totalWeight async {

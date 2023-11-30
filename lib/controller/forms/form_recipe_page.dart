@@ -17,7 +17,6 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/custom_slider.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
@@ -25,6 +24,7 @@ import 'package:bab/widgets/form_decoration.dart';
 import 'package:bab/widgets/forms/beer_style_field.dart';
 import 'package:bab/widgets/forms/color_field.dart';
 import 'package:bab/widgets/forms/duration_field.dart';
+import 'package:bab/widgets/forms/fermentation_field.dart';
 import 'package:bab/widgets/forms/image_field.dart';
 import 'package:bab/widgets/forms/ingredients_field.dart';
 import 'package:bab/widgets/forms/localized_text_field.dart';
@@ -51,16 +51,12 @@ class _FormRecipePageState extends State<FormRecipePage> {
   bool _modified = false;
 
   TextEditingController _volumeController = TextEditingController();
-  TextEditingController _primarydayController = TextEditingController();
-  TextEditingController _primarytempController = TextEditingController();
-  TextEditingController _secondarydayController = TextEditingController();
-  TextEditingController _secondarytempController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      _initialize();
+      _applyChange();
     });
   }
 
@@ -115,7 +111,6 @@ class _FormRecipePageState extends State<FormRecipePage> {
                 RecipeModel model = widget.model.copy();
                 model.uuid = null;
                 model.title = null;
-                model.status = constants.Status.disabled;
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormRecipePage(model);
                 })).then((value) {
@@ -135,17 +130,10 @@ class _FormRecipePageState extends State<FormRecipePage> {
             }
           ),
           CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-            measures: true,
+            showMeasures: true,
             onSelected: (value) {
-              if (value is constants.Measure) {
-                setState(() {
-                  AppLocalizations.of(context)!.measure = value;
-                });
-                _initialize();
+              if (value is constants.Unit) {
+                _applyChange(unit: value);
               }
             },
           )
@@ -166,7 +154,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                 initiallyExpanded: true,
                 backgroundColor: constants.FillColor,
                 // childrenPadding: EdgeInsets.all(8.0),
-                title: Text(AppLocalizations.of(context)!.text('recipe_profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
+                title: Text(AppLocalizations.of(context)!.text('theoretical_profile'), style: TextStyle(color: Theme.of(context).primaryColor)),
                 children: <Widget>[
                   Row(
                     children: [
@@ -392,6 +380,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                   Expanded(
                     child: DurationField(
                       value: widget.model.boil ?? 0,
+                      label: AppLocalizations.of(context)!.text('boiling_time'),
                       onChanged: (value) {
                         widget.model.boil = value;
                         _calculate();
@@ -454,131 +443,11 @@ class _FormRecipePageState extends State<FormRecipePage> {
                 onChanged: (values) => widget.model.mash = values,
               ),
               const Divider(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '',
-                      controller: _primarydayController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (String? value) {
-                        widget.model.primaryday = value != null && value.isNotEmpty ? int.parse(value) : null;
-                      },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.looks_one_outlined),
-                        labelText: AppLocalizations.of(context)!.text('primary_fermentation'),
-                        suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
-                        border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
-                      ),
-                    )
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '',
-                      controller: _primarytempController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
-                      ],
-                      onChanged: (String? value) {
-                        widget.model.primarytemp = value != null && value.isNotEmpty ? AppLocalizations.of(context)!.decimal(value) : null;
-                      },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.device_thermostat_outlined),
-                        labelText: AppLocalizations.of(context)!.text('temperature'),
-                        suffixText: AppLocalizations.of(context)!.tempMeasure,
-                        border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
-                      ),
-                    )
-                  ),
-                ]
-              ),
-              const Divider(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      // initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '',
-                      controller: _secondarydayController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (String? value) {
-                        widget.model.secondaryday = value != null && value.isNotEmpty ? int.parse(value) : null;
-                      },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.looks_two_outlined),
-                        labelText: AppLocalizations.of(context)!.text('secondary_fermentation'),
-                        suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
-                        border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
-                      ),
-                    )
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      // initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '',
-                      controller: _secondarytempController,
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
-                      ],
-                      onChanged: (String? value) {
-                        widget.model.secondarytemp = value != null && value.isNotEmpty ? AppLocalizations.of(context)!.decimal(value) : null;
-                      },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.device_thermostat_outlined),
-                        labelText: AppLocalizations.of(context)!.text('temperature'),
-                        suffixText: AppLocalizations.of(context)!.tempMeasure,
-                        border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
-                      ),
-                    )
-                  ),
-                ]
-              ),
-              const Divider(height: 10),
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      initialValue: AppLocalizations.of(context)!.numberFormat(widget.model.tertiaryday) ?? '',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: false),
-                      onChanged: (String? value) {
-                        widget.model.tertiaryday = value != null && value.isNotEmpty ? int.parse(value) : null;
-                      },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.looks_3_outlined),
-                        labelText: AppLocalizations.of(context)!.text('tertiary_fermentation'),
-                        suffixText: AppLocalizations.of(context)!.text('days').toLowerCase(),
-                        border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
-                      ),
-                    )
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: TextFormField(
-                      initialValue:  AppLocalizations.of(context)!.numberFormat(widget.model.tertiarytemp) ?? '',
-                      keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                      inputFormatters: <TextInputFormatter>[
-                        FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
-                      ],
-                      onChanged: (String? value) {
-                        widget.model.tertiarytemp = value != null && value.isNotEmpty ? AppLocalizations.of(context)!.decimal(value) : null;
-                      },
-                      decoration: FormDecoration(
-                        icon: const Icon(Icons.device_thermostat_outlined),
-                        labelText: AppLocalizations.of(context)!.text('temperature'),
-                        suffixText: AppLocalizations.of(context)!.tempMeasure,
-                        border: InputBorder.none,
-                        fillColor: constants.FillColor, filled: true
-                      ),
-                    )
-                  ),
-                ]
+              FermentationField(
+                context: context,
+                data: widget.model.fermentation,
+                recipe: widget.model,
+                onChanged: (values) => widget.model.fermentation = values,
               ),
               const Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.text = value,
@@ -614,13 +483,9 @@ class _FormRecipePageState extends State<FormRecipePage> {
     );
   }
 
-  _initialize() async {
+  _applyChange({constants.Unit? unit}) async {
     bool modified = _modified;
-    _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, symbol: false) ?? '';
-    _primarydayController.text = AppLocalizations.of(context)!.numberFormat(widget.model.primaryday) ?? '';
-    _primarytempController.text = AppLocalizations.of(context)!.numberFormat(widget.model.primarytemp) ?? '';
-    _secondarydayController.text = AppLocalizations.of(context)!.numberFormat(widget.model.secondaryday) ?? '';
-    _secondarytempController.text = AppLocalizations.of(context)!.numberFormat(widget.model.secondarytemp) ?? '';
+    _volumeController.text = AppLocalizations.of(context)!.volumeFormat(widget.model.volume, unit: unit, symbol: false) ?? '';
     _modified = modified ? true : false;
   }
 

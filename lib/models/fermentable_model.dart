@@ -19,12 +19,11 @@ extension DoubleParsing on double {
 }
 
 class FermentableModel<T> extends Model {
-  Status? status;
   dynamic name;
   Type? type;
   String? origin;
   double? amount;
-  Unit? unit;
+  Measurement? measurement;
   Method? use;
   double? efficiency;
   int? ebc;
@@ -37,12 +36,11 @@ class FermentableModel<T> extends Model {
     String? creator,
     bool? isEdited,
     bool? isSelected,
-    this.status = Status.publied,
     this.name,
     this.type = Type.grain,
     this.origin,
     this.amount,
-    this.unit = Unit.kilo,
+    this.measurement = Measurement.kilo,
     this.use = Method.mashed,
     this.efficiency,
     this.ebc,
@@ -52,12 +50,9 @@ class FermentableModel<T> extends Model {
   @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
-    this.status = Status.values.elementAt(map['status']);
     this.name = LocalizedText.deserialize(map['name']);
     this.type = Type.values.elementAt(map['type']);
     this.origin = map['origin'];
-    // if (map['amount'] != null) this.amount = map['amount'].toDouble();
-    // this.method = Method.values.elementAt(map['method']);
     if (map['efficiency'] != null) this.efficiency = map['efficiency'].toDouble();
     this.ebc = map['ebc'];
     this.notes = LocalizedText.deserialize(map['notes']);
@@ -67,12 +62,9 @@ class FermentableModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'status': this.status!.index,
       'name': LocalizedText.serialize(this.name),
       'type': this.type!.index,
       'origin': this.origin,
-      // 'amount': this.amount,
-      // 'method': this.method!.index,
       'efficiency': this.efficiency,
       'ebc': this.ebc,
       'notes': LocalizedText.serialize(this.notes),
@@ -86,13 +78,12 @@ class FermentableModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      status: this.status,
       name: this.name,
       type: this.type,
       origin: this.origin,
       amount: this.amount,
       use: this.use,
-      unit: this.unit,
+      measurement: this.measurement,
       efficiency: this.efficiency,
       ebc: this.ebc,
       notes: this.notes,
@@ -179,7 +170,7 @@ class FermentableModel<T> extends Model {
       if (model != null) {
         model.amount = item.amount;
         model.use = item.use != null ? Method.values.elementAt(item.use!) : Method.mashed;
-        model.unit = Unit.kilo;
+        model.measurement = Measurement.kilo;
         values.add(model);
       }
     }
@@ -198,7 +189,7 @@ class FermentableModel<T> extends Model {
           model.uuid = item.uuid;
           model.amount = item.amount;
           model.use = item.use?.index;
-          if (item.unit != null) model.unit = item.unit;
+          if (item.measurement != null) model.measurement = item.measurement;
           values.add(Quantity.serialize(model));
         }
         return values;

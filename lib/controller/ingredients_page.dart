@@ -11,7 +11,6 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
 
@@ -24,6 +23,10 @@ class IngredientsPage extends StatefulWidget {
 
 class _IngredientsPageState extends State<IngredientsPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<IngredientsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _fermentablesKey = GlobalKey<FermentablesPageState>();
+  final _hopsKey = GlobalKey<HopsPageState>();
+  final _yeastsKey = GlobalKey<YeastsPageState>();
+  final _miscKey = GlobalKey<MiscPageState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -55,13 +58,26 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
           backgroundColor: Colors.white,
           actions: [
             BasketButton(),
-            CustomMenuAnchor(
-              context: context,
-              publish: false,
-              filtered: false,
-              archived: false,
-              measures: true,
-            )
+            if (DeviceHelper.isDesktop) IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.refresh),
+              tooltip: AppLocalizations.of(context)!.text('refresh'),
+              onPressed: () {
+                if (_fermentablesKey.currentState != null) {
+                  _fermentablesKey.currentState!.fetch();
+                }
+                if (_hopsKey.currentState != null) {
+                  _hopsKey.currentState!.fetch();
+                }
+                if (_yeastsKey.currentState != null) {
+                  _yeastsKey.currentState!.fetch();
+                }
+                if (_miscKey.currentState != null) {
+                  _miscKey.currentState!.fetch();
+                }
+              },
+            ),
+            CustomMenuAnchor()
           ],
           bottom: PreferredSize(
             preferredSize: _tabBar.preferredSize,
@@ -74,10 +90,10 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
         drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
         body: TabBarView(
           children: [
-            FermentablesPage(allowEditing: currentUser != null),
-            HopsPage(allowEditing: currentUser != null),
-            YeastsPage(allowEditing: currentUser != null),
-            MiscPage(allowEditing: currentUser != null),
+            FermentablesPage(key: _fermentablesKey, allowEditing: currentUser != null),
+            HopsPage(key: _hopsKey, allowEditing: currentUser != null),
+            YeastsPage(key: _yeastsKey, allowEditing: currentUser != null),
+            MiscPage(key: _miscKey, allowEditing: currentUser != null),
           ]
         ),
       )

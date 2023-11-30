@@ -1,3 +1,4 @@
+import 'package:bab/controller/forms/form_equipment_page.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
@@ -22,8 +23,7 @@ import 'package:syncfusion_flutter_core/theme.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 
-class TanksDataTable extends StatefulWidget {
-  List<Quantity>? data;
+class EquipmentDataTable extends StatefulWidget {
   Widget? title;
   bool allowEditing;
   bool allowSorting;
@@ -33,8 +33,8 @@ class TanksDataTable extends StatefulWidget {
   Color? color;
   bool? showCheckboxColumn;
   SelectionMode? selectionMode;
-  TanksDataTable({Key? key,
-    this.data,
+  Equipment? equipment;
+  EquipmentDataTable({Key? key,
     this.title,
     this.allowEditing = true,
     this.allowSorting = true,
@@ -43,13 +43,14 @@ class TanksDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
-    this.selectionMode = SelectionMode.multiple}) : super(key: key);
+    this.selectionMode = SelectionMode.multiple,
+    required this.equipment}) : super(key: key);
 
   @override
-  TanksDataTableState createState() => TanksDataTableState();
+  _EquipmentDataTableState createState() => _EquipmentDataTableState();
 }
 
-class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveClientMixin {
+class _EquipmentDataTableState extends State<EquipmentDataTable> with AutomaticKeepAliveClientMixin {
   late TankDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
   final TextEditingController _searchQueryController = TextEditingController();
@@ -87,10 +88,10 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Expanded(child: widget.title ?? (widget.data == null ? SearchText(
+              Expanded(child: widget.title ?? SearchText(
                 _searchQueryController,
                 () {  _fetch(); }
-              ) : Container())),
+              )),
               const SizedBox(width: 4),
               if(widget.allowEditing == true) TextButton(
                 child: const Icon(Icons.add),
@@ -142,7 +143,7 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
                           });
                         }
                       },
-                      columns: TankDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+                      columns: TankDataSource.columns(context: context, allowEditing: widget.allowEditing),
                     );
                   }
                   if (snapshot.hasError) {
@@ -192,13 +193,11 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
           // widget.onChanged?.call(values);
         }
       });
-    } else if (widget.allowEditing == true) {
-      setState(() {
-        _data!.then((value) {
-          value.insert(0, EquipmentModel(isEdited: true));
-          return value;
-        });
-      });
+    } else  {
+      EquipmentModel newModel = EquipmentModel(type: Equipment.tank);
+      Navigator.push(context, MaterialPageRoute(builder: (context) {
+        return FormEquipmentPage(newModel, widget.equipment);
+      })).then((value) { _fetch(); });
     }
   }
 
@@ -206,7 +205,6 @@ class TanksDataTableState extends State<TanksDataTable> with AutomaticKeepAliveC
     setState(() {
       _data!.then((value) => value.removeAt(rowIndex));
     });
-    widget.data!.removeAt(rowIndex);
   }
 
   _showSnackbar(String message) {
@@ -268,7 +266,7 @@ class TankDataSource extends EditDataSource {
   dynamic getValue(DataGridRow dataGridRow, String columnName) {
     var value = super.getValue(dataGridRow, columnName);
     if (value != null && columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value * 1000, unit: Unit.kilo);
+      double? weight = AppLocalizations.of(context)!.weight(value * 1000, measurement: Measurement.kilo);
       return weight!.toPrecision(2);
     }
     return value;
@@ -277,7 +275,7 @@ class TankDataSource extends EditDataSource {
   @override
   String? suffixText(String columnName) {
     if (columnName == 'amount') {
-      return AppLocalizations.of(context)!.weightSuffix(unit: Unit.kilo);
+      return AppLocalizations.of(context)!.weightSuffix(measurement: Measurement.kilo);
     }
     return null;
   }
@@ -423,7 +421,7 @@ class TankDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -432,7 +430,6 @@ class TankDataSource extends EditDataSource {
       ),
       GridColumn(
           columnName: 'name',
-          allowEditing: showQuantity == false,
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.centerLeft,

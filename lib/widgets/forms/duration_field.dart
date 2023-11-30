@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package+
+import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/duration_picker.dart';
@@ -9,11 +10,12 @@ import 'package:bab/widgets/form_decoration.dart';
 class DurationField extends FormField<int> {
   final void Function(int? value)? onChanged;
   String? label;
-  Icon? icon;
+  Widget? icon;
+  bool? showIcon;
   @override
   final FormFieldValidator<dynamic>? validator;
 
-  DurationField({Key? key, required int value, this.onChanged, this.label, this.icon, this.validator}) : super(
+  DurationField({Key? key, required int value, this.onChanged, this.label, this.icon, this.showIcon = true, this.validator}) : super(
       key: key,
       initialValue: value,
       builder: (FormFieldState<int> field) {
@@ -40,10 +42,10 @@ class _DurationFieldState extends FormFieldState<int> {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      readOnly: true,
+      readOnly: !DeviceHelper.isDesktop,
       controller: _textController..text = AppLocalizations.of(context)!.numberFormat(widget.initialValue) ?? '',
       decoration: FormDecoration(
-        icon: widget.icon ?? const Icon(Icons.timer_outlined),
+        icon: widget.showIcon == true ? widget.icon ?? const Icon(Icons.timer_outlined) : null,
         labelText: widget.label ?? AppLocalizations.of(context)!.text('duration'),
         suffixText: 'minutes',
         border: InputBorder.none,
@@ -51,7 +53,10 @@ class _DurationFieldState extends FormFieldState<int> {
       ),
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: widget.validator,
-      onTap: () async {
+      onEditingComplete: DeviceHelper.isDesktop ? () async {
+        didChange(int.tryParse('30'));
+      } : null,
+      onTap: !DeviceHelper.isDesktop ? () async {
         var duration = await showDurationPicker(
           context: context,
           initialTime: Duration(minutes:  widget.initialValue ?? 0),
@@ -66,7 +71,7 @@ class _DurationFieldState extends FormFieldState<int> {
           _textController.text = AppLocalizations.of(context)!.numberFormat(duration.inMinutes) ?? '';
           didChange(duration.inMinutes);
         }
-      },
+      } : null,
     );
   }
 }

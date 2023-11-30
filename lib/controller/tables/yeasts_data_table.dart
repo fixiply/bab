@@ -91,7 +91,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
                 rate: value.pitchingRate(widget.recipe!.og));
             if (widget.data != null) {
               widget.data![dataRowIndex].amount = amount;
-              widget.data![dataRowIndex].unit = value.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
+              widget.data![dataRowIndex].measurement = value.form == Yeast.liquid ? Measurement.milliliter : Measurement.gram;
             }
           }
           widget.onChanged?.call(widget.data ?? [ value ]);
@@ -238,7 +238,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
               );
               if (amount != null) {
                 model.amount = amount.truncateToDouble();
-                model.unit = model.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
+                model.measurement = model.form == Yeast.liquid ? Measurement.milliliter : Measurement.gram;
               }
               widget.data!.add(model);
             }
@@ -265,7 +265,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
       if (values != null && values!.isNotEmpty) {
         if (widget.data != null && widget.data!.isNotEmpty) {
           values.first.amount = widget.data![rowIndex].amount;
-          values.first.unit = values.first.form == Yeast.liquid ? Unit.milliliter : Unit.gram;
+          values.first.measurement = values.first.form == Yeast.liquid ? Measurement.milliliter : Measurement.gram;
           widget.data![rowIndex] = values.first;
           _dataSource.buildDataGridRows(widget.data!);
           _dataSource.notifyListeners();
@@ -311,11 +311,11 @@ class YeastDataSource extends EditDataSource {
     List<YeastModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<amount.Unit>(columnName: 'amount', value: amount.Unit(e.amount, e.unit)),
+      if (showQuantity == true) DataGridCell<amount.Amount>(columnName: 'amount', value: amount.Amount(e.amount, e.measurement)),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<dynamic>(columnName: 'reference', value: e.reference),
       DataGridCell<dynamic>(columnName: 'laboratory', value: e.laboratory),
-      DataGridCell<Fermentation>(columnName: 'type', value: e.type),
+      DataGridCell<Style>(columnName: 'type', value: e.type),
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
       if (showQuantity == false) DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
       if (showQuantity == false) DataGridCell<double>(columnName: 'temperature', value: e.temperature),
@@ -336,9 +336,9 @@ class YeastDataSource extends EditDataSource {
       newCellValue = value;
       return amount.AmountField(
         value: value.copy(),
-        enums: isEnumType('unit'),
-        onChanged: (unit) {
-          newCellValue = unit;
+        enums: isEnumType('measurement'),
+        onChanged: (measurement) {
+          newCellValue = measurement;
           /// Call [CellSubmit] callback to fire the canSubmitCell and
           /// onCellSubmit to commit the new value in single place.
           submitCell();
@@ -389,8 +389,14 @@ class YeastDataSource extends EditDataSource {
         if (e.value is LocalizedText) {
           value = e.value?.get(AppLocalizations.of(context)!.locale);
           alignment = Alignment.centerLeft;
-        } else if (e.value is amount.Unit) {
-          value = AppLocalizations.of(context)!.numberFormat(e.value.amount, symbol: (e.value.unit?.symbol != null ? ' ' + e.value.unit?.symbol : null));
+        } else if (e.value is amount.Amount) {
+          if (Measurement.gram == e.value.measurement) {
+            value = AppLocalizations.of(context)!.weightFormat(e.value.amount);
+          } else  if (Measurement.milliliter == e.value.measurement) {
+            value = AppLocalizations.of(context)!.volumeFormat(e.value.amount);
+          } else {
+            value = AppLocalizations.of(context)!.numberFormat(e.value.amount);
+          }
           alignment = Alignment.centerRight;
         } else if (e.value is num) {
           if (e.columnName == 'attenuation') {
@@ -473,20 +479,20 @@ class YeastDataSource extends EditDataSource {
     switch(column.columnName) {
       case 'amount':
         double? value;
-        switch(newCellValue.unit) {
-          case Unit.gram:
+        switch(newCellValue.measurement) {
+          case Measurement.gram:
             value = AppLocalizations.of(context)!.gram(newCellValue.amount);
             break;
-          case Unit.milliliter:
+          case Measurement.milliliter:
             value = AppLocalizations.of(context)!.volume(newCellValue.amount);
             break;
           default:
             value = newCellValue.amount;
         }
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<amount.Unit>(columnName: column.columnName, value: amount.Unit(value, newCellValue.unit));
+            DataGridCell<amount.Amount>(columnName: column.columnName, value: amount.Amount(value, newCellValue.measurement));
         data[rowColumnIndex.rowIndex].amount = value;
-        data[rowColumnIndex.rowIndex].unit = newCellValue.unit;
+        data[rowColumnIndex.rowIndex].measurement = newCellValue.measurement;
         break;
       case 'name':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
@@ -508,7 +514,7 @@ class YeastDataSource extends EditDataSource {
         break;
       case 'type':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<Fermentation>(columnName: column.columnName, value: newCellValue);
+            DataGridCell<Style>(columnName: column.columnName, value: newCellValue);
         data[rowColumnIndex.rowIndex].type = newCellValue;
         break;
       case 'form':

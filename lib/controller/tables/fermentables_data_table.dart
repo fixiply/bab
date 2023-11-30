@@ -306,7 +306,7 @@ class FermentableDataSource extends EditDataSource {
   dynamic getValue(DataGridRow dataGridRow, String columnName) {
     var value = super.getValue(dataGridRow, columnName);
     if (value != null && columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value * 1000, unit: Unit.kilo);
+      double? weight = AppLocalizations.of(context)!.weight(value * 1000, measurement: Measurement.kilo);
       return weight!.toPrecision(2);
     }
     return value;
@@ -315,7 +315,7 @@ class FermentableDataSource extends EditDataSource {
   @override
   String? suffixText(String columnName) {
     if (columnName == 'amount') {
-      return AppLocalizations.of(context)!.weightSuffix(unit: Unit.kilo);
+      return AppLocalizations.of(context)!.weightSuffix(measurement: Measurement.kilo);
     }
     return null;
   }
@@ -441,7 +441,7 @@ class FermentableDataSource extends EditDataSource {
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        double? value = AppLocalizations.of(context)!.gram(newCellValue, unit: Unit.kilo);
+        double? value = AppLocalizations.of(context)!.gram(newCellValue, measurement: Measurement.kilo);
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: value);
         _data[rowColumnIndex.rowIndex].amount = value;

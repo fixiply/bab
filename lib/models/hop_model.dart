@@ -22,7 +22,6 @@ extension DoubleParsing on double {
 }
 
 class HopModel<T> extends Model {
-  Status? status;
   dynamic name;
   String? origin;
   double? alpha;
@@ -31,7 +30,7 @@ class HopModel<T> extends Model {
   Hop? form;
   Type? type;
   Use? use;
-  Unit? unit;
+  Measurement? measurement;
   int? duration;
   dynamic notes;
 
@@ -42,7 +41,6 @@ class HopModel<T> extends Model {
     String? creator,
     bool? isEdited,
     bool? isSelected,
-    this.status = Status.publied,
     this.name,
     this.origin,
     this.alpha,
@@ -51,7 +49,7 @@ class HopModel<T> extends Model {
     this.form = Hop.pellet,
     this.type = Type.both,
     this.use = Use.boil,
-    this.unit,
+    this.measurement,
     this.duration,
     this.notes,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -59,7 +57,6 @@ class HopModel<T> extends Model {
   @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
-    this.status = Status.values.elementAt(map['status']);
     this.name = LocalizedText.deserialize(map['name']);
     this.origin = map['origin'];
     if (map['alpha'] != null) this.alpha = map['alpha'].toDouble();
@@ -73,7 +70,6 @@ class HopModel<T> extends Model {
   Map<String, dynamic> toMap({bool persist : false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'status': this.status!.index,
       'name': LocalizedText.serialize(this.name),
       'origin': this.origin,
       'alpha': this.alpha,
@@ -91,13 +87,12 @@ class HopModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      status: this.status,
       name: this.name,
       origin: this.origin,
       alpha: this.alpha,
       beta: this.beta,
       amount: this.amount,
-      unit: this.unit,
+      measurement: this.measurement,
       form: this.form,
       type: this.type,
       use: this.use,
@@ -197,7 +192,7 @@ class HopModel<T> extends Model {
         model.amount = item.amount;
         model.duration = item.duration;
         model.use = item.use != null ? Use.values.elementAt(item.use!) : Use.boil;
-        model.unit = Unit.gram;
+        model.measurement = Measurement.gram;
         values.add(model);
       }
     }
@@ -217,7 +212,7 @@ class HopModel<T> extends Model {
           model.amount = item.amount;
           model.duration = item.duration;
           model.use = item.use?.index;
-          if (item.unit != null) model.unit = item.unit;
+          if (item.measurement != null) model.measurement = item.measurement;
           values.add(Quantity.serialize(model));
         }
         return values;

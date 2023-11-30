@@ -9,7 +9,6 @@ import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -74,17 +73,27 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('save'),
-            icon: const Icon(Icons.save),
-            onPressed: _modified == true ? () {
-              if (_formKey.currentState!.validate()) {
-                Database().update(widget.model, context: context).then((value) async {
-                  Navigator.pop(context, widget.model);
-                }).onError((e,s) {
-                  _showSnackbar(e.toString());
+            tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
+            icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
+            onPressed: () {
+              if (_modified == true || widget.model.uuid == null) {
+                if (_formKey.currentState!.validate()) {
+                  Database().update(widget.model, context: context, updateLogs: !currentUser!.isAdmin()).then((value) async {
+                    Navigator.pop(context, widget.model);
+                  }).onError((e, s) {
+                    _showSnackbar(e.toString());
+                  });
+                }
+              } else {
+                EquipmentModel model = widget.model.copy();
+                model.uuid = null;
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return FormEquipmentPage(model, model.type);
+                })).then((value) {
+                  Navigator.pop(context);
                 });
               }
-            } : null
+            }
           ),
           if (widget.model.uuid != null) IconButton(
             padding: EdgeInsets.zero,
@@ -97,19 +106,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
             }
           ),
           CustomMenuAnchor(
-            context: context,
-            publish: false,
-            measures: true,
-            filtered: false,
-            archived: false,
-            onSelected: (value) {
-              if (value is constants.Measure) {
-                // setState(() {
-                //   AppLocalizations.of(context)!.measure = value;
-                // });
-                _initialize();
-              }
-            },
+            showMeasures: true,
           )
         ]
       ),
@@ -145,7 +142,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   return null;
                 }
               ),
-              const Divider(height: 10),
+              const SizedBox(height: 10),
               Row(
                 children: [
                   Expanded(
@@ -163,8 +160,12 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.waves_outlined),
-                        labelText: AppLocalizations.of(context)!.text('tank_volume'),
+                        labelText: AppLocalizations.of(context)!.text('boil_volume'),
                         suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('total_volume_boil'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
                         border: InputBorder.none,
                         fillColor: FillColor, filled: true
                       ),
@@ -213,6 +214,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
+              if (widget.equipment == Equipment.tank) const Divider(height: 10),
               if (widget.equipment == Equipment.tank) Padding(
                   padding: const EdgeInsets.only(top: 16.0),
                   child: Text(AppLocalizations.of(context)!.text('mash'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
@@ -262,6 +264,10 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         icon: const Icon(Icons.looks_one_outlined),
                         labelText: AppLocalizations.of(context)!.text('absorption_grains'),
                         suffixText: 'L/Kg',
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('volume_absorption_grains'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
                         border: InputBorder.none,
                         fillColor: FillColor, filled: true
                       )
@@ -269,7 +275,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
-              if (widget.equipment == Equipment.tank) const Divider(height: 10),
+              if (widget.equipment == Equipment.tank) const SizedBox(height: 10),
               if (widget.equipment == Equipment.tank) Row(
                 children: [
                   Expanded(
@@ -287,6 +293,10 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                         icon: const Icon(Icons.looks_two_outlined),
                         labelText: AppLocalizations.of(context)!.text('lost_volume'),
                         suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                        suffixIcon: Tooltip(
+                          message: AppLocalizations.of(context)!.text('lost_volume_mash'),
+                          child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                        ),
                         border: InputBorder.none,
                         fillColor: FillColor, filled: true
                       )
@@ -308,6 +318,10 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                           icon: const Icon(Icons.looks_3_outlined),
                           labelText: AppLocalizations.of(context)!.text('mash_ratio'),
                           suffixText: 'L/Kg',
+                          suffixIcon: Tooltip(
+                            message: AppLocalizations.of(context)!.text('ratio_mash_tank'),
+                            child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                          ),
                           border: InputBorder.none,
                           fillColor: FillColor, filled: true
                       ),
@@ -322,6 +336,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
+              if (widget.equipment == Equipment.tank) const Divider(height: 10),
               if (widget.equipment == Equipment.tank) Padding(
                 padding: const EdgeInsets.only(top: 16.0),
                 child: Text(AppLocalizations.of(context)!.text('boiling'), style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w600, fontSize: 16.0))
@@ -343,6 +358,10 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                           icon: const Icon(Icons.looks_4_outlined),
                           labelText: AppLocalizations.of(context)!.text('boil_loss'),
                           suffixText: 'L/HR',
+                          suffixIcon: Tooltip(
+                            message: AppLocalizations.of(context)!.text('volume_boil_loss'),
+                            child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                          ),
                           border: InputBorder.none,
                           fillColor: FillColor, filled: true
                       )
@@ -371,7 +390,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ),
                 ]
               ),
-              const Divider(height: 10),
+              const SizedBox(height: 10),
               if (widget.equipment == Equipment.tank) SizedBox(
                 width: (MediaQuery.of(context).size.width / 2) - (DeviceHelper.isDesktop ? 170 : 50),
                 child: TextFormField(
@@ -387,7 +406,11 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   decoration: FormDecoration(
                     icon: const Icon(Icons.looks_6_outlined),
                     labelText: AppLocalizations.of(context)!.text('head_loss'),
-                      suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                    suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
+                    suffixIcon: Tooltip(
+                      message: AppLocalizations.of(context)!.text('volume_head_loss'),
+                      child: Icon(Icons.help_outline, color: Theme.of(context).primaryColor),
+                    ),
                     border: InputBorder.none,
                     fillColor: FillColor, filled: true
                   )
@@ -410,6 +433,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                 image: widget.model.image,
                 height: null,
                 crop: true,
+                memory: !currentUser!.isAdmin() ? true : false,
                 onChanged: (images) => widget.model.image = images
               ),
             ]

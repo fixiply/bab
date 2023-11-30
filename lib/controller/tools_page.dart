@@ -6,9 +6,11 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/abv_container.dart';
+import 'package:bab/widgets/containers/carbonation_container.dart';
+import 'package:bab/widgets/containers/efficiency_container.dart';
 import 'package:bab/widgets/containers/ph_container.dart';
+import 'package:bab/widgets/containers/water_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
 
@@ -46,6 +48,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
 
   final List<Map<int, bool>> _first =  [];
   final List<Map<int, bool>> _second =  [];
+  final List<Map<int, bool>> _third =  [];
 
   @override
   bool get wantKeepAlive => true;
@@ -63,10 +66,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
         actions: [
           BasketButton(),
           CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
+            showMeasures: true,
           )
         ],
       ),
@@ -112,14 +112,14 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
                       subtitle: Text('Covertir les unités utilisées dans le brassage (couleur, densité, température et pression).'),
                     );
                   },
-                    body: Container(
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.all(18),
-                      child: UnitContainer(
-                        showTitle: false,
-                      )
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.all(18),
+                    child: UnitContainer(
+                      showTitle: false,
                     )
-                )
+                  )
+                ),
               ]
             ),
             const SizedBox(height: 20),
@@ -142,7 +142,14 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
                       subtitle: Text('Calcul le pourcentage de sucres disponibles extraits des grains.'),
                     );
                   },
-                  body: Container()
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.all(18),
+                    child: EfficiencyContainer(
+                      showTitle: false,
+                      showVolume: true,
+                    )
+                  )
                 ),
                 ExpansionPanel(
                   canTapOnHeader: true,
@@ -153,7 +160,14 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
                       subtitle: Text('Calcul la quantité d\'eau et de rinçage requise pour votre brassin.'),
                     );
                   },
-                  body: Container()
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.all(18),
+                    child: WaterContainer(
+                      showTitle: false,
+                      showVolume: true,
+                    )
+                  )
                 ),
                 ExpansionPanel(
                   canTapOnHeader: true,
@@ -174,6 +188,37 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
                     )
                   )
                 )
+              ]
+            ),
+            const SizedBox(height: 20),
+            Text('Conditionnement', style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 8),
+            ExpansionPanelList(
+              expandedHeaderPadding: EdgeInsets.zero,
+              expansionCallback: (int index, bool isExpanded) {
+                setState(() {
+                  _third.set(index, isExpanded);
+                });
+              },
+              children: [
+                ExpansionPanel(
+                  canTapOnHeader: true,
+                  isExpanded: _third.isExpanded(0),
+                  headerBuilder: (context, isExpanded) {
+                    return ListTile(
+                      title: Text('Refermentation en bouteille'),
+                      subtitle: Text('Calcul la quantité de sucre nécessaire lors de l\'embouteillage d\'une bière pour atteindre le niveau de carbonatation souhaité.'),
+                    );
+                  },
+                  body: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.all(18),
+                    child: CarbonationContainer(
+                      showTitle: false,
+                      showVolume: true,
+                    )
+                  )
+                ),
               ]
             ),
           ]

@@ -1,3 +1,4 @@
+import 'package:bab/utils/fermentation.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -12,7 +13,6 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 import 'package:bab/widgets/days.dart';
 
 // External package
@@ -62,6 +62,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         actions: [
+          BasketButton(),
           IconButton(
             padding: EdgeInsets.zero,
             icon: const Icon(Icons.refresh),
@@ -70,13 +71,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
               _fetch();
             },
           ),
-          BasketButton(),
-          CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-          )
+          CustomMenuAnchor()
         ],
       ),
       body: RefreshIndicator(
@@ -228,8 +223,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
           return true;
         }
         if ((element.finish() == DateHelper.toDate(day)) ||
-            (element.endDatePrimary() == DateHelper.toDate(day)) ||
-            (element.endDateSecondary() == DateHelper.toDate(day)) ||
+            (element.fermentable().contains(DateHelper.toDate(day))) ||
             (element.dryHop().contains(DateHelper.toDate(day)))) {
           return true;
         }
@@ -257,13 +251,20 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
           subtitle = time + ' - ' + AppLocalizations.of(context)!.text('end_brew');
         } else if (e.fermented_at != null && DateHelper.toDate(e.fermented_at!) == DateHelper.toDate(day)) {
           subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_fermentation');
-        } else if (e.endDatePrimary() == DateHelper.toDate(day)) {
-          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_secondary_fermentation');
-        } else if (e.endDateSecondary() == DateHelper.toDate(day)) {
-          subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_tertiary_fermentation');
         } else if (e.dryHop().contains(DateHelper.toDate(day))) {
           subtitle = time + ' - ' + AppLocalizations.of(context)!.text('start_dry_hopping');
           movable = false;
+        } else {
+            int duration = 0;
+            for(Fermentation item in e.recipe!.fermentation!) {
+              if (duration > 0) {
+                if (DateHelper.toDate(e.start_fermentation!.add(Duration(days: duration))) == DateHelper.toDate(day)) {
+                  subtitle = '$time - ${AppLocalizations.of(context)!.text('start_fermentation')} «${item.name}»';
+                  break;
+                }
+              }
+              duration += item.duration!;
+            }
         }
         trailing = movable ? TextButton(
           child: Text(AppLocalizations.of(context)!.text('move'), style: TextStyle(color: Colors.white)),
@@ -281,12 +282,15 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                   e.started_at = date;
                 } else if (e.fermented_at != null && DateHelper.toDate(e.fermented_at!) == DateHelper.toDate(day)) {
                   e.fermented_at = date;
-                } else if (e.endDatePrimary() == DateHelper.toDate(day)) {
-                  e.primaryday = e.primaryDay()! + days;
-                } else if (e.endDateSecondary() == DateHelper.toDate(day)) {
-                  e.secondaryday = e.secondaryDay()! + days;
-                } else if (e.endDateTertiary() == DateHelper.toDate(day)) {
-                  e.tertiaryday = e.tertiaryDay()! + days;
+                } else {
+                  int duration = 0;
+                  for(Fermentation item in e.recipe!.fermentation!) {
+                    duration += item.duration!;
+                    if (DateHelper.toDate(e.start_fermentation!.add(Duration(days: duration))) == DateHelper.toDate(day)) {
+                      item.duration =  item.duration! + days;
+                      break;
+                    }
+                  }
                 }
                 Database().update(e).then((value) async {
                   _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));

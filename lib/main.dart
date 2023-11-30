@@ -16,7 +16,6 @@ import 'package:bab/utils/changes_notifier.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/device.dart';
-import 'package:bab/utils/edition_notifier.dart';
 import 'package:bab/utils/locale_notifier.dart';
 import 'package:bab/utils/notification_service.dart';
 import 'package:bab/utils/user_notifier.dart';
@@ -48,7 +47,6 @@ final BasketNotifier basketNotifier = BasketNotifier();
 final ChangesNotifier changesNotifier = ChangesNotifier();
 final LocaleNotifier localeNotifier = LocaleNotifier();
 final UserNotifier userNotifier = UserNotifier();
-final ValuesNotifier editionNotifier = ValuesNotifier();
 
 var logger = Logger();
 
@@ -100,7 +98,6 @@ Future<void> main() async {
       providers: [
         ChangeNotifierProvider(create: (_) => basketNotifier),
         ChangeNotifierProvider(create: (_) => changesNotifier),
-        ChangeNotifierProvider(create: (_) => editionNotifier),
         ChangeNotifierProvider(create: (_) => localeNotifier),
         ChangeNotifierProvider(create: (_) => userNotifier),
       ],
@@ -138,13 +135,13 @@ class _AppState extends State<MyApp> {
     final localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
     localeNotifier.addListener(() {
       if (!mounted) return;
-      onLocaleChange(localeNotifier.locale!);
+      onLocaleChange(localeNotifier.locale, localeNotifier.unit, localeNotifier.gravity);
     });
   }
 
-  void onLocaleChange(Locale locale) {
+  void onLocaleChange(Locale? locale, Unit? measure, Gravity? gravity) {
     setState(() {
-      _newLocaleDelegate = TranslationsDelegate(newLocale: locale);
+      _newLocaleDelegate = TranslationsDelegate(newLocale: locale, newMeasure: measure, newGravity: gravity);
     });
   }
 
@@ -208,7 +205,7 @@ class _AppState extends State<MyApp> {
     if (user != null && user.emailVerified) {
       model = await Database().getUser(user.uid);
       if (model != null) {
-        model.user = user;
+        // model.user = user;
         if (!foundation.kIsWeb) {
           Device? device = await _device();
           String? token = await _token();

@@ -82,19 +82,12 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
             },
           ),
           CustomMenuAnchor(
-            context: context,
-            publish: false,
-            filtered: false,
-            archived: false,
-            measures: true,
             importLabel: currentUser != null && currentUser!.isAdmin() ? '${AppLocalizations.of(context)!.text('import')} BJCP' : null,
             onSelected: (value) async {
               if (value == Menu.imported && currentUser != null && currentUser!.isAdmin()) {
                 ImportHelper.styles(context, () {
                   _fetch();
                 });
-              } else if (value is Measure) {
-                _clear();
               }
             }
           )

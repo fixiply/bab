@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/forms/form_address_page.dart';
-import 'package:bab/controller/payments_page.dart';
+import 'package:bab/controller/information_page.dart';
 import 'package:bab/models/basket_model.dart';
 import 'package:bab/models/product_model.dart';
 import 'package:bab/models/recipe_model.dart';
@@ -159,7 +159,7 @@ class _BasketPageState extends State<BasketPage> {
                             child: Text(AppLocalizations.of(context)!.text('add'), style: TextStyle(color: Theme.of(context).primaryColor)),
                             onPressed: () {
                               Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                return PaymentsPage();
+                                return InformationPage();
                               }));
                             },
                           ),

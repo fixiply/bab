@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/controller/fermenters_page.dart';
 import 'package:bab/controller/tanks_page.dart';
+import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
 
@@ -19,6 +19,8 @@ class EquipmentsPage extends StatefulWidget {
 
 class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStateMixin, AutomaticKeepAliveClientMixin<EquipmentsPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+  final _tanksKey = GlobalKey<TanksPageState>();
+  final _fermentersKey = GlobalKey<FermentersPageState>();
 
   @override
   bool get wantKeepAlive => true;
@@ -48,12 +50,21 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
           backgroundColor: Colors.white,
           actions: [
             BasketButton(),
+            if (DeviceHelper.isDesktop) IconButton(
+              padding: EdgeInsets.zero,
+              icon: const Icon(Icons.refresh),
+              tooltip: AppLocalizations.of(context)!.text('refresh'),
+              onPressed: () {
+                if (_tanksKey.currentState != null) {
+                  _tanksKey.currentState!.fetch();
+                }
+                if (_fermentersKey.currentState != null) {
+                  _fermentersKey.currentState!.fetch();
+                }
+              },
+            ),
             CustomMenuAnchor(
-              context: context,
-              publish: false,
-              filtered: false,
-              archived: false,
-              measures: true,
+              showMeasures: true,
             )
           ],
           bottom: PreferredSize(
@@ -66,20 +77,11 @@ class _EquipmentsPageState extends State<EquipmentsPage> with TickerProviderStat
         ),
         body: TabBarView(
           children: [
-            TanksPage(allowEditing: currentUser != null),
-            FermentersPage(allowEditing: currentUser != null),
+            TanksPage(key: _tanksKey, allowEditing: currentUser != null, allowAdding: true),
+            FermentersPage(key: _fermentersKey, allowEditing: currentUser != null, allowAdding: true),
           ]
         ),
       )
-    );
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
     );
   }
 }

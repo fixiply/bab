@@ -15,11 +15,11 @@ import 'package:intl/intl.dart';
 
 class AppLocalizations {
   final Locale locale;
-  Measure measure;
-  Gravity gravity;
+  Unit unit = Unit.metric;
+  Gravity gravity = Gravity.sg;
   static Map<dynamic, dynamic>? _localisedValues;
 
-  AppLocalizations(this.locale, this.measure, this.gravity) {
+  AppLocalizations(this.locale, this.unit, this.gravity) {
     _localisedValues = null;
   }
 
@@ -27,13 +27,8 @@ class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static Future<AppLocalizations> load(Locale locale) async {
-    Measure measure = Measure.metric;
-    Gravity gravity = Gravity.sg;
-    if (locale.countryCode == 'US') {
-      measure = Measure.imperial;
-    }
-    AppLocalizations appTranslations = AppLocalizations(locale, measure, gravity);
+  static Future<AppLocalizations> load(Locale locale, Unit? unit, Gravity? gravity) async {
+    AppLocalizations appTranslations = AppLocalizations(locale, unit ?? Unit.metric, gravity ?? Gravity.sg);
     String jsonContent = await rootBundle.loadString("assets/locales/${locale.languageCode}.json");
     _localisedValues = json.decode(jsonContent);
     return appTranslations;
@@ -71,45 +66,45 @@ class AppLocalizations {
         return 'week';
       case Time.month:
         return 'm';
-      case Unit.gram:
+      case Measurement.gram:
         return 'g';
-      case Unit.kilo:
+      case Measurement.kilo:
         return 'kg';
-      case Unit.milliliter:
+      case Measurement.milliliter:
         return 'ml';
-      case Unit.liter:
+      case Measurement.liter:
         return 'l';
-      case Unit.packages:
+      case Measurement.packages:
         return 'pkt';
-      case Unit.units:
+      case Measurement.units:
         return 'u';
     }
     return null;
   }
 
   String get liquid {
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       return text('gallons');
     }
     return text('liters');
   }
 
   String get colorUnit {
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       return 'SRM';
     }
     return 'EBC';
   }
 
   String get tempMeasure {
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       return '°F';
     }
     return '°C';
   }
 
   int get maxColor {
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       return 40;
     }
     return 80;
@@ -151,6 +146,26 @@ class AppLocalizations {
     return NumberFormat(pattern, currentLanguage).format(number) + (symbol ?? '');
   }
 
+  String? measurementFormat(num? number, Measurement? measurement) {
+    if (number == null || measurement == null) {
+      return null;
+    }
+    switch (measurement) {
+      case Measurement.gram:
+        return weightFormat(number);
+      case Measurement.kilo:
+        return weightFormat(number);
+      case Measurement.milliliter:
+        return litterVolumeFormat(number);
+      case Measurement.liter:
+        return litterVolumeFormat(number);
+      case Measurement.packages:
+        return numberFormat(number, symbol: ' pkt');
+      case Measurement.units:
+        return numberFormat(number);
+    }
+  }
+
   /// Returns the formatted currency.
   String? currencyFormat(num? number) {
     if (number == null) {
@@ -160,14 +175,16 @@ class AppLocalizations {
   }
 
   /// Returns the formatted temperature.
-  String? tempFormat(num? number) {
+  String? tempFormat(num? number, {Unit? unit, bool? symbol = true}) {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
-      return NumberFormat("#0.#°F", currentLanguage).format(number);
+    unit = unit ?? this.unit;
+    if (unit == Unit.us) {
+      number = FormulaHelper.convertCelciusToFarenheit(number);
+      return NumberFormat(symbol == true ? "#0.#°F" : "#0.#", currentLanguage).format(number);
     }
-    return NumberFormat("#0.#°C", currentLanguage).format(number);
+    return NumberFormat(symbol == true ? "#0.#°C" : "#0.#", currentLanguage).format(number);
   }
 
   /// Returns the formatted percent.
@@ -206,16 +223,18 @@ class AppLocalizations {
   /// Returns the formatted weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in grams.
-  String? weightFormat(double? number, {bool? symbol = true}) {
+  String? weightFormat(num? number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
+    String pattern = '#0.#';
+    if (unit == Unit.us) {
       number = FormulaHelper.convertGramToOunce(number);
       var suffix = ' oz';
       if (symbol == true && number >= 10) {
         number = FormulaHelper.convertOunceToLivre(number);
         suffix = ' lb';
+        pattern = '#0.##';
       }
       return numberFormat(number, symbol: (symbol == true ? suffix : null));
     }
@@ -224,22 +243,23 @@ class AppLocalizations {
     if (symbol == true && number >= 1000) {
       number = number / 1000;
       suffix = ' kg';
+      pattern = '#0.##';
     }
-    return numberFormat(number, symbol: (symbol == true ? suffix : null));
+    return numberFormat(number, pattern: pattern, symbol: (symbol == true ? suffix : null));
   }
 
   /// Returns the suffix weight, based on the given conditions.
   ///
   /// The `weight` argument is relative to the number in grams.
-  String? weightSuffix({Unit? unit = Unit.gram}) {
-    if (measure == Measure.imperial) {
-      if (unit == Unit.gram) {
+  String? weightSuffix({Measurement? measurement = Measurement.gram}) {
+    if (unit == Unit.us) {
+      if (measurement == Measurement.gram) {
         return 'oz';
       }
       return 'lb';
     }
 
-    if (unit == Unit.gram) {
+    if (measurement == Measurement.gram) {
       return 'g';
     }
     return 'kg';
@@ -248,20 +268,20 @@ class AppLocalizations {
   /// Returns the localized weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in grams.
-  double? weight(double? number, {Unit? unit = Unit.gram}) {
+  double? weight(double? number, {Measurement? measurement = Measurement.gram}) {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       number = FormulaHelper.convertGramToOunce(number);
-      if (unit == Unit.kilo) {
+      if (measurement == Measurement.kilo) {
         number = FormulaHelper.convertOunceToLivre(number);
       }
 
       return number;
     }
 
-    if (unit == Unit.kilo) {
+    if (measurement == Measurement.kilo) {
       number = number / 1000;
     }
     return number;
@@ -269,12 +289,12 @@ class AppLocalizations {
 
 
   /// Returns the localized weight to gram, based on the given conditions.
-  double? gram(double? number, {Unit? unit = Unit.gram}) {
+  double? gram(double? number, {Measurement? measurement = Measurement.gram}) {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
-      if (unit == Unit.kilo) {
+    if (unit == Unit.us) {
+      if (measurement == Measurement.kilo) {
         number = FormulaHelper.convertLivreToOunce(number);
         number = number / 1000;
       }
@@ -299,14 +319,16 @@ class AppLocalizations {
   /// Returns the formatted volume, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in millimeter.
-  String? volumeFormat(double? number, {bool? symbol = true}) {
+  String? volumeFormat(double? number, {Unit? unit, bool? symbol = true}) {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
-      number = FormulaHelper.convertLiterToGallon(number);
+    unit = unit ?? this.unit;
+    if (unit == Unit.us) {
+      number = FormulaHelper.convertMillimeterToOnce(number);
       var suffix = ' oz';
-      if (symbol == true && number >= 1280) {
+
+      if (symbol == true && number >= 128) {
         number = number / 128;
         suffix = ' gal';
       }
@@ -326,7 +348,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       return FormulaHelper.convertGallonToLiter(number);
     }
     return number;
@@ -339,7 +361,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       return numberFormat(ColorHelper.toSRM(number));
     }
     return numberFormat(number);
@@ -350,7 +372,7 @@ class AppLocalizations {
     if (number == null) {
       return null;
     }
-    if (measure == Measure.imperial) {
+    if (unit == Unit.us) {
       number = ColorHelper.toSRM(number);
     }
     return number > maxColor ? maxColor : number;
@@ -358,7 +380,7 @@ class AppLocalizations {
 
   int? fromSRM(num? number) {
     if (number != null) {
-      if (measure == Measure.imperial) {
+      if (unit == Unit.us) {
         return ColorHelper.toEBC(number);
       }
       return number.toInt();
@@ -367,6 +389,8 @@ class AppLocalizations {
   }
 
   /// Returns the formatted gravity.
+  ///
+  /// The `number` argument is relative to the number in specific gravity.
   String? gravityFormat(double? number, {Gravity? gravity, bool? symbol = true}) {
     switch(gravity ?? this.gravity) {
       case Gravity.sg:
@@ -390,8 +414,10 @@ class AppLocalizations {
 
 class TranslationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   final Locale? newLocale;
+  final Unit? newMeasure;
+  final Gravity? newGravity;
 
-  const TranslationsDelegate({this.newLocale});
+  const TranslationsDelegate({this.newLocale, this.newMeasure, this.newGravity});
 
   @override
   bool isSupported(Locale locale) {
@@ -400,7 +426,7 @@ class TranslationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    return AppLocalizations.load(newLocale ?? locale);
+    return AppLocalizations.load(newLocale ?? locale, newMeasure, newGravity);
   }
 
   @override

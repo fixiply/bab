@@ -35,10 +35,10 @@ class FermentablesPage extends StatefulWidget {
   FermentablesPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
 
   @override
-  _FermentablesPageState createState() => _FermentablesPageState();
+  FermentablesPageState createState() => FermentablesPageState();
 }
 
-class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAliveClientMixin<FermentablesPage> {
+class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAliveClientMixin<FermentablesPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late FermentableDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
@@ -62,7 +62,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
       showCheckboxColumn: widget.showCheckboxColumn,
       allowEditing: widget.allowEditing,
       onChanged: (FermentableModel value, int dataRowIndex) {
-        Database().update(value).then((value) async {
+        Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
           _showSnackbar(e.toString());
@@ -70,7 +70,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
       }
     );
     _dataSource.sortedColumns.add(const SortColumnDetails(name: 'name', sortDirection: DataGridSortDirection.ascending));
-    _fetch();
+    fetch();
   }
 
   @override
@@ -81,17 +81,33 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
       appBar: AppBar(
         title: SearchText(
           _searchQueryController,
-          () {  _fetch(); }
+          () {  fetch(); }
         ),
         foregroundColor: Theme.of(context).primaryColor,
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: widget.showCheckboxColumn == true,
-        leading: widget.showCheckboxColumn == true ? IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-          onPressed:() async {
-            Navigator.pop(context, selected);
-          }
+        leading: widget.showCheckboxColumn == true ? Row(
+          children: [
+            Flexible(
+              child: IconButton(
+                icon: const Icon(Icons.check),
+                tooltip: AppLocalizations.of(context)!.text('validate'),
+                onPressed: selected.isNotEmpty ? () async {
+                  Navigator.pop(context, selected);
+                } : null
+              ),
+            ),
+            Flexible(
+              child: IconButton(
+                icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+                tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                onPressed:() async {
+                  Navigator.pop(context, []);
+                }
+              )
+            )
+          ]
         ) : null,
         actions: [
           if (_showList && widget.allowEditing) IconButton(
@@ -108,7 +124,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
             tooltip: AppLocalizations.of(context)!.text('import'),
             onPressed: () {
               ImportHelper.fermentables(context, () {
-                _fetch();
+                fetch();
               });
             }
           ),
@@ -123,7 +139,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => _fetch(),
+        onRefresh: () => fetch(),
         child: FutureBuilder<List<FermentableModel>>(
           future: _data,
           builder: (context, snapshot) {
@@ -313,9 +329,9 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
     );
   }
 
-  _fetch() async {
+  fetch() async {
     setState(() {
-      _data = Database().getFermentables(searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getFermentables(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
     });
   }
 
@@ -323,18 +339,18 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
     FermentableModel newModel = FermentableModel();
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormFermentablePage(newModel);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _edit(FermentableModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormFermentablePage(model);
-    })).then((value) { _fetch(); });
+    })).then((value) { fetch(); });
   }
 
   _delete(FermentableModel model) async {
     if (await DeleteDialog.model(context, model, forced: true)) {
-      _fetch();
+      fetch();
     }
   }
 
@@ -361,7 +377,7 @@ class _FermentablesPageState extends State<FermentablesPage> with AutomaticKeepA
       } finally {
         EasyLoading.dismiss();
       }
-      _fetch();
+      fetch();
       return true;
     }
     return false;

@@ -327,13 +327,13 @@ class ImportHelper {
             int type = int.parse(element.getElement('F_Y_TYPE')!.innerText);
             switch (type) {
               case 0:
-                model.type = Fermentation.hight;
+                model.type = Style.hight;
                 break;
               case 1:
-                model.type = Fermentation.low;
+                model.type = Style.low;
                 break;
               case 4:
-                model.type = Fermentation.spontaneous;
+                model.type = Style.spontaneous;
                 break;
             }
             if (type != 2 && type != 3) {

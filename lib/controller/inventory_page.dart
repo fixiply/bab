@@ -8,8 +8,8 @@ import 'package:bab/controller/tables/yeasts_data_table.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
+import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
-import 'package:bab/widgets/custom_menu_button.dart';
 
 // External package
 
@@ -41,6 +41,17 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    return Scaffold(
+      key: _scaffoldKey,
+      backgroundColor: FillColor,
+      appBar: AppBar(
+          title: Text(AppLocalizations.of(context)!.text('inventory')),
+          elevation: 0,
+          foregroundColor: Theme.of(context).primaryColor,
+          backgroundColor: Colors.white
+      ),
+      body: EmptyContainer(message: 'En construction')
+    );
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -54,11 +65,7 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
           actions: [
             BasketButton(),
             CustomMenuAnchor(
-              context: context,
-              publish: false,
-              filtered: false,
-              archived: false,
-              measures: true,
+              showMeasures: true,
             )
           ],
           bottom: PreferredSize(
@@ -78,15 +85,6 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
           ]
         ),
       )
-    );
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
     );
   }
 }

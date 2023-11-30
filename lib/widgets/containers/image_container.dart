@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -47,7 +48,7 @@ class _ImageContainerState extends State<ImageContainer> {
     List<ImageModel> images = [];
     if (widget.images != null) {
       if (widget.images is String) {
-        images.add(ImageModel(widget.images));
+        images.add(ImageModel(url: widget.images));
       } else if (widget.images is ImageModel) {
         images.add(widget.images);
       } else if (widget.images is List) {
@@ -81,7 +82,12 @@ class _ImageContainerState extends State<ImageContainer> {
 
   Widget? _image(ImageModel value) {
     List<Widget> stacks = [];
-    CustomImage? image = CustomImage.network(value.url, fit: widget.fit, rect: value.rect, emptyImage: widget.emptyImage, cache: widget.cache);
+    ExtendedImage? image;
+    if (value.bytes != null) {
+      image = CustomImage.memory(value.bytes, fit: widget.fit, rect: value.rect, emptyImage: widget.emptyImage, cache: widget.cache);
+    } else {
+      image = CustomImage.network(value.url, fit: widget.fit, rect: value.rect, emptyImage: widget.emptyImage, cache: widget.cache);
+    }
     if (TextFormat.hasText(value.left)) {
       stacks.add(Positioned(
         top: 8.0,
