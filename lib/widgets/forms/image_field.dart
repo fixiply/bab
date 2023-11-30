@@ -39,10 +39,10 @@ class ImageField extends FormField<ImageModel> {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  if (memory == true) IconButton(
+                  if (memory == true && (image != null && image.bytes != null)) IconButton(
                     icon:const Icon(Icons.close),
                     onPressed: () async {
-                      image!.bytes = null;
+                      image.bytes = null;
                       state.didChange(image);
                     }
                   ),

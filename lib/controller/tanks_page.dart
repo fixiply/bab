@@ -137,22 +137,22 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
           children: [
             Flexible(
               child: IconButton(
-                  icon: const Icon(Icons.check),
-                  tooltip: AppLocalizations.of(context)!.text('validate'),
-                  onPressed: selected.isNotEmpty ? () async {
-                    Navigator.pop(context, selected);
-                  } : null
+                icon: const Icon(Icons.check),
+                tooltip: AppLocalizations.of(context)!.text('validate'),
+                onPressed: selected.isNotEmpty ? () async {
+                  Navigator.pop(context, selected);
+                } : null
               ),
             ),
             Flexible(
-                  child: IconButton(
-                      icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-                      tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
-                      onPressed:() async {
-                        Navigator.pop(context, []);
-                      }
-                  )
+              child: IconButton(
+                icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+                tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                onPressed:() async {
+                  Navigator.pop(context, []);
+                }
               )
+            )
           ]
         ) : null,
         actions: [
@@ -276,7 +276,11 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
       margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: CustomListItem(
         weight: 100,
-        leading: Padding(padding: EdgeInsets.all(4),child:ImageContainer(model.image, height: 100, width: 70, emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.fill))),
+        leading: Container(
+          color: Colors.white,
+          padding: EdgeInsets.all(4),
+          child: ImageContainer(model.image, fit: BoxFit.contain, color: Colors.white, height: 100, width: 70, emptyImage: Image.asset('assets/images/no_image.png', fit: BoxFit.fill))
+        ),
         title: Text(AppLocalizations.of(context)!.localizedText(model.name), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
         subtitle: Column(
           mainAxisAlignment: MainAxisAlignment.start,
