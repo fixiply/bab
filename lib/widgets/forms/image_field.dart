@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:typed_data';
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -121,15 +122,41 @@ class _ImageFieldState extends FormFieldState<ImageModel> {
 
   _showPicker() async {
     if (widget.memory == true) {
-      final pickedFile = await ImagePicker().pickImage(
-          source: ImageSource.gallery,
-          maxWidth: 640,
-          // maxHeight: 480,
-          imageQuality: 80
-      );
-      if (pickedFile != null) {
-        widget.initialValue!.bytes = await pickedFile.readAsBytes();
-        didChange(widget.initialValue);
+      if (DeviceHelper.isDesktop) {
+        await _pickImage(ImageSource.gallery);
+      } else {
+        showModalBottomSheet(
+          context: context,
+          builder: (BuildContext bc) {
+            return SafeArea(
+              child: Container(
+                child: new Wrap(
+                  children: <Widget>[
+                    ListTile(
+                        leading: new Icon(Icons.photo_library),
+                        title: new Text(
+                            AppLocalizations.of(context)!.text('gallery')),
+                        onTap: () async {
+                          await _pickImage(ImageSource.gallery);
+                          Navigator.of(context).pop();
+                        }
+                    ),
+                    if (DeviceHelper.isAndroid ||
+                        DeviceHelper.isIOS) ListTile(
+                      leading: new Icon(Icons.photo_camera),
+                      title: new Text(
+                          AppLocalizations.of(context)!.text('camera')),
+                      onTap: () async {
+                        await _pickImage(ImageSource.camera);
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            );
+          }
+        );
       }
     } else {
       Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -141,6 +168,20 @@ class _ImageFieldState extends FormFieldState<ImageModel> {
       })).then((result) {
         didChange(result);
       });
+    }
+  }
+
+
+  _pickImage(ImageSource source) async {
+    final pickedFile = await ImagePicker().pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 640,
+        // maxHeight: 480,
+        imageQuality: 80
+    );
+    if (pickedFile != null) {
+      widget.initialValue!.bytes = await pickedFile.readAsBytes();
+      didChange(widget.initialValue);
     }
   }
 }
