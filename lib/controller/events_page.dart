@@ -153,7 +153,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
   }
 
   int getDeviceAxisCount() {
-    if (DeviceHelper.isLargeScreen(context)) {
+    if (DeviceHelper.isDesktop) {
       return 3;
     }
     if (DeviceHelper.isMobile(context)) {
