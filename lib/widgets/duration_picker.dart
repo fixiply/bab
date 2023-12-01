@@ -353,7 +353,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
       case BaseUnit.hour:
         return Duration.hoursPerDay;
       default:
-        return 7;
+        return 100;
     }
   }
 
@@ -620,7 +620,7 @@ class _DialState extends State<_Dial> with SingleTickerProviderStateMixin {
         break;
       case BaseUnit.day:
         const int interval = 1;
-        const int factor = 7;
+        const int factor = 10;
         const int length = factor ~/ interval;
         baseUnitMarkerValues =
             List.generate(length, (index) => Duration(days: index * interval));

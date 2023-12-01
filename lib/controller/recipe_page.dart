@@ -356,9 +356,9 @@ class _RecipePageState extends State<RecipePage> {
             if (widget.model.fermentation != null && widget.model.fermentation!.isNotEmpty) Padding(
               padding: const EdgeInsets.all(8.0),
               child: FermentationDataTable(
-                  data: widget.model.fermentation,
-                  title: Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
-                  allowEditing: false, allowSorting: false, showCheckboxColumn: false
+                data: widget.model.fermentation,
+                title: Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
+                allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             )
           ]

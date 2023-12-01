@@ -83,7 +83,7 @@ class Fermentation<T> {
     return values;
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
         columnName: 'name',
@@ -123,12 +123,12 @@ class Fermentation<T> {
   }
 }
 
-class MashDataSource extends EditDataSource {
+class FermentationDataSource extends EditDataSource {
   List<Fermentation> data = [];
   final void Function(Fermentation value, int dataRowIndex)? onChanged;
   final void Function(int rowIndex)? onRemove;
   /// Creates the employee data source class with required details.
-  MashDataSource(BuildContext context, {List<Fermentation>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  FermentationDataSource(BuildContext context, {List<Fermentation>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 

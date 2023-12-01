@@ -147,7 +147,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                     });
                   }
                 },
-                columns: Mash.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+                columns: Mash.columns(context: context, allowEditing: widget.allowEditing),
               ),
             )
           )

@@ -133,13 +133,13 @@ class _ImageFieldState extends FormFieldState<ImageModel> {
                 child: new Wrap(
                   children: <Widget>[
                     ListTile(
-                        leading: new Icon(Icons.photo_library),
-                        title: new Text(
-                            AppLocalizations.of(context)!.text('gallery')),
-                        onTap: () async {
-                          await _pickImage(ImageSource.gallery);
-                          Navigator.of(context).pop();
-                        }
+                      leading: new Icon(Icons.photo_library),
+                      title: new Text(
+                          AppLocalizations.of(context)!.text('gallery')),
+                      onTap: () async {
+                        await _pickImage(ImageSource.gallery);
+                        Navigator.of(context).pop();
+                      }
                     ),
                     if (DeviceHelper.isAndroid ||
                         DeviceHelper.isIOS) ListTile(

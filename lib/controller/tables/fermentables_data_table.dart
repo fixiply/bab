@@ -506,61 +506,61 @@ class FermentableDataSource extends EditDataSource {
           )
       ),
       GridColumn(
-          columnName: 'name',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        columnName: 'name',
+        allowEditing: showQuantity == false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.centerLeft,
+            child: Text(AppLocalizations.of(context)!.text('name'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
-          width: 50,
-          columnName: 'origin',
-          allowEditing: showQuantity == false,
-          allowSorting: false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        width: 50,
+        columnName: 'origin',
+        allowEditing: showQuantity == false,
+        allowSorting: false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.centerLeft,
+            child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
-          columnName: 'type',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        columnName: 'type',
+        allowEditing: showQuantity == false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       if (showQuantity == true) GridColumn(
-          columnName: 'method',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('method'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        columnName: 'method',
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text(AppLocalizations.of(context)!.text('method'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
-          width: 90,
-          columnName: 'efficiency',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('yield'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        width: 90,
+        columnName: 'efficiency',
+        allowEditing: showQuantity == false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.centerRight,
+            child: Text(AppLocalizations.of(context)!.text('yield'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       GridColumn(
-          width: 90,
-          columnName: 'color',
-          allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-          )
+        width: 90,
+        columnName: 'color',
+        allowEditing: showQuantity == false,
+        label: Container(
+            padding: const EdgeInsets.all(8.0),
+            alignment: Alignment.center,
+            child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        )
       ),
       if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
         width: 50,

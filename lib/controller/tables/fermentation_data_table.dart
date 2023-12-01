@@ -41,7 +41,7 @@ class FermentationDataTable extends StatefulWidget {
 }
 
 class FermentationDataTableState extends State<FermentationDataTable> with AutomaticKeepAliveClientMixin {
-  late MashDataSource _dataSource;
+  late FermentationDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
   double dataRowHeight = 30;
   List<Fermentation> _selected = [];
@@ -54,7 +54,7 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
   @override
   void initState() {
     super.initState();
-    _dataSource = MashDataSource(context,
+    _dataSource = FermentationDataSource(context,
       data: widget.data ?? [],
       showCheckboxColumn: widget.showCheckboxColumn!,
       allowEditing: widget.allowEditing,
@@ -117,8 +117,9 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
                     var value = _dataSource.getValue(dataGridRow, details.column.columnName);
                     var duration = await showDurationPicker(
                       context: context,
-                      initialTime: Duration(minutes: value ??  widget.recipe!.boil),
-                      maxTime: Duration(minutes: widget.recipe!.boil!),
+                      baseUnit: BaseUnit.day,
+                      initialTime: Duration(days: value ?? 10),
+                      maxTime: Duration(days: 90)
                         // showOkButton: false,
                         // onComplete: (duration, context) {
                         //   _dataSource.newCellValue = duration.inMinutes;
@@ -127,7 +128,7 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
                         // }
                     );
                     if (duration != null)  {
-                      _dataSource.newCellValue = duration.inMinutes;
+                      _dataSource.newCellValue = duration.inDays;
                       _dataSource.onCellSubmit(dataGridRow, RowColumnIndex(details.rowColumnIndex.rowIndex-1, details.rowColumnIndex.columnIndex), details.column);
                     }
                   }
@@ -146,7 +147,7 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
                     });
                   }
                 },
-                columns: Fermentation.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+                columns: Fermentation.columns(context: context, allowEditing: widget.allowEditing),
               ),
             )
           )

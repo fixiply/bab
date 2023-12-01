@@ -108,8 +108,8 @@ class MiscModel<T> extends Model {
       return Misc.values;
     } else  if (columnName == 'use') {
       return Use.values;
-    } else if (columnName == 'unit') {
-      return [ Measurement.gram, Measurement.kilo, Measurement.milliliter, Measurement.liter, Measurement.units ];
+    } else if (columnName == 'measurement') {
+      return [ Measurement.gram, Measurement.kilo, Measurement.milliliter, Measurement.liter, Measurement.packages, Measurement.units ];
     }
     return null;
   }

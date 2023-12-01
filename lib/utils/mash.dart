@@ -96,7 +96,7 @@ class Mash<T> {
     return values;
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool allowEditing = false}) {
     return <GridColumn>[
       GridColumn(
         columnName: 'name',
