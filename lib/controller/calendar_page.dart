@@ -256,7 +256,7 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
           movable = false;
         } else {
             int duration = 0;
-            for(Fermentation item in e.recipe!.fermentation!) {
+            for(Fermentation item in e.fermentations!) {
               if (duration > 0) {
                 if (DateHelper.toDate(e.start_fermentation!.add(Duration(days: duration))) == DateHelper.toDate(day)) {
                   subtitle = '$time - ${AppLocalizations.of(context)!.text('start_fermentation')} «${item.name}»';
@@ -284,13 +284,14 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                   e.fermented_at = date;
                 } else {
                   int duration = 0;
-                  for(Fermentation item in e.recipe!.fermentation!) {
+                  for(Fermentation item in e.fermentations!) {
                     duration += item.duration!;
                     if (DateHelper.toDate(e.start_fermentation!.add(Duration(days: duration))) == DateHelper.toDate(day)) {
                       item.duration =  item.duration! + days;
                       break;
                     }
                   }
+                  e.fermentation = e.fermentations;
                 }
                 Database().update(e).then((value) async {
                   _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));

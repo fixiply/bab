@@ -63,7 +63,7 @@ class UserModel<T> {
     this.openAI_api_key = map['openAI_api_key'];
   }
 
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at,
       'updated_at': DateTime.now(),

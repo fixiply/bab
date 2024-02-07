@@ -393,7 +393,7 @@ class _BrewsPageState extends State<BrewsPage> with AutomaticKeepAliveClientMixi
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (BrewModel model in _selected) {
           await Database().delete(model, forced: true);
         }

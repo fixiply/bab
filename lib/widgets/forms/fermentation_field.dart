@@ -52,6 +52,7 @@ class _FermentationFieldState extends FormFieldState<List<Fermentation>> {
           allowEditing: true,
           color: FillColor,
           showCheckboxColumn: false,
+          showAction: true,
           recipe: widget.recipe,
           onChanged: (List<Fermentation>? value) {
             didChange(value);

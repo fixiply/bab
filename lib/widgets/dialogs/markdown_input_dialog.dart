@@ -12,7 +12,7 @@ class MarkdownInputDialog extends StatefulWidget {
   final String title;
   final String? hintText;
   final int? maxLines;
-  MarkdownInputDialog({this.initialValue, required this.title, this.hintText, this.maxLines : 10});
+  MarkdownInputDialog({this.initialValue, required this.title, this.hintText, this.maxLines = 10});
 
   @override
   State<StatefulWidget> createState() {

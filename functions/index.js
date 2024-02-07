@@ -2,8 +2,6 @@
 
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
-const moment = require('moment-timezone');
-const nodemailer = require('nodemailer');
 
 const i18next = require('i18next')
 
@@ -12,18 +10,7 @@ admin.initializeApp();
 const firestore = admin.firestore();
 const messaging = admin.messaging();
 
-// Configure the email transport using the default SMTP transport.
-const mailTransport = nodemailer.createTransport({
-    host: 'ssl0.ovh.net',
-    port: 465,
-    secure: true,
-    auth: {
-        user: 'contact@beandbrew.com',
-        pass: 'Yell0-Submarine'
-    }
-});
-
-exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
+exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
     .timeZone('Europe/Paris') // Users can choose timezone - default is America/Los_Angeles
     .onRun(async (context) => {
             const currentDate = new Date();
@@ -43,10 +30,10 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
                     if (brew.fermented_at != null) {
                         started = brew.fermented_at.toDate();
                     }
-                    console.log('Brew '+doc.id+' started: '+started);
-                    const receiptDoc = await firestore.collection('receipts').doc(brew.receipt).get();
-                    if (receiptDoc.exists) {
-                        const receipt = receiptDoc.data();
+                    console.log('Brew '+doc.id+' creator: '+brew.creator+' recipe: '+brew.recipe+' started: '+started);
+                    const recipeDoc = await firestore.collection('recipes').doc(brew.recipe).get();
+                    if (recipeDoc.exists) {
+                        const recipe = recipeDoc.data();
                         const userDoc = await firestore.collection('users').doc(brew.creator).get();
                         if (userDoc.exists) {
                             user = userDoc.data();
@@ -77,44 +64,37 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('0 */1 * * *')
                                 },
                             },
                         });
-                        const name = localizedText(receipt.title, user != null ? user.language : null);
-                        const title = i18next.t('brew') + ' #' + brew.reference + (name != null ? ' - ' + name : '')
-                        if (receipt.primaryday != null) {
-                            started.setDate(started.getDate() + receipt.primaryday);
-                            // console.log('   '+doc.id+' primaryday: '+started);
-                            if (isTime(started)) {
-                                const body = i18next.t(receipt.secondaryday == null ? 'end' : 'secondary');
-                                await sendToDevice(user, title, body + ".", doc.id, 'brew');
-                            } else {
-                                if (receipt.hops != null) {
-                                    for (const item of receipt.hops) {
-                                        if (item.use === 4) { // Dry hppping
-                                            var dryhop = new Date(started.getTime())
-                                            dryhop.setDate(dryhop.getDate() - item.duration);
-                                            // console.log('   '+doc.id+' dryhop: '+dryhop);
-                                            if (isTime(dryhop)) {
-                                                await sendToDevice(user, title, i18next.t('dryhop') + ".", doc.id, 'brew');
-                                                break;
+                        const name = localizedText(recipe.title, user != null ? user.language : null);
+                        const title = i18next.t('brew') + ' #' + brew.reference + (name != null ? ' - ' + name : '');
+                        if (recipe.fermentation != null) {
+                            for (var i= 0; i < recipe.fermentation.length; i++) {
+                                started.setDate(started.getDate() + recipe.fermentation[i].duration);
+                                if (isTime(started)) {
+                                    var text = 'end';
+                                    if ((i + 1) < recipe.fermentation.length ) {
+                                        text = 'end';
+                                    } else if (i === 0) {
+                                        text = 'secondary';
+                                    } else if (i === 1) {
+                                        text = 'tertiary';
+                                    }
+                                    const body = i18next.t(text);
+                                    await sendToDevice(user, title, body + ".", doc.id, 'brew');
+                                } else if (i === 0) {
+                                    if (recipe.hops != null) {
+                                        for (const item of recipe.hops) {
+                                            if (item.use === 4) { // Dry hppping
+                                                var dryhop = new Date(started.getTime())
+                                                dryhop.setDate(dryhop.getDate() - item.duration);
+                                                // log('   '+doc.id+' dryhop: '+dryhop);
+                                                if (isTime(dryhop)) {
+                                                    await sendToDevice(user, title, i18next.t('dryhop') + ".", doc.id, 'brew');
+                                                    break;
+                                                }
                                             }
                                         }
                                     }
                                 }
-                            }
-                        }
-                        if (receipt.secondaryday != null) {
-                            started.setDate(new Date(started.getDate() + receipt.secondaryday));
-                            // console.log('   '+doc.id+' secondaryday: '+started);
-                            if (isTime(started)) {
-                                const body = i18next.t(receipt.tertiaryday == null ? 'end' : 'tertiary');
-                                await sendToDevice(user, title, body + ".", doc.id, 'brew');
-                            }
-                        }
-                        if (receipt.tertiaryday != null) {
-                            started.setDate(started.getDate() + receipt.tertiaryday);
-                            // console.log('   '+doc.id+' tertiaryday: '+started);
-                            if (isTime(started)) {
-                                const body = i18next.t('end');
-                                await sendToDevice(user, title, body + ".", doc.id, 'brew');
                             }
                         }
                     }
@@ -182,8 +162,14 @@ function isTime(date) {
     if (date == null || !date instanceof Date) {
         return  false;
     }
-    const now = new Date();
-    return isToday(date) && now.getHours() === date.getHours();
+    const start = new Date();
+    start.setSeconds(0);
+    start.setMilliseconds(0);
+    const end = new Date();
+    end.setMinutes(start.getMinutes() + 15);
+    end.setSeconds(0);
+    end.setMilliseconds(0);
+    return isToday(start) && date.getTime() >= start.getTime() && date.getTime() < end.getTime();
 }
 
 function localizedText(value, language) {

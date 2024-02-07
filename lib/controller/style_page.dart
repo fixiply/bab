@@ -207,7 +207,7 @@ class _StylePageState extends State<StylePage> {
                       data: AppLocalizations.of(context)!.localizedText(widget.model.overallimpression),
                       softLineBreak: true,
                       styleSheet:
-                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
                   ),
                 ),
@@ -229,7 +229,7 @@ class _StylePageState extends State<StylePage> {
                       data: AppLocalizations.of(context)!.localizedText(widget.model.aroma),
                       softLineBreak: true,
                       styleSheet:
-                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
                   ),
                 ),
@@ -251,7 +251,7 @@ class _StylePageState extends State<StylePage> {
                       data: AppLocalizations.of(context)!.localizedText(widget.model.flavor),
                       softLineBreak: true,
                       styleSheet:
-                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
                   ),
                 ),
@@ -273,7 +273,7 @@ class _StylePageState extends State<StylePage> {
                       data: AppLocalizations.of(context)!.localizedText(widget.model.mouthfeel),
                       softLineBreak: true,
                       styleSheet:
-                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                       )
                   ),
                 ),
@@ -295,7 +295,7 @@ class _StylePageState extends State<StylePage> {
                       data: AppLocalizations.of(context)!.localizedText(widget.model.comments),
                       softLineBreak: true,
                       styleSheet:
-                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
                   ),
                 ),

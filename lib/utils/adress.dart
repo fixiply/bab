@@ -38,7 +38,7 @@ class Adress<T> {
     this.phone = map['phone'];
   }
 
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at,
       'updated_at': DateTime.now(),

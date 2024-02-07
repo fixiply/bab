@@ -107,6 +107,7 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
           ),
           CustomMenuAnchor(
             showMeasures: true,
+            model: widget.model,
           )
         ]
       ),

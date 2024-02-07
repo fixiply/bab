@@ -28,7 +28,7 @@ class Model<T> {
     this.creator = map['creator'];
   }
 
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at,
       'updated_at': DateTime.now(),

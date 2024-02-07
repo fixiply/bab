@@ -152,7 +152,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
             onSelected: (value) async {
               if (value == 'unused') {
                 try {
-                  EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+                  EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
                   List<ImageModel> selected = await Storage().unused(_path);
                   setState(() {
                     _selected = selected;
@@ -630,7 +630,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (ImageModel image in _selected) {
           int count = await Storage().remove(image.url!);
           if (count > 0) {
@@ -677,7 +677,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
     );
     if (path != null) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (ImageModel image in _selected) {
           await Storage().move(image, path);
         }
@@ -704,7 +704,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (ImageModel image in _selected) {
           await Storage().rename(image);
         }
@@ -750,7 +750,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
   Future<List<ImageModel>> sortFutures<T>(Future<List<ImageModel>> input, Sort sort) async {
     List<ImageModel>? list = await input;
     if (sort != Sort.asc_name && sort != Sort.desc_name) {
-      EasyLoading.show(status: AppLocalizations.of(context)!.text('loading'));
+      EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
       for (ImageModel image in list) {
         await image.getUpdated();
       }

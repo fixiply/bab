@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:bab/controller/misc_page.dart';
 import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
-import 'package:bab/controller/tables/fields/amount_field.dart' as amount;
+import 'package:bab/controller/tables/fields/amount_field.dart';
 import 'package:bab/models/misc_model.dart';
 import 'package:bab/models/recipe_model.dart';
+import 'package:bab/utils/amount.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -32,6 +33,7 @@ class MiscDataTable extends StatefulWidget {
   bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   RecipeModel? recipe;
   final void Function(List<MiscModel> value)? onChanged;
@@ -46,6 +48,7 @@ class MiscDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.multiple,
     this.recipe,
     this.onChanged}) : super(key: key);
@@ -73,7 +76,7 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
     _dataSource = MiscDataSource(context,
         showQuantity: widget.data != null,
         showCheckboxColumn: widget.showCheckboxColumn!,
-        allowEditing: widget.allowEditing,
+        showAction: widget.allowEditing,
         onEdit: (int rowIndex) {
           _edit(rowIndex);
         },
@@ -210,7 +213,7 @@ class MiscDataTableState extends State<MiscDataTable> with AutomaticKeepAliveCli
           });
         }
       },
-      columns: MiscDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+      columns: MiscDataSource.columns(context: context, showQuantity: widget.data != null, showAction: widget.showAction!),
     );
   }
 
@@ -293,7 +296,7 @@ class MiscDataSource extends EditDataSource {
   final void Function(int rowIndex)? onRemove;
   final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  MiscDataSource(BuildContext context, {List<MiscModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  MiscDataSource(BuildContext context, {List<MiscModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? showAction, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -305,12 +308,12 @@ class MiscDataSource extends EditDataSource {
     List<MiscModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<amount.Amount>(columnName: 'amount', value: amount.Amount(e.amount, e.measurement)),
+      if (showQuantity == true) DataGridCell<Amount>(columnName: 'amount', value: Amount(e.amount, e.measurement)),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Misc>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
       if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -324,9 +327,9 @@ class MiscDataSource extends EditDataSource {
     if (column.columnName == 'amount') {
       var value = getValue(dataGridRow, column.columnName);
       newCellValue = value;
-      return amount.AmountField(
+      return AmountField(
         value: value.copy(),
-        enums: isEnumType('measurement'),
+        enums: isEnumType('measurement') as List<Measurement>,
         onChanged: (measurement) {
           newCellValue = measurement;
           /// Call [CellSubmit] callback to fire the canSubmitCell and
@@ -350,24 +353,6 @@ class MiscDataSource extends EditDataSource {
     dataGridRows.addAll(getDataRows(data: list));
   }
 
-  // @override
-  // dynamic getValue(DataGridRow dataGridRow, String columnName) {
-  //   var value = super.getValue(dataGridRow, columnName);
-  //   if (value != null && columnName == 'amount') {
-  //     double? weight = AppLocalizations.of(context)!.weight(value);
-  //     return weight!.toPrecision(2);
-  //   }
-  //   return value;
-  // }
-
-  @override
-  // String? suffixText(String columnName) {
-  //   if (columnName == 'amount') {
-  //     return AppLocalizations.of(context)!.weightSuffix();
-  //   }
-  //   return null;
-  // }
-
   @override
   bool isNumericType(String columnName) {
     return MiscModel().isNumericType(columnName);
@@ -387,8 +372,14 @@ class MiscDataSource extends EditDataSource {
         if (e.value is LocalizedText) {
           value = e.value?.get(AppLocalizations.of(context)!.locale);
           alignment = Alignment.centerLeft;
-        } else if (e.value is amount.Amount) {
-          value = AppLocalizations.of(context)!.numberFormat(e.value.amount, symbol: (e.value.measurement?.symbol != null ? ' ' + e.value.measurement?.symbol : null));
+        } else if (e.value is Amount) {
+          if (Measurement.gram == e.value.measurement || Measurement.kilo == e.value.measurement) {
+            value = AppLocalizations.of(context)!.weightFormat(e.value.amount);
+          } else  if (Measurement.milliliter == e.value.measurement || Measurement.liter == e.value.measurement) {
+            value = AppLocalizations.of(context)!.volumeFormat(e.value.amount);
+          } else {
+            value = AppLocalizations.of(context)!.numberFormat(e.value.amount);
+          }
           alignment = Alignment.centerRight;
         } else if (e.value is num) {
           if (e.columnName == 'duration') {
@@ -471,22 +462,22 @@ class MiscDataSource extends EditDataSource {
         double? value;
         switch(newCellValue.measurement) {
           case Measurement.gram:
-            value = AppLocalizations.of(context)!.gram(newCellValue.amount);
+            value = AppLocalizations.of(context)!.gramToKilo(newCellValue.amount);
             break;
           case Measurement.kilo:
-            value = AppLocalizations.of(context)!.gram(newCellValue.amount * 1000);
+            value = AppLocalizations.of(context)!.weight(newCellValue.amount);
             break;
           case Measurement.milliliter:
-            value = AppLocalizations.of(context)!.volume(newCellValue.amount);
+            value = AppLocalizations.of(context)!.millimeterToLiter(newCellValue.amount);
             break;
           case Measurement.liter:
-            value = AppLocalizations.of(context)!.volume(newCellValue.amount * 1000);
+            value = AppLocalizations.of(context)!.volume(newCellValue.amount);
             break;
           default:
             value = newCellValue.amount;
         }
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<amount.Amount>(columnName: column.columnName, value: amount.Amount(value, newCellValue.measurement));
+            DataGridCell<Amount>(columnName: column.columnName, value: Amount(value, newCellValue.measurement));
         data[rowColumnIndex.rowIndex].amount = value;
         data[rowColumnIndex.rowIndex].measurement = newCellValue.measurement;
         break;
@@ -523,7 +514,7 @@ class MiscDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool showAction = false}) {
     return [
       GridColumn(
           columnName: 'uuid',
@@ -575,7 +566,7 @@ class MiscDataSource extends EditDataSource {
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
         width: 50,
         columnName: 'actions',
         allowSorting: false,

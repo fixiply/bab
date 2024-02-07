@@ -67,58 +67,6 @@ class _FormProductPageState extends State<FormProductPage> {
             }
           }
         ),
-        actions: <Widget> [
-          IconButton(
-              padding: EdgeInsets.zero,
-              tooltip: AppLocalizations.of(context)!.text(_modified == true || widget.model.uuid == null ? 'save' : 'duplicate'),
-              icon: Icon(_modified == true || widget.model.uuid == null ? Icons.save : Icons.copy),
-              onPressed: () {
-                if (_modified == true || widget.model.uuid == null) {
-                  if (_formKey.currentState!.validate()) {
-                    Database().update(widget.model, context: context).then((value) async {
-                      Navigator.pop(context, widget.model);
-                    }).onError((e, s) {
-                      _showSnackbar(e.toString());
-                    });
-                  }
-                } else {
-                  ProductModel model = widget.model.copy();
-                  model.uuid = null;
-                  Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return FormProductPage(model);
-                  })).then((value) {
-                    Navigator.pop(context);
-                  });
-                }
-              }
-          ),
-          if (widget.model.uuid != null) IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('remove'),
-            icon: const Icon(Icons.delete),
-            onPressed: () async {
-              if (await DeleteDialog.model(context, widget.model)) {
-                Navigator.pop(context);
-              }
-            }
-          ),
-          if (widget.model.uuid != null) PopupMenuButton<String>(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('tools'),
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) async {
-              if (value == 'information') {
-                await ModalBottomSheet.showInformation(context, widget.model);
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem(
-                value: 'information',
-                child: Text(AppLocalizations.of(context)!.text('information')),
-              ),
-            ]
-          )
-        ]
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(15.0),

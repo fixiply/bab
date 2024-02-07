@@ -77,7 +77,9 @@ class _FormMiscPageState extends State<FormMiscPage> {
               }
             }
           ),
-          CustomMenuAnchor()
+          CustomMenuAnchor(
+            model: widget.model,
+          )
         ]
       ),
       body: SingleChildScrollView(

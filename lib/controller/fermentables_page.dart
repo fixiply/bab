@@ -32,7 +32,7 @@ class FermentablesPage extends StatefulWidget {
   bool loadMore;
   RecipeModel? recipe;
   SelectionMode selectionMode;
-  FermentablesPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
+  FermentablesPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode = SelectionMode.multiple}) : super(key: key);
 
   @override
   FermentablesPageState createState() => FermentablesPageState();
@@ -47,6 +47,7 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
   Future<List<FermentableModel>>? _data;
   List<FermentableModel> _selected = [];
   bool _showList = false;
+  bool _myData = false;
 
   List<FermentableModel> get selected => _selected;
 
@@ -60,7 +61,7 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
     _dataSource = FermentableDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
-      allowEditing: widget.allowEditing,
+      showAction: false,
       onChanged: (FermentableModel value, int dataRowIndex) {
         Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -130,6 +131,15 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
           ),
           IconButton(
             padding: EdgeInsets.zero,
+            icon: Icon(_myData ? Icons.verified_user_outlined : Icons.shield_outlined),
+            tooltip: AppLocalizations.of(context)!.text(_myData ? 'all_data' : 'my_data'),
+            onPressed: () {
+              setState(() { _myData = !_myData; });
+              fetch();
+            },
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
             icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
             tooltip: AppLocalizations.of(context)!.text(_showList ? 'grid_view' : 'view_list'),
             onPressed: () {
@@ -158,7 +168,7 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
                 return EditSfDataGrid(
                   context,
                   allowEditing: widget.allowEditing,
-                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  showCheckboxColumn: widget.showCheckboxColumn || _myData,
                   selectionMode: widget.selectionMode,
                   source: _dataSource,
                   controller: getDataGridController(),
@@ -221,6 +231,8 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
       case SelectionMode.singleDeselect :
         _dataGridController.selectedRow = rows.isNotEmpty ? rows.first : null;
         break;
+      case SelectionMode.none:
+        // TODO: Handle this case.
     }
     return _dataGridController;
   }
@@ -331,7 +343,7 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
 
   fetch() async {
     setState(() {
-      _data = Database().getFermentables(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getFermentables(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true, myData: _myData);
     });
   }
 
@@ -365,7 +377,7 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (FermentableModel model in _selected) {
           await Database().delete(model, forced: true);
         }

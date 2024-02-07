@@ -31,7 +31,7 @@ class HopsPage extends StatefulWidget {
   bool loadMore;
   RecipeModel? recipe;
   SelectionMode selectionMode;
-  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode: SelectionMode.multiple}) : super(key: key);
+  HopsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode = SelectionMode.multiple}) : super(key: key);
 
   @override
   HopsPageState createState() => HopsPageState();
@@ -46,6 +46,7 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
   Future<List<HopModel>>? _data;
   List<HopModel> _selected = [];
   bool _showList = false;
+  bool _myData = false;
 
   List<HopModel> get selected => _selected;
 
@@ -59,7 +60,7 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
     _dataSource = HopDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
-      allowEditing: widget.allowEditing,
+      showAction: false,
       onChanged: (HopModel value, int dataRowIndex) {
         Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -129,6 +130,15 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
           ),
           IconButton(
             padding: EdgeInsets.zero,
+            icon: Icon(_myData ? Icons.verified_user_outlined : Icons.shield_outlined),
+            tooltip: AppLocalizations.of(context)!.text(_myData ? 'all_data' : 'my_data'),
+            onPressed: () {
+              setState(() { _myData = !_myData; });
+              fetch();
+            },
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
             icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
             tooltip: AppLocalizations.of(context)!.text(_showList ? 'grid_view' : 'view_list'),
             onPressed: () {
@@ -157,7 +167,7 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
                 return EditSfDataGrid(
                   context,
                   allowEditing: widget.allowEditing,
-                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  showCheckboxColumn: widget.showCheckboxColumn || _myData,
                   selectionMode: widget.selectionMode,
                   source: _dataSource,
                   controller: getDataGridController(),
@@ -220,6 +230,8 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
       case SelectionMode.singleDeselect :
         _dataGridController.selectedRow = rows.isNotEmpty ? rows.first : null;
         break;
+      case SelectionMode.none:
+        // TODO: Handle this case.
     }
     return _dataGridController;
   }
@@ -311,7 +323,7 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
 
   fetch() async {
     setState(() {
-      _data = Database().getHops(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getHops(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true, myData: _myData);
     });
   }
 
@@ -345,7 +357,7 @@ class HopsPageState extends State<HopsPage> with AutomaticKeepAliveClientMixin<H
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (HopModel model in _selected) {
           await Database().delete(model, forced: true);
         }

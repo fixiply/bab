@@ -12,6 +12,15 @@ import 'package:bab/utils/localized_text.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
+const String XML_ELEMENT_PRIMARY_AGE = 'PRIMARY_AGE';
+const String XML_ELEMENT_PRIMARY_TEMP = 'PRIMARY_TEMP';
+const String XML_ELEMENT_SECONDARY_AGE = 'SECONDARY_AGE';
+const String XML_ELEMENT_SECONDARY_TEMP = 'SECONDARY_TEMP';
+const String XML_ELEMENT_TERTIARY_AGE = 'TERTIARY_AGE';
+const String XML_ELEMENT_TERTIARY_TEMP = 'TERTIARY_TEMP';
+const String XML_ELEMENT_AGE = 'AGE';
+const String XML_ELEMENT_AGE_TEMP = 'AGE_TEMP';
+
 class Fermentation<T> {
   dynamic name;
   int? duration;
@@ -83,7 +92,7 @@ class Fermentation<T> {
     return values;
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showAction = false}) {
     return <GridColumn>[
       GridColumn(
         columnName: 'name',
@@ -112,7 +121,7 @@ class Fermentation<T> {
             child: Text(AppLocalizations.of(context)!.text('temperature'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
           width: 50,
           columnName: 'actions',
           allowSorting: false,
@@ -128,7 +137,7 @@ class FermentationDataSource extends EditDataSource {
   final void Function(Fermentation value, int dataRowIndex)? onChanged;
   final void Function(int rowIndex)? onRemove;
   /// Creates the employee data source class with required details.
-  FermentationDataSource(BuildContext context, {List<Fermentation>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  FermentationDataSource(BuildContext context, {List<Fermentation>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? showAction, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -139,7 +148,7 @@ class FermentationDataSource extends EditDataSource {
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<int>(columnName: 'duration', value: e.duration),
       DataGridCell<double>(columnName: 'temperature', value: e.temperature),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -162,7 +171,8 @@ class FermentationDataSource extends EditDataSource {
                 AppLocalizations.of(context)!.text('primary'),
                 AppLocalizations.of(context)!.text('secondary'),
                 AppLocalizations.of(context)!.text('tertiary'),
-                'Cold Crash'
+                'Cold Crash',
+                AppLocalizations.of(context)!.text('bottle'),
               ].map<PopupMenuItem<String>>((String value) {
                 return new PopupMenuItem(
                     child: new Text(value), value: value);

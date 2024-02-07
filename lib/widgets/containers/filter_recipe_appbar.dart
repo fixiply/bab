@@ -16,7 +16,7 @@ class FilterRecipeAppBar extends StatefulWidget {
   IBU ibu;
   ABV abv;
   ColorHelper cu;
-  bool my_receips;
+  bool my_data;
   RangeValues? srm_values;
   List<Style>? selectedFermentations = [];
   List<Category>? categories;
@@ -33,7 +33,7 @@ class FilterRecipeAppBar extends StatefulWidget {
     required this.ibu,
     required this.abv,
     required this.cu,
-    this.my_receips = true,
+    this.my_data = true,
     this.selectedFermentations,
     this.categories,
     this.selectedCategories,
@@ -114,37 +114,37 @@ class _FilterRecipeAppBarState extends State<FilterRecipeAppBar> with SingleTick
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: <Widget>[
-                    Icon(widget.my_receips ? Icons.done : null, size: 12),
+                    Icon(widget.my_data ? Icons.verified_user_outlined : Icons.shield_outlined, size: 14),
                     const SizedBox(width: 8),
                     Text(AppLocalizations.of(context)!.text('my_recipes'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13)),
                   ],
                 ),
                 onPressed: () {
                   setState(() {
-                    widget.my_receips = !widget.my_receips;
+                    widget.my_data = !widget.my_data;
                   });
-                  widget.onMyChanged?.call(widget.my_receips);
+                  widget.onMyChanged?.call(widget.my_data);
                 }
               ),
               const SizedBox(width: 10),
               Flexible(
                 child: FilledButton.tonal(
-                    style: FilledButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2)),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: <Widget>[
-                        const Icon(Icons.clear, size: 12),
-                        const SizedBox(width: 8),
-                        Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13)),
-                      ],
-                    ),
-                    onPressed: changed ? () {
-                      setState(() {
-                        changed = false;
-                      });
-                      widget.onReset?.call();
-                    } : null
+                  style: FilledButton.styleFrom(foregroundColor: Colors.black, backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2)),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      const Icon(Icons.clear, size: 14),
+                      const SizedBox(width: 8),
+                      Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13)),
+                    ],
+                  ),
+                  onPressed: changed ? () {
+                    setState(() {
+                      changed = false;
+                    });
+                    widget.onReset?.call();
+                  } : null
                 ),
               )
             ],
@@ -166,31 +166,31 @@ class _FilterRecipeAppBarState extends State<FilterRecipeAppBar> with SingleTick
               SizedBox(width: 30, child: Text((widget.ibu.start ?? widget.ibu.min).round().toString(), style: const TextStyle(fontSize: 12))),
               Expanded(
                 child: SliderTheme(
-                    data: SliderThemeData(
-                      trackHeight: 2,
-                      thumbColor: Theme.of(context).primaryColor,
-                      activeTrackColor: Theme.of(context).primaryColor,
-                      inactiveTrackColor: Theme.of(context).primaryColor.withOpacity(.4),
-                      overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
-                      rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
-                      showValueIndicator: ShowValueIndicator.always,
-                      valueIndicatorTextStyle: const TextStyle(fontSize: 12)
-                    ),
-                    child: RangeSlider(
-                      min: widget.ibu.min,
-                      max: widget.ibu.max,
-                      values: RangeValues(widget.ibu.start ?? widget.ibu.min, widget.ibu.end ?? widget.ibu.max),
-                      labels: RangeLabels(IBU.label(widget.ibu.start ?? widget.ibu.min), IBU.label(widget.ibu.end ?? widget.ibu.max)),
-                      onChanged: (values) {
-                        setState(() {
-                          changed = true;
-                          widget.ibu.start = values.start;
-                          widget.ibu.end = values.end;
-                        });
-                        widget.onIBUChanged?.call(values.start, values.end);
-                      },
-                    )
+                  data: SliderThemeData(
+                    trackHeight: 2,
+                    thumbColor: Theme.of(context).primaryColor,
+                    activeTrackColor: Theme.of(context).primaryColor,
+                    inactiveTrackColor: Theme.of(context).primaryColor.withOpacity(.4),
+                    overlayColor: Theme.of(context).primaryColor.withOpacity(.1),
+                    rangeThumbShape: CustomRangeSliderThumbShape(ringColor: Theme.of(context).primaryColor, fillColor: FillColor),
+                    showValueIndicator: ShowValueIndicator.always,
+                    valueIndicatorTextStyle: const TextStyle(fontSize: 12)
+                  ),
+                  child: RangeSlider(
+                    min: widget.ibu.min,
+                    max: widget.ibu.max,
+                    values: RangeValues(widget.ibu.start ?? widget.ibu.min, widget.ibu.end ?? widget.ibu.max),
+                    labels: RangeLabels(IBU.label(widget.ibu.start ?? widget.ibu.min), IBU.label(widget.ibu.end ?? widget.ibu.max)),
+                    onChanged: (values) {
+                      setState(() {
+                        changed = true;
+                        widget.ibu.start = values.start;
+                        widget.ibu.end = values.end;
+                      });
+                      widget.onIBUChanged?.call(values.start, values.end);
+                    },
                   )
+                )
               ),
               SizedBox(width: 30, child: Text((widget.ibu.end ?? widget.ibu.max).round().toString(), style: const TextStyle(fontSize: 12))),
             ]

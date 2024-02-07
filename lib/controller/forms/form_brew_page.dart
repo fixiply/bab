@@ -28,8 +28,8 @@ class FormBrewPage extends StatefulWidget {
 }
 
 class _FormBrewPageState extends State<FormBrewPage> {
+  Key _key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
   bool _autogenerate = true;
 
@@ -47,7 +47,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: _key,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.text('brew')),
         elevation: 0,
@@ -72,7 +72,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('calculate'),
+            tooltip: AppLocalizations.of(context)!.text('calculate_specific_profile'),
             icon: const Icon(Icons.calculate_outlined),
             onPressed: () {
               _calculate();
@@ -101,9 +101,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                 model.abv = null;
                 model.og = null;
                 model.fg = null;
-                model.primaryday = null;
-                model.secondaryday = null;
-                model.tertiaryday = null;
+                model.fermentation = [];
                 Navigator.push(context, MaterialPageRoute(builder: (context) {
                   return FormBrewPage(model);
                 })).then((value) {
@@ -124,6 +122,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
           ),
           CustomMenuAnchor(
             showMeasures: true,
+            model: widget.model,
             onSelected: (value) {
               if (value is constants.Unit) {
                 _applyChange(unit: value);
@@ -507,10 +506,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
   _calculate() async {
     await widget.model.calculate();
     setState(() {
-      widget.model.mash_water = widget.model.mash_water;
-      widget.model.sparge_water = widget.model.sparge_water;
-      widget.model.efficiency = widget.model.efficiency;
-      widget.model.abv = widget.model.abv;
+      _key = UniqueKey();
     });
   }
 

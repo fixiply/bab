@@ -46,8 +46,8 @@ class FormRecipePage extends StatefulWidget {
 }
 
 class _FormRecipePageState extends State<FormRecipePage> {
+  Key _key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
-  final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
 
   TextEditingController _volumeController = TextEditingController();
@@ -63,7 +63,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+      key: _key,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.text('recipe')),
         elevation: 0,
@@ -88,7 +88,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
         actions: <Widget> [
           IconButton(
             padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('calculate'),
+            tooltip: AppLocalizations.of(context)!.text('calculate_theoretical_profile'),
             icon: const Icon(Icons.calculate_outlined),
             onPressed: () {
               _calculate();
@@ -131,6 +131,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
           ),
           CustomMenuAnchor(
             showMeasures: true,
+            model: widget.model,
             onSelected: (value) {
               if (value is constants.Unit) {
                 _applyChange(unit: value);
@@ -308,6 +309,12 @@ class _FormRecipePageState extends State<FormRecipePage> {
                       initialValue: widget.model.style,
                       title: AppLocalizations.of(context)!.text('style'),
                       onChanged: (value) => widget.model.style = value,
+                      validator: (value) {
+                        if (value == null) {
+                          return AppLocalizations.of(context)!.text('validator_field_required');
+                        }
+                        return null;
+                      }
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -450,8 +457,8 @@ class _FormRecipePageState extends State<FormRecipePage> {
                 onChanged: (values) => widget.model.fermentation = values,
               ),
               const Divider(height: 10),
-              MarkdownTextInput((String value) => widget.model.text = value,
-                AppLocalizations.of(context)!.localizedText(widget.model.text),
+              MarkdownTextInput((String value) => widget.model.notes = value,
+                AppLocalizations.of(context)!.localizedText(widget.model.notes),
                 label: AppLocalizations.of(context)!.text('notes'),
                 maxLines: 10,
                 actions: MarkdownType.values,
@@ -491,6 +498,9 @@ class _FormRecipePageState extends State<FormRecipePage> {
 
   _calculate() async {
     await widget.model.calculate();
+    setState(() {
+      _key = UniqueKey();
+    });
   }
 
   _new() async {

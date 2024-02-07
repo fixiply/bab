@@ -241,7 +241,7 @@ class _RecipePageState extends State<RecipePage> {
             )
           ),
         ),
-        if (widget.model.text != null && widget.model.text!.isNotEmpty) SliverToBoxAdapter(
+        if (widget.model.notes != null && widget.model.notes!.isNotEmpty) SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
             child: ExpansionPanelList(
@@ -260,7 +260,7 @@ class _RecipePageState extends State<RecipePage> {
                     return ListTile(
                       dense: true,
                       contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('features'),
+                      title: Text(AppLocalizations.of(context)!.text('notes'),
                           style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
                     );
                   },
@@ -268,11 +268,11 @@ class _RecipePageState extends State<RecipePage> {
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
-                      data: AppLocalizations.of(context)!.localizedText(widget.model.text),
+                      data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
                       fitContent: true,
                       shrinkWrap: true,
                       softLineBreak: true,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
                   ),
                 )

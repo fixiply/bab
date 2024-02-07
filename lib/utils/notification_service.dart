@@ -96,13 +96,11 @@ class NotificationService {
       flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
           AndroidFlutterLocalNotificationsPlugin>();
 
-      final bool? grantedNotificationPermission =
-      await androidImplementation?.requestNotificationsPermission();
+      final bool? grantedNotificationPermission =  await androidImplementation?.requestNotificationsPermission();
     }
   }
 
   Future<void> showNotification(int id, {String? title, String? body, String? payload, Duration? duration}) async {
-    await _configureLocalTimeZone();
     var androidPlatformChannelSpecifics = const AndroidNotificationDetails(
         channelId, 'Notifications',
         playSound: true,
@@ -125,6 +123,7 @@ class NotificationService {
         macOS: DarwinPlatformChannelSpecifics
     );
     if (duration != null && duration.inSeconds > 0) {
+      await _configureLocalTimeZone();
       foundation.debugPrint('showNotification duration: $duration local: ${tz.local} datetime: ${tz.TZDateTime.now(tz.local).add(duration)}');
       await flutterLocalNotificationsPlugin.zonedSchedule(
         id,

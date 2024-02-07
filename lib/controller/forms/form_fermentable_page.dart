@@ -91,7 +91,9 @@ class _FormFermentablePageState extends State<FormFermentablePage> {
               }
             }
           ),
-          CustomMenuAnchor()
+          CustomMenuAnchor(
+            model: widget.model,
+          )
         ]
       ),
       body: SingleChildScrollView(

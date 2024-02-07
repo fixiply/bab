@@ -36,6 +36,10 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
     return map!.containsKey(key);
   }
 
+  bool containsValue(String? value)  {
+    return map!.containsValue(value);
+  }
+
   bool contains(Locale locale)  {
     return containsKey(locale.languageCode);
   }

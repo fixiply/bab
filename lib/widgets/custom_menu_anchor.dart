@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/locale_notifier.dart';
+import 'package:bab/widgets/modal_bottom_sheet.dart';
 
 // External package
 import 'package:app_settings/app_settings.dart';
@@ -20,10 +22,11 @@ class CustomMenuAnchor extends StatefulWidget {
   bool isArchived;
   bool isHidden;
   bool showMeasures;
+  Model? model;
   String? importLabel;
   PopupMenuItemSelected? onSelected;
 
-  CustomMenuAnchor({Key? key, this.showPublish = false, this.showFilters = false, this.isArchived = false, this.isHidden = false, this.showMeasures = false, this.importLabel, this.onSelected}): super(key: key);
+  CustomMenuAnchor({Key? key, this.showPublish = false, this.showFilters = false, this.isArchived = false, this.isHidden = false, this.showMeasures = false, this.model, this.importLabel, this.onSelected}): super(key: key);
   @override
   CustomMenuAnchorState createState() => CustomMenuAnchorState();
 }
@@ -36,6 +39,10 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
         if (!DeviceHelper.isDesktop) MenuItemButton(
           child: Text(AppLocalizations.of(context)!.text('alert_settings')),
           onPressed: () => AppSettings.openNotificationSettings(),
+        ),
+        if (widget.model != null && widget.model!.uuid != null ) MenuItemButton(
+          child: Text(AppLocalizations.of(context)!.text('information')),
+          onPressed: () =>  ModalBottomSheet.showInformation(context, widget.model!),
         ),
         SubmenuButton(
           child: Text(AppLocalizations.of(context)!.text('languages')),

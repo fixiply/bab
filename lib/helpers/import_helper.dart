@@ -7,13 +7,16 @@ import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/fermentable_model.dart' as fm;
 import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/misc_model.dart' as mm;
-import 'package:bab/models/style_model.dart';
+import 'package:bab/models/recipe_model.dart' as rm;
+import 'package:bab/models/style_model.dart' as sm;
 import 'package:bab/models/yeast_model.dart' as ym;
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
+import 'package:bab/utils/fermentation.dart' as fermentation;
 import 'package:bab/utils/localized_text.dart';
+import 'package:bab/utils/mash.dart' as mash;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -23,6 +26,252 @@ import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:xml/xml.dart';
 
 class ImportHelper {
+  static fromBeerXML(BuildContext context, Function() onImported) async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['xml'],
+      );
+      if (result != null) {
+        try {
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
+
+          final XmlDocument? document;
+          if(DeviceHelper.isDesktop) {
+            document = XmlDocument.parse(utf8.decode(result.files.single.bytes!));
+          } else {
+            File file = File(result.files.single.path!);
+            document = XmlDocument.parse(file.readAsStringSync());
+          }
+
+          List<sm.StyleModel> styles = await Database().getStyles();
+
+          final elements = document.findAllElements('RECIPE');
+          for (XmlElement element in elements) {
+            final model = rm.RecipeModel(
+              title: element.getElement(rm.XML_ELEMENT_NAME)!.innerText,
+              method: rm.RecipeModel.getTypeByName(element.getElement(rm.XML_ELEMENT_TYPE)!.innerText),
+              volume: double.parse(element.getElement(rm.XML_ELEMENT_BATCH_SIZE)!.innerText),
+              boil: int.parse(element.getElement(rm.XML_ELEMENT_BOIL_TIME)!.innerText),
+              efficiency: double.parse(element.getElement(rm.XML_ELEMENT_EFFICIENCY)!.innerText),
+              notes: element.getElement(rm.XML_ELEMENT_NOTES)!.innerText
+            );
+            XmlElement? style = element.getElement(rm.XML_ELEMENT_STYLE);
+            if (style != null) {
+              for(sm.StyleModel item in styles) {
+                if (item.hasName(style.getElement(sm.XML_ELEMENT_NAME)!.innerText)) {
+                  model.style = item;
+                  break;
+                }
+              }
+            }
+
+            fermentationsBeerXML(context, element, model);
+            await fermentablesBeerXML(element, model);
+            await hopsBeerXML(element, model);
+            await yeastsBeerXML(element, model);
+            await miscBeerXML(element, model);
+            mashBeerXML(element, model);
+
+            await model.calculate();
+            await Database().add(model, ignoreAuth: currentUser!.isAdmin());
+          }
+          onImported.call();
+        } finally {
+          EasyLoading.dismiss();
+        }
+      }
+    } on PlatformException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text("Unsupported operation $e"),
+              duration: const Duration(seconds: 10)
+          )
+      );
+    } catch (ex) {
+      debugPrint(ex.toString());
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text(ex.toString()),
+              duration: const Duration(seconds: 10)
+          )
+      );
+    }
+  }
+
+  static fermentationsBeerXML(BuildContext context, XmlElement element, rm.RecipeModel model) {
+    List<fermentation.Fermentation> list = [];
+
+    final primary = element.getElement(fermentation.XML_ELEMENT_PRIMARY_AGE);
+    if (primary != null) {
+      double? primary_temp = double.tryParse(element.getElement(fermentation.XML_ELEMENT_PRIMARY_TEMP)!.innerText);
+      if (primary_temp != null) {
+        list.add(fermentation.Fermentation(
+          name: AppLocalizations.of(context)!.text('primary'),
+          duration: int.tryParse(primary.innerText),
+          temperature: primary_temp)
+        );
+      }
+    }
+
+    final secondary = element.getElement(fermentation.XML_ELEMENT_SECONDARY_AGE);
+    if (secondary != null) {
+      double? secondary_temp = double.tryParse(element.getElement(fermentation.XML_ELEMENT_SECONDARY_TEMP)!.innerText);
+      if (secondary_temp != null) {
+        list.add(fermentation.Fermentation(
+          name: AppLocalizations.of(context)!.text('secondary'),
+          duration: int.tryParse(secondary.innerText),
+          temperature: secondary_temp)
+        );
+      }
+    }
+
+    final tertiary = element.getElement(fermentation.XML_ELEMENT_TERTIARY_AGE);
+    if (tertiary != null) {
+      double? temp = double.tryParse(element.getElement(fermentation.XML_ELEMENT_TERTIARY_TEMP)!.innerText);
+      if (temp != null) {
+        list.add(fermentation.Fermentation(
+          name: AppLocalizations.of(context)!.text('tertiary'),
+          duration: int.tryParse(tertiary.innerText),
+          temperature: temp)
+        );
+      }
+    }
+
+    final age = element.getElement(fermentation.XML_ELEMENT_AGE);
+    if (age != null) {
+      double? temp = double.tryParse(element.getElement(fermentation.XML_ELEMENT_AGE_TEMP)!.innerText);
+      if (temp != null) {
+        list.add(fermentation.Fermentation(
+            name: AppLocalizations.of(context)!.text('bottle'),
+            duration: int.tryParse(age.innerText),
+            temperature: temp)
+        );
+      }
+    }
+
+    if (list.isNotEmpty) {
+      model.fermentation = list;
+    }
+  }
+
+  static fermentablesBeerXML(XmlElement element, rm.RecipeModel model) async {
+    var children = element.findAllElements('FERMENTABLE');
+    if (children.isNotEmpty) {
+      List<fm.FermentableModel> fermentables = await Database().getFermentables(user: currentUser!.uuid);
+      for (XmlElement child in children) {
+        bool found = false;
+        fm.Type? type = fm.FermentableModel.getTypeByName(child.getElement(rm.XML_ELEMENT_TYPE)!.innerText);
+        for(fm.FermentableModel item in fermentables) {
+          if (item.hasName(child.getElement(fm.XML_ELEMENT_NAME)!.innerText, ['malt']) && item.type == type) {
+            found = true;
+            fm.FermentableModel newModel = fm.FermentableModel.fromXML(child, old: item);
+            model.addFermentable(newModel);
+            break;
+          }
+        }
+        if (!found) {
+          fm.FermentableModel newModel = fm.FermentableModel.fromXML(child);
+          await Database().add(newModel, ignoreAuth: currentUser!.isAdmin());
+          model.addFermentable(newModel);
+          fermentables.add(newModel);
+        }
+      }
+    }
+  }
+
+  static hopsBeerXML(XmlElement element, rm.RecipeModel model) async {
+    var children = element.findAllElements('HOP');
+    if (children.isNotEmpty) {
+      List<hm.HopModel> hops = await Database().getHops(user: currentUser!.uuid);
+      for (XmlElement child in children) {
+        bool found = false;
+        hm.Hop? form = hm.HopModel.getFormByName(child.getElement(hm.XML_ELEMENT_FORM)!.innerText);
+        for(hm.HopModel item in hops) {
+          if (item.hasName(child.getElement(hm.XML_ELEMENT_NAME)!.innerText, ['hop']) && item.form == form) {
+            found = true;
+            hm.HopModel newModel = hm.HopModel.fromXML(child, old: item);
+            model.addHop(newModel);
+            break;
+          }
+        }
+        if (!found) {
+          hm.HopModel newModel = hm.HopModel.fromXML(child);
+          await Database().add(newModel, ignoreAuth: currentUser!.isAdmin());
+          model.addHop(newModel);
+          hops.add(newModel);
+        }
+      }
+    }
+  }
+
+  static yeastsBeerXML(XmlElement element, rm.RecipeModel model) async {
+    var children = element.findAllElements('YEAST');
+    if (children.isNotEmpty) {
+      List<ym.YeastModel> yeasts = await Database().getYeasts(user: currentUser!.uuid);
+      for (XmlElement child in children) {
+        bool found = false;
+        ym.Yeast? form = ym.YeastModel.getFormByName(child.getElement(hm.XML_ELEMENT_FORM)!.innerText);
+        for(ym.YeastModel item in yeasts) {
+          if (item.hasName(child.getElement(hm.XML_ELEMENT_NAME)!.innerText, ['yeast']) && item.form == form) {
+            found = true;
+            ym.YeastModel newModel = ym.YeastModel.fromXML(child, old: item);
+            model.addYeast(newModel);
+            break;
+          }
+        }
+        if (!found) {
+          ym.YeastModel newModel = ym.YeastModel.fromXML(child);
+          await Database().add(newModel, ignoreAuth: currentUser!.isAdmin());
+          model.addYeast(newModel);
+          yeasts.add(newModel);
+        }
+      }
+    }
+  }
+
+  static miscBeerXML(XmlElement element, rm.RecipeModel model) async {
+    var children = element.findAllElements('MISC');
+    if (children.isNotEmpty) {
+      List<mm.MiscModel> miscs = await Database().getMiscellaneous(user: currentUser!.uuid);
+      for (XmlElement child in children) {
+        bool found = false;
+        mm.Misc? form = mm.MiscModel.getFormByName(child.getElement(hm.XML_ELEMENT_FORM)!.innerText);
+        for(mm.MiscModel item in miscs) {
+          if (item.hasName(child.getElement(hm.XML_ELEMENT_NAME)!.innerText, ['misc']) && item.type == form) {
+            found = true;
+            mm.MiscModel newModel = mm.MiscModel.fromXML(child, old: item);
+            model.addMisc(newModel);
+            break;
+          }
+        }
+        if (!found) {
+          mm.MiscModel newModel = mm.MiscModel.fromXML(child);
+          await Database().add(newModel, ignoreAuth: currentUser!.isAdmin());
+          model.addMisc(newModel);
+          miscs.add(newModel);
+        }
+      }
+    }
+  }
+
+  static mashBeerXML(XmlElement element, rm.RecipeModel model) {
+    var children = element.findAllElements('MASH_STEP');
+    if (children.isNotEmpty) {
+      List<mash.Mash> list = [];
+      for (XmlElement child in children) {
+        list.add(mash.Mash(
+          name: child.getElement(mash.XML_ELEMENT_NAME)!.innerText,
+          duration: int.tryParse(child.getElement(mash.XML_ELEMENT_STEP_TIME)!.innerText),
+          temperature: double.tryParse(child.getElement(mash.XML_ELEMENT_STEP_TEMP)!.innerText)
+        ));
+      }
+      if (list.isNotEmpty) {
+        model.mash = list;
+      }
+    }
+  }
+
   static styles(BuildContext context, Function() onImported) async {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
@@ -31,7 +280,7 @@ class ImportHelper {
       );
       if (result != null) {
         try {
-          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
           List<dynamic> list;
           if (DeviceHelper.isDesktop) {
             list = json.decode(utf8.decode(result.files.single.bytes!));
@@ -41,7 +290,7 @@ class ImportHelper {
           }
           for(dynamic item in list) {
             final Map map = Map.from(item);
-            final model = StyleModel(
+            final model = sm.StyleModel(
               name: LocalizedText(map: { 'en': map['name']}),
               number: map['number'],
               category: LocalizedText(map: { 'en': map['category']}),
@@ -62,7 +311,7 @@ class ImportHelper {
             if (map['ibumax'] != null) model.ibumax = double.tryParse(map['ibumax']);
             if (map['srmmin'] != null) model.ebcmin = ColorHelper.toEBC(int.tryParse(map['srmmin']));
             if (map['srmmax'] != null) model.ebcmax = ColorHelper.toEBC(int.tryParse(map['srmmax']));
-            List<StyleModel> list = await Database().getStyles(number: model.number);
+            List<sm.StyleModel> list = await Database().getStyles(number: model.number);
             if (list.isEmpty) {
               Database().add(model, ignoreAuth: true);
             } else {
@@ -104,7 +353,7 @@ class ImportHelper {
       );
       if (result != null) {
         try {
-          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
 
           final XmlDocument? document;
           if(DeviceHelper.isDesktop) {
@@ -113,8 +362,8 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          final fermentables = document.findAllElements('Grain');
-          for (XmlElement element in fermentables) {
+          final elements = document.findAllElements('Grain');
+          for (XmlElement element in elements) {
             final model = fm.FermentableModel(
                 name: LocalizedText(map: { 'en': element.getElement('F_G_NAME')!.innerText}),
                 origin: LocalizedText.country(element.getElement('F_G_ORIGIN')!.innerText),
@@ -194,7 +443,7 @@ class ImportHelper {
       );
       if (result != null) {
         try {
-          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
 
           final XmlDocument document;
           if(DeviceHelper.isDesktop) {
@@ -203,8 +452,8 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          final hops = document.findAllElements('Hops');
-          for(XmlElement element in hops) {
+          final elements = document.findAllElements('Hops');
+          for(XmlElement element in elements) {
             final model = hm.HopModel(
               name: LocalizedText( map: { 'en': element.getElement('F_H_NAME')!.innerText}),
               alpha: double.tryParse(element.getElement('F_H_ALPHA')!.innerText),
@@ -281,7 +530,7 @@ class ImportHelper {
       );
       if (result != null) {
         try {
-          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
 
           final XmlDocument document;
           if(DeviceHelper.isDesktop) {
@@ -290,11 +539,11 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          final fermentables = document.findAllElements('Yeast');
-          for(XmlElement element in fermentables) {
+          final elements = document.findAllElements('Yeast');
+          for(XmlElement element in elements) {
             final model = ym.YeastModel(
                 name: LocalizedText( map: { 'en': element.getElement('F_Y_NAME')!.innerText}),
-                reference: element.getElement('F_Y_PRODUCT_ID')!.innerText,
+                product: element.getElement('F_Y_PRODUCT_ID')!.innerText,
                 laboratory: element.getElement('F_Y_LAB')!.innerText,
                 cells: double.tryParse(element.getElement('F_Y_CELLS')!.innerText),
                 attmin: double.tryParse(element.getElement('F_Y_MIN_ATTENUATION')!.innerText),
@@ -337,7 +586,7 @@ class ImportHelper {
                 break;
             }
             if (type != 2 && type != 3) {
-              List<ym.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.reference, laboratory: model.laboratory);
+              List<ym.YeastModel> list = await Database().getYeasts(name: model.name.toString(), reference: model.product, laboratory: model.laboratory);
               if (list.isEmpty) {
                 Database().add(model, ignoreAuth: true);
               }
@@ -374,7 +623,7 @@ class ImportHelper {
       );
       if (result != null) {
         try {
-          EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+          EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
 
           final XmlDocument document;
           if(DeviceHelper.isDesktop) {
@@ -383,8 +632,8 @@ class ImportHelper {
             File file = File(result.files.single.path!);
             document = XmlDocument.parse(file.readAsStringSync());
           }
-          final fermentables = document.findAllElements('Misc');
-          for(XmlElement element in fermentables) {
+          final elements = document.findAllElements('Misc');
+          for(XmlElement element in elements) {
             final model = mm.MiscModel(
                 name: LocalizedText( map: { 'en': element.getElement('F_M_NAME')!.innerText})
             );

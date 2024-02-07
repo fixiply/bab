@@ -12,10 +12,6 @@ import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/mash.dart';
 import 'package:bab/utils/quantity.dart';
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
-
 class BrewModel<T> extends Model {
   DateTime? started_at;
   DateTime? fermented_at;
@@ -32,10 +28,8 @@ class BrewModel<T> extends Model {
   double? abv;
   double? og;
   double? fg;
-  int? primaryday;
-  int? secondaryday;
-  int? tertiaryday;
   int? last_step;
+  List<Fermentation>? fermentation;
   dynamic notes;
 
   BrewModel({
@@ -58,12 +52,12 @@ class BrewModel<T> extends Model {
     this.abv,
     this.og,
     this.fg,
-    this.primaryday,
-    this.secondaryday,
-    this.tertiaryday,
+    this.fermentation,
     this.last_step,
     this.notes
-  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
+  }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
+    fermentation ??= [];
+  }
 
   @override
   Future fromMap(Map<String, dynamic> map) async {
@@ -83,15 +77,13 @@ class BrewModel<T> extends Model {
     if (map['abv'] != null) this.abv = map['abv'].toDouble();
     if (map['og'] != null) this.og = map['og'].toDouble();
     if (map['fg'] != null) this.fg = map['fg'].toDouble();
-    this.primaryday = map['primaryday'];
-    this.secondaryday = map['secondaryday'];
-    this.tertiaryday = map['tertiaryday'];
+    if (map['fermentation'] != null) this.fermentation = Fermentation.deserialize(map['fermentation']);
     this.last_step = map['last_step'];
     this.notes = LocalizedText.deserialize(map['notes']);
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'started_at': started_at,
@@ -109,9 +101,7 @@ class BrewModel<T> extends Model {
       'abv': this.abv,
       'og': this.og,
       'fg': this.fg,
-      'primaryday': this.primaryday,
-      'secondaryday': this.secondaryday,
-      'tertiaryday': this.tertiaryday,
+      'fermentation': Fermentation.serialize(this.fermentation),
       'last_step': this.last_step,
       'notes': LocalizedText.serialize(this.notes),
     });
@@ -139,9 +129,7 @@ class BrewModel<T> extends Model {
       abv: this.abv,
       og: this.og,
       fg: this.fg,
-      primaryday: this.primaryday,
-      secondaryday: this.secondaryday,
-      tertiaryday: this.tertiaryday,
+      fermentation: this.fermentation,
       last_step: this.last_step,
       notes: this.notes
     );
@@ -180,56 +168,12 @@ class BrewModel<T> extends Model {
 
   DateTime? get start_fermentation => fermented_at ?? started_at;
 
-  /*
-  int? primaryDay() {
-    return primaryday ?? recipe?.primaryDay;
-  }
-
-  DateTime? endDatePrimary() {
-    int? primary = primaryday ?? recipe?.primaryDay;
-    if (primary != null) {
-      return DateHelper.toDate(start_fermentation!.add(Duration(days: primary)));
-    }
-    return null;
-  }
-
-  int? secondaryDay() {
-    return secondaryday ?? recipe?.secondaryday;
-  }
-
-  DateTime? endDateSecondary() {
-    int? secondary = secondaryday ?? recipe?.secondaryday;
-    if (secondary != null) {
-      int? primary = primaryday ?? recipe?.primaryday;
-      int days = (primary ?? 0) + secondary;
-      return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
-    }
-    return null;
-  }
-
-  int? tertiaryDay() {
-    return tertiaryday ?? recipe?.tertiaryday;
-  }
-
-  DateTime? endDateTertiary() {
-    int? secondary = secondaryday ?? recipe?.secondaryday;
-    int? tertiary = tertiaryday ?? recipe?.tertiaryday;
-    if (secondary != null && tertiary != null) {
-      int? primary = primaryday ?? recipe?.primaryday;
-      int days = (primary ?? 0) + (secondary ?? 0) + (tertiary ?? 0);
-      return DateHelper.toDate(start_fermentation!.add(Duration(days: days)));
-    }
-    return null;
-  }
-  */
-
   List<DateTime> dryHop() {
     List<DateTime> values = [];
     if (recipe != null) {
-      int? primary = primaryday ?? recipe?.primaryDay;
       for(Quantity item in recipe!.cacheHops!) {
         if (item.use == Use.dry_hop.index) {
-          int days = (primary ?? 0) - (item.duration ?? 0);
+          int days = (primaryDay ?? 0) - (item.duration ?? 0);
           values.add(DateHelper.toDate(start_fermentation!.add(Duration(days: days))));
         }
       }
@@ -237,11 +181,25 @@ class BrewModel<T> extends Model {
     return values;
   }
 
+  List<Fermentation>? get fermentations {
+    if (fermentation!.isNotEmpty) {
+      return fermentation;
+    }
+    return recipe?.fermentation;
+  }
+
+  int? get primaryDay {
+    if (fermentations!.isNotEmpty) {
+      return fermentations!.first.duration!;
+    }
+    return null;
+  }
+
   List<DateTime> fermentable() {
     List<DateTime> values = [];
     if (recipe != null) {
       int days = 0;
-      for(Fermentation item in recipe!.fermentation!) {
+      for(Fermentation item in fermentations!) {
         days += item.duration!;
         values.add(DateHelper.toDate(start_fermentation!.add(Duration(days: days))));
       }
@@ -251,7 +209,7 @@ class BrewModel<T> extends Model {
 
   DateTime? finish() {
     int days = 0;
-    for (Fermentation fermentation in recipe!.fermentation!) {
+    for (Fermentation fermentation in fermentations!) {
       days += fermentation.duration!;
     }
     return days > 0 ? DateHelper.toDate(start_fermentation!.add(Duration(days: days))) : null;

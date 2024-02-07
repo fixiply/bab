@@ -15,8 +15,8 @@ abstract class EditDataSource extends DataGridSource {
   BuildContext context;
   bool? showCheckboxColumn;
   bool? showQuantity;
-  bool? allowEditing;
-  EditDataSource(this.context, {this.showCheckboxColumn = false, this.showQuantity = false, this.allowEditing = false});
+  bool? showAction;
+  EditDataSource(this.context, {this.showCheckboxColumn = false, this.showQuantity = false, this.showAction = false});
 
   List<DataGridRow> dataGridRows = [];
 

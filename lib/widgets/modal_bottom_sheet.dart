@@ -40,7 +40,7 @@ class ModalBottomSheet {
             ),
           ),
           body: SizedBox(
-            height: 200,
+            height: 120,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               children: <Widget>[
@@ -208,94 +208,94 @@ class ModalBottomSheet {
         price: product.price
     );
     return showModalBottomSheet(
-        context: context,
-        isScrollControlled:true,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        builder: (BuildContext context) {
-          return StatefulBuilder(
-            builder: (context, setState) {
-              return Container(
-                height: MediaQuery.of(context).size.height * 0.8,
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: <Widget>[
-                    Expanded(
-                      child: TableCalendar(
-                        focusedDay: focusedDay,
-                        firstDay: DateTime.now(),
-                        lastDay: DateTime.now().add(const Duration(days: 90)),
-                        startingDayOfWeek: StartingDayOfWeek.monday,
-                        locale: AppLocalizations.of(context)!.text('locale'),
-                        selectedDayPredicate: (day) {
-                          return isSameDay(selectedDay, day);
-                        },
-                        onDaySelected: (selected, focused) {
-                          if (!isSameDay(selectedDay, selected)) {
-                            setState(() {
-                              selectedDay = selected;
-                              focusedDay = focused;
-                            });
-                          }
-                        },
-                        calendarBuilders: CalendarBuilders(
-                          defaultBuilder: (context, day, _) {
-                            if (product.weekdays != null) {
-                              DateTime? last = product.term != null ?  product.term!.getLast() : null;
-                              for(dynamic weekday in product.weekdays!) {
-                                if (day.weekday == weekday && (last == null || day.isBefore(last))) {
+      context: context,
+      isScrollControlled:true,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Container(
+              height: MediaQuery.of(context).size.height * 0.8,
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: <Widget>[
+                  Expanded(
+                    child: TableCalendar(
+                      focusedDay: focusedDay,
+                      firstDay: DateTime.now(),
+                      lastDay: DateTime.now().add(const Duration(days: 90)),
+                      startingDayOfWeek: StartingDayOfWeek.monday,
+                      locale: AppLocalizations.of(context)!.text('locale'),
+                      selectedDayPredicate: (day) {
+                        return isSameDay(selectedDay, day);
+                      },
+                      onDaySelected: (selected, focused) {
+                        if (!isSameDay(selectedDay, selected)) {
+                          setState(() {
+                            selectedDay = selected;
+                            focusedDay = focused;
+                          });
+                        }
+                      },
+                      calendarBuilders: CalendarBuilders(
+                        defaultBuilder: (context, day, _) {
+                          if (product.weekdays != null) {
+                            DateTime? last = product.term != null ?  product.term!.getLast() : null;
+                            for(dynamic weekday in product.weekdays!) {
+                              if (day.weekday == weekday && (last == null || day.isBefore(last))) {
 
-                                  return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: Colors.green);
-                                }
+                                return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: Colors.green);
                               }
                             }
-                            return null;
-                          },
-                          selectedBuilder: (context, day, focusedDay) {
-                            return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: PrimaryColor);
-                          },
-                          todayBuilder: (context, day, focusedDay) {
-                            return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: TextGrey);
                           }
-                        ),
+                          return null;
+                        },
+                        selectedBuilder: (context, day, focusedDay) {
+                          return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: PrimaryColor);
+                        },
+                        todayBuilder: (context, day, focusedDay) {
+                          return Days.buildCalendarDayMarker(text: day.day.toString(), backColor: TextGrey);
+                        }
                       ),
                     ),
-                    const SizedBox(height: 10),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        TextButton(
-                          child: Text(MaterialLocalizations.of(context).cancelButtonLabel,
-                          style: const TextStyle(color: Colors.red)),
-                          style: TextButton.styleFrom(backgroundColor: Colors.transparent),
-                          onPressed: () async {
-                            Navigator.pop(context);
-                          },
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        child: Text(MaterialLocalizations.of(context).cancelButtonLabel,
+                        style: const TextStyle(color: Colors.red)),
+                        style: TextButton.styleFrom(backgroundColor: Colors.transparent),
+                        onPressed: () async {
+                          Navigator.pop(context);
+                        },
+                      ),
+                      const SizedBox(width: 30),
+                      ElevatedButton(
+                        child: Text(update ? AppLocalizations.of(context)!.text('edit_cart') : AppLocalizations.of(context)!.text('add_to_cart')),
+                        style: TextButton.styleFrom(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18.0),
+                            side: BorderSide(color: Theme.of(context).primaryColor),
+                          )
                         ),
-                        const SizedBox(width: 30),
-                        ElevatedButton(
-                          child: Text(update ? AppLocalizations.of(context)!.text('edit_cart') : AppLocalizations.of(context)!.text('add_to_cart')),
-                          style: TextButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18.0),
-                              side: BorderSide(color: Theme.of(context).primaryColor),
-                            )
-                          ),
-                          onPressed: () async {
-                            newBasket.quantity = quantity;
-                            if (update) Provider.of<BasketNotifier>(context, listen: false).set(newBasket);
-                            else Provider.of<BasketNotifier>(context, listen: false).add(newBasket);
-                            Navigator.pop(context);
-                          },
-                        )
-                      ]
-                    )
-                  ]
-                ),
-              );
-            }
-          );
-        }
+                        onPressed: () async {
+                          newBasket.quantity = quantity;
+                          if (update) Provider.of<BasketNotifier>(context, listen: false).set(newBasket);
+                          else Provider.of<BasketNotifier>(context, listen: false).add(newBasket);
+                          Navigator.pop(context);
+                        },
+                      )
+                    ]
+                  )
+                ]
+              ),
+            );
+          }
+        );
+      }
     );
   }
 }

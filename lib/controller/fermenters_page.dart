@@ -389,7 +389,7 @@ class FermentersPageState extends State<FermentersPage> with AutomaticKeepAliveC
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (EquipmentModel model in _selected) {
           await Database().delete(model, forced: true);
         }

@@ -4,7 +4,9 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/quantity.dart';
-import 'package:flutter/foundation.dart';
+
+// External package
+import 'package:xml/xml.dart';
 
 enum Misc with Enums { spice, fining, water_agent, herb, flavor, other;
   List<Enum> get enums => [ spice, fining, water_agent, herb, flavor, other ];
@@ -14,16 +16,20 @@ enum Use with Enums { boil, mash, primary, secondary, bottling, sparge;
   List<Enum> get enums => [ boil, mash, primary, secondary, bottling, sparge ];
 }
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
+const String XML_ELEMENT_NAME = 'NAME';
+const String XML_ELEMENT_AMOUNT = 'AMOUNT';
+const String XML_ELEMENT_USE = 'USE';
+const String XML_ELEMENT_FORM = 'FORM';
+const String XML_ELEMENT_AMOUNT_IS_WEIGHT = 'AMOUNT_IS_WEIGHT';
 
 class MiscModel<T> extends Model {
   dynamic name;
   Misc? type;
   Use? use;
+  /// Weight in Kilograms or volume in litters.
   double? amount;
   Measurement? measurement;
+  /// The time in minutes.
   int? duration;
   dynamic notes;
 
@@ -52,7 +58,7 @@ class MiscModel<T> extends Model {
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'name': LocalizedText.serialize(this.name),
@@ -109,9 +115,23 @@ class MiscModel<T> extends Model {
     } else  if (columnName == 'use') {
       return Use.values;
     } else if (columnName == 'measurement') {
-      return [ Measurement.gram, Measurement.kilo, Measurement.milliliter, Measurement.liter, Measurement.packages, Measurement.units ];
+      return [ Measurement.gram, Measurement.kilo, Measurement.milliliter, Measurement.liter, Measurement.packages, Measurement.units ].toList();
     }
     return null;
+  }
+
+  bool hasName(String? text, List<String> excludes) {
+    if (text == null) return false;
+    if (name is LocalizedText) {
+      for(String value in name.map!.values) {
+        if (value.containsWord(text, excludes)) {
+          return true;
+        }
+      }
+    } else if ((name as String).containsWord(text, excludes)) {
+      return true;
+    }
+    return false;
   }
 
   static dynamic serialize(dynamic data) {
@@ -144,6 +164,19 @@ class MiscModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static MiscModel fromXML(XmlElement child, {MiscModel? old}) {
+    MiscModel model = old != null ? old.copy() : MiscModel();
+    if (old == null) {
+      model.name = child.getElement(XML_ELEMENT_NAME)!.innerText;
+      model.type = MiscModel.getFormByName(child.getElement(XML_ELEMENT_FORM)!.innerText);
+      XmlElement? weight = child.getElement(XML_ELEMENT_AMOUNT_IS_WEIGHT);
+      model.measurement = weight == null ? Measurement.liter : Measurement.kilo;
+    }
+    model.amount = double.parse(child.getElement(XML_ELEMENT_AMOUNT)!.innerText) * 1000;
+    model.use = MiscModel.getUseByName(child.getElement(XML_ELEMENT_USE)!.innerText);
+    return model;
   }
 
   static Future<List<MiscModel>> data(List<Quantity> data) async {
@@ -179,6 +212,44 @@ class MiscModel<T> extends Model {
         }
         return values;
       }
+    }
+    return null;
+  }
+
+  static Misc? getFormByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Spice':
+        return Misc.spice;
+      case 'Fining':
+        return Misc.fining;
+      case 'Water Agent':
+        return Misc.water_agent;
+      case 'Herb':
+        return Misc.herb;
+      case 'Flavor':
+        return Misc.flavor;
+      case 'Other':
+        return Misc.other;
+    }
+    return null;
+  }
+
+  static Use? getUseByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Boil':
+        return Use.boil;
+      case 'Mash':
+        return Use.mash;
+      case 'Primary':
+        return Use.primary;
+      case 'Secondary':
+        return Use.secondary;
+      case 'Bottling':
+        return Use.bottling;
+      case 'Sparge':
+        return Use.sparge;
     }
     return null;
   }

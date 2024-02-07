@@ -88,6 +88,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
+                showAction: true,
                 recipe: widget.recipe,
                 onChanged: (List<FermentableModel>? values) {
                   didChange(values);
@@ -109,6 +110,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
+                showAction: true,
                 recipe: widget.recipe,
                 onChanged: (List<MiscModel>? values) {
                   didChange(values);
@@ -130,6 +132,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
+                showAction: true,
                 recipe: widget.recipe,
                 onChanged: (List<YeastModel>? values) {
                   didChange(values);
@@ -151,6 +154,7 @@ class _IngredientsFieldState extends FormFieldState<List<Model>> {
                 allowEditing: true,
                 allowAdding: true,
                 showCheckboxColumn: false,
+                showAction: true,
                 recipe: widget.recipe,
                 onChanged: (List<HopModel>? values) {
                   didChange(values);

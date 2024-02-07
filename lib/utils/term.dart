@@ -15,7 +15,7 @@ class Term<T> {
     this.each = map['each'];
   }
 
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'period': this.period!.index,
       'each': this.each,

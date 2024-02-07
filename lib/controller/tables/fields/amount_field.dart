@@ -1,14 +1,16 @@
+import 'package:bab/utils/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package+
+import 'package:bab/utils/amount.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:intl/intl.dart';
 
 
 class AmountField extends FormField<Amount> {
-  final List<constants.Enums>? enums;
+  final List<constants.Measurement>? enums;
   final void Function(Amount? value)? onChanged;
 
   AmountField({Key? key, required Amount value, this.enums, this.onChanged}) : super(
@@ -21,37 +23,6 @@ class AmountField extends FormField<Amount> {
 
   @override
   _AmountFieldState createState() => _AmountFieldState();
-}
-
-class Amount {
-  double? amount;
-  Enum? measurement;
-  Amount(
-    this.amount,
-    this.measurement
-  );
-
-  // ignore: hash_and_equals
-  @override
-  bool operator ==(other) {
-    return (other is Amount && other.amount == amount && other.measurement == measurement);
-  }
-
-  @override
-  int get hashCode => amount.hashCode;
-
-
-  @override
-  String toString() {
-    return 'class: $amount $measurement';
-  }
-
-  Amount copy() {
-    return Amount(
-      amount,
-      measurement
-    );
-  }
 }
 
 class _AmountFieldState extends FormFieldState<Amount> {
@@ -76,7 +47,7 @@ class _AmountFieldState extends FormFieldState<Amount> {
           Flexible(
             child: TextField(
               autofocus: true,
-              controller: _textController..text = value!.amount?.toString() ?? '',
+              controller: _textController..text = getValue(),
               textAlign: TextAlign.right,
               decoration: const InputDecoration(
                   contentPadding: EdgeInsets.fromLTRB(0, 0, 0, 16.0)
@@ -103,17 +74,17 @@ class _AmountFieldState extends FormFieldState<Amount> {
           ),
           if (widget.enums != null && widget.enums!.isNotEmpty) const SizedBox(width: 2),
           if (widget.enums != null && widget.enums!.isNotEmpty) Flexible(
-            child: DropdownButton<Enum>(
+            child: DropdownButton<Measurement>(
               value: widget.enums!.contains(value!.measurement) ? value!.measurement : null,
               isDense: true,
               isExpanded: true,
               style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
-              onChanged: (Enum? e) async {
+              onChanged: (Measurement? e) async {
                 value!.measurement = e;
                 didChange(value);
               },
-              items: widget.enums!.map<DropdownMenuItem<Enum>>((Enum e) {
-                return DropdownMenuItem<Enum>(
+              items: widget.enums!.map<DropdownMenuItem<Measurement>>((Measurement e) {
+                return DropdownMenuItem<Measurement>(
                   value: e,
                   child: LayoutBuilder(
                     builder: (BuildContext ctx, BoxConstraints constraints) {
@@ -131,5 +102,18 @@ class _AmountFieldState extends FormFieldState<Amount> {
         ],
       )
     );
+  }
+
+  String getValue() {
+    if (value!.amount != null)  {
+      if (Measurement.gram == value!.measurement || Measurement.kilo == value!.measurement) {
+        return AppLocalizations.of(context)!.weight(value!.amount, measurement: value!.measurement).toString();
+      } else  if (Measurement.milliliter == value!.measurement || Measurement.liter == value!.measurement) {
+        return AppLocalizations.of(context)!.volume(value!.amount, measurement: value!.measurement).toString();
+      } else {
+        return value!.amount.toString();
+      }
+    }
+    return '';
   }
 }

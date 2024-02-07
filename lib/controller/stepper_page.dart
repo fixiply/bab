@@ -268,7 +268,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: snapshot.data!.map((e) {
-                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.kiloWeightFormat(e.amount)} «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
+                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount)} «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
                   }).toList()
                 );
               }

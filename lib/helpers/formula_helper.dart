@@ -311,6 +311,17 @@ class FormulaHelper {
     return number / 28.35;
   }
 
+  /// Returns the kilo to livre conversion
+  ///
+  /// The `number` argument is relative to the weight in kilo.
+  static double convertKiloToLivre(num? number) {
+    if (number == null) {
+      return 0;
+    }
+    return number * 2.205;
+  }
+
+
   /// Returns the ounce to gram conversion
   ///
   /// The `number` argument is relative to the weight in ounce.

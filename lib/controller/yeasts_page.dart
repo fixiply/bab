@@ -30,7 +30,7 @@ class YeastsPage extends StatefulWidget {
   bool loadMore;
   RecipeModel? recipe;
   SelectionMode selectionMode;
-  YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
+  YeastsPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode = SelectionMode.multiple}) : super(key: key);
 
   @override
   YeastsPageState createState() => YeastsPageState();
@@ -45,6 +45,7 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
   Future<List<YeastModel>>? _data;
   List<YeastModel> _selected = [];
   bool _showList = false;
+  bool _myData = false;
 
   List<YeastModel> get selected => _selected;
 
@@ -58,7 +59,7 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
     _dataSource = YeastDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
-      allowEditing: widget.allowEditing,
+      showAction: false,
       onChanged: (YeastModel value, int dataRowIndex) {
         Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -89,32 +90,32 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
           children: [
             Flexible(
               child: IconButton(
-                  icon: const Icon(Icons.check),
-                  tooltip: AppLocalizations.of(context)!.text('validate'),
-                  onPressed: selected.isNotEmpty ? () async {
-                    Navigator.pop(context, selected);
-                  } : null
+                icon: const Icon(Icons.check),
+                tooltip: AppLocalizations.of(context)!.text('validate'),
+                onPressed: selected.isNotEmpty ? () async {
+                  Navigator.pop(context, selected);
+                } : null
               ),
             ),
             Flexible(
-                child: IconButton(
-                    icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-                    tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
-                    onPressed:() async {
-                      Navigator.pop(context, []);
-                    }
-                )
+              child: IconButton(
+                icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+                tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                onPressed:() async {
+                  Navigator.pop(context, []);
+                }
+              )
             )
           ]
         ) : null,
         actions: [
           if (_showList && widget.allowEditing) IconButton(
-              padding: EdgeInsets.zero,
-              icon: const Icon(Icons.delete_outline),
-              tooltip: AppLocalizations.of(context)!.text('delete'),
-              onPressed: () {
-                _deleteAll();
-              }
+            padding: EdgeInsets.zero,
+            icon: const Icon(Icons.delete_outline),
+            tooltip: AppLocalizations.of(context)!.text('delete'),
+            onPressed: () {
+              _deleteAll();
+            }
           ),
           if (currentUser != null && currentUser!.isAdmin() && widget.allowEditing) IconButton(
             padding: EdgeInsets.zero,
@@ -125,6 +126,15 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
                 fetch();
               });
             }
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
+            icon: Icon(_myData ? Icons.verified_user_outlined : Icons.shield_outlined),
+            tooltip: AppLocalizations.of(context)!.text(_myData ? 'all_data' : 'my_data'),
+            onPressed: () {
+              setState(() { _myData = !_myData; });
+              fetch();
+            },
           ),
           IconButton(
             padding: EdgeInsets.zero,
@@ -156,7 +166,7 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
                 return EditSfDataGrid(
                   context,
                   allowEditing: widget.allowEditing,
-                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  showCheckboxColumn: widget.showCheckboxColumn || _myData,
                   selectionMode: widget.selectionMode,
                   source: _dataSource,
                   controller: getDataGridController(),
@@ -219,6 +229,8 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
       case SelectionMode.singleDeselect :
         _dataGridController.selectedRow = rows.isNotEmpty ? rows.first : null;
         break;
+      case SelectionMode.none:
+        // TODO: Handle this case.
     }
     return _dataGridController;
   }
@@ -250,7 +262,7 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
             style: DefaultTextStyle.of(context).style,
             children: <TextSpan>[
               TextSpan(text: AppLocalizations.of(context)!.localizedText(model.name),  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              if (model.reference != null) TextSpan(text: '  ${model.reference}'),
+              if (model.product != null) TextSpan(text: '  ${model.product}'),
             ],
           ),
         ),
@@ -319,7 +331,7 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
 
   fetch() async {
     setState(() {
-      _data = Database().getYeasts(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getYeasts(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true, myData: _myData);
     });
   }
 
@@ -353,7 +365,7 @@ class YeastsPageState extends State<YeastsPage> with AutomaticKeepAliveClientMix
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (YeastModel model in _selected) {
           await Database().delete(model, forced: true);
         }

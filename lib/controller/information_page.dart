@@ -166,7 +166,7 @@ class _InformationPageState extends State<InformationPage> {
                   if (!changeEmail) InkWell(
                     hoverColor: Colors.white,
                     child: Text(AppLocalizations.of(context)!.text('change_mail'), style: TextStyle(color: Theme.of(context).primaryColor)),
-                    onTap: EmailValidator.validate(_emailController.text ?? '') ? () async {
+                    onTap: EmailValidator.validate(_emailController.text) ? () async {
                       setState(() {
                         changeEmail = true;
                       });

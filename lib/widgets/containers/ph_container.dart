@@ -15,7 +15,7 @@ class PHContainer extends StatefulWidget {
   double? target;
   double? volume;
 
-  PHContainer({this.showTitle : true, this.showVolume : false, this.target, this.volume});
+  PHContainer({this.showTitle = true, this.showVolume = false, this.target, this.volume});
 
   @override
   State<StatefulWidget> createState() {

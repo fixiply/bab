@@ -11,15 +11,13 @@ enum Equipment with Enums { tank, fermenter;
   List<Enum> get enums => [ tank, fermenter ];
 }
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
-
 class EquipmentModel<T> extends Model {
   String? reference;
   String? name;
   Equipment? type;
+  /// The pre-boil volume in liters.
   double? volume;
+  /// The finale volume in liters.
   double? mash_volume;
   double? efficiency;
   double? absorption;
@@ -28,6 +26,7 @@ class EquipmentModel<T> extends Model {
   double? boil_loss;
   double? shrinkage;
   double? head_loss;
+  bool? bluetooth = false;
   dynamic notes;
   ImageModel? image;
   bool selected = false;
@@ -51,6 +50,7 @@ class EquipmentModel<T> extends Model {
     this.boil_loss = DEFAULT_BOIL_LOSS,
     this.shrinkage = DEFAULT_WORT_SHRINKAGE,
     this.head_loss,
+    this.bluetooth,
     this.notes,
     this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -70,12 +70,13 @@ class EquipmentModel<T> extends Model {
     if (map['boil_loss'] != null) this.boil_loss = map['boil_loss'].toDouble();
     if (map['shrinkage'] != null) this.shrinkage = map['shrinkage'].toDouble();
     if (map['head_loss'] != null) this.head_loss = map['head_loss'].toDouble();
+    if (map['bluetooth'] != null) this.bluetooth = map['bluetooth'];
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'reference': this.reference,

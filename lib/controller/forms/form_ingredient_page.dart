@@ -59,60 +59,6 @@ class _FormIngredientPageState extends State<FormIngredientPage> {
             }
           }
         ),
-        actions: <Widget> [
-          IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('save'),
-            icon: const Icon(Icons.save),
-            onPressed: _modified == true ? () {
-              if (_formKey.currentState!.validate()) {
-                Database().update(widget.model, context: context, updateLogs: !currentUser!.isAdmin()).then((value) async {
-                  Navigator.pop(context, widget.model);
-                }).onError((e,s) {
-                  _showSnackbar(e.toString());
-                });
-              }
-            } : null
-          ),
-          if (widget.model.uuid != null) IconButton(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('remove'),
-            icon: const Icon(Icons.delete),
-            onPressed: () async {
-              if (await DeleteDialog.model(context, widget.model)) {
-                Navigator.pop(context);
-              }
-            }
-          ),
-          if (widget.model.uuid != null) PopupMenuButton<String>(
-            padding: EdgeInsets.zero,
-            tooltip: AppLocalizations.of(context)!.text('tools'),
-            icon: const Icon(Icons.more_vert),
-            onSelected: (value) async {
-              if (value == 'information') {
-                await ModalBottomSheet.showInformation(context, widget.model);
-              } else if (value == 'duplicate') {
-                FermentableModel model = widget.model.copy();
-                model.uuid = null;
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return FormIngredientPage(model);
-                })).then((value) {
-                  Navigator.pop(context);
-                });
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              PopupMenuItem(
-                value: 'information',
-                child: Text(AppLocalizations.of(context)!.text('information')),
-              ),
-              PopupMenuItem(
-                value: 'duplicate',
-                child: Text(AppLocalizations.of(context)!.text('duplicate')),
-              )
-            ]
-          )
-        ]
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(15.0),

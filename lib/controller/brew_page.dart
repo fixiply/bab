@@ -306,10 +306,10 @@ class _BrewPageState extends State<BrewPage> {
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
             ),
-            if (widget.model.recipe!.fermentation != null && widget.model.recipe!.fermentation!.isNotEmpty) Padding(
+            if (widget.model.fermentations!.isNotEmpty) Padding(
               padding: const EdgeInsets.all(8.0),
               child: FermentationDataTable(
-                data: widget.model.recipe!.fermentation,
+                data: widget.model.fermentations,
                 title: Text(AppLocalizations.of(context)!.text('fermentation'), style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 16.0)),
                 allowEditing: false, allowSorting: false, showCheckboxColumn: false
               )
@@ -348,7 +348,7 @@ class _BrewPageState extends State<BrewPage> {
                       fitContent: true,
                       shrinkWrap: true,
                       softLineBreak: true,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),
+                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
                   ),
                 )

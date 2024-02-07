@@ -32,6 +32,7 @@ class FermentablesDataTable extends StatefulWidget {
   bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   rm.RecipeModel? recipe;
   final void Function(List<FermentableModel>? value)? onChanged;
@@ -46,6 +47,7 @@ class FermentablesDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.multiple,
     this.recipe,
     this.onChanged}) : super(key: key);
@@ -73,7 +75,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
     _dataSource = FermentableDataSource(context,
       showQuantity: widget.data != null,
       showCheckboxColumn: widget.showCheckboxColumn!,
-      allowEditing: widget.allowEditing,
+      showAction: widget.allowEditing,
       onEdit: (int rowIndex) {
         _edit(rowIndex);
       },
@@ -180,7 +182,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
           });
         }
       },
-      columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+      columns: FermentableDataSource.columns(context: context, showQuantity: widget.data != null, showAction: widget.showAction!),
       tableSummaryRows: FermentableDataSource.summaries(context: context, showQuantity: widget.data != null),
     );
   }
@@ -262,7 +264,7 @@ class FermentableDataSource extends EditDataSource {
   final void Function(int rowIndex)? onRemove;
   final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  FermentableDataSource(BuildContext context, {List<FermentableModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? showAction, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -281,7 +283,7 @@ class FermentableDataSource extends EditDataSource {
       if (showQuantity == true) DataGridCell<Method>(columnName: 'method', value: e.use),
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
       DataGridCell<int>(columnName: 'color', value: e.ebc),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -306,7 +308,7 @@ class FermentableDataSource extends EditDataSource {
   dynamic getValue(DataGridRow dataGridRow, String columnName) {
     var value = super.getValue(dataGridRow, columnName);
     if (value != null && columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value * 1000, measurement: Measurement.kilo);
+      double? weight = AppLocalizations.of(context)!.weight(value);
       return weight!.toPrecision(2);
     }
     return value;
@@ -342,7 +344,7 @@ class FermentableDataSource extends EditDataSource {
           alignment = Alignment.centerLeft;
         } else if (e.value is num) {
           if (e.columnName == 'amount') {
-            value = AppLocalizations.of(context)!.kiloWeightFormat(e.value);
+            value = AppLocalizations.of(context)!.weightFormat(e.value);
           } else if (e.columnName == 'efficiency') {
             value = AppLocalizations.of(context)!.percentFormat(e.value);
           } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
@@ -422,7 +424,7 @@ class FermentableDataSource extends EditDataSource {
         color: Theme.of(context).primaryColor.withOpacity(0.1),
         padding: const EdgeInsets.all(8.0),
         alignment: Alignment.centerRight,
-        child: Text(AppLocalizations.of(context)!.kiloWeightFormat(double.parse(summaryValue)) ?? '0',
+        child: Text(AppLocalizations.of(context)!.weightFormat(double.parse(summaryValue)) ?? '0',
           overflow: TextOverflow.ellipsis,
           style: const TextStyle(fontWeight: FontWeight.w500)
         ),
@@ -441,7 +443,7 @@ class FermentableDataSource extends EditDataSource {
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        double? value = AppLocalizations.of(context)!.gram(newCellValue, measurement: Measurement.kilo);
+        double? value = AppLocalizations.of(context)!.weight(newCellValue);
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: value);
         _data[rowColumnIndex.rowIndex].amount = value;
@@ -489,7 +491,7 @@ class FermentableDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool showAction = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -562,7 +564,7 @@ class FermentableDataSource extends EditDataSource {
             child: Text(AppLocalizations.of(context)!.colorUnit, style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
         width: 50,
         columnName: 'actions',
         allowSorting: false,

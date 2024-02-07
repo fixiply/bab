@@ -4,11 +4,12 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
-import 'package:bab/controller/tables/fields/amount_field.dart' as amount;
+import 'package:bab/controller/tables/fields/amount_field.dart';
 import 'package:bab/controller/yeasts_page.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
+import 'package:bab/utils/amount.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -32,6 +33,7 @@ class YeastsDataTable extends StatefulWidget {
   bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   RecipeModel? recipe;
   final void Function(List<YeastModel> value)? onChanged;
@@ -46,6 +48,7 @@ class YeastsDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.singleDeselect,
     this.recipe,
     this.onChanged}) : super(key: key);
@@ -73,7 +76,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
     _dataSource = YeastDataSource(context,
         showQuantity: widget.data != null,
         showCheckboxColumn: widget.showCheckboxColumn!,
-        allowEditing: widget.allowEditing,
+        showAction: widget.showAction,
         onEdit: (int rowIndex) {
           _edit(rowIndex);
         },
@@ -197,7 +200,7 @@ class YeastsDataTableState extends State<YeastsDataTable> with AutomaticKeepAliv
           });
         }
       },
-      columns: YeastDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+      columns: YeastDataSource.columns(context: context, showQuantity: widget.data != null, showAction: widget.showAction!),
     );
   }
 
@@ -299,7 +302,7 @@ class YeastDataSource extends EditDataSource {
   final void Function(int rowIndex)? onRemove;
   final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  YeastDataSource(BuildContext context, {List<YeastModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? showAction, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -311,16 +314,16 @@ class YeastDataSource extends EditDataSource {
     List<YeastModel>? list = data ?? _data;
     return list.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<String>(columnName: 'uuid', value: e.uuid),
-      if (showQuantity == true) DataGridCell<amount.Amount>(columnName: 'amount', value: amount.Amount(e.amount, e.measurement)),
+      if (showQuantity == true) DataGridCell<Amount>(columnName: 'amount', value: Amount(e.amount, e.measurement)),
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
-      DataGridCell<dynamic>(columnName: 'reference', value: e.reference),
+      DataGridCell<dynamic>(columnName: 'reference', value: e.product),
       DataGridCell<dynamic>(columnName: 'laboratory', value: e.laboratory),
       DataGridCell<Style>(columnName: 'type', value: e.type),
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
       if (showQuantity == false) DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
       if (showQuantity == false) DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       if (showQuantity == false) DataGridCell<double>(columnName: 'cells', value: e.cells),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -334,9 +337,9 @@ class YeastDataSource extends EditDataSource {
     if (column.columnName == 'amount') {
       var value = getValue(dataGridRow, column.columnName);
       newCellValue = value;
-      return amount.AmountField(
+      return AmountField(
         value: value.copy(),
-        enums: isEnumType('measurement'),
+        enums: isEnumType('measurement') as List<Measurement>,
         onChanged: (measurement) {
           newCellValue = measurement;
           /// Call [CellSubmit] callback to fire the canSubmitCell and
@@ -361,16 +364,6 @@ class YeastDataSource extends EditDataSource {
   }
 
   @override
-  // dynamic getValue(DataGridRow dataGridRow, String columnName) {
-  //   var value = super.getValue(dataGridRow, columnName);
-  //   if (value != null && columnName == 'amount') {
-  //     double? weight = AppLocalizations.of(context)!.weight(value);
-  //     return weight!.toPrecision(2);
-  //   }
-  //   return value;
-  // }
-
-  @override
   bool isNumericType(String columnName) {
     return YeastModel().isNumericType(columnName);
   }
@@ -389,7 +382,7 @@ class YeastDataSource extends EditDataSource {
         if (e.value is LocalizedText) {
           value = e.value?.get(AppLocalizations.of(context)!.locale);
           alignment = Alignment.centerLeft;
-        } else if (e.value is amount.Amount) {
+        } else if (e.value is Amount) {
           if (Measurement.gram == e.value.measurement) {
             value = AppLocalizations.of(context)!.weightFormat(e.value.amount);
           } else  if (Measurement.milliliter == e.value.measurement) {
@@ -481,7 +474,7 @@ class YeastDataSource extends EditDataSource {
         double? value;
         switch(newCellValue.measurement) {
           case Measurement.gram:
-            value = AppLocalizations.of(context)!.gram(newCellValue.amount);
+            value = AppLocalizations.of(context)!.gramToKilo(newCellValue.amount);
             break;
           case Measurement.milliliter:
             value = AppLocalizations.of(context)!.volume(newCellValue.amount);
@@ -490,7 +483,7 @@ class YeastDataSource extends EditDataSource {
             value = newCellValue.amount;
         }
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
-            DataGridCell<amount.Amount>(columnName: column.columnName, value: amount.Amount(value, newCellValue.measurement));
+            DataGridCell<Amount>(columnName: column.columnName, value: Amount(value, newCellValue.measurement));
         data[rowColumnIndex.rowIndex].amount = value;
         data[rowColumnIndex.rowIndex].measurement = newCellValue.measurement;
         break;
@@ -505,7 +498,7 @@ class YeastDataSource extends EditDataSource {
       case 'reference':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<String>(columnName: column.columnName, value: newCellValue);
-        data[rowColumnIndex.rowIndex].reference = newCellValue;
+        data[rowColumnIndex.rowIndex].product = newCellValue;
         break;
       case 'laboratory':
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
@@ -532,7 +525,7 @@ class YeastDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool showAction = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -623,7 +616,7 @@ class YeastDataSource extends EditDataSource {
             child: Text('\u023B', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
         width: 50,
         columnName: 'actions',
         allowSorting: false,

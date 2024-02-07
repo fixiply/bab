@@ -89,7 +89,9 @@ class _FormYeastPageState extends State<FormYeastPage> {
               }
             }
           ),
-          CustomMenuAnchor()
+          CustomMenuAnchor(
+            model: widget.model,
+          )
         ]
       ),
       body: SingleChildScrollView(
@@ -127,8 +129,8 @@ class _FormYeastPageState extends State<FormYeastPage> {
                   children: [
                     Expanded(
                       child: TextFormField(
-                        initialValue: widget.model.reference ?? '',
-                        onChanged: (value) => widget.model.reference = value,
+                        initialValue: widget.model.product ?? '',
+                        onChanged: (value) => widget.model.product = value,
                         decoration: FormDecoration(
                           icon: const Icon(Icons.tag),
                           labelText: AppLocalizations.of(context)!.text('reference'),

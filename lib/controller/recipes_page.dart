@@ -5,6 +5,7 @@ import 'package:bab/controller/forms/form_recipe_page.dart';
 import 'package:bab/controller/recipe_page.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/helpers/import_helper.dart';
 import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/style_model.dart';
 import 'package:bab/utils/abv.dart';
@@ -80,7 +81,16 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
               _fetch();
             },
           ),
-          CustomMenuAnchor()
+          CustomMenuAnchor(
+            importLabel: currentUser != null ? '${AppLocalizations.of(context)!.text('import_file')} BeerXML' : null,
+            onSelected: (value) async {
+              if (value == Menu.imported && currentUser != null) {
+                ImportHelper.fromBeerXML(context, () {
+                  _fetch();
+                });
+              }
+            },
+          )
         ]
       ),
       drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
@@ -96,7 +106,7 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
                     ibu: _ibu,
                     abv: _abv,
                     cu: _cu,
-                    my_receips: _my_receips,
+                    my_data: _my_receips,
                     // selectedFermentations: _selectedFermentations,
                     categories: _categories,
                     selectedCategories: _selectedCategories,
@@ -263,7 +273,13 @@ class _RecipesPageState extends State<RecipesPage> with AutomaticKeepAliveClient
                 ],
               ),
             ),
-            if (model.text != null ) _text(AppLocalizations.of(context)!.localizedText(model.text))
+            if (model.notes != null ) ExpandableText(
+              model.notes,
+              linkColor: Theme.of(context).primaryColor,
+              expandText: AppLocalizations.of(context)!.text('show_more').toLowerCase(),
+              collapseText: AppLocalizations.of(context)!.text('show_less').toLowerCase(),
+              maxLines: DeviceHelper.isDesktop ? 5 : 3,
+            )
           ],
         ),
         trailing: model.isEditable() && DeviceHelper.isDesktop ? PopupMenuButton<String>(

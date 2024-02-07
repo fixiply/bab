@@ -30,7 +30,7 @@ class MiscPage extends StatefulWidget {
   bool loadMore;
   RecipeModel? recipe;
   SelectionMode selectionMode;
-  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode : SelectionMode.multiple}) : super(key: key);
+  MiscPage({Key? key, this.allowEditing = false, this.showCheckboxColumn = false, this.showQuantity = false, this.loadMore = false, this.recipe, this.selectionMode = SelectionMode.multiple}) : super(key: key);
 
   @override
   MiscPageState createState() => MiscPageState();
@@ -45,6 +45,7 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
   Future<List<MiscModel>>? _data;
   List<MiscModel> _selected = [];
   bool _showList = false;
+  bool _myData = false;
 
   List<MiscModel> get selected => _selected;
 
@@ -58,7 +59,7 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
     _dataSource = MiscDataSource(context,
       showQuantity: widget.showQuantity,
       showCheckboxColumn: widget.showCheckboxColumn,
-      allowEditing: widget.allowEditing,
+      showAction: false,
       onChanged: (MiscModel value, int dataRowIndex) {
         Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
           _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
@@ -128,6 +129,15 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
           ),
           IconButton(
             padding: EdgeInsets.zero,
+            icon: Icon(_myData ? Icons.verified_user_outlined : Icons.shield_outlined),
+            tooltip: AppLocalizations.of(context)!.text(_myData ? 'all_data' : 'my_data'),
+            onPressed: () {
+              setState(() { _myData = !_myData; });
+              fetch();
+            },
+          ),
+          IconButton(
+            padding: EdgeInsets.zero,
             icon: _showList ? const Icon(Icons.grid_view_outlined) : const Icon(Icons.format_list_bulleted_outlined),
             tooltip: AppLocalizations.of(context)!.text(_showList ? 'grid_view' : 'view_list'),
             onPressed: () {
@@ -156,7 +166,7 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
                 return EditSfDataGrid(
                   context,
                   allowEditing: widget.allowEditing,
-                  showCheckboxColumn: widget.allowEditing || widget.showCheckboxColumn,
+                  showCheckboxColumn: widget.showCheckboxColumn || _myData,
                   selectionMode: widget.selectionMode,
                   source: _dataSource,
                   controller: getDataGridController(),
@@ -219,6 +229,8 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
       case SelectionMode.singleDeselect :
         _dataGridController.selectedRow = rows.isNotEmpty ? rows.first : null;
         break;
+      case SelectionMode.none:
+        // TODO: Handle this case.
     }
     return _dataGridController;
   }
@@ -287,7 +299,7 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
 
   fetch() async {
     setState(() {
-      _data = Database().getMiscellaneous(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true);
+      _data = Database().getMiscellaneous(user: currentUser?.uuid, searchText: _searchQueryController.value.text, ordered: true, myData: _myData);
     });
   }
 
@@ -321,7 +333,7 @@ class MiscPageState extends State<MiscPage> with AutomaticKeepAliveClientMixin<M
     );
     if (confirm) {
       try {
-        EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+        EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
         for (MiscModel model in _selected) {
           await Database().delete(model, forced: true);
         }

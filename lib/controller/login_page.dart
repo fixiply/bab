@@ -176,7 +176,7 @@ class _LoginPageState extends State<LoginPage> {
                   InkWell(
                     hoverColor: Colors.white,
                     child: Text(AppLocalizations.of(context)!.text('forgot_password'), style: TextStyle(color: Theme.of(context).primaryColor)),
-                    onTap: EmailValidator.validate(_emailController.text ?? '') ? () async {
+                    onTap: EmailValidator.validate(_emailController.text) ? () async {
                       FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
                       _showSnackbar(AppLocalizations.of(context)!.text('password_reset'));
                     } : null,
@@ -260,6 +260,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   _signInWithEmailAndPassword() async {
+    if (!mounted) return;
     try {
       if (foundation.kIsWeb && !_rememberMe) {
         await FirebaseAuth.instance.setPersistence(Persistence.SESSION);

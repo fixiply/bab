@@ -20,6 +20,10 @@ enum Type with Enums { infusion, temperature, decoction;
   List<Enum> get enums => [ infusion, temperature, decoction ];
 }
 
+const String XML_ELEMENT_NAME = 'NAME';
+const String XML_ELEMENT_STEP_TIME = 'STEP_TIME';
+const String XML_ELEMENT_STEP_TEMP = 'STEP_TEMP';
+
 class Mash<T> {
   dynamic name;
   Type? type;
@@ -96,7 +100,7 @@ class Mash<T> {
     return values;
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showAction = false}) {
     return <GridColumn>[
       GridColumn(
         columnName: 'name',
@@ -133,7 +137,7 @@ class Mash<T> {
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
           width: 50,
           columnName: 'actions',
           allowSorting: false,
@@ -149,7 +153,7 @@ class MashDataSource extends EditDataSource {
   final void Function(Mash value, int dataRowIndex)? onChanged;
   final void Function(int rowIndex)? onRemove;
   /// Creates the employee data source class with required details.
-  MashDataSource(BuildContext context, {List<Mash>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  MashDataSource(BuildContext context, {List<Mash>? data, bool? showQuantity, bool? showCheckboxColumn, bool? showAction, this.onChanged, this.onRemove}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -161,7 +165,7 @@ class MashDataSource extends EditDataSource {
       DataGridCell<Type>(columnName: 'type', value: e.type),
       DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       DataGridCell<int>(columnName: 'duration', value: e.duration),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 

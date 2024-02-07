@@ -6,6 +6,9 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/quantity.dart';
 
+// External package
+import 'package:xml/xml.dart';
+
 enum Hop with Enums { leaf, pellet, plug, other;
   List<Enum> get enums => [ leaf, pellet, plug, other ];
 }
@@ -17,20 +20,26 @@ enum Use with Enums { mash, first_wort, boil, aroma, dry_hop;
   List<Enum> get enums => [ mash, first_wort, boil, aroma, dry_hop ];
 }
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
+const String XML_ELEMENT_NAME = 'NAME';
+const String XML_ELEMENT_TIME = 'TIME';
+const String XML_ELEMENT_AMOUNT = 'AMOUNT';
+const String XML_ELEMENT_USE = 'USE';
+const String XML_ELEMENT_FORM = 'FORM';
+const String XML_ELEMENT_ALPHA = 'ALPHA';
+const String XML_ELEMENT_BETA = 'BETA';
 
 class HopModel<T> extends Model {
   dynamic name;
   String? origin;
   double? alpha;
   double? beta;
+  /// Weight in Kilograms.
   double? amount;
   Hop? form;
   Type? type;
   Use? use;
   Measurement? measurement;
+  /// The time in minutes.
   int? duration;
   dynamic notes;
 
@@ -67,7 +76,7 @@ class HopModel<T> extends Model {
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'name': LocalizedText.serialize(this.name),
@@ -127,7 +136,7 @@ class HopModel<T> extends Model {
   ///
   /// The `volume` argument is relative to the final volume.
   double? ibu(double? og, int? duration, double? volume, {double? maximum})  {
-    return FormulaHelper.ibu(this.amount, this.alpha, og, this.duration, volume, maximum: maximum);
+    return FormulaHelper.ibu((this.amount! * 1000), this.alpha, og, this.duration, volume, maximum: maximum);
   }
 
   @override
@@ -150,6 +159,20 @@ class HopModel<T> extends Model {
       return Use.values;
     }
     return null;
+  }
+
+  bool hasName(String? text, List<String> excludes) {
+    if (text == null) return false;
+    if (name is LocalizedText) {
+      for(String value in name.map!.values) {
+        if (value.containsWord(text, excludes)) {
+          return true;
+        }
+      }
+    } else if ((name as String).containsWord(text, excludes)) {
+      return true;
+    }
+    return false;
   }
 
   static dynamic serialize(dynamic data) {
@@ -182,6 +205,24 @@ class HopModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static HopModel fromXML(XmlElement child, {HopModel? old}) {
+    HopModel model = old != null ? old.copy() : HopModel();
+    if (old == null) {
+      model.name = child.getElement(XML_ELEMENT_NAME)!.innerText;
+      model.form = HopModel.getFormByName(child.getElement(XML_ELEMENT_FORM)!.innerText);
+      model.alpha = double.parse(child.getElement(XML_ELEMENT_ALPHA)!.innerText);
+      final beta = child.getElement(XML_ELEMENT_BETA);
+      if (beta != null) {
+        model.beta = double.parse(beta.innerText);
+      }
+    }
+    model.duration = int.parse(child.getElement(XML_ELEMENT_TIME)!.innerText);
+    model.amount = double.parse(child.getElement(XML_ELEMENT_AMOUNT)!.innerText);
+    model.measurement = Measurement.kilo;
+    model.use = HopModel.getUseByName(child.getElement(XML_ELEMENT_USE)!.innerText);
+    return model;
   }
 
   static Future<List<HopModel>> data(List<Quantity> data) async {
@@ -217,6 +258,38 @@ class HopModel<T> extends Model {
         }
         return values;
       }
+    }
+    return null;
+  }
+
+  static Hop? getFormByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Leaf':
+        return Hop.leaf;
+      case 'Pellet':
+        return Hop.pellet;
+      case 'Plug':
+        return Hop.plug;
+      case 'Other':
+        return Hop.other;
+    }
+    return null;
+  }
+
+  static Use? getUseByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Mash':
+        return Use.mash;
+      case 'First Wort':
+        return Use.first_wort;
+      case 'Boil':
+        return Use.boil;
+      case 'Aroma':
+        return Use.aroma;
+      case 'Dry Hop':
+        return Use.dry_hop;
     }
     return null;
   }

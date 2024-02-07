@@ -12,7 +12,6 @@ import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
-import 'package:bab/utils/quantity.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:bab/widgets/search_text.dart';
@@ -32,6 +31,7 @@ class EquipmentDataTable extends StatefulWidget {
   bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   Equipment? equipment;
   EquipmentDataTable({Key? key,
@@ -43,6 +43,7 @@ class EquipmentDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.multiple,
     required this.equipment}) : super(key: key);
 
@@ -143,7 +144,7 @@ class _EquipmentDataTableState extends State<EquipmentDataTable> with AutomaticK
                           });
                         }
                       },
-                      columns: TankDataSource.columns(context: context, allowEditing: widget.allowEditing),
+                      columns: TankDataSource.columns(context: context, showAction: widget.showAction!),
                     );
                   }
                   if (snapshot.hasError) {
@@ -223,7 +224,7 @@ class TankDataSource extends EditDataSource {
   final void Function(int rowIndex)? onRemove;
   final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  TankDataSource(BuildContext context, {List<EquipmentModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? showAction, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -241,7 +242,7 @@ class TankDataSource extends EditDataSource {
       DataGridCell<double>(columnName: 'efficiency', value: e.efficiency),
       DataGridCell<double>(columnName: 'absorption', value: e.absorption),
       DataGridCell<double>(columnName: 'lost_volume', value: e.lost_volume),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -260,24 +261,6 @@ class TankDataSource extends EditDataSource {
   void _addMoreRows(int count) {
     List<EquipmentModel>? list = data.skip(dataGridRows.length).toList().take(count).toList();
     dataGridRows.addAll(getDataRows(data: list));
-  }
-
-  @override
-  dynamic getValue(DataGridRow dataGridRow, String columnName) {
-    var value = super.getValue(dataGridRow, columnName);
-    if (value != null && columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value * 1000, measurement: Measurement.kilo);
-      return weight!.toPrecision(2);
-    }
-    return value;
-  }
-
-  @override
-  String? suffixText(String columnName) {
-    if (columnName == 'amount') {
-      return AppLocalizations.of(context)!.weightSuffix(measurement: Measurement.kilo);
-    }
-    return null;
   }
 
   @override
@@ -301,9 +284,7 @@ class TankDataSource extends EditDataSource {
             value = e.value?.get(AppLocalizations.of(context)!.locale);
             alignment = Alignment.centerLeft;
           } else if (e.value is num) {
-            if (e.columnName == 'amount') {
-              value = AppLocalizations.of(context)!.kiloWeightFormat(e.value);
-            } else if (e.columnName == 'efficiency') {
+            if (e.columnName == 'efficiency') {
               value = AppLocalizations.of(context)!.percentFormat(e.value);
             } else value = NumberFormat("#0.#", AppLocalizations.of(context)!.locale.toString()).format(e.value);
             alignment = Alignment.centerRight;
@@ -313,14 +294,6 @@ class TankDataSource extends EditDataSource {
           } else if (e.value is DateTime) {
             alignment = Alignment.centerRight;
             value = AppLocalizations.of(context)!.datetimeFormat(e.value);
-          } else {
-            if (e.columnName == 'amount') {
-              return Container(
-                  alignment: Alignment.center,
-                  margin: const EdgeInsets.all(4),
-                  child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
-              );
-            }
           }
           if (e.columnName == 'color') {
             return Container(
@@ -421,7 +394,7 @@ class TankDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showAction = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -481,7 +454,7 @@ class TankDataSource extends EditDataSource {
               child: Text(AppLocalizations.of(context)!.text('lost_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
           )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
           width: 50,
           columnName: 'actions',
           allowSorting: false,

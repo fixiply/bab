@@ -16,7 +16,7 @@ class MarkdownBuilder extends JsonWidgetBuilder {
 
   MarkdownBuilder({
     required this.text,
-    this.textScaleFactor : 1.0
+    this.textScaleFactor = 1.0
   }) : super(numSupportedChildren: 1);
 
   static MarkdownBuilder fromDynamic(

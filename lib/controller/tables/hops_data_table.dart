@@ -31,6 +31,7 @@ class HopsDataTable extends StatefulWidget {
   bool loadMore;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   RecipeModel? recipe;
   final void Function(List<HopModel> value)? onChanged;
@@ -45,6 +46,7 @@ class HopsDataTable extends StatefulWidget {
     this.loadMore = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.multiple,
     this.recipe,
     this.onChanged}) : super(key: key);
@@ -72,7 +74,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
     _dataSource = HopDataSource(context,
       showQuantity: widget.data != null,
       showCheckboxColumn: widget.showCheckboxColumn!,
-      allowEditing: widget.allowEditing,
+      showAction: widget.showAction,
       onEdit: (int rowIndex) {
         _edit(rowIndex);
       },
@@ -196,7 +198,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
           });
         }
       },
-      columns: HopDataSource.columns(context: context, showQuantity: widget.data != null, allowEditing: widget.allowEditing),
+      columns: HopDataSource.columns(context: context, showQuantity: widget.data != null, showAction: widget.showAction!),
     );
   }
 
@@ -279,7 +281,7 @@ class HopDataSource extends EditDataSource {
   final void Function(int rowIndex)? onRemove;
   final void Function(int rowIndex)? onEdit;
   /// Creates the employee data source class with required details.
-  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? allowEditing, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, allowEditing: allowEditing, showCheckboxColumn: showCheckboxColumn) {
+  HopDataSource(BuildContext context, {List<HopModel>? data, bool? showQuantity, bool? showCheckboxColumn,  bool? showAction, this.onChanged, this.onRemove, this.onEdit}) : super(context, showQuantity: showQuantity, showAction: showAction, showCheckboxColumn: showCheckboxColumn) {
     if (data != null) buildDataGridRows(data);
   }
 
@@ -299,7 +301,7 @@ class HopDataSource extends EditDataSource {
       DataGridCell<Type>(columnName: 'type', value: e.type),
       if (showQuantity == true) DataGridCell<Use>(columnName: 'use', value: e.use),
       if (showQuantity == true) DataGridCell<int>(columnName: 'duration', value: e.duration),
-      if (DeviceHelper.isDesktop && allowEditing == true) DataGridCell<int>(columnName: 'actions', value: index++),
+      if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
 
@@ -324,7 +326,7 @@ class HopDataSource extends EditDataSource {
   dynamic getValue(DataGridRow dataGridRow, String columnName) {
     var value = super.getValue(dataGridRow, columnName);
     if (value != null && columnName == 'amount') {
-      double? weight = AppLocalizations.of(context)!.weight(value);
+      double? weight = AppLocalizations.of(context)!.weight(value, measurement: Measurement.gram);
       return weight!.toPrecision(2);
     }
     return value;
@@ -449,7 +451,7 @@ class HopDataSource extends EditDataSource {
     int columnIndex = showCheckboxColumn == true ? rowColumnIndex.columnIndex-1 : rowColumnIndex.columnIndex;
     switch(column.columnName) {
       case 'amount':
-        double? value = AppLocalizations.of(context)!.gram(newCellValue);
+        double? value = AppLocalizations.of(context)!.gramToKilo(newCellValue);
         dataGridRows[rowColumnIndex.rowIndex].getCells()[columnIndex] =
             DataGridCell<double>(columnName: column.columnName, value: value);
         data[rowColumnIndex.rowIndex].amount = value;
@@ -502,7 +504,7 @@ class HopDataSource extends EditDataSource {
     notifyListeners();
   }
 
-  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool allowEditing = false}) {
+  static List<GridColumn> columns({required BuildContext context, bool showQuantity = false, bool showAction = false}) {
     return <GridColumn>[
       GridColumn(
           columnName: 'uuid',
@@ -584,7 +586,7 @@ class HopDataSource extends EditDataSource {
             child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
         )
       ),
-      if (DeviceHelper.isDesktop && allowEditing == true) GridColumn(
+      if (DeviceHelper.isDesktop && showAction == true) GridColumn(
         width: 50,
         columnName: 'actions',
         allowSorting: false,

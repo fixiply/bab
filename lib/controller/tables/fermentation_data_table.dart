@@ -21,6 +21,7 @@ class FermentationDataTable extends StatefulWidget {
   bool sort;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   RecipeModel? recipe;
   final void Function(List<Fermentation>? value)? onChanged;
@@ -32,6 +33,7 @@ class FermentationDataTable extends StatefulWidget {
     this.sort = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.multiple,
     this.recipe,
     this.onChanged}) : super(key: key);
@@ -57,7 +59,7 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
     _dataSource = FermentationDataSource(context,
       data: widget.data ?? [],
       showCheckboxColumn: widget.showCheckboxColumn!,
-      allowEditing: widget.allowEditing,
+      showAction: widget.showAction,
       onRemove: (int rowIndex) {
         _remove(rowIndex);
       },
@@ -147,7 +149,7 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
                     });
                   }
                 },
-                columns: Fermentation.columns(context: context, allowEditing: widget.allowEditing),
+                columns: Fermentation.columns(context: context, showAction: widget.showAction!),
               ),
             )
           )

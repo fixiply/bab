@@ -15,7 +15,7 @@ class WaterContainer extends StatefulWidget {
   bool showVolume;
   double? volume;
 
-  WaterContainer({this.showTitle : true, this.showVolume : false, this.volume = 20});
+  WaterContainer({this.showTitle = true, this.showVolume = false, this.volume = 20});
 
   @override
   State<StatefulWidget> createState() {

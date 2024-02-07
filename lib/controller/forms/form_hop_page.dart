@@ -81,7 +81,9 @@ class _FormHopPageState extends State<FormHopPage> {
               }
             }
           ),
-          CustomMenuAnchor()
+          CustomMenuAnchor(
+            model: widget.model,
+          )
         ]
       ),
       body: SingleChildScrollView(

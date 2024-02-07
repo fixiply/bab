@@ -49,7 +49,7 @@ class InventoryModel<T> extends Model {
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'status': this.status!.index,

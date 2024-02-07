@@ -160,6 +160,9 @@ class _AppState extends State<MyApp> {
     return MaterialApp(
       onGenerateTitle: (BuildContext context) => AppLocalizations.of(context)!.text('app_title'),
       debugShowCheckedModeBanner: false,
+      shortcuts: {
+        LogicalKeySet(LogicalKeyboardKey.space): ActivateIntent(),
+      },
       theme: theme.copyWith(
         colorScheme: theme.colorScheme.copyWith(
           primary: PrimaryColor,

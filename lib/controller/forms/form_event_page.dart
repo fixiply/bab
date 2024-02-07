@@ -113,7 +113,7 @@ class _FormEventPageState extends State<FormEventPage> {
                 await ModalBottomSheet.showInformation(context, widget.model);
               } else if (value == 'sending') {
                 try {
-                  EasyLoading.show(status: AppLocalizations.of(context)!.text('in_progress'));
+                  EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
                   await Push.notification(context,widget.model, topic: foundation.kDebugMode ? 'debug' : 'default');
                 } finally {
                   EasyLoading.dismiss();

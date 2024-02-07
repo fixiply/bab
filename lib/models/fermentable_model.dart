@@ -6,6 +6,9 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/quantity.dart';
 
+// External package
+import 'package:xml/xml.dart';
+
 enum Type with Enums { grain, sugar, extract,  dry_extract, adjunct, fruit, juice, honey;
   List<Enum> get enums => [ grain, sugar, extract,  dry_extract, adjunct, fruit, juice, honey ];
 }
@@ -14,14 +17,17 @@ enum Method with Enums { mashed,  steeped;
   List<Enum> get enums => [ mashed,  steeped ];
 }
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
+const String XML_ELEMENT_NAME = 'NAME';
+const String XML_ELEMENT_TYPE = 'TYPE';
+const String XML_ELEMENT_AMOUNT = 'AMOUNT';
+const String XML_ELEMENT_YIELD = 'YIELD';
+const String XML_ELEMENT_COLOR = 'COLOR';
 
 class FermentableModel<T> extends Model {
   dynamic name;
   Type? type;
   String? origin;
+  /// Weight in Kilograms.
   double? amount;
   Measurement? measurement;
   Method? use;
@@ -59,7 +65,7 @@ class FermentableModel<T> extends Model {
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'name': LocalizedText.serialize(this.name),
@@ -131,6 +137,20 @@ class FermentableModel<T> extends Model {
     return null;
   }
 
+  bool hasName(String? text, List<String> excludes) {
+    if (text == null) return false;
+    if (name is LocalizedText) {
+      for(String value in name.map!.values) {
+        if (value.containsWord(text, excludes)) {
+          return true;
+        }
+      }
+    } else if ((name as String).containsWord(text, excludes)) {
+      return true;
+    }
+    return false;
+  }
+
   static dynamic serialize(dynamic data) {
     if (data != null) {
       if (data is FermentableModel) {
@@ -161,6 +181,19 @@ class FermentableModel<T> extends Model {
       }
     }
     return values;
+  }
+
+  static FermentableModel fromXML(XmlElement child, {FermentableModel? old}) {
+    FermentableModel model = old != null ? old.copy() : FermentableModel();
+    if (old == null) {
+      model.name = child.getElement(XML_ELEMENT_NAME)!.innerText;
+      model.type = FermentableModel.getTypeByName( child.getElement(XML_ELEMENT_TYPE)!.innerText);
+      model.efficiency = double.parse(child.getElement(XML_ELEMENT_YIELD)!.innerText);
+      model.ebc = int.parse(child.getElement(XML_ELEMENT_COLOR)!.innerText);
+    }
+    model.amount = double.parse(child.getElement(XML_ELEMENT_AMOUNT)!.innerText);
+    model.measurement = Measurement.kilo;
+    return model;
   }
 
   static Future<List<FermentableModel>> data(List<Quantity> data) async {
@@ -194,6 +227,29 @@ class FermentableModel<T> extends Model {
         }
         return values;
       }
+    }
+    return null;
+  }
+
+  static Type? getTypeByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Grain':
+        return Type.grain;
+      case 'Sugar':
+        return Type.sugar;
+      case 'Extract':
+        return Type.extract;
+      case 'Dry Extract':
+        return Type.dry_extract;
+      case 'Adjunct':
+        return Type.adjunct;
+      case 'Fruit':
+        return  Type.fruit;
+      case 'Juice':
+        return Type.juice;
+      case 'Honey':
+        return Type.honey;
     }
     return null;
   }

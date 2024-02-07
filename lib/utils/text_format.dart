@@ -28,7 +28,7 @@ class TextFormat<T> {
     this.color = map['color'];
   }
 
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'text': this.text,
       'size': this.size,

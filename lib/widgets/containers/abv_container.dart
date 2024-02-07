@@ -11,7 +11,7 @@ import 'package:bab/widgets/form_decoration.dart';
 class ABVContainer extends StatefulWidget {
   final bool showTitle;
 
-  ABVContainer({this.showTitle : true});
+  ABVContainer({this.showTitle = true});
 
   @override
   State<StatefulWidget> createState() {

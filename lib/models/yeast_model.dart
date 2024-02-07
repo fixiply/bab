@@ -5,25 +5,38 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/quantity.dart';
+import 'package:flutter/foundation.dart';
+
+// External package
+import 'package:xml/xml.dart';
 
 enum Yeast with Enums { liquid, dry, slant, culture;
   List<Enum> get enums => [ liquid, dry, slant, culture ];
 }
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
+const String XML_ELEMENT_NAME = 'NAME';
+const String XML_ELEMENT_LABORATORY = 'LABORATORY';
+const String XML_ELEMENT_PRODUCT_ID = 'PRODUCT_ID';
+const String XML_ELEMENT_AMOUNT = 'AMOUNT';
+const String XML_ELEMENT_FORM = 'FORM';
+const String XML_ELEMENT_TYPE = 'TYPE';
+const String XML_ELEMENT_MIN_TEMPERATURE = 'MIN_TEMPERATURE';
+const String XML_ELEMENT_MAX_TEMPERATURE = 'MAX_TEMPERATURE';
+const String XML_ELEMENT_ATTENUATION = 'ATTENUATION';
 
 class YeastModel<T> extends Model {
   dynamic name;
-  String? reference;
+  String? product;
   String? laboratory;
   Style? type;
   Yeast? form;
+  /// Weight in Kilograms or volume in litters.
   double? amount;
   Measurement? measurement;
   double? cells;
+  /// Degrees in Celsius
   double? tempmin;
+  /// Degrees in Celsius
   double? tempmax;
   double? attmin;
   double? attmax;
@@ -37,7 +50,7 @@ class YeastModel<T> extends Model {
     bool? isEdited,
     bool? isSelected,
     this.name,
-    this.reference,
+    this.product,
     this.laboratory,
     this.type = Style.hight,
     this.form = Yeast.dry,
@@ -55,8 +68,7 @@ class YeastModel<T> extends Model {
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
     this.name = LocalizedText.deserialize(map['name']);
-    this.name = LocalizedText.deserialize(map['name']);
-    this.reference = map['product'];
+    this.product = map['product'];
     this.laboratory = map['laboratory'];
     this.type = Style.values.elementAt(map['type']);
     this.form = Yeast.values.elementAt(map['form']);
@@ -69,11 +81,11 @@ class YeastModel<T> extends Model {
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'name': LocalizedText.serialize(this.name),
-      'product': this.reference,
+      'product': this.product,
       'laboratory': this.laboratory,
       'type': this.type!.index,
       'form': this.form!.index,
@@ -94,7 +106,7 @@ class YeastModel<T> extends Model {
       updated_at: updated_at,
       creator: creator,
       name: this.name,
-      reference: this.reference,
+      product: this.product,
       laboratory: this.laboratory,
       type: this.type,
       form: this.form,
@@ -179,9 +191,38 @@ class YeastModel<T> extends Model {
     } else if (columnName == 'form') {
       return Yeast.values;
     } else if (columnName == 'measurement') {
-      return [ Measurement.gram, Measurement.milliliter, Measurement.packages ];
+      return [ Measurement.gram, Measurement.milliliter, Measurement.packages ].toList();
     }
     return [];
+  }
+
+  bool hasName(String? text, List<String> excludes) {
+    if (text == null) return false;
+    List<String> split = text.toLowerCase().split(' ');
+    if (name is LocalizedText) {
+      for(String value in name.map!.values) {
+        if (value.containsWord(text, excludes)) {
+          return true;
+        }
+        if (split.length == 2 && product != null) {
+          String product = this.product!.replaceAll(new RegExp(r'[^\w\s]+'), '').toLowerCase();
+          if (value.toLowerCase().contains(split.first.toLowerCase()) && product.contains(split.last.toLowerCase()))  {
+            return true;
+          }
+        }
+      }
+    } else if (name is String) {
+      if ((name as String).containsWord(text, excludes)) {
+        return true;
+      }
+      if (split.length == 2 && product != null) {
+        String product = this.product!.replaceAll(new RegExp(r'[^\w\s]+'), '').toLowerCase();
+        if (name.toLowerCase().contains(split.first.toLowerCase()) && product.contains(split.last.toLowerCase()))  {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   static dynamic serialize(dynamic data) {
@@ -216,13 +257,31 @@ class YeastModel<T> extends Model {
     return values;
   }
 
+  static YeastModel fromXML(XmlElement child, {YeastModel? old}) {
+    YeastModel model = old != null ? old.copy() : YeastModel();
+    if (old == null) {
+      model.name = child.getElement(XML_ELEMENT_NAME)!.innerText;
+      model.laboratory = child.getElement(XML_ELEMENT_LABORATORY)!.innerText;
+      model.product = child.getElement(XML_ELEMENT_PRODUCT_ID)!.innerText;
+      model.form = YeastModel.getFormByName(child.getElement(XML_ELEMENT_FORM)!.innerText);
+      model.type = YeastModel.getTypeByName( child.getElement(XML_ELEMENT_TYPE)!.innerText);
+      model.tempmin = double.parse(child.getElement(XML_ELEMENT_MIN_TEMPERATURE)!.innerText);
+      model.tempmax = double.parse(child.getElement(XML_ELEMENT_MAX_TEMPERATURE)!.innerText);
+      model.attmin = double.parse(child.getElement(XML_ELEMENT_ATTENUATION)!.innerText);
+      model.attmax = double.parse(child.getElement(XML_ELEMENT_ATTENUATION)!.innerText);
+    }
+    model.amount = double.parse(child.getElement(XML_ELEMENT_AMOUNT)!.innerText);
+    model.measurement = Measurement.packages;
+    return model;
+  }
+
   static Future<List<YeastModel>> data(List<Quantity> data) async {
     List<YeastModel>? values = [];
     for(Quantity item in data) {
       YeastModel? model = await Database().getYeast(item.uuid!);
       if (model != null) {
         model.amount = item.amount;
-        model.measurement = item.measurement ?? (model.form == Yeast.liquid ? Measurement.milliliter : Measurement.gram);
+        model.measurement = item.measurement ?? (model.form == Yeast.liquid ? Measurement.liter : Measurement.kilo);
         values.add(model);
       }
     }
@@ -245,6 +304,34 @@ class YeastModel<T> extends Model {
         }
         return values;
       }
+    }
+    return null;
+  }
+
+  static Yeast? getFormByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Liquid':
+        return Yeast.liquid;
+      case 'Dry':
+        return Yeast.dry;
+      case 'Slant':
+        return Yeast.slant;
+      case 'Culture':
+        return Yeast.culture;
+    }
+    return null;
+  }
+
+  static Style? getTypeByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'Ale':
+        return Style.hight;
+      case 'Lager':
+        return Style.low;
+      case 'Spontaneous':
+        return Style.spontaneous;
     }
     return null;
   }

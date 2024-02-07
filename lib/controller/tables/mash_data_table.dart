@@ -21,6 +21,7 @@ class MashDataTable extends StatefulWidget {
   bool sort;
   Color? color;
   bool? showCheckboxColumn;
+  bool? showAction;
   SelectionMode? selectionMode;
   RecipeModel? recipe;
   final void Function(List<Mash>? value)? onChanged;
@@ -32,6 +33,7 @@ class MashDataTable extends StatefulWidget {
     this.sort = false,
     this.color,
     this.showCheckboxColumn = true,
+    this.showAction = false,
     this.selectionMode = SelectionMode.multiple,
     this.recipe,
     this.onChanged}) : super(key: key);
@@ -57,7 +59,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
     _dataSource = MashDataSource(context,
       data: widget.data ?? [],
       showCheckboxColumn: widget.showCheckboxColumn!,
-      allowEditing: widget.allowEditing,
+      showAction: widget.showAction,
       onRemove: (int rowIndex) {
         _remove(rowIndex);
       },
@@ -147,7 +149,7 @@ class MashDataTableState extends State<MashDataTable> with AutomaticKeepAliveCli
                     });
                   }
                 },
-                columns: Mash.columns(context: context, allowEditing: widget.allowEditing),
+                columns: Mash.columns(context: context, showAction: widget.showAction!),
               ),
             )
           )

@@ -91,7 +91,9 @@ class _FormStylePageState extends State<FormStylePage> {
               }
             }
           ),
-          CustomMenuAnchor()
+          CustomMenuAnchor(
+            model: widget.model,
+          )
         ]
       ),
       body: SingleChildScrollView(

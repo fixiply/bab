@@ -21,14 +21,24 @@ enum Method with Enums { all_grain,  extract, partial;
   List<Enum> get enums => [ all_grain,  extract, partial ];
 }
 
+const String XML_ELEMENT_NAME = 'NAME';
+const String XML_ELEMENT_BATCH_SIZE = 'BATCH_SIZE';
+const String XML_ELEMENT_BOIL_TIME = 'BOIL_TIME';
+const String XML_ELEMENT_EFFICIENCY = 'EFFICIENCY';
+const String XML_ELEMENT_NOTES = 'NOTES';
+const String XML_ELEMENT_STYLE = 'STYLE';
+const String XML_ELEMENT_TYPE = 'TYPE';
+
 class RecipeModel<T> extends Model {
   Method? method;
   String? color;
   dynamic title;
-  dynamic text;
+  dynamic notes;
   bool? shared;
   StyleModel? style;
+  /// The finale volume in liters.
   double? volume;
+  /// The time in minutes.
   int? boil;
   double? efficiency;
   double? og;
@@ -42,11 +52,9 @@ class RecipeModel<T> extends Model {
   List<Quantity>? cacheYeasts;
   List<Mash>? mash;
   List<Fermentation>? fermentation;
-  dynamic notes;
   ImageModel? image;
   List<Rating>? ratings;
   String? country;
-
   List<fm.FermentableModel>? _fermentables;
   List<hm.HopModel>? _hops;
   List<mm.MiscModel>? _misc;
@@ -60,7 +68,7 @@ class RecipeModel<T> extends Model {
     this.method = Method.all_grain,
     this.color,
     this.title,
-    this.text,
+    this.notes,
     this.shared = false,
     this.style,
     this.volume,
@@ -77,7 +85,6 @@ class RecipeModel<T> extends Model {
     this.cacheYeasts,
     this.mash,
     this.fermentation,
-    this.notes,
     this.image,
     this.ratings,
     this.country,
@@ -101,7 +108,7 @@ class RecipeModel<T> extends Model {
     if (map.containsKey('method')) this.method = Method.values.elementAt(map['method']);
     this.color = map['color'];
     this.title = LocalizedText.deserialize(map['title']);
-    this.text = LocalizedText.deserialize(map['text']);
+    this.notes = LocalizedText.deserialize(map['notes']);
     if (map.containsKey('shared')) this.shared = map['shared'];
     if (map['style'] != null) this.style = await Database().getStyle(map['style']);
     if (map['volume'] != null) this.volume = map['volume'].toDouble();
@@ -118,20 +125,19 @@ class RecipeModel<T> extends Model {
     this.cacheYeasts =  Quantity.deserialize(map['yeasts']);
     this.mash = Mash.deserialize(map['mash']);
     if (map['fermentation'] != null) this.fermentation = Fermentation.deserialize(map['fermentation']);
-    this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
     this.ratings = Rating.deserialize(map['ratings']);
     this.country = map['country'];
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'method': this.method!.index,
       'color': this.color,
       'title': LocalizedText.serialize(this.title),
-      'text': LocalizedText.serialize(this.text),
+      'notes': LocalizedText.serialize(this.notes),
       'shared': this.shared,
       'style': this.style != null ? this.style!.uuid : null,
       'volume': this.volume,
@@ -148,7 +154,6 @@ class RecipeModel<T> extends Model {
       'yeasts': YeastModel.quantities(this._yeasts),
       'mash': Mash.serialize(this.mash),
       'fermentation': Fermentation.serialize(this.fermentation),
-      'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
       'ratings': Rating.serialize(this.ratings),
       'country': this.country
@@ -165,7 +170,7 @@ class RecipeModel<T> extends Model {
       method: this.method,
       color: this.color,
       title: this.title,
-      text: this.text,
+      notes: this.notes,
       shared: this.shared,
       style: this.style,
       volume: this.volume,
@@ -182,7 +187,6 @@ class RecipeModel<T> extends Model {
       cacheYeasts: this.cacheYeasts,
       mash: this.mash,
       fermentation: this.fermentation,
-      notes: this.notes,
       image: this.image,
       ratings: this.ratings,
       country: this.country
@@ -238,6 +242,11 @@ class RecipeModel<T> extends Model {
     return fermentation!.first.duration!;
   }
 
+  addFermentable(fm.FermentableModel model) {
+    if (_fermentables == null) _fermentables = [];
+   _fermentables!.add(model);
+  }
+
   set fermentables(List<fm.FermentableModel>data) => _fermentables = data;
 
   List<fm.FermentableModel> get fermentables => _fermentables ?? [];
@@ -248,6 +257,11 @@ class RecipeModel<T> extends Model {
       resizeFermentales(volume);
     }
     return _fermentables ?? [];
+  }
+
+  addHop(hm.HopModel model) {
+    if (_hops == null) _hops = [];
+    _hops!.add(model);
   }
 
   set hops(List<hm.HopModel>data) => _hops = data;
@@ -265,6 +279,11 @@ class RecipeModel<T> extends Model {
     return _hops ?? [];
   }
 
+  addMisc(mm.MiscModel model) {
+    if (_misc == null) _misc = [];
+    _misc!.add(model);
+  }
+
   set miscellaneous(List<mm.MiscModel>data) => _misc = data;
 
   List<mm.MiscModel> get miscellaneous => _misc ?? [];
@@ -278,6 +297,11 @@ class RecipeModel<T> extends Model {
       }
     }
     return _misc ?? [];
+  }
+
+  addYeast(YeastModel model) {
+    if (_yeasts == null) _yeasts = [];
+    _yeasts!.add(model);
   }
 
   set yeasts(List<YeastModel>data) => _yeasts = data;
@@ -297,6 +321,17 @@ class RecipeModel<T> extends Model {
     return 'Recipe: $title, UUID: $uuid';
   }
 
+  /// Returns the bitterness index, based on the given conditions.
+  ///
+  /// The `amount` argument is relative to the amount of hops in grams.
+  ///
+  /// The `alpha` argument is relative to the hops alpha acid.
+  ///
+  /// The `og` argument is relative to the original gravity.
+  ///
+  /// The `duration` argument is relative to the boil duration in minute.
+  ///
+  /// The `volume` argument is relative to the final volume.
   resizeFermentales(double? volume) {
     if (volume == null || volume == this.volume) {
       return;
@@ -394,7 +429,7 @@ class RecipeModel<T> extends Model {
           ibu = (ibu ?? 0) + bitterness;
         }
       } else if (item.use == hm.Use.dry_hop) {
-        if (item.duration != null && primaryday != null && item.duration! > primaryday!) {
+        if (item.duration != null && primaryday != null && item.duration! > primaryday) {
           item.duration = primaryday;
         }
       }
@@ -410,5 +445,18 @@ class RecipeModel<T> extends Model {
 
     if (og != 0 && fg != 0) abv = FormulaHelper.abv(og, fg);
     if (mcu != 0) ebc = ColorHelper.ratingEBC(mcu).toInt();
+  }
+
+  static Method? getTypeByName(String? name) {
+    if (name == null) return null;
+    switch (name) {
+      case 'All Grain':
+        return Method.all_grain;
+      case 'Extract':
+        return Method.extract;
+      case 'Partial Mash':
+        return Method.partial;
+    }
+    return null;
   }
 }

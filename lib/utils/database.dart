@@ -172,7 +172,7 @@ class Database {
 
   Future<void> delete(dynamic d, {bool forced = false, BuildContext? context}) async {
     try {
-      if (forced == true || (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled)) {
+      if (forced == true || !ClassHelper.hasStatus(d) || d.status == constants.Status.disabled) {
         return await getTableName(d)!.doc(d.uuid).delete();
       } else {
         if (ClassHelper.hasStatus(d)) {
@@ -363,12 +363,9 @@ class Database {
     return null;
   }
 
-  Future<List<StyleModel>> getStyles({String? name, String? number, bool ordered = false}) async {
+  Future<List<StyleModel>> getStyles({String? number, bool ordered = false}) async {
     List<StyleModel> list = [];
     Query query = styles;
-    if (name != null) {
-      query = query.where('name', isEqualTo: name);
-    }
     if (number != null) {
       query = query.where('number', isEqualTo: number);
     }
@@ -472,11 +469,14 @@ class Database {
     return null;
   }
 
-  Future<List<FermentableModel>> getFermentables({String? user, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<FermentableModel>> getFermentables({String? user, String? name, String? searchText, bool ordered = false, bool myData = false}) async {
     List<FermentableModel> list = [];
     Query query = fermentables;
     if (user != null && user.isNotEmpty) {
-      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+      if (myData) {
+        query = query.where('creator', isEqualTo: user);
+      }
+      else query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
     } else {
       query = query.where('creator', isNull: true);
     }
@@ -519,11 +519,14 @@ class Database {
     return null;
   }
 
-  Future<List<HopModel>> getHops({String? user, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<HopModel>> getHops({String? user, String? name, String? searchText, bool ordered = false, bool myData = false}) async {
     List<HopModel> list = [];
     Query query = hops;
     if (user != null && user.isNotEmpty) {
-      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+      if (myData) {
+        query = query.where('creator', isEqualTo: user);
+      }
+      else query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
     } else {
       query = query.where('creator', isNull: true);
     }
@@ -566,11 +569,14 @@ class Database {
     return null;
   }
 
-  Future<List<MiscModel>> getMiscellaneous({String? user, String? name, String? searchText, bool ordered = false}) async {
+  Future<List<MiscModel>> getMiscellaneous({String? user, String? name, String? searchText, bool ordered = false, bool myData = false}) async {
     List<MiscModel> list = [];
     Query query = miscellaneous;
     if (user != null && user.isNotEmpty) {
-      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+      if (myData) {
+        query = query.where('creator', isEqualTo: user);
+      }
+      else query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
     } else {
       query = query.where('creator', isNull: true);
     }
@@ -613,11 +619,14 @@ class Database {
     return null;
   }
 
-  Future<List<YeastModel>> getYeasts({String? user, String? name, String? reference, String? laboratory, String? searchText, bool ordered = false}) async {
+  Future<List<YeastModel>> getYeasts({String? user, String? name, String? reference, String? laboratory, String? searchText, bool ordered = false, bool myData = false}) async {
     List<YeastModel> list = [];
     Query query = yeasts;
     if (user != null && user.isNotEmpty) {
-      query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
+      if (myData) {
+        query = query.where('creator', isEqualTo: user);
+      }
+      else query = query.where(Filter.or(Filter('creator', isEqualTo: user), Filter('creator', isNull: true)));
     } else {
       query = query.where('creator', isNull: true);
     }

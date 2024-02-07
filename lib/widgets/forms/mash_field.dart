@@ -52,6 +52,7 @@ class _MashFieldState extends FormFieldState<List<Mash>> {
           allowEditing: true,
           color: FillColor,
           showCheckboxColumn: false,
+          showAction: true,
           recipe: widget.recipe,
           onChanged: (List<Mash>? value) {
             didChange(value);

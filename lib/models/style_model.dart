@@ -3,6 +3,8 @@ import 'package:bab/models/model.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/localized_text.dart';
 
+const String XML_ELEMENT_NAME = 'NAME';
+
 class StyleModel<T> extends Model {
   dynamic name;
   String? number;
@@ -75,7 +77,7 @@ class StyleModel<T> extends Model {
   }
 
   @override
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
       'name': LocalizedText.serialize(this.name),
@@ -141,5 +143,19 @@ class StyleModel<T> extends Model {
   @override
   String toString() {
     return 'Style: $name, UUID: $uuid';
+  }
+
+  bool hasName(String? text) {
+    if (text == null) return false;
+    if (name is LocalizedText) {
+      for(String value in name.map!.values) {
+        if (value.containsWord(text, [])) {
+          return true;
+        }
+      }
+    } else if ((name as String).containsWord(text, [])) {
+      return true;
+    }
+    return false;
   }
 }

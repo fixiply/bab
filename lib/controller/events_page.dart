@@ -19,9 +19,9 @@ import 'package:bab/widgets/containers/shimmer_container.dart';
 import 'package:bab/widgets/custom_drawer.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/search_text.dart';
-import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 // External package
+import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class EventsPage extends StatefulWidget {
   EventsPage({Key? key}) : super(key: key);

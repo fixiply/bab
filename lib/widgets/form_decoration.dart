@@ -7,8 +7,8 @@ class FormDecoration extends InputDecoration {
   FormDecoration({
     bool? filled,
     Color? fillColor,
-    bool isDense: true,
-    InputBorder? border: InputBorder.none,
+    bool isDense = true,
+    InputBorder? border = InputBorder.none,
     Widget? icon,
     Color? iconColor,
     String? labelText,

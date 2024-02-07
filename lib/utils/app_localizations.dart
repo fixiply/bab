@@ -213,37 +213,37 @@ class AppLocalizations {
   /// Returns the formatted weight, based on the given conditions.
   ///
   /// The `number` argument is relative to the number in kilogram.
-  String? kiloWeightFormat(double? number, {bool? symbol = true}) {
-    if (number == null) {
-      return null;
-    }
-    return weightFormat(number * 1000, symbol: symbol);
-  }
+  // String? kiloWeightFormat(double? number, {bool? symbol = true}) {
+  //   if (number == null) {
+  //     return null;
+  //   }
+  //   return weightFormat(number * 1000, symbol: symbol);
+  // }
 
   /// Returns the formatted weight, based on the given conditions.
   ///
-  /// The `number` argument is relative to the number in grams.
+  /// The `number` argument is relative to the number in kilo.
   String? weightFormat(num? number, {bool? symbol = true}) {
     if (number == null) {
       return null;
     }
-    String pattern = '#0.#';
+    String pattern = '#0.##';
     if (unit == Unit.us) {
-      number = FormulaHelper.convertGramToOunce(number);
-      var suffix = ' oz';
-      if (symbol == true && number >= 10) {
-        number = FormulaHelper.convertOunceToLivre(number);
-        suffix = ' lb';
-        pattern = '#0.##';
+      number = FormulaHelper.convertKiloToLivre(number);
+      var suffix = ' lb';
+      if (symbol == true && number < 1) {
+        number = FormulaHelper.convertLivreToOunce(number);
+        suffix = ' oz';
+        pattern = '#0.#';
       }
       return numberFormat(number, symbol: (symbol == true ? suffix : null));
     }
 
-    var suffix = ' g';
-    if (symbol == true && number >= 1000) {
-      number = number / 1000;
-      suffix = ' kg';
-      pattern = '#0.##';
+    var suffix = ' kg';
+    if (symbol == true && number < 1) {
+      number = number * 1000;
+      suffix = ' g';
+      pattern = '#0.#';
     }
     return numberFormat(number, pattern: pattern, symbol: (symbol == true ? suffix : null));
   }
@@ -267,42 +267,34 @@ class AppLocalizations {
 
   /// Returns the localized weight, based on the given conditions.
   ///
-  /// The `number` argument is relative to the number in grams.
-  double? weight(double? number, {Measurement? measurement = Measurement.gram}) {
+  /// The `number` argument is relative to the number in kilo.
+  double? weight(double? number, {Measurement? measurement = Measurement.kilo}) {
     if (number == null) {
       return null;
     }
     if (unit == Unit.us) {
-      number = FormulaHelper.convertGramToOunce(number);
-      if (measurement == Measurement.kilo) {
-        number = FormulaHelper.convertOunceToLivre(number);
+      number = FormulaHelper.convertKiloToLivre(number);
+      if (measurement == Measurement.gram) {
+        number = FormulaHelper.convertLivreToOunce(number);
       }
 
       return number;
     }
 
-    if (measurement == Measurement.kilo) {
-      number = number / 1000;
+    if (measurement == Measurement.gram) {
+      number = number * 1000;
     }
     return number;
   }
 
-
-  /// Returns the localized weight to gram, based on the given conditions.
-  double? gram(double? number, {Measurement? measurement = Measurement.gram}) {
+  double? gramToKilo(double? number) {
     if (number == null) {
       return null;
     }
+    number = number / 1000;
     if (unit == Unit.us) {
-      if (measurement == Measurement.kilo) {
-        number = FormulaHelper.convertLivreToOunce(number);
-        number = number / 1000;
-      }
-      number =  FormulaHelper.convertOunceToGram(number);
+      number = FormulaHelper.convertKiloToLivre(number);
     }
-    // if (weight == Weight.kilo) {
-    //   number = number * 1000;
-    // }
     return number;
   }
 
@@ -344,12 +336,27 @@ class AppLocalizations {
   }
 
   /// Returns the localized volume to litter, based on the given conditions.
-  double? volume(double? number) {
+  double? volume(double? number, {Measurement? measurement = Measurement.liter}) {
     if (number == null) {
       return null;
     }
     if (unit == Unit.us) {
-      return FormulaHelper.convertGallonToLiter(number);
+      number = FormulaHelper.convertLiterToGallon(number);
+      return number;
+    }
+    if (measurement == Measurement.milliliter) {
+      number = number * 1000;
+    }
+    return number;
+  }
+
+  double? millimeterToLiter(double? number) {
+    if (number == null) {
+      return null;
+    }
+    number = number / 1000;
+    if (unit == Unit.us) {
+      number = FormulaHelper.convertLiterToGallon(number);
     }
     return number;
   }

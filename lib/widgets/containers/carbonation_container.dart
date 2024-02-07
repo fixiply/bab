@@ -13,7 +13,7 @@ class CarbonationContainer extends StatefulWidget {
   bool showVolume;
   double? volume;
 
-  CarbonationContainer({this.showTitle : true, this.showVolume : false, this.volume});
+  CarbonationContainer({this.showTitle = true, this.showVolume = false, this.volume});
 
   @override
   State<StatefulWidget> createState() {

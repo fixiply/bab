@@ -15,8 +15,8 @@ class MyStep extends Step {
     Widget? subtitle,
     required Widget content,
     Widget? label,
-    StepState state: StepState.indexed,
-    bool isActive: false,
+    StepState state = StepState.indexed,
+    bool isActive = false,
     this.onStepTapped,
     this.onStepCancel,
     this.onStepContinue

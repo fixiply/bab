@@ -104,7 +104,7 @@ class _FilterStyleAppBarState extends State<FilterStyleAppBar> with SingleTicker
                 mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  const Icon(Icons.clear, size: 12),
+                  const Icon(Icons.clear, size: 14),
                   const SizedBox(width: 8),
                   Text(AppLocalizations.of(context)!.text('erase_all'), overflow: TextOverflow.visible, style: const TextStyle(fontSize: 13)),
                 ],

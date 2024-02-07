@@ -24,7 +24,7 @@ class Device<T> {
     this.os = map['os'];
   }
 
-  Map<String, dynamic> toMap({bool persist : false}) {
+  Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at,
       'name': this.name,

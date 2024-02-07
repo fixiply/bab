@@ -13,7 +13,7 @@ import 'package:intl/intl.dart';
 class UnitContainer extends StatefulWidget {
   final bool showTitle;
 
-  UnitContainer({this.showTitle : true});
+  UnitContainer({this.showTitle = true});
 
   @override
   State<StatefulWidget> createState() {

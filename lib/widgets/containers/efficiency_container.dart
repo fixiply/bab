@@ -15,7 +15,7 @@ class EfficiencyContainer extends StatefulWidget {
   double? target;
   double? volume;
 
-  EfficiencyContainer({this.showTitle : true, this.showVolume : false, this.target, this.volume = 20});
+  EfficiencyContainer({this.showTitle = true, this.showVolume = false, this.target, this.volume = 20});
 
   @override
   State<StatefulWidget> createState() {
