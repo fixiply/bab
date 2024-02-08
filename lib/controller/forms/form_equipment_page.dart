@@ -157,7 +157,6 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                        _calculate();
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.waves_outlined),
@@ -191,7 +190,6 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.mash_volume = AppLocalizations.of(context)!.volume(AppLocalizations.of(context)!.decimal(value));
-                        _calculate();
                       },
                       decoration: FormDecoration(
                         icon: const Icon(Icons.waves_outlined),
@@ -231,10 +229,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.efficiency = AppLocalizations.of(context)!.decimal(value);
-                        _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.propane_tank_outlined),
+                          icon: _icon('1'),
                         labelText: AppLocalizations.of(context)!.text('mash_efficiency'),
                         suffixText: '%',
                         border: InputBorder.none,
@@ -259,10 +256,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.absorption = AppLocalizations.of(context)!.decimal(value);
-                        _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.looks_one_outlined),
+                        icon: _icon('2'),
                         labelText: AppLocalizations.of(context)!.text('absorption_grains'),
                         suffixText: 'L/Kg',
                         suffixIcon: Tooltip(
@@ -288,10 +284,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.lost_volume = AppLocalizations.of(context)!.decimal(value);
-                        _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.looks_two_outlined),
+                          icon: _icon('3'),
                         labelText: AppLocalizations.of(context)!.text('lost_volume'),
                         suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                         suffixIcon: Tooltip(
@@ -313,10 +308,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.mash_ratio = AppLocalizations.of(context)!.decimal(value);
-                        _calculate();
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.looks_3_outlined),
+                          icon: _icon('4'),
                           labelText: AppLocalizations.of(context)!.text('mash_ratio'),
                           suffixText: 'L/Kg',
                           suffixIcon: Tooltip(
@@ -353,10 +347,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.boil_loss = AppLocalizations.of(context)!.decimal(value);
-                        _calculate();
                       },
                       decoration: FormDecoration(
-                          icon: const Icon(Icons.looks_4_outlined),
+                          icon: _icon('5'),
                           labelText: AppLocalizations.of(context)!.text('boil_loss'),
                           suffixText: 'L/HR',
                           suffixIcon: Tooltip(
@@ -378,10 +371,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                       ],
                       onChanged: (value) {
                         widget.model.shrinkage = AppLocalizations.of(context)!.decimal(value);
-                        _calculate();
                       },
                       decoration: FormDecoration(
-                        icon: const Icon(Icons.looks_5_outlined),
+                        icon: _icon('6'),
                         labelText: AppLocalizations.of(context)!.text('wort_shrinkage'),
                         suffixText: '%',
                         border: InputBorder.none,
@@ -402,10 +394,9 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
                   ],
                   onChanged: (value) {
                     widget.model.head_loss = AppLocalizations.of(context)!.decimal(value);
-                    _calculate();
                   },
                   decoration: FormDecoration(
-                    icon: const Icon(Icons.looks_6_outlined),
+                      icon: _icon('7'),
                     labelText: AppLocalizations.of(context)!.text('head_loss'),
                     suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                     suffixIcon: Tooltip(
@@ -452,8 +443,19 @@ class _FormEquipmentPageState extends State<FormEquipmentPage> {
     _modified = modified ? true : false;
   }
 
-  _calculate() async {
-
+  Widget _icon(String text) {
+    return Container(
+      width: 16,
+      height: 16,
+      alignment: Alignment.center,
+      padding: EdgeInsets.zero,
+      decoration: BoxDecoration(
+        shape: BoxShape.rectangle,
+        borderRadius: BorderRadius.circular(4.0),
+        border: Border.all(width: 1.25),
+      ),
+      child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 10.0)),
+    );
   }
 
   _showSnackbar(String message) {
