@@ -112,30 +112,40 @@ class Mash<T> {
       ),
       GridColumn(
         columnName: 'type',
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-        )
-      ),
-      GridColumn(
-        width: 90,
-        columnName: 'temperature',
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('temperature'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('type'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       GridColumn(
         width: 90,
         columnName: 'duration',
         allowEditing: DeviceHelper.isDesktop,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('duration'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
+      ),
+      GridColumn(
+          width: 80,
+          columnName: 'temperature',
+          allowEditing: false,
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('temperature'),
+              child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.centerRight,
+                  child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              )
+          )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(
           width: 50,
@@ -163,8 +173,8 @@ class MashDataSource extends EditDataSource {
     dataGridRows = data.map<DataGridRow>((e) => DataGridRow(cells: [
       DataGridCell<dynamic>(columnName: 'name', value: e.name),
       DataGridCell<Type>(columnName: 'type', value: e.type),
-      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       DataGridCell<int>(columnName: 'duration', value: e.duration),
+      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
       if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
@@ -286,15 +296,15 @@ class MashDataSource extends EditDataSource {
             DataGridCell<Type>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].type = newCellValue as Type;
         break;
-      case 'temperature':
-        dataGridRows[dataRowIndex].getCells()[columnIndex] =
-            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
-        data[dataRowIndex].temperature = newCellValue as double;
-        break;
       case 'duration':
         dataGridRows[dataRowIndex].getCells()[columnIndex] =
             DataGridCell<int>(columnName: column.columnName, value: newCellValue);
         data[dataRowIndex].duration = newCellValue as int;
+        break;
+      case 'temperature':
+        dataGridRows[dataRowIndex].getCells()[columnIndex] =
+            DataGridCell<double>(columnName: column.columnName, value: newCellValue);
+        data[dataRowIndex].temperature = newCellValue as double;
         break;
     }
     onChanged?.call(data[dataRowIndex], rowColumnIndex.rowIndex);

@@ -524,10 +524,13 @@ class MiscDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
           width: 120,
           columnName: 'amount',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('amount'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
@@ -542,28 +545,37 @@ class MiscDataSource extends EditDataSource {
       GridColumn(
           columnName: 'type',
           allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('type'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       if (showQuantity == true) GridColumn(
           columnName: 'use',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('use'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('use'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: Text(AppLocalizations.of(context)!.text('use'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       if (showQuantity == true) GridColumn(
         width: 90,
         columnName: 'duration',
         allowEditing: DeviceHelper.isDesktop,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('duration'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(

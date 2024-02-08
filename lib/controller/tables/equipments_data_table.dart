@@ -412,46 +412,61 @@ class TankDataSource extends EditDataSource {
       GridColumn(
           width: 90,
           columnName: 'volume',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('tank_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('boil_volume'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('boiling'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           width: 90,
           columnName: 'size',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('mash_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('mash_volume'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('brew'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           width: 90,
           columnName: 'efficiency',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('mash_efficiency'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('mash_efficiency'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('efficiency'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           width: 90,
           columnName: 'absorption',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('absorption'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('absorption_grains'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('absorption'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           width: 90,
           columnName: 'lost_volume',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('lost_volume'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+            message: AppLocalizations.of(context)!.text('lost_volume'),
+            child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('lost'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(

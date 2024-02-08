@@ -106,20 +106,27 @@ class Fermentation<T> {
         width: 90,
         columnName: 'duration',
         allowEditing: DeviceHelper.isDesktop,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('duration'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       GridColumn(
-        width: 90,
-        columnName: 'temperature',
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('temperature'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-        )
+          width: 80,
+          columnName: 'temperature',
+          allowEditing: false,
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('temperature'),
+              child: Container(
+                  padding: const EdgeInsets.all(8.0),
+                  alignment: Alignment.centerRight,
+                  child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+              )
+          )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(
           width: 50,

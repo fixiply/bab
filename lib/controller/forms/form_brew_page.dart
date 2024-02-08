@@ -214,7 +214,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                             text: TextSpan(
                               style: DefaultTextStyle.of(context).style,
                               children: <TextSpan>[
-                                TextSpan(text: '${AppLocalizations.of(context)!.text('volume_alcohol')} : '),
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('abv')} : '),
                                 if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: const TextStyle(fontWeight: FontWeight.bold)),
                                 if (widget.model.abv == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable'))                              ],
                             ),

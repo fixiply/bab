@@ -514,10 +514,13 @@ class HopDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
           width: 90,
           columnName: 'amount',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('amount'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
@@ -534,56 +537,74 @@ class HopDataSource extends EditDataSource {
           columnName: 'origin',
           allowEditing: showQuantity == false,
           allowSorting: false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('origin'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           width: 90,
           columnName: 'alpha',
           allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('alpha'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('alpha'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('alpha'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           columnName: 'form',
           allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('form'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           columnName: 'type',
           allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('type'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       if (showQuantity == true) GridColumn(
           columnName: 'use',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.center,
-              child: Text(AppLocalizations.of(context)!.text('use'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('use'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.center,
+                child: Text(AppLocalizations.of(context)!.text('use'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       if (showQuantity == true) GridColumn(
         width: 90,
         columnName: 'duration',
         allowEditing: DeviceHelper.isDesktop,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('duration'),
+              child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('duration'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(

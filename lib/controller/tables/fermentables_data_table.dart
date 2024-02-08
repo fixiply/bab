@@ -501,10 +501,13 @@ class FermentableDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
           width: 90,
           columnName: 'amount',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            label: Tooltip(
+                message: AppLocalizations.of(context)!.text('amount'),
+                child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
@@ -521,37 +524,49 @@ class FermentableDataSource extends EditDataSource {
         columnName: 'origin',
         allowEditing: showQuantity == false,
         allowSorting: false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerLeft,
-            child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('origin'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerLeft,
+              child: Text(AppLocalizations.of(context)!.text('origin'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       GridColumn(
         columnName: 'type',
         allowEditing: showQuantity == false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('type'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       if (showQuantity == true) GridColumn(
         columnName: 'method',
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.text('method'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('method'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Text(AppLocalizations.of(context)!.text('method'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       GridColumn(
         width: 90,
         columnName: 'efficiency',
         allowEditing: showQuantity == false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text(AppLocalizations.of(context)!.text('yield'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('yield'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text(AppLocalizations.of(context)!.text('yield'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       GridColumn(

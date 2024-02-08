@@ -48,8 +48,9 @@ class FormulaHelper {
     }
     og = (og - 1) * 1000;
     attenuation = attenuation / 100;
-    var fg = og * (1 - attenuation) + 1000;
-    return fg / 1000;
+    var result = og * (1 - attenuation) + 1000;
+    if (foundation.kDebugMode) debugPrint('fg $result=($og * (1 - $attenuation) + 1000');
+    return result / 1000;
   }
 
   /// Returns the Alcohol level, based on the given conditions.

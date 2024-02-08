@@ -320,9 +320,9 @@ class YeastDataSource extends EditDataSource {
       DataGridCell<dynamic>(columnName: 'laboratory', value: e.laboratory),
       DataGridCell<Style>(columnName: 'type', value: e.type),
       DataGridCell<Yeast>(columnName: 'form', value: e.form),
-      if (showQuantity == false) DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
-      if (showQuantity == false) DataGridCell<double>(columnName: 'temperature', value: e.temperature),
-      if (showQuantity == false) DataGridCell<double>(columnName: 'cells', value: e.cells),
+      DataGridCell<double>(columnName: 'attenuation', value: e.attenuation),
+      DataGridCell<double>(columnName: 'temperature', value: e.temperature),
+      DataGridCell<double>(columnName: 'cells', value: e.cells),
       if (DeviceHelper.isDesktop && showAction == true) DataGridCell<int>(columnName: 'actions', value: index++),
     ])).toList();
   }
@@ -535,10 +535,13 @@ class YeastDataSource extends EditDataSource {
       if (showQuantity == true) GridColumn(
           width: 120,
           columnName: 'amount',
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerRight,
-              child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('amount'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text(AppLocalizations.of(context)!.text('amount'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
@@ -553,67 +556,88 @@ class YeastDataSource extends EditDataSource {
       GridColumn(
           columnName: 'reference',
           allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('reference'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('reference'),
+              child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(AppLocalizations.of(context)!.text('reference'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
           columnName: 'laboratory',
           allowEditing: showQuantity == false,
-          label: Container(
-              padding: const EdgeInsets.all(8.0),
-              alignment: Alignment.centerLeft,
-              child: Text(AppLocalizations.of(context)!.text('laboratory'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          label: Tooltip(
+              message: AppLocalizations.of(context)!.text('laboratory'),
+                child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerLeft,
+                child: Text(AppLocalizations.of(context)!.text('laboratory'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
           )
       ),
       GridColumn(
         columnName: 'type',
         allowEditing: showQuantity == false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('type'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Text(AppLocalizations.of(context)!.text('type'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       GridColumn(
         columnName: 'form',
         allowEditing: showQuantity == false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.center,
-            child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('form'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.center,
+              child: Text(AppLocalizations.of(context)!.text('form'), style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
-      if (showQuantity == false) GridColumn(
-        width: 90,
+      GridColumn(
+        width: 80,
         columnName: 'attenuation',
         allowEditing: false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text('Att.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('attenuation'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text('Att.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
-      if (showQuantity == false) GridColumn(
-        width: 90,
+      GridColumn(
+        width: 80,
         columnName: 'temperature',
         allowEditing: false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('temperature'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
-      if (showQuantity == false) GridColumn(
-        width: 90,
+      GridColumn(
+        width: 80,
         columnName: 'cells',
         allowEditing: false,
-        label: Container(
-            padding: const EdgeInsets.all(8.0),
-            alignment: Alignment.centerRight,
-            child: Text('\u023B', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('cells'),
+            child: Container(
+              padding: const EdgeInsets.all(8.0),
+              alignment: Alignment.centerRight,
+              child: Text('\u023B', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+          )
         )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(

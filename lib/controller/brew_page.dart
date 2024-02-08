@@ -218,7 +218,7 @@ class _BrewPageState extends State<BrewPage> {
                           text: TextSpan(
                             style: DefaultTextStyle.of(context).style,
                             children: <TextSpan>[
-                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'alcohol' : 'volume_alcohol')} : '),
+                              TextSpan(text: '${AppLocalizations.of(context)!.text(DeviceHelper.isSmallScreen(context) ? 'alcohol' : 'abv')} : '),
                               if (widget.model.abv != null) TextSpan(text: AppLocalizations.of(context)!.percentFormat(widget.model.abv), style: const TextStyle(fontWeight: FontWeight.bold)),
                               if (widget.model.abv == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable'))
                             ],
