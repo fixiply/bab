@@ -1,5 +1,6 @@
 // Internal package
 import 'package:bab/helpers/date_helper.dart';
+import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/models/fermentable_model.dart' as fm;

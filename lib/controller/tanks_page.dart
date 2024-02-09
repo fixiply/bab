@@ -330,7 +330,7 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
               child: Text(AppLocalizations.of(context)!.text('remove')),
             ),
           ]
-        ) : model.bluetooth == true  && (DeviceHelper.isAndroid ||  DeviceHelper.isIOS) ? IconButton(
+        ) : model.hasBluetooth() ? IconButton(
           icon: const Icon(Icons.bluetooth_outlined),
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {

@@ -1,4 +1,5 @@
 // Internal package
+import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/image_model.dart';
 import 'package:bab/models/model.dart';
@@ -165,6 +166,10 @@ class EquipmentModel<T> extends Model {
   double sparge(double volume, double weight, {int duration = 60}) {
     var preboil = preboilVolume(volume, duration: duration);
     return FormulaHelper.spargeWater(weight, preboil, mash(weight), absorption: absorption);
+  }
+
+  bool hasBluetooth() {
+    return bluetooth == true && (DeviceHelper.isAndroid ||  DeviceHelper.isIOS);
   }
 
   static dynamic serialize(dynamic data) {

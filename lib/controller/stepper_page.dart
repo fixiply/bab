@@ -341,8 +341,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   )
                 ),
               ),
-              const SizedBox(height: 6),
-              SizedBox(
+              if (widget.model.tank!.hasBluetooth()) const SizedBox(height: 6),
+              if (widget.model.tank!.hasBluetooth()) SizedBox(
                 width: 140,
                 height: 140,
                 child: _temp,
@@ -472,7 +472,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     steps.add(MyStep(
       index: ++_index,
       title: Text('Mettre en ébullition votre cuve'),
-      content: Container(
+      content: widget.model.tank?.bluetooth == true ? Container(
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
@@ -480,7 +480,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           height: 140,
           child: _temp,
         )
-      ),
+      ) : Container(),
       onStepContinue: (int index) {
       },
     ));
