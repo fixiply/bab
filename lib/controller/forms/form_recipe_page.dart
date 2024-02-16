@@ -18,6 +18,7 @@ import 'package:bab/utils/ibu.dart';
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_slider.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -45,7 +46,7 @@ class FormRecipePage extends StatefulWidget {
   _FormRecipePageState createState() => _FormRecipePageState();
 }
 
-class _FormRecipePageState extends State<FormRecipePage> {
+class _FormRecipePageState extends CustomState<FormRecipePage> {
   Key _key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
   bool _modified = false;
@@ -104,7 +105,7 @@ class _FormRecipePageState extends State<FormRecipePage> {
                   Database().update(widget.model, context: context).then((value) async {
                     Navigator.pop(context, widget.model);
                   }).onError((e, s) {
-                    _showSnackbar(e.toString());
+                    showSnackbar(e.toString());
                   });
                 }
               } else {
@@ -511,15 +512,6 @@ class _FormRecipePageState extends State<FormRecipePage> {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
       return FormBrewPage(newModel);
     }));
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10)
-      )
-    );
   }
 }
 

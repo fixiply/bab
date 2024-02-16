@@ -9,6 +9,7 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -25,7 +26,7 @@ class FormStylePage extends StatefulWidget {
   _FormStylePageState createState() => _FormStylePageState();
 }
 
-class _FormStylePageState extends State<FormStylePage> {
+class _FormStylePageState extends CustomState<FormStylePage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
@@ -76,7 +77,7 @@ class _FormStylePageState extends State<FormStylePage> {
                 Database().update(widget.model, context: context, updateLogs: !currentUser!.isAdmin()).then((value) async {
                   Navigator.pop(context, widget.model);
                 }).onError((e,s) {
-                  _showSnackbar(e.toString());
+                  showSnackbar(e.toString());
                 });
               }
             } : null
@@ -389,15 +390,6 @@ class _FormStylePageState extends State<FormStylePage> {
     _ebcminController.text = AppLocalizations.of(context)!.colorFormat(widget.model.ebcmin) ?? '';
     _ebcmaxController.text = AppLocalizations.of(context)!.colorFormat(widget.model.ebcmax) ?? '';
     _modified = modified ? true : false;
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }
 

@@ -8,6 +8,7 @@ import 'package:bab/controller/forms/form_payment_page.dart';
 import 'package:bab/models/payment_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/custom_state.dart';
 
 // External package
 import 'package:uuid/uuid.dart';
@@ -17,7 +18,7 @@ class InformationPage extends StatefulWidget {
   _InformationPageState createState() => _InformationPageState();
 }
 
-class _InformationPageState extends State<InformationPage> {
+class _InformationPageState extends CustomState<InformationPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   final GlobalKey<FormState> _globaley = GlobalKey<FormState>();
   final GlobalKey<FormState> _emailKey = GlobalKey<FormState>();
@@ -100,7 +101,7 @@ class _InformationPageState extends State<InformationPage> {
                     onPressed: () async {
                       if (_globaley.currentState!.validate()) {
                         FirebaseAuth.instance.currentUser!.updateDisplayName(_fullNameController.text);
-                        _showSnackbar(AppLocalizations.of(context)!.text('information_recorded'));
+                        showSnackbar(AppLocalizations.of(context)!.text('information_recorded'));
                       }
                     },
                   ),
@@ -189,7 +190,7 @@ class _InformationPageState extends State<InformationPage> {
                           onPressed: () async {
                             if (_emailKey.currentState!.validate()) {
                               FirebaseAuth.instance.currentUser!.updateEmail(_confirmEmailController.text);
-                              _showSnackbar(AppLocalizations.of(context)!.text('email_changed'));
+                              showSnackbar(AppLocalizations.of(context)!.text('email_changed'));
                               setState(() {
                                 changeEmail = false;
                               });
@@ -337,7 +338,7 @@ class _InformationPageState extends State<InformationPage> {
                                 password: _passwordController.text.trim(),
                               ).then((value) {
                                 FirebaseAuth.instance.currentUser!.updatePassword(_confirmPasswordController.text);
-                                _showSnackbar(AppLocalizations.of(context)!.text('password_changed'));
+                                showSnackbar(AppLocalizations.of(context)!.text('password_changed'));
                               });
                             }
                           },
@@ -363,9 +364,9 @@ class _InformationPageState extends State<InformationPage> {
           newModel.uuid = const Uuid().v4();
           currentUser!.payments!.add(newModel);
           Database().update(currentUser).then((value) async {
-            _showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
+            showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
           }).onError((e,s) {
-            _showSnackbar(e.toString());
+            showSnackbar(e.toString(), success: false);
           });
         });
       }
@@ -379,22 +380,13 @@ class _InformationPageState extends State<InformationPage> {
       if (value != null) {
         setState(() {
           Database().update(currentUser).then((value) async {
-            _showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
+            showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
           }).onError((e,s) {
-            _showSnackbar(e.toString());
+            showSnackbar(e.toString(), success: false);
           });
         });
       }
     });
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }
 

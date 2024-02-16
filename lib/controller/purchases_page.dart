@@ -76,14 +76,5 @@ class _PurchasesPageState extends State<PurchasesPage> {
       _purchases = Database().getPurchases(user: currentUser!.uuid);
     });
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 

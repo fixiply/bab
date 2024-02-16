@@ -8,6 +8,7 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -22,7 +23,7 @@ class FormMiscPage extends StatefulWidget {
   _FormMiscPageState createState() => _FormMiscPageState();
 }
 
-class _FormMiscPageState extends State<FormMiscPage> {
+class _FormMiscPageState extends CustomState<FormMiscPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
@@ -62,7 +63,7 @@ class _FormMiscPageState extends State<FormMiscPage> {
                 Database().update(widget.model, context: context, updateLogs: !currentUser!.isAdmin()).then((value) async {
                   Navigator.pop(context, widget.model);
                 }).onError((e,s) {
-                  _showSnackbar(e.toString());
+                  showSnackbar(e.toString());
                 });
               }
             } : null
@@ -151,15 +152,6 @@ class _FormMiscPageState extends State<FormMiscPage> {
           ),
         )
       )
-    );
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
     );
   }
 }

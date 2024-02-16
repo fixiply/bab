@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/widgets/custom_state.dart';
 
 class MyStep extends Step {
   int index;
@@ -39,7 +40,7 @@ class CustomStepper extends StatefulWidget {
   CustomStepperState createState() => CustomStepperState();
 }
 
-class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserver  {
+class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingObserver  {
   int _lastStep = 0;
   int _currentStep = 0;
 
@@ -63,7 +64,7 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
               _currentStep -= 1;
             });
           } catch (e) {
-            _showSnackbar(e.toString());
+            showSnackbar(e.toString(), success: false);
           }
         }
       },
@@ -79,7 +80,7 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
               }
             });
           } catch (e) {
-            _showSnackbar(e.toString(), action: SnackBarAction(
+            showSnackbar(e.toString(), action: SnackBarAction(
               label: localizations.continueButtonLabel.toUpperCase(),
               textColor: Colors.white,
               onPressed: () {
@@ -130,16 +131,6 @@ class CustomStepperState extends State<CustomStepper> with WidgetsBindingObserve
         );
       },
       steps: widget.steps
-    );
-  }
-
-  _showSnackbar(String message, {SnackBarAction? action}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10),
-          action: action,
-        )
     );
   }
 }

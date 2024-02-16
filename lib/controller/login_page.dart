@@ -7,6 +7,7 @@ import 'package:bab/controller/register_page.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/custom_checkbox.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/markdown_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -21,7 +22,7 @@ class LoginPage extends StatefulWidget {
   _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends CustomState<LoginPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _email = foundation.kDebugMode ? GUEST : null;
   late TextEditingController _emailController;
@@ -178,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
                     child: Text(AppLocalizations.of(context)!.text('forgot_password'), style: TextStyle(color: Theme.of(context).primaryColor)),
                     onTap: EmailValidator.validate(_emailController.text) ? () async {
                       FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
-                      _showSnackbar(AppLocalizations.of(context)!.text('password_reset'));
+                      showSnackbar(AppLocalizations.of(context)!.text('password_reset'));
                     } : null,
                   ),
                 ],
@@ -272,7 +273,7 @@ class _LoginPageState extends State<LoginPage> {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString(SIGN_IN_KEY, _emailController.text.trim());
       if (!credential.user!.emailVerified) {
-        _showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
+        showSnackbar(AppLocalizations.of(context)!.text('email_validate_registration'),
           action: SnackBarAction(
             textColor: Colors.white,
             label: AppLocalizations.of(context)!.text('resend'),
@@ -289,23 +290,13 @@ class _LoginPageState extends State<LoginPage> {
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'user-not-found') {
-        _showSnackbar(AppLocalizations.of(context)!.text('no_user_found'));
+        showSnackbar(AppLocalizations.of(context)!.text('no_user_found'), success: false);
       } else if (e.code == 'wrong-password') {
-        _showSnackbar(AppLocalizations.of(context)!.text('wrong_password'));
+        showSnackbar(AppLocalizations.of(context)!.text('wrong_password'), success: false);
       } else {
-        _showSnackbar(e.message!);
+        showSnackbar(e.message!, success: false);
       }
     }
-  }
-
-  _showSnackbar(String message, {SnackBarAction? action, VoidCallback? onClosed}) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 10),
-        action: action,
-      )
-    ).closed.then((value) => onClosed?.call());
   }
 }
 

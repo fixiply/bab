@@ -15,6 +15,7 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/utils/payment.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/custom_image.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/modal_bottom_sheet.dart';
 
 // External package
@@ -27,7 +28,7 @@ class BasketPage extends StatefulWidget {
   _BasketPageState createState() => _BasketPageState();
 }
 
-class _BasketPageState extends State<BasketPage> {
+class _BasketPageState extends CustomState<BasketPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
   List<StyleModel>? _styles;
@@ -363,22 +364,13 @@ class _BasketPageState extends State<BasketPage> {
       if (value != null) {
         setState(() {
           Database().update(currentUser).then((value) async {
-            _showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
+            showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
           }).onError((e,s) {
-            _showSnackbar(e.toString());
+            showSnackbar(e.toString(), success: false);
           });
         });
       }
     });
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10)
-      )
-    );
   }
 }
 

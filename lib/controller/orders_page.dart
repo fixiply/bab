@@ -38,14 +38,5 @@ class _OrdersPageState extends State<OrdersPage> with AutomaticKeepAliveClientMi
       body: EmptyContainer(message: 'En construction')
     );
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 

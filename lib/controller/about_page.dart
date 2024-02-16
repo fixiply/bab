@@ -70,14 +70,5 @@ class _AboutPageState extends State<AboutPage> {
       _version = 'V${packageInfo.version} (${packageInfo.buildNumber})';
     });
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 

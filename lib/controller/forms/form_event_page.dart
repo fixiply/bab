@@ -8,6 +8,7 @@ import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/push.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -31,7 +32,7 @@ class FormEventPage extends StatefulWidget {
   _FormEventPageState createState() => _FormEventPageState();
 }
 
-class _FormEventPageState extends State<FormEventPage> {
+class _FormEventPageState extends CustomState<FormEventPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
@@ -72,7 +73,7 @@ class _FormEventPageState extends State<FormEventPage> {
                   Database().update(widget.model, context: context).then((value) async {
                     Navigator.pop(context, widget.model);
                   }).onError((e,s) {
-                    _showSnackbar(e.toString());
+                    showSnackbar(e.toString());
                   });
                 }
               } else {
@@ -277,15 +278,6 @@ class _FormEventPageState extends State<FormEventPage> {
           ),
         )
       )
-    );
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
     );
   }
 }

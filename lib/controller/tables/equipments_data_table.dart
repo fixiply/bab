@@ -207,15 +207,6 @@ class _EquipmentDataTableState extends State<EquipmentDataTable> with AutomaticK
       _data!.then((value) => value.removeAt(rowIndex));
     });
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 
 class TankDataSource extends EditDataSource {

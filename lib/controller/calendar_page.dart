@@ -13,6 +13,7 @@ import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/days.dart';
 
 // External package
@@ -23,7 +24,7 @@ class CalendarPage extends StatefulWidget {
   _CalendarPageState createState() => _CalendarPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
+class _CalendarPageState extends CustomState<CalendarPage> with AutomaticKeepAliveClientMixin<CalendarPage> {
   Future<List<Model>>? _data;
   final ValueNotifier<List<ListTile>> _selectedEvents = ValueNotifier([]);
   final _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -294,10 +295,10 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
                   e.fermentation = e.fermentations;
                 }
                 Database().update(e).then((value) async {
-                  _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
+                  showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
                   _fetch();
                 }).onError((e, s) {
-                  _showSnackbar(e.toString());
+                  showSnackbar(e.toString(), success: false);
                 });
               }
             }
@@ -335,15 +336,6 @@ class _CalendarPageState extends State<CalendarPage> with AutomaticKeepAliveClie
     final dayCount = last.difference(first).inDays + 1;
     return List.generate(
       dayCount, (index) => DateTime.utc(first.year, first.month, first.day + index),
-    );
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10)
-      )
     );
   }
 }

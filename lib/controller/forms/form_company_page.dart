@@ -6,6 +6,7 @@ import 'package:bab/models/company_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -24,7 +25,7 @@ class FormCompanyPage extends StatefulWidget {
   _FormCompanyPageState createState() => _FormCompanyPageState();
 }
 
-class _FormCompanyPageState extends State<FormCompanyPage> {
+class _FormCompanyPageState extends CustomState<FormCompanyPage> {
   final _formKey = GlobalKey<FormState>();
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   bool _modified = false;
@@ -64,7 +65,7 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
                 Database().update(widget.model, context: context).then((value) async {
                   Navigator.pop(context, widget.model);
                 }).onError((e,s) {
-                  _showSnackbar(e.toString());
+                  showSnackbar(e.toString());
                 });
               }
             } : null
@@ -169,15 +170,6 @@ class _FormCompanyPageState extends State<FormCompanyPage> {
           ),
         )
       )
-    );
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
     );
   }
 }

@@ -17,6 +17,7 @@ import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/search_text.dart';
 
@@ -38,7 +39,7 @@ class FermentablesPage extends StatefulWidget {
   FermentablesPageState createState() => FermentablesPageState();
 }
 
-class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAliveClientMixin<FermentablesPage> {
+class FermentablesPageState extends CustomState<FermentablesPage> with AutomaticKeepAliveClientMixin<FermentablesPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late FermentableDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
@@ -64,9 +65,9 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
       showAction: false,
       onChanged: (FermentableModel value, int dataRowIndex) {
         Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
-          _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
+          showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
-          _showSnackbar(e.toString());
+          showSnackbar(e.toString(), success: false);
         });
       }
     );
@@ -385,7 +386,7 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
           _selected.clear();
         });
       } catch (e) {
-        _showSnackbar(e.toString());
+        showSnackbar(e.toString(), success: false);
       } finally {
         EasyLoading.dismiss();
       }
@@ -393,15 +394,6 @@ class FermentablesPageState extends State<FermentablesPage> with AutomaticKeepAl
       return true;
     }
     return false;
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }
 

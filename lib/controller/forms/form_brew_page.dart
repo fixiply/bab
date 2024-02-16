@@ -10,6 +10,7 @@ import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -27,7 +28,7 @@ class FormBrewPage extends StatefulWidget {
   _FormBrewPageState createState() => _FormBrewPageState();
 }
 
-class _FormBrewPageState extends State<FormBrewPage> {
+class _FormBrewPageState extends CustomState<FormBrewPage> {
   Key _key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
   bool _modified = false;
@@ -88,7 +89,7 @@ class _FormBrewPageState extends State<FormBrewPage> {
                   Database().update(widget.model, context: context).then((value) async {
                     Navigator.pop(context, widget.model);
                   }).onError((e,s) {
-                    _showSnackbar(e.toString());
+                    showSnackbar(e.toString());
                   });
                 }
               } else {
@@ -508,15 +509,6 @@ class _FormBrewPageState extends State<FormBrewPage> {
     setState(() {
       _key = UniqueKey();
     });
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 10)
-      )
-    );
   }
 }
 

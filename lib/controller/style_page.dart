@@ -312,14 +312,5 @@ class _StylePageState extends State<StylePage> {
       return FormStylePage(model);
     }));
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(message),
-          duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 

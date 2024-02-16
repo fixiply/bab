@@ -16,7 +16,7 @@ import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
-import 'package:bab/widgets/custom_image.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/search_text.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -86,7 +86,7 @@ class CustomListItem extends StatelessWidget {
   }
 }
 
-class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin<TanksPage> {
+class TanksPageState extends CustomState<TanksPage> with AutomaticKeepAliveClientMixin<TanksPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   late TankDataSource _dataSource;
   final DataGridController _dataGridController = DataGridController();
@@ -109,9 +109,9 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
       showCheckboxColumn: widget.showCheckboxColumn,
       onChanged: (EquipmentModel value, int dataRowIndex) {
         Database().update(value, updateLogs: !currentUser!.isAdmin()).then((value) async {
-          _showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
+          showSnackbar(AppLocalizations.of(context)!.text('saved_item'));
         }).onError((e, s) {
-          _showSnackbar(e.toString());
+          showSnackbar(e.toString(), success: false);
         });
       }
     );
@@ -330,8 +330,8 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
               child: Text(AppLocalizations.of(context)!.text('remove')),
             ),
           ]
-        ) : model.hasBluetooth() ? IconButton(
-          icon: const Icon(Icons.bluetooth_outlined),
+        ) : model.hasBluetooth() ? ElevatedButton(
+          child: const Icon(Icons.bluetooth_outlined),
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
               return BluetoothPage(model);
@@ -430,7 +430,7 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
           _selected.clear();
         });
       } catch (e) {
-        _showSnackbar(e.toString());
+        showSnackbar(e.toString(), success: false);
       } finally {
         EasyLoading.dismiss();
       }
@@ -438,15 +438,6 @@ class TanksPageState extends State<TanksPage> with AutomaticKeepAliveClientMixin
       return true;
     }
     return false;
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }
 

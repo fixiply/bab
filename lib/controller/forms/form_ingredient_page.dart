@@ -111,14 +111,5 @@ class _FormIngredientPageState extends State<FormIngredientPage> {
       )
     );
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 

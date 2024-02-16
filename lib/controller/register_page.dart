@@ -6,6 +6,7 @@ import 'package:bab/controller/login_page.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/dialogs/markdown_dialog.dart';
+import 'package:bab/widgets/custom_state.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +19,7 @@ class RegisterPage extends StatefulWidget {
   _RegisterPageState createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends CustomState<RegisterPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -222,29 +223,20 @@ class _RegisterPageState extends State<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      _showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
+      showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
       credential.user!.sendEmailVerification();
       credential.user!.updateDisplayName(_fullNameController.text);
       debugPrint('createUserWithEmailAndPassword ${credential.user!.uid}');
       await FirebaseAuth.instance.signOut();
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        _showSnackbar(AppLocalizations.of(context)!.text('weak_password'));
+        showSnackbar(AppLocalizations.of(context)!.text('weak_password'), success: false);
       } else if (e.code == 'email-already-in-use') {
-        _showSnackbar(AppLocalizations.of(context)!.text('email_already_in_use'));
+        showSnackbar(AppLocalizations.of(context)!.text('email_already_in_use'), success: false);
       }
     } catch (e) {
       print(e);
     }
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }
 

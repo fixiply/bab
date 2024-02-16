@@ -9,6 +9,7 @@ import 'package:bab/models/image_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/storage.dart';
+import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
@@ -44,7 +45,7 @@ class AppBarParams {
   });
 }
 
-class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin<GalleryPage> {
+class _GalleryPageState extends CustomState<GalleryPage> with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin<GalleryPage> {
   String _path = 'pictures';
   AppBarParams? _appBar;
   List<ImageModel> _selected = [];
@@ -159,7 +160,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                   });
                   _applyChange();
                 } catch (e) {
-                  _showSnackbar(e.toString());
+                  showSnackbar(e.toString());
                 } finally {
                   EasyLoading.dismiss();
                 }
@@ -297,7 +298,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
                         });
                         _fetch();
                       } else {
-                        _showSnackbar(AppLocalizations.of(context)!.text('unable_delete_folder'));
+                        showSnackbar(AppLocalizations.of(context)!.text('unable_delete_folder'));
                       }
                       Navigator.pop(context);
                     }
@@ -651,7 +652,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         });
         _fetch();
       } catch (e) {
-        _showSnackbar(e.toString());
+        showSnackbar(e.toString());
       } finally {
         EasyLoading.dismiss();
       }
@@ -686,7 +687,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         });
         _fetch();
       } catch (e) {
-        _showSnackbar(e.toString());
+        showSnackbar(e.toString());
       } finally {
         EasyLoading.dismiss();
       }
@@ -713,7 +714,7 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         });
         _fetch();
       } catch (e) {
-        _showSnackbar(e.toString());
+        showSnackbar(e.toString());
       } finally {
         EasyLoading.dismiss();
       }
@@ -820,14 +821,5 @@ class _GalleryPageState extends State<GalleryPage> with SingleTickerProviderStat
         break;
       default:
     }
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }

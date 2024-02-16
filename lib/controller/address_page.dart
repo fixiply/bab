@@ -6,6 +6,7 @@ import 'package:bab/controller/forms/form_address_page.dart';
 import 'package:bab/utils/adress.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/custom_state.dart';
 
 // External package
 import 'package:uuid/uuid.dart';
@@ -15,7 +16,7 @@ class AddressPage extends StatefulWidget {
   _AddressPageState createState() => _AddressPageState();
 }
 
-class _AddressPageState extends State<AddressPage> {
+class _AddressPageState extends CustomState<AddressPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   ScrollController? _controller;
   bool _modify = false;
@@ -107,9 +108,9 @@ class _AddressPageState extends State<AddressPage> {
           newModel.uuid = const Uuid().v4();
           currentUser!.addresses!.add(newModel);
           Database().update(currentUser).then((value) async {
-            _showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
+            showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
           }).onError((e,s) {
-            _showSnackbar(e.toString());
+            showSnackbar(e.toString(), success: false);
           });
         });
       }
@@ -123,22 +124,13 @@ class _AddressPageState extends State<AddressPage> {
       if (value != null) {
         setState(() {
           Database().update(currentUser).then((value) async {
-            _showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
+            showSnackbar(AppLocalizations.of(context)!.text('saved_address'));
           }).onError((e,s) {
-            _showSnackbar(e.toString());
+            showSnackbar(e.toString(), success: false);
           });
         });
       }
     });
-  }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
   }
 }
 

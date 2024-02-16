@@ -154,14 +154,5 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
       return FormProductPage(model);
     })).then((value) { _fetch(); });
   }
-
-  _showSnackbar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(message),
-            duration: const Duration(seconds: 10)
-        )
-    );
-  }
 }
 
