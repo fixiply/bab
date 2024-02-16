@@ -109,7 +109,7 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
       );
     } else {
       return AnimatedActionButton(
-        title: AppLocalizations.of(context)!.text('bluetooth_searching'),
+        title: AppLocalizations.of(context)!.text('search'),
         icon: const Icon(Icons.bluetooth_searching),
         onPressed: onScanPressed,
       );
@@ -144,7 +144,7 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context)!.text('bluetooth_connection')),
+        title: Text(AppLocalizations.of(context)!.text('available_devices')),
       ),
       body: RefreshIndicator(
         onRefresh: onRefresh,
