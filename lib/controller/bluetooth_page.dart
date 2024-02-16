@@ -127,8 +127,7 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
         ),
         onConnect: () => onConnectPressed(d),
       ),
-    )
-        .toList();
+    ).toList();
   }
 
   List<Widget> _buildScanResultTiles(BuildContext context) {
@@ -136,8 +135,7 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
         result: r,
         onTap: () => onConnectPressed(r.device),
       ),
-    )
-        .toList();
+    ).toList();
   }
 
   @override

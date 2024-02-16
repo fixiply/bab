@@ -1,3 +1,4 @@
+import 'package:bab/widgets/image_animate_rotate.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -31,7 +32,7 @@ class MyStep extends Step {
 }
 
 class CustomStepper extends StatefulWidget {
-  List<MyStep> steps;
+  List<MyStep> steps = [];
   int currentStep;
   final void Function(int index)? onLastStep;
 
@@ -54,6 +55,13 @@ class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingO
   @override
   Widget build(BuildContext context) {
     final MaterialLocalizations localizations = MaterialLocalizations.of(context);
+    if (widget.steps.isEmpty) {
+      return Center(
+        child: ImageAnimateRotate(
+          child: Image.asset('assets/images/logo.png', width: 60, height: 60, color: Theme.of(context).primaryColor),
+        )
+      );
+    }
     return Stepper(
       currentStep: _currentStep,
       onStepCancel: () {

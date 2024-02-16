@@ -11,13 +11,13 @@ import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/hop_model.dart' as hm;
 import 'package:bab/models/misc_model.dart' as mm;
 import 'package:bab/models/recipe_model.dart';
+import 'package:bab/models/yeast_model.dart' as ym;
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/mash.dart' as mash;
 import 'package:bab/utils/notification_service.dart';
 import 'package:bab/widgets/circular_timer.dart';
-import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/containers/ph_container.dart';
 import 'package:bab/widgets/countdown_text.dart';
 import 'package:bab/widgets/custom_stepper.dart';
@@ -77,7 +77,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   double _grainTemp = 20;
   Future<double>? _initialBrewTemp;
 
-  Future<List<MyStep>>? _steps;
+  List<MyStep> _steps = [];
   late SfRadialGauge _temp;
 
   CountDownController _boilController = CountDownController();
@@ -135,23 +135,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             }
           ),
         ),
-        body: FutureBuilder<List<MyStep>>(
-          future: _steps,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return CustomStepper(
-                steps: snapshot.data!,
-                currentStep: widget.model.last_step ?? 0,
-                onLastStep: (index) {
-                  widget.model.last_step = index;
-                  Database().update(widget.model, updateLogs: false);
-                }
-              );
-            }
-            if (snapshot.hasError) {
-              return ErrorContainer(snapshot.error.toString());
-            }
-            return const Center(child: CircularProgressIndicator(strokeWidth: 2.0, valueColor:AlwaysStoppedAnimation<Color>(Colors.black38)));
+        body: CustomStepper(
+          steps: _steps,
+          currentStep: widget.model.last_step ?? 0,
+          onLastStep: (index) {
+            widget.model.last_step = index;
+            Database().update(widget.model, updateLogs: false);
           }
         )
       )
@@ -229,210 +218,197 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ]
     );
     _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
-    _fetch();
+    _generate();
   }
 
-  _fetch() async {
-    setState(() {
-      _steps = _generate();
-    });
-  }
-
-  Future<List<MyStep>> _generate() async {
+  _generate() async {
     RecipeModel recipe = widget.model.recipe!.copy();
-    List<MyStep> steps = [
-      MyStep(
-        index: ++_index,
-        title: const Text('Début'),
-        content: Container(
-          alignment: Alignment.centerLeft,
-          child: const Text('Démarrage du brassin')
-        ),
-        onStepContinue: (int index) {
-          if (widget.model.started_at == null) {
-            widget.model.started_at = DateTime.now();
-            Database().update(widget.model, updateLogs: false);
-          }
-        },
-      ),
-      MyStep(
-        index: ++_index,
-        title: const Text('Concasser le grain'),
-        content: Container(
-          alignment: Alignment.centerLeft,
-          child: FutureBuilder<List<FermentableModel>>(
-            future: recipe.getFermentables(volume: widget.model.volume, forceResizing: true),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: snapshot.data!.map((e) {
-                    return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount)} «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
-                  }).toList()
-                );
-              }
-              return Container();
+    Map<CountDownTextController, Ingredient> ingredients = await _ingredients(recipe);
+    List<ym.YeastModel> yeasts = await recipe.getYeasts(volume: widget.model.volume);
+    setState(() {
+      _steps = [
+        MyStep(
+          index: ++_index,
+          title: const Text('Début'),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            child: const Text('Démarrage du brassin')
+          ),
+          onStepContinue: (int index) {
+            if (widget.model.started_at == null) {
+              widget.model.started_at = DateTime.now();
+              Database().update(widget.model, updateLogs: false);
             }
-          )
+          },
         ),
-      ),
-      MyStep(
-        index: ++_index,
-        title: Text('Ajoutez ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
-        content: Container(
-          alignment: Alignment.centerLeft,
-          child: PHContainer(
-            target: widget.model.mash_ph,
-            volume: widget.model.volume,
-          )
-        ),
-      ),
-      MyStep(
-        index: ++_index,
-        title: RichText(
-          text: TextSpan(
-            text: 'Mettre en chauffe votre cuve',
-            style: DefaultTextStyle.of(context).style,
-            children: [
-              // TextSpan(text:  ' à ${AppLocalizations.of(context)!.tempFormat(_initialBrewTemp)}'),
-              WidgetSpan(
-                child: FutureBuilder<double?>(
-                  future: _initialBrewTemp,
-                  builder: (context, snapshot) {
-                    double initialTemp = 50;
-                    if (snapshot.hasData) {
-                      initialTemp = snapshot.data!;
-                    }
-                    return Text(' à ${AppLocalizations.of(context)!.tempFormat(initialTemp)}');
-                  }
-                )
-              )
-            ],
+        MyStep(
+          index: ++_index,
+          title: const Text('Concasser le grain'),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            child: FutureBuilder<List<FermentableModel>>(
+              future: recipe.getFermentables(volume: widget.model.volume, forceResizing: true),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: snapshot.data!.map((e) {
+                      return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount)} «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
+                    }).toList()
+                  );
+                }
+                return Container();
+              }
+            )
           ),
         ),
-        content: Container(
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text('Température du grain'),
-              SizedBox(
-                width: DeviceHelper.isLargeScreen(context) ? 320: null,
-                child: TextFormField(
-                  initialValue: _grainTemp.toString(),
-                  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: <TextInputFormatter>[
-                    FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
-                  ],
-                  onChanged: (String? value) {
-                    if (value != null) {
-                      _grainTemp = AppLocalizations.of(context)!.decimal(value) ?? 20;
-                      _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
-                      _fetch();
+        MyStep(
+          index: ++_index,
+          title: Text('Ajoutez ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            child: PHContainer(
+              target: widget.model.mash_ph,
+              volume: widget.model.volume,
+            )
+          ),
+        ),
+        MyStep(
+          index: ++_index,
+          title: RichText(
+            text: TextSpan(
+              text: 'Mettre en chauffe votre cuve',
+              style: DefaultTextStyle.of(context).style,
+              children: [
+                // TextSpan(text:  ' à ${AppLocalizations.of(context)!.tempFormat(_initialBrewTemp)}'),
+                WidgetSpan(
+                  child: FutureBuilder<double?>(
+                    future: _initialBrewTemp,
+                    builder: (context, snapshot) {
+                      double initialTemp = 50;
+                      if (snapshot.hasData) {
+                        initialTemp = snapshot.data!;
+                      }
+                      return Text(' à ${AppLocalizations.of(context)!.tempFormat(initialTemp)}');
                     }
-                  },
-                  decoration: FormDecoration(
-                    labelText: AppLocalizations.of(context)!.text('temperature'),
-                    suffixText: AppLocalizations.of(context)!.tempMeasure,
-                    border: InputBorder.none,
-                    fillColor: constants.FillColor, filled: true
                   )
+                )
+              ],
+            ),
+          ),
+          content: Container(
+            alignment: Alignment.centerLeft,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Température du grain'),
+                SizedBox(
+                  width: DeviceHelper.isLargeScreen(context) ? 320: null,
+                  child: TextFormField(
+                    initialValue: _grainTemp.toString(),
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    inputFormatters: <TextInputFormatter>[
+                      FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
+                    ],
+                    onChanged: (String? value) {
+                      if (value != null) {
+                        _grainTemp = AppLocalizations.of(context)!.decimal(value) ?? 20;
+                        _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
+                        _generate();
+                      }
+                    },
+                    decoration: FormDecoration(
+                      labelText: AppLocalizations.of(context)!.text('temperature'),
+                      suffixText: AppLocalizations.of(context)!.tempMeasure,
+                      border: InputBorder.none,
+                      fillColor: constants.FillColor, filled: true
+                    )
+                  ),
                 ),
-              ),
-              if (widget.model.tank!.hasBluetooth()) const SizedBox(height: 6),
-              if (widget.model.tank!.hasBluetooth()) SizedBox(
-                width: 140,
-                height: 140,
-                child: _temp,
+                if (widget.model.tank!.hasBluetooth()) const SizedBox(height: 6),
+                if (widget.model.tank!.hasBluetooth()) SizedBox(
+                  width: 140,
+                  height: 140,
+                  child: _temp,
+                )
+              ],
+            )
+          ),
+        ),
+        MyStep(
+          index: ++_index,
+          title: const Text('Ajouter le grain'),
+          content: Container(),
+        ),
+        ..._mash(recipe),
+        MyStep(
+          index: ++_index,
+          title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(78)}'),
+          content: Container(
+              alignment: Alignment.centerLeft,
+              child: PHContainer(
+                target: widget.model.sparge_ph,
+                volume: widget.model.volume,
               )
+          ),
+        ),
+        ..._boil(recipe, ingredients),
+        MyStep(
+          index: ++_index,
+          title: const Text('Faire un whirlpool'),
+          content: Container(),
+        ),
+        MyStep(
+          index: ++_index,
+          title: const Text('Transférer le moût dans le fermenteur'),
+          content: Container(),
+        ),
+        MyStep(
+          index: ++_index,
+          title: const Text('Prendre la densité initiale'),
+          content: TextField(
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
             ],
-          )
+            onSubmitted: (value) {
+              widget.model.og = AppLocalizations.of(context)!.decimal(value);
+              widget.model.calculate();
+              Database().update(widget.model, updateLogs: false);
+            },
+            decoration: FormDecoration(
+                icon: const Icon(Icons.colorize_outlined),
+                hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
+                labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
+                border: InputBorder.none,
+                fillColor: constants.FillColor, filled: true
+            ),
+          ),
         ),
-      ),
-      MyStep(
-        index: ++_index,
-        title: const Text('Ajouter le grain'),
-        content: Container(),
-      )
-    ];
-    _mash(recipe, steps);
-    steps.add(MyStep(
-      index: ++_index,
-      title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(78)}'),
-      content: Container(
-        alignment: Alignment.centerLeft,
-        child: PHContainer(
-          target: widget.model.sparge_ph,
-          volume: widget.model.volume,
+        ..._yeast(recipe, yeasts),
+        MyStep(
+          index: ++_index,
+          title: Text('Fin'),
+          content: Container(
+              alignment: Alignment.centerLeft,
+              child: const Text('Votre brassin est prêt.')
+          ),
         )
-      ),
-    ));
-    await _boil(recipe, steps);
-    steps.add(MyStep(
-      index: ++_index,
-      title: const Text('Faire un whirlpool'),
-      content: Container(),
-    ));
-    steps.add(MyStep(
-      index: ++_index,
-      title: const Text('Transférer le moût dans le fermenteur'),
-      content: Container(),
-    ));
-    steps.add(MyStep(
-      index: ++_index,
-      title: const Text('Prendre la densité initiale'),
-      content: TextField(
-        keyboardType: const TextInputType.numberWithOptions(decimal: true),
-        inputFormatters: <TextInputFormatter>[
-          FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
-        ],
-        onSubmitted: (value) {
-          widget.model.og = AppLocalizations.of(context)!.decimal(value);
-          widget.model.calculate();
-          Database().update(widget.model, updateLogs: false);
-        },
-        decoration: FormDecoration(
-          icon: const Icon(Icons.colorize_outlined),
-          hintText: constants.Gravity.sg == AppLocalizations.of(context)!.gravity ? '1.xxx' : null,
-          labelText: AppLocalizations.of(context)!.text('oiginal_gravity'),
-          border: InputBorder.none,
-          fillColor: constants.FillColor, filled: true
-        ),
-      ),
-    ));
-    await recipe.getYeasts(volume: widget.model.volume).then((values) {
-      steps.add(MyStep(
-        index: ++_index,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(recipe.yeasts.first.amount)} levure «${AppLocalizations.of(context)!.localizedText(recipe.yeasts.first.name)}»'),
-        content: Container(),
-        onStepContinue: (int index) {
-          if (widget.model.fermented_at == null) {
-            widget.model.fermented_at = DateTime.now();
-            Database().update(widget.model, updateLogs: false);
-          }
-        },
-      ));
+      ];
     });
-    steps.add(MyStep(
-      index: ++_index,
-      title: Text('Fin'),
-      content: Container(
-        alignment: Alignment.centerLeft,
-        child: const Text('Votre brassin est prêt.')
-      ),
-    ));
-    return steps;
   }
 
-  _mash(RecipeModel recipe, List<MyStep> steps) {
-    for(int i = 0 ; i < recipe.mash!.length ; i++) {
-      if (recipe.mash![i].type == mash.Type.infusion) {
+  List<MyStep> _mash(RecipeModel recipe) {
+    List<MyStep> values = [];
+    for(mash.Mash item in recipe.mash!) {
+      if (item.type == mash.Type.infusion) {
+        var index = ++_index;
         CountDownController controller = CountDownController();
-        steps.add(MyStep(
-          index: ++_index,
-          title: Text('Palier «${recipe.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(recipe.mash![i].temperature)} pendant ${recipe.mash![i].duration} minutes'),
+        values.add(MyStep(
+          index: index,
+          title: Text('Palier «${item.name}» à ${AppLocalizations.of(context)!.tempFormat(item.temperature)} pendant ${item.duration} minutes'),
           content: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(8.0),
@@ -444,32 +420,33 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               child: CircularTimer(
                 controller,
                 duration: 0,
-                index: steps.length,
+                index: index,
                 onComplete: (int index) {
-                  _notification('Le Palier «${recipe.mash![i].name}» à ${AppLocalizations.of(context)!.tempFormat(recipe.mash![i].temperature)} est terminé.');
-                  steps[index].completed = true;
+                  _notification('Le Palier «${item.name}» à ${AppLocalizations.of(context)!.tempFormat(item.temperature)} est terminé.');
+                  _steps[index].completed = true;
                 }
               ),
               onTap: () {
                 if (!controller.isStarted) {
-                  controller.restart(duration: recipe.mash![i].duration! * 60);
+                  controller.restart(duration: item.duration! * 60);
                 }
               },
             )
           ),
           onStepContinue: (int index) {
-            if (!steps[index].completed) {
+            if (!_steps[index].completed) {
               throw 'Cette étape n\'est pas terminée.';
             }
           },
         ));
       }
     }
+    return values;
   }
 
-  _boil(RecipeModel recipe, List<MyStep> steps) async {
-    Map<CountDownTextController, Ingredient> ingredients = await _ingredients(recipe);
-    steps.add(MyStep(
+  List<MyStep> _boil(RecipeModel recipe, Map<CountDownTextController, Ingredient> ingredients)  {
+    List<MyStep> values = [];
+    values.add(MyStep(
       index: ++_index,
       title: Text('Mettre en ébullition votre cuve'),
       content: widget.model.tank?.bluetooth == true ? Container(
@@ -484,8 +461,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       onStepContinue: (int index) {
       },
     ));
-    steps.add(MyStep(
-      index: ++_index,
+    var index = ++_index;
+    values.add(MyStep(
+      index: index,
       title: Text('Commencer le houblonnage pendant ${AppLocalizations.of(context)!.durationFormat(recipe.boil)}'),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -502,10 +480,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               child: CircularTimer(
                 _boilController,
                 duration: 0,
-                index: steps.length,
+                index: index,
                 onComplete: (int index) {
                   _notification('Houblonnage terminé.');
-                  steps[index].completed = true;
+                  _steps[index].completed = true;
                 }
               ),
               onTap: () {
@@ -545,11 +523,30 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       onStepTapped: (int index) {
       },
       onStepContinue: (int index) {
-        if (!steps[index].completed) {
+        if (!_steps[index].completed) {
           throw 'Cette étape n\'est pas terminée.';
         }
       },
     ));
+    return values;
+  }
+
+  List<MyStep> _yeast(RecipeModel recipe, List<ym.YeastModel> yeasts) {
+    List<MyStep> values = [];
+    for(ym.YeastModel item in yeasts) {
+      values.add(MyStep(
+        index: ++_index,
+        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(item.amount)} levure «${AppLocalizations.of(context)!.localizedText(item.name)}»'),
+        content: Container(),
+        onStepContinue: (int index) {
+          if (widget.model.fermented_at == null) {
+            widget.model.fermented_at = DateTime.now();
+            Database().update(widget.model, updateLogs: false);
+          }
+        },
+      ));
+    }
+    return values;
   }
 
   Future<Map<CountDownTextController, Ingredient>> _ingredients(RecipeModel recipe) async {
