@@ -2,6 +2,7 @@
 import 'package:bab/models/image_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/text_format.dart';
 import 'package:flutter/material.dart';
 
@@ -12,8 +13,8 @@ class EventModel<T> extends Model {
   TextFormat? top_left;
   TextFormat? top_right;
   TextFormat? bottom_left;
-  String? title;
-  String? subtitle;
+  dynamic title;
+  dynamic subtitle;
   String? page;
   List<String>? widgets;
   List<ImageModel>? images;
@@ -56,13 +57,13 @@ class EventModel<T> extends Model {
     this.top_left = TextFormat.deserialize(map['top_left']);
     this.top_right = TextFormat.deserialize(map['top_right']);
     this.bottom_left = TextFormat.deserialize(map['bottom_left']);
-    this.title = map['title'];
-    this.subtitle = map['subtitle'];
+    this.title = LocalizedText.deserialize(map['title']);
+    this.subtitle = LocalizedText.deserialize(map['subtitle']);
     this.page = map['page'];
     if (map.containsKey('widgets')) this.widgets = map['widgets'].cast<String>();
     this.images = ImageModel.deserialize(map['images']);
     if (map.containsKey('logged_out')) this.logged_out = map['logged_out'];
-    if (map.containsKey('countries')) this.countries = map['countries'];
+    if (map.containsKey('countries')) this.countries = map['countries'].cast<String>();
   }
 
   @override
@@ -75,8 +76,8 @@ class EventModel<T> extends Model {
       'top_left': TextFormat.serialize(this.top_left),
       'top_right': TextFormat.serialize(this.top_right),
       'bottom_left': TextFormat.serialize(this.bottom_left),
-      'title': this.title,
-      'subtitle': this.subtitle,
+      'title': LocalizedText.serialize(this.title),
+      'subtitle': LocalizedText.serialize(this.subtitle),
       'page': this.page,
       'widgets': this.widgets,
       'images': ImageModel.serialize(this.images),
@@ -133,18 +134,5 @@ class EventModel<T> extends Model {
       });
     }
     return list;
-  }
-
-  String getTitle() {
-    if (title != null) {
-      return title!;
-    }
-    if (top_left != null) {
-      return top_left!.text!;
-    }
-    if (bottom_left != null) {
-      return bottom_left!.text!;
-    }
-    return '';
   }
 }

@@ -147,9 +147,7 @@ class _DeviceScreenState extends CustomState<DevicePage> {
   }
 
   List<Widget> _buildServiceTiles(BuildContext context, BluetoothDevice d) {
-    return _services
-        .map(
-          (s) => ServiceTile(
+    return _services.map((s) => ServiceTile(
         service: s,
         characteristicTiles: s.characteristics.map((c) => _buildCharacteristicTile(c)).toList(),
       ),

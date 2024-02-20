@@ -29,6 +29,7 @@ class _CharacteristicTileState extends CustomState<CharacteristicTile> {
     super.initState();
     _lastValueSubscription = widget.characteristic.lastValueStream.listen((value) {
       _value = value;
+      debugPrint('Characteristic ${widget.characteristic.characteristicUuid} value: $_value');
       if (mounted) {
         setState(() {});
       }

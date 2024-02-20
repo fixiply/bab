@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // Internal package
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/event_model.dart';
+import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/widgets/basket_button.dart';
 import 'package:bab/widgets/containers/image_container.dart';
 
@@ -98,7 +99,7 @@ class _EventPageState extends State<EventPage> {
               title: FittedBox(
                 fit: BoxFit.scaleDown,
                 child: Text(
-                  widget.model.getTitle(),
+                  getTitle(),
                   style: TextStyle(color: _dominantColor),
                 ),
               ),
@@ -152,5 +153,19 @@ class _EventPageState extends State<EventPage> {
       //   }
       // });
     }
+  }
+
+
+  String getTitle() {
+    if (widget.model.title != null) {
+      return AppLocalizations.of(context)!.localizedText(widget.model.title);
+    }
+    if (widget.model.top_left != null) {
+      return widget.model.top_left!.text!;
+    }
+    if (widget.model.bottom_left != null) {
+      return widget.model.bottom_left!.text!;
+    }
+    return '';
   }
 }

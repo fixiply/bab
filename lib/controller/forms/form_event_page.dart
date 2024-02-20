@@ -14,6 +14,7 @@ import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
 import 'package:bab/widgets/forms/carousel_field.dart';
 import 'package:bab/widgets/forms/code_editor_field.dart';
+import 'package:bab/widgets/forms/localized_text_field.dart';
 import 'package:bab/widgets/forms/switch_field.dart';
 import 'package:bab/widgets/forms/text_format_field.dart';
 import 'package:bab/widgets/forms/widgets_field.dart';
@@ -105,6 +106,14 @@ class _FormEventPageState extends CustomState<FormEventPage> {
               }
             }
           ),
+          if (widget.model.uuid != null && widget.model.status != Status.publied) IconButton(
+            padding: EdgeInsets.zero,
+            tooltip: AppLocalizations.of(context)!.text('publish'),
+            icon: const Icon(Icons.publish),
+            onPressed: () async {
+              await Database().publish(widget.model);
+            }
+          ),
           if (widget.model.uuid != null) PopupMenuButton<String>(
             padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text('tools'),
@@ -129,7 +138,7 @@ class _FormEventPageState extends CustomState<FormEventPage> {
               PopupMenuItem(
                 value: 'sending',
                 child: Text(AppLocalizations.of(context)!.text('notification_sending')),
-              )
+              ),
             ]
           )
         ]
@@ -214,36 +223,48 @@ class _FormEventPageState extends CustomState<FormEventPage> {
                 )
               ),
               const Divider(height: 10),
-              TextFormField(
+              LocalizedTextField(
+                context: context,
                 initialValue: widget.model.title,
                 textCapitalization: TextCapitalization.sentences,
-                onChanged: (text) => setState(() {
-                  widget.model.title = text;
-                }),
+                onChanged: (value) => widget.model.title = value,
                 decoration: FormDecoration(
-                  icon: const Icon(Icons.title),
-                  labelText: AppLocalizations.of(context)!.text('title'),
-                  border: InputBorder.none,
-                  fillColor: FillColor, filled: true
+                    icon: const Icon(Icons.title),
+                    labelText: AppLocalizations.of(context)!.text('title'),
+                    border: InputBorder.none,
+                    fillColor: FillColor, filled: true
                 ),
-                // autovalidateMode: AutovalidateMode.onUserInteraction,
-                // validator: (value) {
-                //   if (value!.isEmpty) {
-                //     return AppLocalizations.of(context)!.text('validator_field_required');
-                //   }
-                //   return null;
-                // }
+                autovalidateMode: AutovalidateMode.onUserInteraction,
+                validator: (value) {
+                  if (value!.isEmpty) {
+                    return AppLocalizations.of(context)!.text('validator_field_required');
+                  }
+                  return null;
+                }
+              ),
+              const Divider(height: 10),
+              LocalizedTextField(
+                context: context,
+                initialValue: widget.model.subtitle,
+                textCapitalization: TextCapitalization.sentences,
+                onChanged: (value) => widget.model.subtitle = value,
+                decoration: FormDecoration(
+                    icon: const Icon(Icons.subtitles),
+                    labelText: AppLocalizations.of(context)!.text('subtitle'),
+                    border: InputBorder.none,
+                    fillColor: FillColor, filled: true
+                ),
               ),
               const Divider(height: 10),
               TextFormField(
-                initialValue: widget.model.subtitle,
+                initialValue: widget.model.countries!.join(','),
                 textCapitalization: TextCapitalization.sentences,
-                onChanged: (text) => setState(() {
-                  widget.model.subtitle = text;
+                onChanged: (String? text) => setState(() {
+                  widget.model.countries = text != null ? text.split(',') : [];
                 }),
                 decoration: FormDecoration(
-                  icon: const Icon(Icons.subtitles),
-                  labelText: AppLocalizations.of(context)!.text('subtitle'),
+                  icon: const Icon(Icons.flag_outlined),
+                  labelText: AppLocalizations.of(context)!.text('countries'),
                   border: InputBorder.none,
                   fillColor: FillColor, filled: true
                 )

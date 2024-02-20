@@ -120,7 +120,7 @@ enum Role with Enums { admin, editor, customer;
 }
 enum Acid { hydrochloric, phosphoric, lactic, sulfuric }
 enum Sort { asc_date, desc_date, asc_name, desc_name, asc_size, desc_size }
-enum Status { pending, publied, disabled }
+enum Status { pending, publied, archived }
 enum Unit { metric, us }
 enum Gravity { sg, plato, brix }
 enum Pressure { psi, bar, pascal}

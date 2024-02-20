@@ -150,7 +150,7 @@ class Database {
     }
     try {
       if (updateLogs == true) {
-        if (ClassHelper.hasStatus(d) && d.status == constants.Status.disabled) {
+        if (ClassHelper.hasStatus(d) && d.status == constants.Status.archived) {
           d.status = constants.Status.pending;
         }
         if (d is Model && _auth.currentUser != null) {
@@ -172,11 +172,11 @@ class Database {
 
   Future<void> delete(dynamic d, {bool forced = false, BuildContext? context}) async {
     try {
-      if (forced == true || !ClassHelper.hasStatus(d) || d.status == constants.Status.disabled) {
+      if (forced == true || !ClassHelper.hasStatus(d) || d.status == constants.Status.archived) {
         return await getTableName(d)!.doc(d.uuid).delete();
       } else {
         if (ClassHelper.hasStatus(d)) {
-          d.status = constants.Status.disabled;
+          d.status = constants.Status.archived;
         }
         await getTableName(d)!.doc(d.uuid).update(d.toMap());
         if (context != null) {
@@ -190,11 +190,16 @@ class Database {
     }
   }
 
-  Future<void> publishAll() async {
-    await publish(events);
+  Future<void> publish(dynamic d) async {
+    d.status = constants.Status.publied;
+    await update(d);
   }
 
-  Future<void> publish(CollectionReference collection, {bool push = false}) async {
+  Future<void> publishAll() async {
+    await _publish(events);
+  }
+
+  Future<void> _publish(CollectionReference collection, {bool push = false}) async {
     Query query = collection.where('status', isEqualTo: constants.Status.pending.index);
     await query.get().then((result) async {
       for (var doc in result.docs) {
@@ -233,18 +238,20 @@ class Database {
     return null;
   }
 
-  Future<List<EventModel>> getEvents({String? searchText, constants.Status? status, bool all = false, bool ordered = false}) async {
+  Future<List<EventModel>> getEvents({String? country, String? searchText, constants.Status? status, bool all = false, bool ordered = false}) async {
     List<EventModel> list = [];
     Query query = events;
     if (all == false) {
-      if (status == constants.Status.disabled) {
-        query = query.where('status', isEqualTo: constants.Status.disabled.index);
+      if (status == constants.Status.archived) {
+        query = query.where('status', isEqualTo: constants.Status.archived.index);
         query = query.orderBy('updated_at', descending: true);
       } else if (status == constants.Status.pending) {
-        query = query.where('status', isLessThanOrEqualTo: constants.Status.publied.index);
-        query = query.orderBy('status', descending: false);
+        query = query.where('status', isEqualTo: constants.Status.pending.index);
         query = query.orderBy('updated_at', descending: true);
       } else {
+        if (country != null) {
+          query = query.where(Filter.or(Filter('countries', arrayContains: country), Filter('countries', isEqualTo: [])));
+        }
         query = query.where('status', isEqualTo: constants.Status.publied.index);
         query = query.orderBy('updated_at', descending: true);
       }

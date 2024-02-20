@@ -13,20 +13,19 @@ import 'package:bab/widgets/modal_bottom_sheet.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:provider/provider.dart';
 
-enum Menu {settings, options, publish, archived, hidden, imported}
+enum Menu {settings, options, publish, archived, pending, imported}
 
 
 class CustomMenuAnchor extends StatefulWidget {
-  bool showPublish;
+  // bool showPublish;
   bool showFilters;
-  bool isArchived;
-  bool isHidden;
+  Status? status;
   bool showMeasures;
   Model? model;
   String? importLabel;
   PopupMenuItemSelected? onSelected;
 
-  CustomMenuAnchor({Key? key, this.showPublish = false, this.showFilters = false, this.isArchived = false, this.isHidden = false, this.showMeasures = false, this.model, this.importLabel, this.onSelected}): super(key: key);
+  CustomMenuAnchor({Key? key, this.showFilters = false, this.status, this.showMeasures = false, this.model, this.importLabel, this.onSelected}): super(key: key);
   @override
   CustomMenuAnchorState createState() => CustomMenuAnchorState();
 }
@@ -115,28 +114,28 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
             ),
           ]
         ),
-        if (widget.showPublish) MenuItemButton(
-            child: Text(AppLocalizations.of(context)!.text('publish_everything')),
-            onPressed: () async {
-              await Database().publishAll();
-              widget.onSelected?.call(Menu.publish);
-            }
-        ),
+        // if (widget.showPublish) MenuItemButton(
+        //     child: Text(AppLocalizations.of(context)!.text('publish_everything')),
+        //     onPressed: () async {
+        //       await Database().publish(widget.model!);
+        //       widget.onSelected?.call(Menu.publish);
+        //     }
+        // ),
         if (widget.showFilters) SubmenuButton(
           child: Text(AppLocalizations.of(context)!.text('filtered')),
           menuChildren: <Widget>[
             CheckboxMenuButton(
               child: Text(AppLocalizations.of(context)!.text('archives')),
-              value: widget.isArchived,
+              value: widget.status == Status.archived,
               onChanged: (value) {
                 widget.onSelected?.call(Menu.archived);
               }
             ),
             CheckboxMenuButton(
-              child: Text(AppLocalizations.of(context)!.text('hidden')),
-              value: widget.isHidden,
+              child: Text(AppLocalizations.of(context)!.text('pending')),
+              value: widget.status == Status.pending,
               onChanged: (value) {
-                widget.onSelected?.call(Menu.hidden);
+                widget.onSelected?.call(Menu.pending);
               }
             ),
           ]

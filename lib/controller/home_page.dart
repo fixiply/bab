@@ -278,7 +278,7 @@ class _HomeState extends State<HomePage> {
             onGenerateRoute: (RouteSettings settings) {
               return MaterialPageRoute(
                 fullscreenDialog: true,
-                builder: (_) => EventsPage(),
+                builder: (_) => EventsPage(country: AppLocalizations.of(context)!.locale.countryCode),
               );
             }
         ),

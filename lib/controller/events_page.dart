@@ -24,7 +24,8 @@ import 'package:bab/widgets/search_text.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class EventsPage extends StatefulWidget {
-  EventsPage({Key? key}) : super(key: key);
+  String? country;
+  EventsPage({Key? key, this.country}) : super(key: key);
 
   @override
   _EventsPageState createState() => _EventsPageState();
@@ -36,9 +37,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
   Future<List<EventModel>>? _events;
 
   // Edition mode
-  bool _remove = false;
-  bool _hidden = false;
-  bool _archived = false;
+  Status? _status;
 
   @override
   bool get wantKeepAlive => true;
@@ -65,18 +64,14 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
         actions: <Widget> [
           BasketButton(),
           CustomMenuAnchor(
-            showPublish: currentUser != null && currentUser!.isAdmin(),
             showFilters: currentUser != null && currentUser!.isAdmin(),
-            isArchived: _archived,
+            status: _status,
             onSelected: (value) async {
-              if (value == 1) {
-                await Database().publishAll();
-              } else if (value == Menu.hidden) {
-                bool checked = !_remove;
-                if (checked) {
-                  _hidden = false;
-                }
-                setState(() { _remove = checked; });
+              if (value == Menu.archived) {
+                setState(() { _status = (_status == Status.archived ? null : Status.archived ); });
+                _fetch();
+              } else if (value == Menu.pending) {
+                setState(() { _status = (_status == Status.pending ? null : Status.pending ); });
                 _fetch();
               }
             },
@@ -274,13 +269,13 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                 )
               ),
             ),
-            if(model.title != null && model.title!.isNotEmpty) Container(
+            if(model.title != null) Container(
               padding: const EdgeInsets.all(5),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  model.title!,
+                  AppLocalizations.of(context)!.localizedText(model.title),
                   overflow: grid ? TextOverflow.ellipsis : null,
                   style: const TextStyle(
                     fontSize: 18,
@@ -290,13 +285,13 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                 ),
               )
             ),
-            if(model.subtitle != null && model.subtitle!.isNotEmpty) Container(
+            if(model.subtitle != null) Container(
               padding: const EdgeInsets.all(5),
               child: FittedBox(
                 fit: BoxFit.scaleDown,
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  model.subtitle ?? '',
+                  AppLocalizations.of(context)!.localizedText(model.subtitle),
                   overflow: grid ? TextOverflow.ellipsis : null,
                   style: const TextStyle(
                     fontSize: 14,
@@ -322,7 +317,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
     Icon? icon;
     Color color = Theme.of(context).primaryColor;
     String message = '';
-    if (model.status == Status.disabled) {
+    if (model.status == Status.archived) {
       visible = true;
       icon = const Icon(Icons.delete, color: Colors.white);
       color = PointerColor;
@@ -355,8 +350,9 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
   _fetch() async {
     setState(() {
       _events = Database().getEvents(
+        country: widget.country,
         searchText: _searchQueryController.value.text,
-        status: currentUser != null && currentUser!.isAdmin() ?  _archived ? Status.disabled : Status.publied : null,
+        status: currentUser != null && currentUser!.isAdmin() ? _status : null,
       );
     });
   }
