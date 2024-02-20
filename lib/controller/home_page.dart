@@ -191,7 +191,7 @@ class _HomeState extends State<HomePage> {
                     WidgetSpan(
                         child: RotatedBox(
                             quarterTurns: -1,
-                            child: Text(' AND', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 9, color: Colors.white))
+                            child: Text(' And', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.white))
                         )
                     ),
                     TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
