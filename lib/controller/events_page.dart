@@ -217,7 +217,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                         fit: BoxFit.scaleDown,
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          model.title!,
+                          AppLocalizations.of(context)!.localizedText(model.title),
                           overflow: grid ? TextOverflow.ellipsis : null,
                           style: const TextStyle(
                             fontSize: 18,
@@ -230,7 +230,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
                     if (model.subtitle != null) Container(
                       padding: const EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                       child: Text(
-                        model.subtitle ?? '',
+                        AppLocalizations.of(context)!.localizedText(model.subtitle),
                         overflow: grid ? TextOverflow.ellipsis : null,
                         style: const TextStyle(
                           fontSize: 14,

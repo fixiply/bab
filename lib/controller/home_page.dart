@@ -185,16 +185,17 @@ class _HomeState extends State<HomePage> {
                 textAlign: TextAlign.left,
                 overflow: TextOverflow.ellipsis,
                 text: TextSpan(
-                  style: DefaultTextStyle.of(context).style,
+                  style: DefaultTextStyle.of(context).style.copyWith(fontFamily: 'BebasNeuePro', fontWeight: FontWeight.bold, color: Colors.white),
                   children: const [
-                    TextSpan(text: 'Be', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
+                    TextSpan(text: 'Be', style: TextStyle(fontSize: 28)),
                     WidgetSpan(
-                        child: RotatedBox(
-                            quarterTurns: -1,
-                            child: Text(' And', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 10, color: Colors.white))
-                        )
+                      alignment: PlaceholderAlignment.bottom,
+                      child: RotatedBox(
+                        quarterTurns: -1,
+                        child: Text(' And', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontFamily: 'BebasNeuePro', fontWeight: FontWeight.bold, letterSpacing: 2.0,color: Colors.white))
+                      )
                     ),
-                    TextSpan(text: 'Brew', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28, color: Colors.white)),
+                    TextSpan(text: 'Brew', style: TextStyle(fontSize: 28)),
                   ],
                 ),
               )
