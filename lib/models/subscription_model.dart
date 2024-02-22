@@ -1,29 +1,21 @@
 // Internal package
 import 'package:bab/helpers/date_helper.dart';
 
-class PaymentModel<T> {
+class SubscriptionModel<T> {
   String? uuid;
   DateTime? inserted_at;
   DateTime? updated_at;
-  String? name;
-  int? number;
-  String? date;
-  int? security;
-  String? address;
-  int? zip;
-  String? city;
+  String? transaction;
+  DateTime? started_at;
+  DateTime? ended_at;
 
-  PaymentModel({
+  SubscriptionModel({
     this.uuid,
     this.inserted_at,
     this.updated_at,
-    this.name,
-    this.number,
-    this.date,
-    this.security,
-    this.address,
-    this.zip,
-    this.city,
+    this.transaction,
+    this.started_at,
+    this.ended_at,
   }) {
     inserted_at ??= DateTime.now();
   }
@@ -32,26 +24,18 @@ class PaymentModel<T> {
     if (map.containsKey('uuid')) this.uuid = map['uuid'];
     this.inserted_at = DateHelper.parse(map['inserted_at']);
     this.updated_at = DateHelper.parse(map['updated_at']);
-    this.name = map['name'];
-    this.number = map['number'];
-    this.date = map['date'];
-    this.security = map['code'];
-    this.address = map['address'];
-    this.zip = map['zip'];
-    this.city = map['city'];
+    this.transaction = map['transaction'];
+    this.started_at = DateHelper.parse(map['inserted_at']);
+    this.ended_at = DateHelper.parse(map['ended_at']);
   }
 
   Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at,
       'updated_at': DateTime.now(),
-      'name': this.name,
-      'number': this.number,
-      'date': this.date,
-      'code': this.security,
-      'address': this.address,
-      'zip': this.zip,
-      'city': this.city,
+      'transaction': this.transaction,
+      'started_at': this.started_at,
+      'ended_at': this.ended_at,
     };
     if (persist == true) {
       map.addAll({'uuid': this.uuid});
@@ -59,25 +43,21 @@ class PaymentModel<T> {
     return map;
   }
 
-  PaymentModel copy() {
-    return PaymentModel(
+  SubscriptionModel copy() {
+    return SubscriptionModel(
       uuid: this.uuid,
       inserted_at: this.inserted_at,
       updated_at: this.updated_at,
-      name: this.name,
-      number: this.number,
-      date: this.date,
-      security: this.security,
-      address: this.address,
-      zip: this.zip,
-      city: this.city,
+      transaction: this.transaction,
+      started_at: this.started_at,
+      ended_at: this.ended_at,
     );
   }
 
   // ignore: hash_and_equals
   @override
   bool operator ==(other) {
-    return (other is PaymentModel && other.uuid == uuid);
+    return (other is SubscriptionModel && other.uuid == uuid);
   }
 
   @override
@@ -85,12 +65,16 @@ class PaymentModel<T> {
 
   @override
   String toString() {
-    return 'Payment: $name, UUID: $uuid';
+    return 'Subscription: $transaction, UUID: $uuid';
+  }
+
+  bool isValid(DateTime date) {
+    return DateHelper.isBetween(started_at, ended_at ?? date);
   }
 
   static dynamic serialize(dynamic data) {
     if (data != null) {
-      if (data is PaymentModel) {
+      if (data is SubscriptionModel) {
         return data.toMap(persist: true);
       }
       if (data is List) {
@@ -104,15 +88,15 @@ class PaymentModel<T> {
     return null;
   }
 
-  static List<PaymentModel> deserialize(dynamic data) {
-    List<PaymentModel> values = [];
+  static List<SubscriptionModel> deserialize(dynamic data) {
+    List<SubscriptionModel> values = [];
     if (data != null) {
       if (data is List) {
         for(final value in data) {
           values.addAll(deserialize(value));
         }
       } else {
-        PaymentModel model = PaymentModel();
+        SubscriptionModel model = SubscriptionModel();
         model.fromMap(data);
         values.add(model);
       }

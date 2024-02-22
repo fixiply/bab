@@ -372,10 +372,13 @@ class _RecipePageState extends State<RecipePage> {
            )
         ]
       ),
-      floatingActionButton: AnimatedActionButton(
-        title: AppLocalizations.of(context)!.text('new_brew'),
-        icon: const Icon(Icons.add),
-        onPressed: _new,
+      floatingActionButton: Visibility(
+        visible: currentUser != null,
+        child: AnimatedActionButton(
+          title: AppLocalizations.of(context)!.text('new_brew'),
+          icon: const Icon(Icons.add),
+          onPressed: _new,
+        )
       )
     );
   }

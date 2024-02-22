@@ -24,6 +24,7 @@ import 'package:bab/widgets/builders/chatgpt_builder.dart';
 import 'package:bab/widgets/builders/list_builder.dart';
 import 'package:bab/widgets/builders/markdown_builder.dart';
 import 'package:bab/widgets/builders/parallax_builder.dart';
+import 'package:bab/widgets/builders/registration_builder.dart';
 import 'package:bab/widgets/builders/subscription_builder.dart';
 
 // External package
@@ -328,11 +329,11 @@ class _AppState extends State<MyApp> {
           builder: SubscriptionBuilder.fromDynamic
       ),
     );
-    // registry.registerCustomBuilder(
-    //   ImageEditorBuilder.type,
-    //   JsonWidgetBuilderContainer(
-    //       builder: ImageEditorBuilder.fromDynamic
-    //   ),
-    // );
+    registry.registerCustomBuilder(
+      RegistrationBuilder.type,
+      const JsonWidgetBuilderContainer(
+          builder: RegistrationBuilder.fromDynamic
+      ),
+    );
   }
 }

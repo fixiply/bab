@@ -6,6 +6,14 @@ import 'package:bab/utils/localized_text.dart';
 import 'package:bab/utils/text_format.dart';
 import 'package:flutter/material.dart';
 
+enum Logged with Enums { connected, disconnected;
+  List<Enum> get enums => [ connected, disconnected ];
+}
+
+enum Subscription with Enums { valid, invalide;
+  List<Enum> get enums => [ valid, invalide ];
+}
+
 class EventModel<T> extends Model {
   Status? status;
   Axis? axis;
@@ -18,7 +26,8 @@ class EventModel<T> extends Model {
   String? page;
   List<String>? widgets;
   List<ImageModel>? images;
-  bool? logged_out;
+  Logged? logged;
+  Subscription? subscribed;
   List<String>? countries;
 
   EventModel({
@@ -37,7 +46,8 @@ class EventModel<T> extends Model {
     this.page,
     this.widgets,
     this.images,
-    this.logged_out,
+    this.logged,
+    this.subscribed,
     this.countries,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator) {
     top_left ??= TextFormat();
@@ -62,7 +72,8 @@ class EventModel<T> extends Model {
     this.page = map['page'];
     if (map.containsKey('widgets')) this.widgets = map['widgets'].cast<String>();
     this.images = ImageModel.deserialize(map['images']);
-    if (map.containsKey('logged_out')) this.logged_out = map['logged_out'];
+    if (map.containsKey('logged') && map['logged'] != null) this.logged = Logged.values.elementAt(map['logged']);
+    if (map.containsKey('subscribed') && map['subscribed'] != null) this.subscribed = Subscription.values.elementAt(map['subscribed']);
     if (map.containsKey('countries')) this.countries = map['countries'].cast<String>();
   }
 
@@ -81,7 +92,8 @@ class EventModel<T> extends Model {
       'page': this.page,
       'widgets': this.widgets,
       'images': ImageModel.serialize(this.images),
-      'logged_out': this.logged_out,
+      'logged': this.logged?.index,
+      'subscribed': this.subscribed?.index,
       'countries': this.countries,
     });
     return map;
@@ -104,7 +116,8 @@ class EventModel<T> extends Model {
       page: this.page,
       widgets: this.widgets,
       images: this.images,
-      logged_out: this.logged_out,
+      logged: this.logged,
+      subscribed: this.subscribed,
       countries: this.countries,
     );
   }
@@ -121,6 +134,18 @@ class EventModel<T> extends Model {
   @override
   String toString() {
     return 'Style: $title, UUID: $uuid';
+  }
+
+  bool isLogged() {
+    return logged == Logged.connected;
+  }
+
+  bool isSubscribed() {
+    return subscribed == Subscription.valid;
+  }
+
+  bool isNotSubscribed() {
+    return subscribed == Subscription.invalide;
   }
 
   List<ImageModel> getImages() {

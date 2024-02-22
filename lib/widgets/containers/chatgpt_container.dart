@@ -134,8 +134,8 @@ class _ChatGPTContainerState extends AbstractContainerState {
                 if (currentUser == null) Align(
                   child: Text(AppLocalizations.of(context)!.text('log_in_feature'))
                 ),
-                if (currentUser == null)  const SizedBox(height: 4),
-                if (currentUser == null)  Align(
+                if (currentUser == null) const SizedBox(height: 4),
+                if (currentUser == null) Align(
                   child: TextButton(
                     child: Text(AppLocalizations.of(context)!.text('login'), style: TextStyle(color: Theme.of(context).primaryColor)),
                     onPressed: () {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/about_page.dart';
-import 'package:bab/controller/address_page.dart';
 import 'package:bab/controller/devices_page.dart';
 import 'package:bab/controller/login_page.dart';
 import 'package:bab/controller/information_page.dart';
@@ -107,16 +106,16 @@ class _AccountPageState extends State<AccountPage> {
                       }));
                     },
                   ),
-                  if (currentUser != null) ListTile(
-                    contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.local_shipping_outlined),
-                    title: Text(AppLocalizations.of(context)!.text('delivery_addresses')),
-                    onTap: () {
-                      Navigator.push(context, MaterialPageRoute(builder: (context) {
-                        return AddressPage();
-                      }));
-                    },
-                  ),
+                  // if (currentUser != null) ListTile(
+                  //   contentPadding: EdgeInsets.zero,
+                  //   leading: const Icon(Icons.local_shipping_outlined),
+                  //   title: Text(AppLocalizations.of(context)!.text('delivery_addresses')),
+                  //   onTap: () {
+                  //     Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  //       return AddressPage();
+                  //     }));
+                  //   },
+                  // ),
                   ListTile(
                     contentPadding: EdgeInsets.zero,
                     leading: const Icon(Icons.help_outline),

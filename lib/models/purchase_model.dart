@@ -1,33 +1,34 @@
 // Internal package
+import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/utils/constants.dart';
 
 class PurchaseModel<T> extends Model {
-  Status? status;
   String? name;
+  String? transaction;
 
   PurchaseModel({
     String? uuid,
     DateTime? inserted_at,
     DateTime? updated_at,
     String? creator,
-    this.status = Status.publied,
     this.name,
+    this.transaction,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator);
 
   @override
   void fromMap(Map<String, dynamic> map) {
     super.fromMap(map);
-    this.status = Status.values.elementAt(map['status']);
     this.name = map['name'];
+    this.transaction = map['transaction'];
   }
 
   @override
   Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = super.toMap(persist: persist);
     map.addAll({
-      'status': this.status!.index,
       'name': this.name,
+      'transaction': this.transaction,
     });
     return map;
   }
@@ -38,8 +39,8 @@ class PurchaseModel<T> extends Model {
       inserted_at: inserted_at,
       updated_at: updated_at,
       creator: creator,
-      status: this.status,
       name: this.name,
+      transaction: this.transaction,
     );
   }
 

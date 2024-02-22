@@ -1,6 +1,6 @@
 // Internal package
 import 'package:bab/utils/adress.dart';
-import 'package:bab/models/payment_model.dart';
+import 'package:bab/models/subscription_model.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/utils/device.dart';
@@ -16,7 +16,7 @@ class UserModel<T> {
   String? company;
   String? language;
   List<Adress>? addresses;
-  List<PaymentModel>? payments;
+  List<SubscriptionModel>? subscriptions;
   List<Device>? devices;
   String? openAI_api_key;
 
@@ -28,13 +28,13 @@ class UserModel<T> {
     this.company,
     this.language,
     this.addresses,
-    this.payments,
+    this.subscriptions,
     this.devices,
     this.openAI_api_key
   }) {
     inserted_at ??= DateTime.now();
     addresses ??= [];
-    payments ??= [];
+    subscriptions ??= [];
     devices ??= [];
   }
 
@@ -58,7 +58,7 @@ class UserModel<T> {
     this.company = map['company'];
     this.language = map['language'];
     this.addresses = Adress.deserialize(map['addresses']);
-    this.payments = PaymentModel.deserialize(map['payments']);
+    this.subscriptions = SubscriptionModel.deserialize(map['subscriptions']);
     this.devices = Device.deserialize(map['devices']);
     this.openAI_api_key = map['openAI_api_key'];
   }
@@ -71,7 +71,7 @@ class UserModel<T> {
       'company': company,
       'language': language,
       'addresses': Adress.serialize(this.addresses),
-      'payments': PaymentModel.serialize(this.payments),
+      'subscriptions': SubscriptionModel.serialize(this.subscriptions),
       'devices': Device.serialize(this.devices),
       'openAI_api_key': this.openAI_api_key,
     };
@@ -90,7 +90,7 @@ class UserModel<T> {
       company: this.company,
       language: this.language,
       addresses: this.addresses,
-      payments: this.payments,
+      subscriptions: this.subscriptions,
       devices: this.devices,
       openAI_api_key: this.openAI_api_key,
     );
@@ -108,5 +108,15 @@ class UserModel<T> {
   @override
   String toString() {
     return 'User: $role, UUID: $uuid';
+  }
+
+  bool isSubscribed() {
+    final now = DateTime.now();
+    for(SubscriptionModel subscription in subscriptions!) {
+      if (subscription.isValid(now)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

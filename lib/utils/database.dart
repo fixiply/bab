@@ -238,7 +238,7 @@ class Database {
     return null;
   }
 
-  Future<List<EventModel>> getEvents({String? country, String? searchText, constants.Status? status, bool all = false, bool ordered = false}) async {
+  Future<List<EventModel>> getEvents({UserModel? user, String? country, String? searchText, constants.Status? status, bool all = false, bool ordered = false}) async {
     List<EventModel> list = [];
     Query query = events;
     if (all == false) {
@@ -272,6 +272,22 @@ class Database {
           EventModel model = EventModel();
           model.uuid = doc.id;
           model.fromMap(doc.data() as Map<String, dynamic>);
+          if (all == false) {
+            if (user == null || !user.isAdmin()) {
+              if (model.logged == Logged.connected && user == null) {
+                continue;
+              }
+              if (model.logged == Logged.disconnected && user != null) {
+                continue;
+              }
+              if (model.subscribed == Subscription.valid && (user == null || !user.isSubscribed())) {
+                continue;
+              }
+              if (model.subscribed == Subscription.invalide && (user == null || user.isSubscribed())) {
+                continue;
+              }
+            }
+          }
           list.add(model);
         }
       }

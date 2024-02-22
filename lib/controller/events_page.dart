@@ -352,6 +352,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
       _events = Database().getEvents(
         country: widget.country,
         searchText: _searchQueryController.value.text,
+        user: currentUser,
         status: currentUser != null && currentUser!.isAdmin() ? _status : null,
       );
     });

@@ -3,9 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/utils/database.dart';
-import 'package:bab/controller/forms/form_payment_page.dart';
-import 'package:bab/models/payment_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/custom_state.dart';
@@ -49,7 +46,6 @@ class _InformationPageState extends CustomState<InformationPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<PaymentModel>? payments = currentUser != null ? currentUser!.payments : [];
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,
@@ -352,41 +348,6 @@ class _InformationPageState extends CustomState<InformationPage> {
         )
       )
     );
-  }
-
-  _new() async {
-    PaymentModel newModel = PaymentModel();
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormPaymentPage(newModel);
-    })).then((value) {
-      if (value != null) {
-        setState(() {
-          newModel.uuid = const Uuid().v4();
-          currentUser!.payments!.add(newModel);
-          Database().update(currentUser).then((value) async {
-            showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
-          }).onError((e,s) {
-            showSnackbar(e.toString(), success: false);
-          });
-        });
-      }
-    });
-  }
-
-  _edit(PaymentModel model) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return FormPaymentPage(model);
-    })).then((value) {
-      if (value != null) {
-        setState(() {
-          Database().update(currentUser).then((value) async {
-            showSnackbar(AppLocalizations.of(context)!.text('saved_credit_card'));
-          }).onError((e,s) {
-            showSnackbar(e.toString(), success: false);
-          });
-        });
-      }
-    });
   }
 }
 

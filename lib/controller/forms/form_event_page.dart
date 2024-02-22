@@ -154,31 +154,109 @@ class _FormEventPageState extends CustomState<FormEventPage> {
           },
           child: Column(
             children: <Widget>[
-              DropdownButtonFormField<Axis>(
-                value: widget.model.axis,
-                style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
-                decoration: FormDecoration(
-                  icon: const Icon(Icons.directions),
-                  labelText: AppLocalizations.of(context)!.text('direction')
-                ),
-                items: Axis.values.map((Axis display) {
-                  return DropdownMenuItem<Axis>(
-                      value: display,
-                      child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
-                }).toList(),
-                onChanged: (value) => setState(() {
-                  widget.model.axis = value;
-                })
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<Axis>(
+                        value: widget.model.axis,
+                        style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
+                        decoration: FormDecoration(
+                            icon: const Icon(Icons.directions),
+                            labelText: AppLocalizations.of(context)!.text('direction')
+                        ),
+                        items: Axis.values.map((Axis display) {
+                          return DropdownMenuItem<Axis>(
+                              value: display,
+                              child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                        }).toList(),
+                        onChanged: (value) => setState(() {
+                          widget.model.axis = value;
+                        })
+                    )
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: SwitchField(
+                        context: context,
+                        value: widget.model.sliver!,
+                        icon: const Icon(Icons.expand),
+                        hintText: AppLocalizations.of(context)!.text('show_sliver'),
+                        onChanged: (value) => setState(() {
+                          widget.model.sliver = value;
+                        })
+                    )
+                  )
+                ]
               ),
               const Divider(height: 10),
-              SwitchField(
-                context: context,
-                value: widget.model.sliver!,
-                icon: const Icon(Icons.expand),
-                hintText: AppLocalizations.of(context)!.text('show_sliver'),
-                onChanged: (value) => setState(() {
-                  widget.model.sliver = value;
-                })
+              Row(
+                children: [
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Logged>(
+                            value: widget.model.logged,
+                            style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
+                            decoration: FormDecoration(
+                              icon: const Icon(Icons.login),
+                              labelText: AppLocalizations.of(context)!.text('show_user'),
+                              fillColor: FillColor,
+                              filled: true,
+                            ),
+                            items: Logged.values.map((Logged display) {
+                              return DropdownMenuItem<Logged>(
+                                value: display,
+                                child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                            }).toList(),
+                            onChanged: (value) => widget.model.logged = value,
+                          )
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: widget.model.logged != null ? () {
+                            setState(() {
+                              widget.model.logged = null;
+                            });
+                          } : null,
+                        )
+                      ],
+                    )
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: DropdownButtonFormField<Subscription>(
+                            value: widget.model.subscribed,
+                            style: DefaultTextStyle.of(context).style.copyWith(overflow: TextOverflow.ellipsis),
+                            decoration: FormDecoration(
+                              icon: const Icon(Icons.subscriptions_outlined),
+                              labelText: AppLocalizations.of(context)!.text('show_subscription'),
+                              fillColor: FillColor,
+                              filled: true,
+                            ),
+                            items: Subscription.values.map((Subscription display) {
+                              return DropdownMenuItem<Subscription>(
+                                value: display,
+                                child: Text(AppLocalizations.of(context)!.text(display.toString().toLowerCase())));
+                            }).toList(),
+                            onChanged: (value) => widget.model.subscribed = value,
+                          )
+                        ),
+                        IconButton(
+                          icon: Icon(Icons.close),
+                          onPressed: widget.model.subscribed != null ? () {
+                            setState(() {
+                              widget.model.subscribed = null;
+                            });
+                          } : null,
+                        )
+                      ],
+                    )
+                  )
+                ]
               ),
               const Divider(height: 10),
               TextFormatField(

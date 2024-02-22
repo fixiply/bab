@@ -40,7 +40,7 @@ class _EventPageState extends State<EventPage> {
         backgroundColor: Colors.white,
         title: FittedBox(
           fit: BoxFit.scaleDown,
-          child: Text(widget.model.title!),
+          child: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
         ),
         leading: IconButton(
           icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
