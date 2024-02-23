@@ -1,9 +1,10 @@
-import 'package:bab/helpers/device_helper.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
 import 'package:bab/controller/register_page.dart';
+import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/widgets/containers/abstract_container.dart';
 // External package
@@ -70,7 +71,7 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
               ]
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: foundation.kIsWeb ? 30 : 12),
           Flexible(
             child: TabBarView(
               controller: _tabController,
@@ -82,11 +83,11 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                       Expanded(
                         child: _image('assets/images/create_recipe.png', maxHeight),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: foundation.kIsWeb ? 30 : 20),
                       Text('Création de recette', textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
                       Text("Imaginez et construisez vos recettes de bières. Des centaines d'ingrédients préchargés sont disponibles, y compris les céréales, le houblon, les levures et divers ingrédients. Au fur et à mesure que vous ajoutez des ingrédients, la couleur, la gravité et l'amertume sont mises à jour automatiquement.", textAlign: TextAlign.center, style: subtitleStyle),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
@@ -97,11 +98,11 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                       Flexible(
                         child: _image('assets/images/create_brew.png', maxHeight),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: foundation.kIsWeb ? 30 : 20),
                       Text('Création de brassin', textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
                       Text("Créer et plannifier vos brassins. En fonction du volume souhaité et de l'équipement selectionné, le profile du brassin et la quantité des ingrédients sont calculer automatiquement.", textAlign: TextAlign.center, style: subtitleStyle),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
@@ -112,11 +113,11 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                       Flexible(
                         child: _image('assets/images/brewing_steps.png', maxHeight),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: foundation.kIsWeb ? 30 : 20),
                       Text('Processus de brassage étape par étape', textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
                       Text("Pour ne pas oublier un ingredient ou une étape, le logiciel crée automatiquement des instructions étape par étape dans le processus de brassage.", textAlign: TextAlign.center, style: subtitleStyle),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
@@ -127,11 +128,11 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                       Flexible(
                         child: _image('assets/images/calendar.png', maxHeight),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: foundation.kIsWeb ? 30 : 20),
                       Text('Calendrier de brassage', textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
                       Text("Le calendrier vous permet de suivre vos brassins et d'être informé grâce à des notifications lorsqu'une action doit être effectuée (houblonnage à cru, garde à froid, etc.).", textAlign: TextAlign.center, style: subtitleStyle),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
@@ -140,14 +141,13 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       Flexible(
-
                         child: _image('assets/images/tools.png', maxHeight),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: foundation.kIsWeb ? 30 : 20),
                       Text("Outils d'aide au brassage", textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
                       Text("Ces outils de brassage sont là pour vous aider lors des étapes de fabrication d'une bière.", textAlign: TextAlign.center, style: subtitleStyle),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: foundation.kIsWeb ? 40 : 10),
                     ],
                   ),
                 ),
@@ -181,10 +181,10 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
       children: [
         const SizedBox(width: 8),
         CircleAvatar(
-          radius: 14,
+          radius: 18,
           backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
           child: IconButton(
-            icon: Icon(Icons.arrow_back_ios_new_outlined, size: 10),
+            icon: Icon(Icons.arrow_back_ios_new_outlined, size: 12),
             onPressed: () {
               if (_tabController.index == 0) {
                 _tabController.animateTo(_tabController.length - 1);
@@ -200,10 +200,10 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
         ),
         const SizedBox(width: 12),
         CircleAvatar(
-          radius: 14,
+          radius: 18,
           backgroundColor: Theme.of(context).primaryColor.withOpacity(0.2),
           child: IconButton(
-            icon: Icon(Icons.arrow_forward_ios_outlined, size: 10),
+            icon: Icon(Icons.arrow_forward_ios_outlined, size: 12),
             onPressed: () {
               if ((_tabController.index + 1) == _tabController.length) {
                 _tabController.animateTo(0);
