@@ -86,7 +86,7 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                       const SizedBox(height: foundation.kIsWeb ? 30 : 20),
                       Text('Création de recette', textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
-                      Text("Imaginez et construisez vos recettes de bières. Des centaines d'ingrédients préchargés sont disponibles, y compris les céréales, le houblon, les levures et divers ingrédients. Au fur et à mesure que vous ajoutez des ingrédients, la couleur, la gravité et l'amertume sont mises à jour automatiquement.", textAlign: TextAlign.center, style: subtitleStyle),
+                      Text("Imaginez et construisez vos recettes de bières. Des centaines d'ingrédients préchargés sont disponibles, céréales, houblons, les levures et divers ingrédients. Au fur et à mesure que vous ajoutez des ingrédients, la couleur, la densité et l'amertume sont mises à jour automatiquement.", textAlign: TextAlign.center, style: subtitleStyle),
                       const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
