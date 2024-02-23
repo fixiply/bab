@@ -218,13 +218,18 @@ exports.updates = functions.https.onRequest(async (req, res) => {
 });
 
 exports.createUser = functions.auth.user().onCreate((user) => {
+    var now = new Date();
     firestore.collection("users").doc(user.uid).set({
-        inserted_at: new Date(),
-        updated_at: new Date(),
+        inserted_at: now,
+        updated_at: now,
         name: user.displayName,
         email: user.email,
         role: 2,
-        verified: false
+        verified: false,
+        subscriptions: [{
+            inserted_at: now,
+            started_at: now
+        }]
     }).then(() => {
         console.log("User #" + user.uid + " successfully written!");
     }).catch((error) => {

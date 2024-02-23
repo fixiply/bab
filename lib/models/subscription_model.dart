@@ -4,16 +4,12 @@ import 'package:bab/helpers/date_helper.dart';
 class SubscriptionModel<T> {
   String? uuid;
   DateTime? inserted_at;
-  DateTime? updated_at;
-  String? transaction;
   DateTime? started_at;
   DateTime? ended_at;
 
   SubscriptionModel({
     this.uuid,
     this.inserted_at,
-    this.updated_at,
-    this.transaction,
     this.started_at,
     this.ended_at,
   }) {
@@ -23,8 +19,6 @@ class SubscriptionModel<T> {
   void fromMap(Map<String, dynamic> map) {
     if (map.containsKey('uuid')) this.uuid = map['uuid'];
     this.inserted_at = DateHelper.parse(map['inserted_at']);
-    this.updated_at = DateHelper.parse(map['updated_at']);
-    this.transaction = map['transaction'];
     this.started_at = DateHelper.parse(map['inserted_at']);
     this.ended_at = DateHelper.parse(map['ended_at']);
   }
@@ -32,8 +26,6 @@ class SubscriptionModel<T> {
   Map<String, dynamic> toMap({bool persist = false}) {
     Map<String, dynamic> map = {
       'inserted_at': this.inserted_at,
-      'updated_at': DateTime.now(),
-      'transaction': this.transaction,
       'started_at': this.started_at,
       'ended_at': this.ended_at,
     };
@@ -47,8 +39,6 @@ class SubscriptionModel<T> {
     return SubscriptionModel(
       uuid: this.uuid,
       inserted_at: this.inserted_at,
-      updated_at: this.updated_at,
-      transaction: this.transaction,
       started_at: this.started_at,
       ended_at: this.ended_at,
     );
@@ -65,7 +55,7 @@ class SubscriptionModel<T> {
 
   @override
   String toString() {
-    return 'Subscription: $transaction, UUID: $uuid';
+    return 'Subscription: UUID: $uuid';
   }
 
   bool isValid(DateTime date) {
