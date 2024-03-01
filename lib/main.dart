@@ -36,6 +36,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
@@ -91,6 +92,8 @@ Future<void> main() async {
     Workmanager().initialize(
       callbackDispatcher, // The top level function, aka callbackDispatcher
     );
+  } else if (!foundation.kDebugMode) {
+      await GRecaptchaV3.ready("6LfjMIIpAAAAAK-R4zKfDbn4DelHvE71roCQgFqn", showBadge: false); //--2
   }
   FirebaseFirestore.instance.settings = const Settings(persistenceEnabled: true, cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED);
   await dotenv.load(fileName: 'assets/.env');
@@ -104,6 +107,7 @@ Future<void> main() async {
       ],
       child: MyApp()),
   );
+  _configLoading();
 }
 
 void _configureFirebaseMessaging() async {
@@ -114,6 +118,15 @@ void _configureFirebaseMessaging() async {
     badge: true,
     sound: true,
   );
+}
+
+void _configLoading() {
+  EasyLoading.instance
+    ..loadingStyle = EasyLoadingStyle.custom
+    ..progressColor = Colors.white
+    ..backgroundColor = PrimaryColor
+    ..indicatorColor = Colors.white
+    ..textColor = Colors.white;
 }
 
 class MyApp extends StatefulWidget {
@@ -155,6 +168,13 @@ class _AppState extends State<MyApp> {
       primaryColor: PrimaryColor,
       primaryColorLight: PrimaryColorLight,
       primaryColorDark: PrimaryColorDark,
+      cardTheme: const CardTheme(surfaceTintColor: Colors.white),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: PrimaryColor,
+          foregroundColor: Colors.white
+        ),
+      ),
       bottomAppBarTheme: const BottomAppBarTheme(color: PrimaryColor),
       // navigationBarTheme: const NavigationBarThemeData(backgroundColor: PrimaryColor),
     );

@@ -67,7 +67,7 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
                       }));
                     }
                 ),
-                TextSpan(text: ' pour profiter de plus de fonctionnalités')
+                TextSpan(text: ' ' + AppLocalizations.of(context)!.text('to_more_features').toLowerCase())
               ]
             ),
           ),
@@ -78,75 +78,75 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
               children: <Widget>[
                 Container(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Expanded(
                         child: _image('assets/images/create_recipe.png', maxHeight),
                       ),
                       const SizedBox(height: foundation.kIsWeb ? 30 : 20),
-                      Text('Création de recette', textAlign: TextAlign.center, style: titleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_1'), textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
-                      Text("Imaginez et construisez vos recettes de bières. Des centaines d'ingrédients préchargés sont disponibles, céréales, houblons, levures et divers ingrédients. Au fur et à mesure que vous ajoutez des ingrédients, la couleur, la densité et l'amertume sont mises à jour automatiquement.", textAlign: TextAlign.center, style: subtitleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_1_tooltip'), textAlign: TextAlign.center, style: subtitleStyle),
                       const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
                 Container(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Flexible(
                         child: _image('assets/images/create_brew.png', maxHeight),
                       ),
                       const SizedBox(height: foundation.kIsWeb ? 30 : 20),
-                      Text('Créer et plannifier vos brassins', textAlign: TextAlign.center, style: titleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_2'), textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
-                      Text("En fonction du volume final souhaité et de l'équipement utilisé, le profil du brassin et la quantité des ingrédients sont calculés automatiquement.", textAlign: TextAlign.center, style: subtitleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_2_tooltip'), textAlign: TextAlign.center, style: subtitleStyle),
                       const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
                 Container(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Flexible(
                         child: _image('assets/images/brewing_steps.png', maxHeight),
                       ),
                       const SizedBox(height: foundation.kIsWeb ? 30 : 20),
-                      Text('Processus de brassage étape par étape', textAlign: TextAlign.center, style: titleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_3'), textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
-                      Text("Pour ne pas oublier un ingredient ou une étape, le logiciel crée automatiquement des instructions étape par étape dans le processus de brassage.", textAlign: TextAlign.center, style: subtitleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_3_tooltip'), textAlign: TextAlign.center, style: subtitleStyle),
                       const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
                 Container(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Flexible(
                         child: _image('assets/images/calendar.png', maxHeight),
                       ),
                       const SizedBox(height: foundation.kIsWeb ? 30 : 20),
-                      Text('Calendrier de brassage', textAlign: TextAlign.center, style: titleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_4'), textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
-                      Text("Le calendrier vous permet de suivre vos brassins et d'être informé grâce à des notifications lorsqu'une action doit être effectuée (houblonnage à cru, garde à froid, etc.).", textAlign: TextAlign.center, style: subtitleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_4_tooltip'), textAlign: TextAlign.center, style: subtitleStyle),
                       const SizedBox(height: foundation.kIsWeb ? 40 : 8),
                     ],
                   ),
                 ),
                 Container(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Flexible(
                         child: _image('assets/images/tools.png', maxHeight),
                       ),
                       const SizedBox(height: foundation.kIsWeb ? 30 : 20),
-                      Text("Outils d'aide au brassage", textAlign: TextAlign.center, style: titleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_5'), textAlign: TextAlign.center, style: titleStyle),
                       const SizedBox(height: 8),
-                      Text("Ces outils de brassage sont là pour vous aider lors des étapes de fabrication d'une bière.", textAlign: TextAlign.center, style: subtitleStyle),
+                      Text(AppLocalizations.of(context)!.text('functionality_5_tooltip'), textAlign: TextAlign.center, style: subtitleStyle),
                       const SizedBox(height: foundation.kIsWeb ? 40 : 10),
                     ],
                   ),
@@ -156,16 +156,17 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
           ),
           TabBar(
             controller: _tabController,
+            indicatorSize: TabBarIndicatorSize.tab,
             indicator: ShapeDecoration(
               color: Theme.of(context).primaryColor.withOpacity(0.2),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
             ),
             tabs: <Widget>[
-              Tab(child: Text('Recette', style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
-              Tab(child: Text('Brassage', style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
-              Tab(child: Text('Processsus', style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
-              Tab(child: Text('Calendrier', style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
-              Tab(child: Text('Outils de brassage', style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
+              Tab(child: Text(AppLocalizations.of(context)!.text('recipe'), style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
+              Tab(child: Text(AppLocalizations.of(context)!.text('brewing'), style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
+              Tab(child: Text(AppLocalizations.of(context)!.text('process'), style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
+              Tab(child: Text(AppLocalizations.of(context)!.text('calendar'), style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
+              Tab(child: Text(AppLocalizations.of(context)!.text('brewing_tools'), style: TextStyle(overflow: TextOverflow.ellipsis, color: Theme.of(context).primaryColor))),
             ],
           ),
           const SizedBox(height: 12),

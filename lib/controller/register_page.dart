@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' as foundation;
 
 // Internal package
 import 'package:bab/controller/login_page.dart';
@@ -10,7 +11,8 @@ import 'package:bab/widgets/custom_state.dart';
 
 // External package
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
+import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 
 class RegisterPage extends StatefulWidget {
   RegisterPage({Key? key}) : super(key: key);
@@ -30,6 +32,22 @@ class _RegisterPageState extends CustomState<RegisterPage> {
     setState(() {
       passwordVisible = !passwordVisible;
     });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    if (foundation.kIsWeb && !foundation.kDebugMode) {
+      GRecaptchaV3.showBadge();
+    }
+  }
+
+  @override
+  void dispose() {
+    if (foundation.kIsWeb && !foundation.kDebugMode) {
+      GRecaptchaV3.hideBadge();
+    }
+    super.dispose();
   }
 
   @override
@@ -180,16 +198,16 @@ class _RegisterPageState extends CustomState<RegisterPage> {
                           style: regular14pt.copyWith(color: TextGrey),
                           children: <TextSpan>[
                             TextSpan(
-                                text: '${AppLocalizations.of(context)!.text('privacy_policy')}.',
-                                style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
-                                recognizer: TapGestureRecognizer()..onTap = () {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return const MarkdownDialog(filename: PRIVACY_POLICY);
-                                      }
-                                  );
-                                }
+                              text: '${AppLocalizations.of(context)!.text('privacy_policy')}.',
+                              style: regular14pt.copyWith(color: Theme.of(context).primaryColor),
+                              recognizer: TapGestureRecognizer()..onTap = () {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return const MarkdownDialog(filename: PRIVACY_POLICY);
+                                  }
+                                );
+                              }
                             )
                           ]
                       )
@@ -198,6 +216,25 @@ class _RegisterPageState extends CustomState<RegisterPage> {
                 ),
               ),
               const SizedBox(height: 18),
+              // if (foundation.kIsWeb) WebViewX(
+              //   height: 100,
+              //   width: 400,
+              //   javascriptMode: JavascriptMode.unrestricted,
+              //   onWebViewCreated: (controller) {
+              //     controller.loadContent("assets/html/recaptcha.html", sourceType: SourceType.html, fromAssets: true);
+              //   },
+              //   dartCallBacks: {
+              //     DartCallback(
+              //       name: 'Captcha',
+              //       callBack: (msg) {
+              //         debugPrint('Captcha ${msg.message}');
+              //         setState(() {
+              //           _isVerified = true;
+              //         });
+              //       },
+              //     )
+              //   },
+              // ),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -223,7 +260,10 @@ class _RegisterPageState extends CustomState<RegisterPage> {
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
-      showSnackbar(AppLocalizations.of(context)!.text('email_confirm_registration'));
+      EasyLoading.showInfo(AppLocalizations.of(context)!.text('email_confirm_registration'),
+          dismissOnTap: true,
+          duration: Duration(seconds: 10)
+      );
       credential.user!.sendEmailVerification();
       credential.user!.updateDisplayName(_fullNameController.text);
       debugPrint('createUserWithEmailAndPassword ${credential.user!.uid}');

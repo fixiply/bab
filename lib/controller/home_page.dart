@@ -179,31 +179,16 @@ class _HomeState extends State<HomePage> {
       ),
       headerBuilder: (context, extended) {
         if (extended == true) {
-          return Padding(
-              padding: const EdgeInsets.only(top: 24.0),
-              child: RichText(
-                textAlign: TextAlign.left,
-                overflow: TextOverflow.ellipsis,
-                text: TextSpan(
-                  style: DefaultTextStyle.of(context).style.copyWith(fontFamily: 'BebasNeuePro', fontWeight: FontWeight.bold, color: Colors.white),
-                  children: const [
-                    TextSpan(text: 'Be', style: TextStyle(fontSize: 28)),
-                    WidgetSpan(
-                      alignment: PlaceholderAlignment.bottom,
-                      child: RotatedBox(
-                        quarterTurns: -1,
-                        child: Text(' And', textAlign: TextAlign.center, style: TextStyle(fontSize: 11, fontFamily: 'BebasNeuePro', fontWeight: FontWeight.bold, letterSpacing: 2.0,color: Colors.white))
-                      )
-                    ),
-                    TextSpan(text: 'Brew', style: TextStyle(fontSize: 28)),
-                  ],
-                ),
-              )
+          return SizedBox(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 16.0),
+              child: Image.asset('assets/images/header.png', width: 100)
+            )
           );
         }
         return SizedBox(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 24.0, 16.0, 0),
+            padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 0),
             child: Image.asset('assets/images/logo.png', color: Colors.white),
           ),
         );

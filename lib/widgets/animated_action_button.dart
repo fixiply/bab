@@ -38,6 +38,7 @@ class _AnimatedActionButtonState extends State<AnimatedActionButton> {
     return FloatingActionButton.extended(
       heroTag: widget.tag ?? const Uuid().v1(),
       onPressed: widget.onPressed,
+      foregroundColor: Colors.white,
       backgroundColor: widget.backgroundColor ?? Theme.of(context).primaryColor,
       tooltip: widget.title,
       extendedPadding: const EdgeInsetsDirectional.only(start: 12.0, end: 12.0),

@@ -76,6 +76,7 @@ class _FilterRecipeAppBarState extends State<FilterRecipeAppBar> with SingleTick
       backgroundColor: FillColor,
       title: TabBar(
         controller: _tabController,
+        indicatorSize: TabBarIndicatorSize.tab,
         indicator: ShapeDecoration(
           color: Theme.of(context).primaryColor.withOpacity(0.2),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),

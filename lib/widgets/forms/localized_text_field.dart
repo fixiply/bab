@@ -20,7 +20,7 @@ class LocalizedTextField extends FormField<dynamic> {
   @override
   final FormFieldValidator<dynamic>? validator;
 
-  LocalizedTextField({Key? key, required BuildContext context, this.initialValue, this.decoration, this.textCapitalization, this.autovalidateMode: AutovalidateMode.onUserInteraction, this.onChanged, this.validator}) : super(
+  LocalizedTextField({Key? key, required BuildContext context, this.initialValue, this.decoration, this.textCapitalization, this.autovalidateMode = AutovalidateMode.onUserInteraction, this.onChanged, this.validator}) : super(
     key: key,
     initialValue: initialValue ?? TextFormat(),
     builder: (FormFieldState<dynamic> field) {

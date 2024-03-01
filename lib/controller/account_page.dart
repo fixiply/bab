@@ -126,7 +126,7 @@ class _AccountPageState extends State<AccountPage> {
                     leading: const Icon(Icons.notifications),
                     title: Text(AppLocalizations.of(context)!.text('alert_settings')),
                     onTap: () {
-                      AppSettings.openNotificationSettings();
+                      AppSettings.openAppSettings(type: AppSettingsType.notification);
                     },
                   ),
                   ListTile(

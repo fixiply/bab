@@ -15,10 +15,10 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 0.0.1+21
+version: 0.0.1+22
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=3.3.0 <4.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -31,26 +31,26 @@ dependencies:
     sdk: flutter
 
   another_flushbar: ^1.12.30
-  app_settings: ^4.2.0
+  app_settings: ^5.1.1
   audioplayers: ^5.2.0
   badges: ^3.1.1
   carousel_slider: ^4.2.1
-  chat_gpt_sdk: ^2.2.5
+  chat_gpt_sdk: ^3.0.3
   circular_countdown_timer: ^0.2.3
-  cloud_firestore: ^4.14.0
-  cloud_functions: ^4.6.0
+  cloud_firestore: ^4.15.6
+  cloud_functions: ^4.6.6
   code_text_field: ^1.1.0
   device_info_plus: ^9.0.2
-  devicelocale: ^0.6.0
+  devicelocale: ^0.7.0
   dropdown_search: ^5.0.6
   email_validator: ^2.1.17
   expandable_text: ^2.3.0
-  extended_image: ^8.0.2
-  file_picker: ^5.3.2
-  firebase_auth: ^4.16.0
-  firebase_core: ^2.24.2
-  firebase_messaging: ^14.7.10
-  firebase_storage: ^11.6.0
+  extended_image: ^8.2.0
+  file_picker: ^6.1.1
+  firebase_auth: ^4.17.6
+  firebase_core: ^2.25.5
+  firebase_messaging: ^14.7.17
+  firebase_storage: ^11.6.7
   flex_color_picker: ^3.2.2
   flutter_blue_plus: ^1.31.14
   flutter_colorpicker: ^1.0.3
@@ -58,46 +58,47 @@ dependencies:
   flutter_easyloading: ^3.0.5
   flutter_highlight: ^0.7.0
   flutter_local_notifications: ^16.1.0
-  flutter_markdown: ^0.6.15
+  flutter_markdown: ^0.6.20+1
   flutter_native_timezone: ^2.0.0
   flutter_rating_bar: ^4.0.1
-  flutter_typeahead: ^4.6.2
-  google_sign_in: ^6.1.4
-  googleapis_auth: ^1.4.1
-  i18n_extension: ^9.0.2
+  flutter_typeahead: ^5.2.0
+  g_recaptcha_v3: ^0.0.5
+  google_sign_in: ^6.2.1
+  googleapis_auth: ^1.5.0
+  i18n_extension: ^11.0.11
   image: ^4.0.17
-  image_painter: ^0.5.0
-  image_picker: ^0.8.9
-  intl: ^0.18.0
-  json_dynamic_widget: ^5.1.7+2
-  logger: ^1.4.0
-  markdown_editable_textinput: ^2.2.0
-  package_info_plus: ^4.0.2
+  image_painter: ^0.6.1
+  image_picker: ^1.0.7
+  intl: ^0.18.1
+  json_dynamic_widget: ^6.1.4
+  logger: ^2.0.2+1
+  markdown_editable_textinput: ^2.1.0
+  package_info_plus: ^5.0.1
   palette_generator: ^0.3.3+2
   parallax_animation: ^0.0.3
-  permission_handler: ^10.3.0
+  permission_handler: ^11.3.0
   phosphor_flutter: ^2.0.0
-  provider: ^6.0.5
+  provider: ^6.1.2
   shared_preferences: ^2.1.2
-  shimmer: ^2.0.0
+  shimmer: ^3.0.0
   sidebarx: ^0.16.1
   stack_board: ^0.1.2
-  syncfusion_flutter_core: ^21.2.10
-  syncfusion_flutter_datagrid: ^21.2.10
-  syncfusion_flutter_gauges: ^21.2.10
-  syncfusion_flutter_sliders: ^21.2.10
+  syncfusion_flutter_core: ^24.2.8
+  syncfusion_flutter_datagrid: ^24.2.8
+  syncfusion_flutter_gauges: ^24.2.8
+  syncfusion_flutter_sliders: ^24.2.8
   table_calendar: ^3.0.9
-  url_launcher: ^6.1.11
-  uuid: ^3.0.7
+  url_launcher: ^6.2.5
+  uuid: ^4.1.0
   workmanager: ^0.5.2
-  xml: ^6.3.0
+  xml: ^6.5.0
 #  dropdown_search: ^5.0.3
 #  flutter_painter: ^1.0.1
 #  syncfusion_flutter_calendar: ^21.1.39
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
+  cupertino_icons: ^1.0.6
 
   flutter_localizations:
     sdk: flutter
@@ -111,7 +112,7 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
-  flutter_lints: ^2.0.0
+  flutter_lints: ^3.0.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -128,10 +129,11 @@ flutter:
   assets:
     - assets/.env
     - assets/data/
-    - assets/terms/
+    - assets/html/
     - assets/images/
     - assets/locales/
     - assets/sounds/
+    - assets/terms/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

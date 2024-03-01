@@ -13,6 +13,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 // External package
 import 'package:email_validator/email_validator.dart';
+import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
@@ -39,8 +40,19 @@ class _LoginPageState extends CustomState<LoginPage> {
   @override
   void initState() {
     super.initState();
+    if (foundation.kIsWeb && !foundation.kDebugMode) {
+      GRecaptchaV3.showBadge();
+    }
     _emailController = TextEditingController(text: _email);
     _initialize();
+  }
+
+  @override
+  void dispose() {
+    if (foundation.kIsWeb && !foundation.kDebugMode) {
+      GRecaptchaV3.hideBadge();
+    }
+    super.dispose();
   }
 
   @override
@@ -153,7 +165,7 @@ class _LoginPageState extends CustomState<LoginPage> {
                   return null;
                 }
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 18),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

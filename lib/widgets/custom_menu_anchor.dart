@@ -37,7 +37,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
       menuChildren: [
         if (!DeviceHelper.isDesktop) MenuItemButton(
           child: Text(AppLocalizations.of(context)!.text('alert_settings')),
-          onPressed: () => AppSettings.openNotificationSettings(),
+          onPressed: () => AppSettings.openAppSettings(type: AppSettingsType.notification),
         ),
         if (widget.model != null && widget.model!.uuid != null ) MenuItemButton(
           child: Text(AppLocalizations.of(context)!.text('information')),

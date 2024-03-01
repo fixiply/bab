@@ -160,7 +160,7 @@ abstract class EditDataSource extends DataGridSource {
             const Duration(seconds: 1), () => matches,
           );
         },
-        onSuggestionSelected: (String value) {
+        onSelected: (String value) {
           newCellValue = value;
           /// Call [CellSubmit] callback to fire the canSubmitCell and
           /// onCellSubmit to commit the new value in single place.

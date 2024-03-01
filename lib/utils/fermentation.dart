@@ -116,17 +116,16 @@ class Fermentation<T> {
         )
       ),
       GridColumn(
-          width: 80,
-          columnName: 'temperature',
-          allowEditing: false,
-          label: Tooltip(
-              message: AppLocalizations.of(context)!.text('temperature'),
-              child: Container(
-                  padding: const EdgeInsets.all(8.0),
-                  alignment: Alignment.centerRight,
-                  child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
-              )
-          )
+        width: 80,
+        columnName: 'temperature',
+        label: Tooltip(
+            message: AppLocalizations.of(context)!.text('temperature'),
+            child: Container(
+                padding: const EdgeInsets.all(8.0),
+                alignment: Alignment.centerRight,
+                child: Text('Temp.', style: TextStyle(color: Theme.of(context).primaryColor), overflow: TextOverflow.ellipsis)
+            )
+        )
       ),
       if (DeviceHelper.isDesktop && showAction == true) GridColumn(
           width: 50,

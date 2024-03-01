@@ -32,6 +32,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
   bool get wantKeepAlive => true;
 
   TabBar get _tabBar => TabBar(
+    indicatorSize: TabBarIndicatorSize.tab,
     indicator: ShapeDecoration(
       color: Theme.of(context).primaryColor.withOpacity(0.2),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
