@@ -16,6 +16,7 @@ import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/containers/empty_container.dart';
 import 'package:bab/widgets/containers/error_container.dart';
 import 'package:bab/widgets/custom_dismissible.dart';
+import 'package:bab/widgets/custom_menu_anchor.dart';
 import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/search_text.dart';
@@ -103,6 +104,9 @@ class _BrewsPageState extends CustomState<BrewsPage> with AutomaticKeepAliveClie
               setState(() { _showList = !_showList; });
             },
           ),
+          CustomMenuAnchor(
+            showMeasures: true,
+          )
         ],
       ),
       body: RefreshIndicator(

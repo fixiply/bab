@@ -28,6 +28,7 @@ import 'package:bab/widgets/form_decoration.dart';
 import 'package:another_flushbar/flushbar.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
+import 'package:sprintf/sprintf.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import 'package:uuid/uuid.dart';
 
@@ -229,10 +230,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       _steps = [
         MyStep(
           index: ++_index,
-          title: const Text('Début'),
+          title: Text(AppLocalizations.of(context)!.text('beginning')),
           content: Container(
             alignment: Alignment.centerLeft,
-            child: const Text('Démarrage du brassin')
+            child: Text(AppLocalizations.of(context)!.text('starting_brew'))
           ),
           onStepContinue: (int index) {
             if (widget.model.started_at == null) {
@@ -243,7 +244,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
         MyStep(
           index: ++_index,
-          title: const Text('Concasser le grain'),
+          title: Text(AppLocalizations.of(context)!.text('crushing')),
           content: Container(
             alignment: Alignment.centerLeft,
             child: FutureBuilder<List<FermentableModel>>(
@@ -254,7 +255,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
                     children: snapshot.data!.map((e) {
-                      return Flexible(child: Text('Concassez ${AppLocalizations.of(context)!.weightFormat(e.amount)} «${AppLocalizations.of(context)!.localizedText(e.name)}».'));
+                      return Flexible(child: Text(sprintf(AppLocalizations.of(context)!.text('crush_grain'),
+                        [
+                          AppLocalizations.of(context)!.weightFormat(e.amount),
+                          AppLocalizations.of(context)!.localizedText(e.name)
+                        ]
+                      )));
                     }).toList()
                   );
                 }
@@ -265,7 +271,11 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
         MyStep(
           index: ++_index,
-          title: Text('Ajoutez ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water)} d\'eau dans votre cuve'),
+          title: Text(sprintf(AppLocalizations.of(context)!.text('add_water'),
+            [
+              AppLocalizations.of(context)!.litterVolumeFormat(widget.model.mash_water),
+            ]
+          )),
           content: Container(
             alignment: Alignment.centerLeft,
             child: PHContainer(
@@ -276,26 +286,19 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
         MyStep(
           index: ++_index,
-          title: RichText(
-            text: TextSpan(
-              text: 'Mettre en chauffe votre cuve',
-              style: DefaultTextStyle.of(context).style,
-              children: [
-                // TextSpan(text:  ' à ${AppLocalizations.of(context)!.tempFormat(_initialBrewTemp)}'),
-                WidgetSpan(
-                  child: FutureBuilder<double?>(
-                    future: _initialBrewTemp,
-                    builder: (context, snapshot) {
-                      double initialTemp = 50;
-                      if (snapshot.hasData) {
-                        initialTemp = snapshot.data!;
-                      }
-                      return Text(' à ${AppLocalizations.of(context)!.tempFormat(initialTemp)}');
-                    }
-                  )
-                )
-              ],
-            ),
+          title: FutureBuilder<double?>(
+            future: _initialBrewTemp,
+            builder: (context, snapshot) {
+              double initialTemp = 50;
+              if (snapshot.hasData) {
+                initialTemp = snapshot.data!;
+              }
+              return Text(sprintf(AppLocalizations.of(context)!.text('heat_tank'),
+                [
+                  AppLocalizations.of(context)!.tempFormat(initialTemp)
+                ]
+              ));
+            }
           ),
           content: Container(
             alignment: Alignment.centerLeft,
@@ -303,7 +306,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Température du grain'),
+                Text(AppLocalizations.of(context)!.text('grain_temperature')),
                 SizedBox(
                   width: DeviceHelper.isLargeScreen(context) ? 320: null,
                   child: TextFormField(
@@ -339,35 +342,40 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
         MyStep(
           index: ++_index,
-          title: const Text('Ajouter le grain'),
+          title: Text(AppLocalizations.of(context)!.text('add_grain')),
           content: Container(),
         ),
         ..._mash(recipe),
         MyStep(
           index: ++_index,
-          title: Text('Rinçage des drêches avec ${AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water)} d\'eau à ${AppLocalizations.of(context)!.tempFormat(78)}'),
+          title: Text(sprintf(AppLocalizations.of(context)!.text('rinsing_spent_grains'),
+            [
+              AppLocalizations.of(context)!.litterVolumeFormat(widget.model.sparge_water),
+              AppLocalizations.of(context)!.tempFormat(78)
+            ]
+          )),
           content: Container(
-              alignment: Alignment.centerLeft,
-              child: PHContainer(
-                target: widget.model.sparge_ph,
-                volume: widget.model.volume,
-              )
+            alignment: Alignment.centerLeft,
+            child: PHContainer(
+              target: widget.model.sparge_ph,
+              volume: widget.model.volume,
+            )
           ),
         ),
         ..._boil(recipe, ingredients),
         MyStep(
           index: ++_index,
-          title: const Text('Faire un whirlpool'),
+          title: Text(AppLocalizations.of(context)!.text('make_whirlpool')),
           content: Container(),
         ),
         MyStep(
           index: ++_index,
-          title: const Text('Transférer le moût dans le fermenteur'),
+          title: Text(AppLocalizations.of(context)!.text('transfer_fermenter')),
           content: Container(),
         ),
         MyStep(
           index: ++_index,
-          title: const Text('Prendre la densité initiale'),
+          title: Text(AppLocalizations.of(context)!.text('take_original_gravity')),
           content: TextField(
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: <TextInputFormatter>[
@@ -390,10 +398,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ..._yeast(recipe, yeasts),
         MyStep(
           index: ++_index,
-          title: Text('Fin'),
+          title: Text(AppLocalizations.of(context)!.text('end')),
           content: Container(
               alignment: Alignment.centerLeft,
-              child: const Text('Votre brassin est prêt.')
+              child: Text(AppLocalizations.of(context)!.text('brew_ready'))
           ),
         )
       ];
@@ -408,7 +416,13 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         CountDownController controller = CountDownController();
         values.add(MyStep(
           index: index,
-          title: Text('Palier «${item.name}» à ${AppLocalizations.of(context)!.tempFormat(item.temperature)} pendant ${item.duration} minutes'),
+          title: Text(sprintf(AppLocalizations.of(context)!.text('level_minutes'),
+            [
+              item.name,
+              AppLocalizations.of(context)!.tempFormat(item.temperature),
+              item.duration
+            ]
+          )),
           content: Container(
             alignment: Alignment.centerLeft,
             padding: const EdgeInsets.all(8.0),
@@ -422,7 +436,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 duration: 0,
                 index: index,
                 onComplete: (int index) {
-                  _notification('Le Palier «${item.name}» à ${AppLocalizations.of(context)!.tempFormat(item.temperature)} est terminé.');
+                  _notification(sprintf(AppLocalizations.of(context)!.text('level_over'),
+                    [
+                      item.name,
+                      AppLocalizations.of(context)!.tempFormat(item.temperature)
+                    ]
+                  ));
                   _steps[index].completed = true;
                 }
               ),
@@ -435,7 +454,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           ),
           onStepContinue: (int index) {
             if (!_steps[index].completed) {
-              throw 'Cette étape n\'est pas terminée.';
+              throw AppLocalizations.of(context)!.text('step_not_finished');
             }
           },
         ));
@@ -448,7 +467,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     List<MyStep> values = [];
     values.add(MyStep(
       index: ++_index,
-      title: Text('Mettre en ébullition votre cuve'),
+      title: Text(AppLocalizations.of(context)!.text('boil_tank')),
       content: widget.model.tank?.bluetooth == true ? Container(
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
@@ -464,7 +483,11 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     var index = ++_index;
     values.add(MyStep(
       index: index,
-      title: Text('Commencer le houblonnage pendant ${AppLocalizations.of(context)!.durationFormat(recipe.boil)}'),
+      title: Text(sprintf(AppLocalizations.of(context)!.text('start_hopping'),
+        [
+          AppLocalizations.of(context)!.durationFormat(recipe.boil)
+        ]
+      )),
       content: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
@@ -482,7 +505,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 duration: 0,
                 index: index,
                 onComplete: (int index) {
-                  _notification('Houblonnage terminé.');
+                  _notification(AppLocalizations.of(context)!.text('hopping_finished'));
                   _steps[index].completed = true;
                 }
               ),
@@ -495,7 +518,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                     key.start(duration);
                     String text = '';
                     value.map!.forEach((k, v) {
-                      text += '${text.isNotEmpty ? '\n' : ''}Ajoutez $v «$k»';
+                      text += '${text.isNotEmpty ? '\n' : ''}${AppLocalizations.of(context)!.text('add')} $v «$k»';
                     });
                     _notification(text, duration: duration);
                   });
@@ -524,7 +547,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       },
       onStepContinue: (int index) {
         if (!_steps[index].completed) {
-          throw 'Cette étape n\'est pas terminée.';
+          throw AppLocalizations.of(context)!.text('step_not_finished');
         }
       },
     ));
@@ -536,7 +559,12 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     for(ym.YeastModel item in yeasts) {
       values.add(MyStep(
         index: ++_index,
-        title: Text('Ajouter ${AppLocalizations.of(context)!.weightFormat(item.amount)} levure «${AppLocalizations.of(context)!.localizedText(item.name)}»'),
+        title: Text(sprintf(AppLocalizations.of(context)!.text('add_yeast'),
+          [
+            AppLocalizations.of(context)!.weightFormat(item.amount),
+            AppLocalizations.of(context)!.localizedText(item.name)
+          ]
+        )),
         content: Container(),
         onStepContinue: (int index) {
           if (widget.model.fermented_at == null) {

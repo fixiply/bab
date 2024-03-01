@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/main.dart';
+import 'package:bab/utils/app_localizations.dart';
 
 class CountDownText extends StatefulWidget {
   Duration duration;
@@ -129,7 +129,7 @@ class CountDownTextState extends State<CountDownText> with WidgetsBindingObserve
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(width: 30, child: Icon(_countDownSeconds < 0 ? Icons.check_box_outlined : Icons.check_box_outline_blank_outlined, color: _countDownSeconds < 0 ? Theme.of(context).primaryColor : Colors.black54)),
-            Flexible(child: Text('Ajoutez ${e.value} «${e.key}»' + (_countDownSeconds > 0 && index == 1 ? ' dans $hours:$minutes:$seconds' : ''))),
+            Flexible(child: Text('${AppLocalizations.of(context)!.text('add')} ${e.value} «${e.key}»' + (_countDownSeconds > 0 && index == 1 ? ' dans $hours:$minutes:$seconds' : ''))),
           ],
         );
       }).toList()
