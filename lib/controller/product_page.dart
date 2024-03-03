@@ -28,9 +28,6 @@ class ProductPage extends StatefulWidget {
 class _ProductPageState extends State<ProductPage> {
   final ScrollController _controller = ScrollController();
 
-  // Edition mode
-  bool _features = true;
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,34 +128,19 @@ class _ProductPageState extends State<ProductPage> {
             ],
           ),
           if (widget.model.text!.isNotEmpty) SliverToBoxAdapter(
-            child: ExpansionPanelList(
-              elevation: 1,
-              expansionCallback: (int index, bool isExpanded) {
-                setState(() {
-                  _features = !isExpanded;
-                });
-              },
-              children: [
-                ExpansionPanel(
-                  isExpanded: _features,
-                  canTapOnHeader: true,
-                  headerBuilder: (context, isExpanded) {
-                    return ListTile(
-                      dense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('features'), style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
-                    );
-                  },
-                  body: Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
-                    child: MarkdownBody(data: widget.model.text!, softLineBreak: true,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
-                          .copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),)
-                  ),
-                )
-              ]
-            )
+            child: ExpansionTile(
+                initiallyExpanded: true,
+                title: Text(AppLocalizations.of(context)!.text('features'), style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                children: <Widget>[
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                      child: MarkdownBody(data: widget.model.text!, softLineBreak: true,
+                        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context))
+                            .copyWith(textScaleFactor: 1.2, textAlign: WrapAlignment.start),)
+                  )
+                ]
+            ),
           ),
           SliverToBoxAdapter(
             child: RatingsContainer(widget.model)

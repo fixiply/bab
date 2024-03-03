@@ -169,6 +169,7 @@ class _AppState extends State<MyApp> {
       primaryColorLight: PrimaryColorLight,
       primaryColorDark: PrimaryColorDark,
       cardTheme: const CardTheme(surfaceTintColor: Colors.white),
+      expansionTileTheme: ExpansionTileThemeData(shape: BeveledRectangleBorder()),
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: PrimaryColor,

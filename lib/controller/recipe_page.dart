@@ -47,9 +47,6 @@ class RecipePage extends StatefulWidget {
 class _RecipePageState extends State<RecipePage> {
   Key _key = UniqueKey();
 
-  // Edition mode
-  bool _expanded = true;
-
   double _rating = 0;
   int _notices = 0;
 
@@ -241,44 +238,6 @@ class _RecipePageState extends State<RecipePage> {
             )
           ),
         ),
-        if (widget.model.notes != null && widget.model.notes!.isNotEmpty) SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ExpansionPanelList(
-              elevation: 1,
-              expandedHeaderPadding: EdgeInsets.zero,
-              expansionCallback: (int index, bool isExpanded) {
-                setState(() {
-                  _expanded = !isExpanded;
-                });
-              },
-              children: [
-                ExpansionPanel(
-                  isExpanded: _expanded,
-                  canTapOnHeader: true,
-                  headerBuilder: (context, isExpanded) {
-                    return ListTile(
-                      dense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('notes'),
-                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                    );
-                  },
-                  body: Container(
-                    alignment: Alignment.centerLeft,
-                    padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
-                    child: MarkdownBody(
-                      data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
-                      fitContent: true,
-                      shrinkWrap: true,
-                      softLineBreak: true,
-                      styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
-                    )
-                  ),
-                )
-            ])
-          ),
-        ),
         SliverList(
           delegate: SliverChildListDelegate([
             FutureBuilder<List<FermentableModel>>(
@@ -363,6 +322,28 @@ class _RecipePageState extends State<RecipePage> {
             )
           ]
         )),
+        if (widget.model.notes != null && widget.model.notes!.isNotEmpty) SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ExpansionTile(
+                initiallyExpanded: true,
+                title: Text(AppLocalizations.of(context)!.text('notes'), style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                children: <Widget>[
+                  Container(
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
+                      child: MarkdownBody(
+                        data: AppLocalizations.of(context)!.localizedText(widget.model.notes),
+                        fitContent: true,
+                        shrinkWrap: true,
+                        softLineBreak: true,
+                        styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
+                      )
+                  )
+                ]
+            ),
+          ),
+        ),
         SliverToBoxAdapter(child: CarouselContainer(recipe: widget.model.uuid)),
         SliverToBoxAdapter(
           child: Padding(

@@ -42,9 +42,6 @@ class BrewPage extends StatefulWidget {
 class _BrewPageState extends State<BrewPage> {
   Key _key = UniqueKey();
 
-  // Edition mode
-  bool _expanded = true;
-
   @override
   void initState() {
     super.initState();
@@ -320,27 +317,11 @@ class _BrewPageState extends State<BrewPage> {
         if (widget.model.notes != null) SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: ExpansionPanelList(
-              elevation: 1,
-              expandedHeaderPadding: EdgeInsets.zero,
-              expansionCallback: (int index, bool isExpanded) {
-                setState(() {
-                  _expanded = !isExpanded;
-                });
-              },
-              children: [
-                ExpansionPanel(
-                  isExpanded: _expanded,
-                  canTapOnHeader: true,
-                  headerBuilder: (context, isExpanded) {
-                    return ListTile(
-                      dense: true,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      title: Text(AppLocalizations.of(context)!.text('notes'),
-                          style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
-                    );
-                  },
-                  body: Container(
+            child: ExpansionTile(
+              initiallyExpanded: true,
+              title: Text(AppLocalizations.of(context)!.text('notes'), style: const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+              children: <Widget>[
+                Container(
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.only(bottom: 12, left: 12, right: 12),
                     child: MarkdownBody(
@@ -350,10 +331,9 @@ class _BrewPageState extends State<BrewPage> {
                       softLineBreak: true,
                       styleSheet: MarkdownStyleSheet.fromTheme(Theme.of(context)).copyWith(textAlign: WrapAlignment.start),
                     )
-                  ),
                 )
               ]
-            )
+            ),
           ),
         ),
       ]

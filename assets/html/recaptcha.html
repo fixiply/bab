@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>reCAPTCHA</title>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</head>
+<body>
+<form action="?" method="POST">
+    <div class="g-recaptcha"
+         data-sitekey="6LdhMoIpAAAAAD4CeSk29Ave91Sz-4o9-c4lR3nq"
+         data-callback="captchaCallback"></div>
+</form>
+<script>
+    function captchaCallback(response){
+        if(typeof Captcha!=="undefined"){
+            Captcha.postMessage(response);
+        }
+    }
+</script>
+</body>
+</html>
+<html>
+<body>
