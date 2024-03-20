@@ -79,6 +79,7 @@ class _EquipmentDataTableState extends State<EquipmentDataTable> with AutomaticK
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       color: widget.color,
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),

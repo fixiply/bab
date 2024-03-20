@@ -34,6 +34,7 @@ class _CompaniesPageState extends State<CompaniesPage> with AutomaticKeepAliveCl
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,

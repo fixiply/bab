@@ -76,6 +76,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
   double _grainTemp = 20;
+  int _currentStep = 0;
   Future<double>? _initialBrewTemp;
 
   List<MyStep> _steps = [];
@@ -106,13 +107,20 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
+    super.build(context);
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) async {
+        if (didPop) {
+          return;
+        }
         bool? exitResult = await showDialog(
           context: context,
           builder: (context) => ConfirmDialog(content: Text(AppLocalizations.of(context)!.text('stop_brewing'))),
         );
-        return exitResult ?? false;
+        if (exitResult == true) {
+          Navigator.of(context).pop();
+        }
       },
       child: Scaffold(
         key: _scaffoldKey,
@@ -135,10 +143,25 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               }
             }
           ),
+          actions: <Widget>[
+            if (_currentStep > 0)
+              IconButton(
+                icon: const Icon(Icons.restart_alt),
+                tooltip: AppLocalizations.of(context)!.text('reset'),
+                onPressed: () {
+                  widget.model.started_at = null;
+                  widget.model.last_step = 0;
+                  Database().update(widget.model, updateLogs: false);
+                  setState(() {
+                    _currentStep = 0;
+                  });
+                },
+              ),
+          ],
         ),
         body: CustomStepper(
           steps: _steps,
-          currentStep: widget.model.last_step ?? 0,
+          currentStep: _currentStep,
           onLastStep: (index) {
             widget.model.last_step = index;
             Database().update(widget.model, updateLogs: false);
@@ -149,6 +172,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   }
 
   _initialize() async {
+    _currentStep = widget.model.last_step ?? 0;
     _temp = SfRadialGauge(
         animationDuration: 3500,
         enableLoadingAnimation: true,
@@ -412,10 +436,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
     List<MyStep> values = [];
     for(mash.Mash item in recipe.mash!) {
       if (item.type == mash.Type.infusion) {
-        var index = ++_index;
         CountDownController controller = CountDownController();
         values.add(MyStep(
-          index: index,
+          index: ++_index,
           title: Text(sprintf(AppLocalizations.of(context)!.text('level_minutes'),
             [
               item.name,
@@ -434,8 +457,9 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               child: CircularTimer(
                 controller,
                 duration: 0,
-                index: index,
+                index: _index,
                 onComplete: (int index) {
+                  debugPrint('onComplete $index');
                   _notification(sprintf(AppLocalizations.of(context)!.text('level_over'),
                     [
                       item.name,
@@ -453,7 +477,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             )
           ),
           onStepContinue: (int index) {
-            if (!_steps[index].completed) {
+            if (!_steps[index+1].completed) {
               throw AppLocalizations.of(context)!.text('step_not_finished');
             }
           },
@@ -480,9 +504,8 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       onStepContinue: (int index) {
       },
     ));
-    var index = ++_index;
     values.add(MyStep(
-      index: index,
+      index: ++_index,
       title: Text(sprintf(AppLocalizations.of(context)!.text('start_hopping'),
         [
           AppLocalizations.of(context)!.durationFormat(recipe.boil)
@@ -503,7 +526,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               child: CircularTimer(
                 _boilController,
                 duration: 0,
-                index: index,
+                index: _index,
                 onComplete: (int index) {
                   _notification(AppLocalizations.of(context)!.text('hopping_finished'));
                   _steps[index].completed = true;
@@ -546,7 +569,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
       onStepTapped: (int index) {
       },
       onStepContinue: (int index) {
-        if (!_steps[index].completed) {
+        if (!_steps[index+1].completed) {
           throw AppLocalizations.of(context)!.text('step_not_finished');
         }
       },

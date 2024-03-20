@@ -22,7 +22,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                 console.log('No matching brews.');
                 return;
             }
-            snapshot.forEach(async doc => {
+            snapshot.forEach(async doc=> {
                 var user;
                 const brew = doc.data();
                 if (brew.started_at != null) {

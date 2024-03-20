@@ -157,7 +157,7 @@ class FermentableModel<T> extends Model {
         return data.toMap();
       }
       if (data is List) {
-        List<dynamic> values = [];
+        List<FermentableModel> values = [];
         for(final value in data) {
           values.add(serialize(value));
         }

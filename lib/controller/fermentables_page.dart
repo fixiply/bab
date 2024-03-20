@@ -77,6 +77,7 @@ class FermentablesPageState extends CustomState<FermentablesPage> with Automatic
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,

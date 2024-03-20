@@ -140,7 +140,7 @@ class MiscModel<T> extends Model {
         return data.toMap();
       }
       if (data is List) {
-        List<dynamic> values = [];
+        List<MiscModel> values = [];
         for(final value in data) {
           values.add(serialize(value));
         }

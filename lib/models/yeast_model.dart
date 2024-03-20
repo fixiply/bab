@@ -231,7 +231,7 @@ class YeastModel<T> extends Model {
         return data.toMap();
       }
       if (data is List) {
-        List<dynamic> values = [];
+        List<YeastModel> values = [];
         for(final value in data) {
           values.add(serialize(value));
         }

@@ -47,7 +47,6 @@ class FormRecipePage extends StatefulWidget {
 }
 
 class _FormRecipePageState extends CustomState<FormRecipePage> {
-  Key _key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
   bool _modified = false;
 
@@ -64,7 +63,6 @@ class _FormRecipePageState extends CustomState<FormRecipePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _key,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.text('recipe')),
         elevation: 0,
@@ -146,6 +144,7 @@ class _FormRecipePageState extends CustomState<FormRecipePage> {
         child: Form(
           key: _formKey,
           onChanged: () {
+            if (!mounted) return;
             setState(() {
               _modified = true;
             });
@@ -498,9 +497,8 @@ class _FormRecipePageState extends CustomState<FormRecipePage> {
   }
 
   _calculate() async {
-    await widget.model.calculate();
     setState(() {
-      _key = UniqueKey();
+      widget.model.calculate();
     });
   }
 

@@ -188,6 +188,44 @@ class _BrewPageState extends State<BrewPage> {
                   ]
                 ),
                 Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: RichText(
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('oiginal_gravity')} : '),
+                                if (widget.model.og != null) TextSpan(text: AppLocalizations.of(context)!.gravityFormat(widget.model.og), style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.og == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8),
+                          child: RichText(
+                            textAlign: TextAlign.left,
+                            overflow: TextOverflow.ellipsis,
+                            text: TextSpan(
+                              style: DefaultTextStyle.of(context).style,
+                              children: <TextSpan>[
+                                TextSpan(text: '${AppLocalizations.of(context)!.text('final_gravity')} : '),
+                                if (widget.model.fg != null) TextSpan(text: AppLocalizations.of(context)!.gravityFormat(widget.model.fg) , style: const TextStyle(fontWeight: FontWeight.bold)),
+                                if (widget.model.fg == null) TextSpan(text: AppLocalizations.of(context)!.text('not_applicable')),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]
+                ),
+                Row(
                   children: [
                     Expanded(
                       child: Padding(
@@ -232,7 +270,7 @@ class _BrewPageState extends State<BrewPage> {
         SliverList(
           delegate: SliverChildListDelegate([
             FutureBuilder<List<FermentableModel>>(
-              future: widget.model.recipe!.getFermentables(volume: widget.model.volume),
+              future: widget.model.recipe!.getFermentables(volume: widget.model.volume, forceResizing: true),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -248,7 +286,7 @@ class _BrewPageState extends State<BrewPage> {
               }
             ),
             FutureBuilder<List<HopModel>>(
-              future: widget.model.recipe!.gethops(volume: widget.model.volume),
+              future: widget.model.recipe!.gethops(volume: widget.model.volume, forceResizing: true),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -264,7 +302,7 @@ class _BrewPageState extends State<BrewPage> {
               }
             ),
             FutureBuilder<List<YeastModel>>(
-              future: widget.model.recipe!.getYeasts(volume: widget.model.volume),
+              future: widget.model.recipe!.getYeasts(volume: widget.model.volume, forceResizing: true),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -280,7 +318,7 @@ class _BrewPageState extends State<BrewPage> {
             }
             ),
             FutureBuilder<List<MiscModel>>(
-              future: widget.model.recipe!.getMisc(volume: widget.model.volume),
+              future: widget.model.recipe!.getMisc(volume: widget.model.volume, forceResizing: true),
               builder: (context, snapshot) {
                 if (snapshot.hasData && snapshot.data!.isNotEmpty) {
                   return Padding(
@@ -378,7 +416,7 @@ class _BrewPageState extends State<BrewPage> {
       if (changesProvider.model == widget.model.recipe) {
         if (!mounted) return;
         setState(() {
-          widget.model.recipe = changesProvider.model as RecipeModel;
+          widget.model.recipe = (changesProvider.model as RecipeModel).copy();
           _key = UniqueKey();
         });
       }

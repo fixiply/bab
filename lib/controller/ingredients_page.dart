@@ -47,6 +47,7 @@ class _IngredientsPageState extends State<IngredientsPage> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return DefaultTabController(
       length: 4,
       child: Scaffold(

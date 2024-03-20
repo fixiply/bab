@@ -40,10 +40,18 @@ class _DurationFieldState extends FormFieldState<int> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      _textController = TextEditingController(text: widget.initialValue?.toString() ?? '');
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
       readOnly: !DeviceHelper.isDesktop,
-      controller: _textController..text = AppLocalizations.of(context)!.numberFormat(widget.initialValue) ?? '',
+      controller: _textController,
       decoration: FormDecoration(
         icon: widget.showIcon == true ? widget.icon ?? const Icon(Icons.timer_outlined) : null,
         labelText: widget.label ?? AppLocalizations.of(context)!.text('duration'),
@@ -54,7 +62,10 @@ class _DurationFieldState extends FormFieldState<int> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       validator: widget.validator,
       onEditingComplete: DeviceHelper.isDesktop ? () async {
-        didChange(int.tryParse('30'));
+        didChange(int.tryParse(_textController.text));
+      } : null,
+      onChanged: DeviceHelper.isDesktop ? (value) async {
+        didChange(int.tryParse(value));
       } : null,
       onTap: !DeviceHelper.isDesktop ? () async {
         var duration = await showDurationPicker(

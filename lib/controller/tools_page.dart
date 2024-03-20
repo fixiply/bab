@@ -55,6 +55,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,

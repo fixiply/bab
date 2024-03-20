@@ -54,6 +54,7 @@ class _CalendarPageState extends CustomState<CalendarPage> with AutomaticKeepAli
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: constants.FillColor,

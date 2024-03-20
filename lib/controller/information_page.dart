@@ -8,7 +8,6 @@ import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/custom_state.dart';
 
 // External package
-import 'package:uuid/uuid.dart';
 
 class InformationPage extends StatefulWidget {
   @override

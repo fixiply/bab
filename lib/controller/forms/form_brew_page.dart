@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/equipment_model.dart';
@@ -29,7 +30,6 @@ class FormBrewPage extends StatefulWidget {
 }
 
 class _FormBrewPageState extends CustomState<FormBrewPage> {
-  Key _key = UniqueKey();
   final _formKey = GlobalKey<FormState>();
   bool _modified = false;
   bool _autogenerate = true;
@@ -48,7 +48,6 @@ class _FormBrewPageState extends CustomState<FormBrewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _key,
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.text('brew')),
         elevation: 0,
@@ -226,7 +225,8 @@ class _FormBrewPageState extends CustomState<FormBrewPage> {
                   )
                 ],
               ),
-              if (widget.model.started_at != null) Row(
+              const Divider(height: 10),
+              Row(
                 children: [
                   Expanded(
                     child: DateTimeField(
@@ -248,7 +248,7 @@ class _FormBrewPageState extends CustomState<FormBrewPage> {
                       }
                     )
                   ),
-                  Expanded(
+                  if (widget.model.started_at != null && DateHelper.isBeforeNow(widget.model.started_at!)) Expanded(
                     child: DateTimeField(
                       context: context,
                       datetime: widget.model.fermented_at,
@@ -505,9 +505,8 @@ class _FormBrewPageState extends CustomState<FormBrewPage> {
   }
 
   _calculate() async {
-    await widget.model.calculate();
     setState(() {
-      _key = UniqueKey();
+      widget.model.calculate();
     });
   }
 }

@@ -121,6 +121,7 @@ class TanksPageState extends CustomState<TanksPage> with AutomaticKeepAliveClien
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,

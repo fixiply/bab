@@ -5,12 +5,9 @@ import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
-import 'package:bab/utils/database.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
-import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
 import 'package:bab/widgets/forms/localized_text_field.dart';
-import 'package:bab/widgets/modal_bottom_sheet.dart';
 
 // External package
 import 'package:markdown_editable_textinput/format_markdown.dart';

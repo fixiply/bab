@@ -35,6 +35,7 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,

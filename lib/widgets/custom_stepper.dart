@@ -43,13 +43,11 @@ class CustomStepper extends StatefulWidget {
 
 class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingObserver  {
   int _lastStep = 0;
-  int _currentStep = 0;
 
   @override
   void initState() {
     super.initState();
     _lastStep = widget.currentStep ?? 0;
-    _currentStep = widget.currentStep ?? 0;
   }
 
   @override
@@ -63,13 +61,13 @@ class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingO
       );
     }
     return Stepper(
-      currentStep: _currentStep,
+      currentStep: widget.currentStep,
       onStepCancel: () {
-        if (_currentStep > 0) {
+        if (widget.currentStep > 0) {
           try {
-            widget.steps[_currentStep].onStepCancel?.call(_currentStep);
+            widget.steps[widget.currentStep].onStepCancel?.call(widget.currentStep);
             setState(() {
-              _currentStep -= 1;
+              widget.currentStep -= 1;
             });
           } catch (e) {
             showSnackbar(e.toString(), success: false);
@@ -77,13 +75,13 @@ class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingO
         }
       },
       onStepContinue: () {
-        if (_currentStep < widget.steps.length - 1) {
+        if (widget.currentStep < widget.steps.length - 1) {
           try {
-            widget.steps[_currentStep].onStepContinue?.call(_currentStep);
+            widget.steps[widget.currentStep].onStepContinue?.call(widget.currentStep);
             setState(() {
-              _currentStep += 1;
-              if (_currentStep > _lastStep) {
-                _lastStep = _currentStep;
+              widget.currentStep += 1;
+              if (widget.currentStep > _lastStep) {
+                _lastStep = widget.currentStep;
                 widget.onLastStep?.call(_lastStep);
               }
             });
@@ -93,8 +91,8 @@ class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingO
               textColor: Colors.white,
               onPressed: () {
                 setState(() {
-                  _currentStep += 1;
-                  if (_currentStep > _lastStep) _lastStep = _currentStep;
+                  widget.currentStep += 1;
+                  if (widget.currentStep > _lastStep) _lastStep = widget.currentStep;
                 });
               },
             ));
@@ -103,9 +101,9 @@ class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingO
       },
       onStepTapped: (int index) {
         if (index <= _lastStep) {
-          widget.steps[_currentStep].onStepTapped?.call(index);
+          widget.steps[widget.currentStep].onStepTapped?.call(index);
           setState(() {
-            _currentStep = index;
+            widget.currentStep = index;
           });
         }
       },
@@ -116,17 +114,17 @@ class CustomStepperState extends CustomState<CustomStepper> with WidgetsBindingO
             constraints: const BoxConstraints.tightFor(height: 48.0),
             child: Row(
               children: <Widget>[
-                if (_currentStep == widget.steps.length - 1) ElevatedButton(
+                if (widget.currentStep == widget.steps.length - 1) ElevatedButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },
                   child: Text(localizations.closeButtonLabel.toUpperCase()),
                 ),
-                if (_currentStep < widget.steps.length - 1) ElevatedButton(
+                if (widget.currentStep < widget.steps.length - 1) ElevatedButton(
                   onPressed: controls.onStepContinue,
-                  child: Text(_currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel.toUpperCase()),
+                  child: Text(widget.currentStep == 0 ? AppLocalizations.of(context)!.text('start').toUpperCase() : localizations.continueButtonLabel.toUpperCase()),
                 ),
-                if (_currentStep != 0) TextButton(
+                if (widget.currentStep != 0) TextButton(
                   onPressed: controls.onStepCancel,
                   child: Text(
                     localizations.backButtonTooltip.toUpperCase(),

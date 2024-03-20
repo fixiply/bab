@@ -22,6 +22,7 @@ class _OrdersPageState extends State<OrdersPage> with AutomaticKeepAliveClientMi
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,

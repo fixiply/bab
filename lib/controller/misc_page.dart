@@ -75,6 +75,7 @@ class MiscPageState extends CustomState<MiscPage> with AutomaticKeepAliveClientM
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,

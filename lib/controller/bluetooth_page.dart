@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/utils/app_localizations.dart';

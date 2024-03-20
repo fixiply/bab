@@ -97,6 +97,7 @@ class FermentablesDataTableState extends State<FermentablesDataTable> with Autom
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       color: widget.color,
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),
@@ -358,9 +359,10 @@ class FermentableDataSource extends EditDataSource {
         } else {
           if (e.columnName == 'amount') {
             return Container(
-              alignment: Alignment.center,
+              alignment: Alignment.centerRight,
               margin: const EdgeInsets.all(4),
-              child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
+              child: Text(AppLocalizations.of(context)!.text('not_applicable'), style: TextStyle(color: Theme.of(context).primaryColor))
+              // child: Icon(Icons.warning_amber_outlined, size: 18, color: Colors.redAccent.withOpacity(0.3))
             );
           }
         }

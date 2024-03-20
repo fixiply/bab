@@ -38,6 +38,7 @@ class _InventoryDataTableState extends State<InventoryDataTable> with AutomaticK
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       color: Colors.white,
       child: FutureBuilder<List<InventoryModel>>(

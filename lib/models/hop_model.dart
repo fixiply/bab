@@ -136,6 +136,9 @@ class HopModel<T> extends Model {
   ///
   /// The `volume` argument is relative to the final volume.
   double? ibu(double? og, int? duration, double? volume, {double? maximum})  {
+    if (volume != null) {
+      return null;
+    }
     return FormulaHelper.ibu((this.amount! * 1000), this.alpha, og, this.duration, volume, maximum: maximum);
   }
 
@@ -181,7 +184,7 @@ class HopModel<T> extends Model {
         return data.toMap();
       }
       if (data is List) {
-        List<dynamic> values = [];
+        List<HopModel> values = [];
         for(final value in data) {
           values.add(serialize(value));
         }

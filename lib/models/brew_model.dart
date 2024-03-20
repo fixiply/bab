@@ -218,9 +218,11 @@ class BrewModel<T> extends Model {
 
   Future<double> get totalWeight async {
     double weight = 0;
-    for(fm.FermentableModel item in await recipe!.getFermentables()) {
-      if (item.use == fm.Method.mashed) {
-        weight +=  (item.amount! * (volume! / recipe!.volume!)).abs();
+    if (volume != null) {
+      for (fm.FermentableModel item in await recipe!.getFermentables()) {
+        if (item.use == fm.Method.mashed) {
+          weight += (item.amount! * (volume! / recipe!.volume!)).abs();
+        }
       }
     }
     return weight;
@@ -229,7 +231,7 @@ class BrewModel<T> extends Model {
   calculate() async {
     abv = null;
     efficiency = null;
-    if (recipe != null && tank != null) {
+    if (recipe != null && tank != null && volume != null) {
       double weight = await totalWeight;
       mash_water = tank!.mash(weight);
       sparge_water = tank!.sparge(volume!, weight, duration: recipe!.boil!);

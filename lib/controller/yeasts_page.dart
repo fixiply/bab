@@ -75,6 +75,7 @@ class YeastsPageState extends CustomState<YeastsPage> with AutomaticKeepAliveCli
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: Colors.white,

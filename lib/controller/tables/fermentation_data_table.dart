@@ -76,6 +76,7 @@ class FermentationDataTableState extends State<FermentationDataTable> with Autom
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Container(
       color: widget.color,
       padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 16.0),

@@ -42,6 +42,7 @@ class _InventoryPageState extends State<InventoryPage> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: FillColor,

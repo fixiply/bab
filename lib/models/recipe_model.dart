@@ -245,9 +245,13 @@ class RecipeModel<T> extends Model {
   addFermentable(fm.FermentableModel model) {
     if (_fermentables == null) _fermentables = [];
    _fermentables!.add(model);
+    cacheFermentables = fm.FermentableModel.quantities(this._fermentables);
   }
 
-  set fermentables(List<fm.FermentableModel>data) => _fermentables = data;
+  set fermentables(List<fm.FermentableModel>data) {
+    _fermentables = data;
+    cacheFermentables = fm.FermentableModel.quantities(this._fermentables);
+  }
 
   List<fm.FermentableModel> get fermentables => _fermentables ?? [];
 
@@ -262,14 +266,18 @@ class RecipeModel<T> extends Model {
   addHop(hm.HopModel model) {
     if (_hops == null) _hops = [];
     _hops!.add(model);
+    cacheHops = hm.HopModel.quantities(this._hops);
   }
 
-  set hops(List<hm.HopModel>data) => _hops = data;
+  set hops(List<hm.HopModel>data) {
+    _hops = data;
+    cacheHops = hm.HopModel.quantities(this._hops);
+  }
 
   List<hm.HopModel> get hops => _hops ?? [];
 
   Future<List<hm.HopModel>> gethops({double? volume, hm.Use? use, bool forceResizing = false}) async {
-    if (_hops == null|| forceResizing) {
+    if (_hops == null || forceResizing) {
       _hops = await hm.HopModel.data(cacheHops!);
       resizeHops(volume);
       if (use != null) {
@@ -282,9 +290,13 @@ class RecipeModel<T> extends Model {
   addMisc(mm.MiscModel model) {
     if (_misc == null) _misc = [];
     _misc!.add(model);
+    cacheMisc = mm.MiscModel.quantities(this._misc);
   }
 
-  set miscellaneous(List<mm.MiscModel>data) => _misc = data;
+  set miscellaneous(List<mm.MiscModel>data) {
+    _misc = data;
+    cacheMisc = mm.MiscModel.quantities(this._misc);
+  }
 
   List<mm.MiscModel> get miscellaneous => _misc ?? [];
 
@@ -302,13 +314,17 @@ class RecipeModel<T> extends Model {
   addYeast(YeastModel model) {
     if (_yeasts == null) _yeasts = [];
     _yeasts!.add(model);
+    cacheYeasts = YeastModel.quantities(this._yeasts);
   }
 
-  set yeasts(List<YeastModel>data) => _yeasts = data;
+  set yeasts(List<YeastModel>data) {
+    _yeasts = data;
+    cacheYeasts = YeastModel.quantities(this._yeasts);
+  }
 
   List<YeastModel> get yeasts => _yeasts ?? [];
 
-  Future<List<YeastModel>> getYeasts({double? volume}) async {
+  Future<List<YeastModel>> getYeasts({double? volume, bool forceResizing = false}) async {
     if (_yeasts == null) {
       _yeasts = await YeastModel.data(cacheYeasts!);
       resizeYeasts(volume);
@@ -337,7 +353,9 @@ class RecipeModel<T> extends Model {
       return;
     }
     for(fm.FermentableModel item in fermentables) {
-      item.amount = (item.amount! * (volume / this.volume!)).abs();
+      if (item.amount != null) {
+        item.amount = (item.amount! * (volume / this.volume!)).abs();
+      }
     }
     calculate(volume: volume);
   }
@@ -347,7 +365,9 @@ class RecipeModel<T> extends Model {
       return;
     }
     for(hm.HopModel item in hops) {
-      item.amount = (item.amount! * (volume / this.volume!)).abs();
+      if (item.amount != null) {
+        item.amount = (item.amount! * (volume / this.volume!)).abs();
+      }
     }
     calculate(volume: volume);
   }
@@ -356,7 +376,11 @@ class RecipeModel<T> extends Model {
     if (volume == null || volume == this.volume) {
       return;
     }
-    var percent = (volume - this.volume!) / this.volume!;
+    for(YeastModel item in yeasts) {
+      if ((item.measurement == Measurement.milliliter || item.measurement == Measurement.liter || item.measurement == Measurement.gram || item.measurement == Measurement.kilo) && item.amount != null) {
+        item.amount = (item.amount! * (volume / this.volume!)).abs();
+      }
+    }
 
     calculate(volume: volume);
   }
@@ -365,7 +389,11 @@ class RecipeModel<T> extends Model {
     if (volume == null || volume == this.volume) {
       return;
     }
-    var percent = (volume - this.volume!) / this.volume!;
+    for(mm.MiscModel item in miscellaneous) {
+      if (item.amount != null) {
+        item.amount = (item.amount! * (volume / this.volume!)).abs();
+      }
+    }
 
     calculate(volume: volume);
   }
