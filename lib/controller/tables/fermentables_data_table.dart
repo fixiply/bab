@@ -1,14 +1,15 @@
-import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/material.dart';
 
-import 'package:bab/models/fermentable_model.dart';
 // Internal package
 import 'package:bab/controller/fermentables_page.dart';
 import 'package:bab/controller/tables/edit_data_source.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
+import 'package:bab/extensions/double_extensions.dart';
+import 'package:bab/helpers/color_helper.dart';
+import 'package:bab/helpers/device_helper.dart';
+import 'package:bab/models/fermentable_model.dart';
 import 'package:bab/models/recipe_model.dart' as rm;
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
 import 'package:bab/utils/localized_text.dart';

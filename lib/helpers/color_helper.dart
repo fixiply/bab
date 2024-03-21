@@ -2,6 +2,10 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+// Internal package
+import 'package:bab/extensions/color_extensions.dart';
+import 'package:bab/extensions/string_extensions.dart';
+
 const List<Color> SRM_COLORS = [
   Color(0xFFFFE699),
   Color(0xFFFFD878),
@@ -44,27 +48,6 @@ const List<Color> SRM_COLORS = [
   Color(0xFF3A070B),
   Color(0xFF36080A),
 ];
-
-extension ColorExtension on String {
-  toColor() {
-    var hexColor = replaceAll("#", "");
-    if (hexColor.length == 6) {
-      hexColor = "FF$hexColor";
-    }
-    if (hexColor.length == 8) {
-      return Color(int.parse("0x$hexColor"));
-    }
-  }
-}
-
-extension HexColor on Color {
-  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
-      '${alpha.toRadixString(16).padLeft(2, '0')}'
-      '${red.toRadixString(16).padLeft(2, '0')}'
-      '${green.toRadixString(16).padLeft(2, '0')}'
-      '${blue.toRadixString(16).padLeft(2, '0')}';
-}
 
 class ColorHelper {
   double? start;

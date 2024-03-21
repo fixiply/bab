@@ -1,4 +1,5 @@
 // Internal package
+import 'package:bab/extensions/string_extensions.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
@@ -200,7 +201,7 @@ class MiscModel<T> extends Model {
         return data.toMap();
       }
       if (data is List) {
-        List<dynamic> values = [];
+        List<Quantity> values = [];
         for(final item in data) {
           Quantity model = Quantity();
           model.uuid = item.uuid;
@@ -208,7 +209,7 @@ class MiscModel<T> extends Model {
           if (item.measurement != null) model.measurement = item.measurement;
           model.duration = item.duration;
           model.use = item.use?.index;
-          values.add(Quantity.serialize(model));
+          values.add(model);
         }
         return values;
       }

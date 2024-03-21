@@ -1,7 +1,7 @@
-import 'package:bab/widgets/containers/unit_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/extensions/list_extensions.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/basket_button.dart';
@@ -9,6 +9,7 @@ import 'package:bab/widgets/containers/abv_container.dart';
 import 'package:bab/widgets/containers/carbonation_container.dart';
 import 'package:bab/widgets/containers/efficiency_container.dart';
 import 'package:bab/widgets/containers/ph_container.dart';
+import 'package:bab/widgets/containers/unit_container.dart';
 import 'package:bab/widgets/containers/water_container.dart';
 import 'package:bab/widgets/custom_menu_anchor.dart';
 
@@ -17,30 +18,6 @@ import 'package:bab/widgets/custom_menu_anchor.dart';
 class ToolsPage extends StatefulWidget {
   @override
   _ToolsPageState createState() => _ToolsPageState();
-}
-
-extension ListExpanded on List {
-  bool isExpanded(int n) {
-    for (Map element in this) {
-      if (element.containsKey(n)) {
-        return element[n];
-      }
-    }
-    return false;
-  }
-
-  void set(int n, bool b) {
-    bool found = false;
-    for (Map element in this) {
-      if (element.containsKey(n)) {
-        element[n] = b;
-        found = true;
-      }
-    }
-    if (!found) {
-      add({n: b});
-    }
-  }
 }
 
 class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixin<ToolsPage> {
@@ -83,7 +60,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
               expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  _first.set(index, isExpanded);
+                  _first.update(index, isExpanded);
                 });
               },
               children: [
@@ -130,7 +107,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
               expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  _second.set(index, isExpanded);
+                  _second.update(index, isExpanded);
                 });
               },
               children: [
@@ -198,7 +175,7 @@ class _ToolsPageState extends State<ToolsPage> with AutomaticKeepAliveClientMixi
               expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  _third.set(index, isExpanded);
+                  _third.update(index, isExpanded);
                 });
               },
               children: [

@@ -1,6 +1,8 @@
 import 'dart:ui';
 
-class LocalizedText<T> implements Comparable<LocalizedText> {
+import 'package:flutter/material.dart';
+
+class LocalizedText<T> implements Comparable<T> {
   Map<String, dynamic>? map;
 
   LocalizedText({
@@ -22,10 +24,10 @@ class LocalizedText<T> implements Comparable<LocalizedText> {
 
   @override
   String toString() {
-    if (map!.containsKey(window.locale.languageCode)) {
-      return map![window.locale.languageCode] ?? '';
+    if (map!.containsKey(WidgetsBinding.instance.platformDispatcher.locale.languageCode)) {
+      return map![WidgetsBinding.instance.platformDispatcher.locale.languageCode].toString() ?? '';
     }
-    return map!.values.first;
+    return map!.values.first.toString();
   }
 
   int size()  {

@@ -271,7 +271,7 @@ class RecipeModel<T> extends Model {
 
   set hops(List<hm.HopModel>data) {
     _hops = data;
-    cacheHops = hm.HopModel.quantities(this._hops);
+    cacheHops = hm.HopModel.quantities(data);
   }
 
   List<hm.HopModel> get hops => _hops ?? [];

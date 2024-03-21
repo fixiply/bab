@@ -1,6 +1,6 @@
 // Internal package
+import 'package:bab/extensions/string_extensions.dart';
 import 'package:bab/models/model.dart';
-import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/localized_text.dart';
 
 const String XML_ELEMENT_NAME = 'NAME';

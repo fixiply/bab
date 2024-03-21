@@ -1,7 +1,9 @@
+import 'package:bab/utils/localized_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 // Internal package
+import 'package:bab/extensions/iterate_extensions.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 
@@ -177,6 +179,43 @@ abstract class EditDataSource extends DataGridSource {
       }
     }
     return null;
+  }
+
+  @override
+  int compare(DataGridRow? a, DataGridRow? b, SortColumnDetails sortColumn) {
+    Object? getCellValue(List<DataGridCell>? cells, String columnName) {
+      return cells?.firstWhereOrNull((DataGridCell element) => element.columnName == columnName)?.value;
+    }
+
+    Object? valueA = getCellValue(a?.getCells(), sortColumn.name);
+    Object? valueB = getCellValue(b?.getCells(), sortColumn.name);
+
+    if (valueA is LocalizedText) {
+      valueA = valueA.toString();
+    }
+    if (valueB is LocalizedText) {
+      valueB = valueB.toString();
+    }
+
+    return _compareTo(valueA, valueB, sortColumn.sortDirection);
+  }
+
+  int _compareTo(dynamic value1, dynamic value2, DataGridSortDirection sortDirection) {
+    if (sortDirection == DataGridSortDirection.ascending) {
+      if (value1 == null) {
+        return -1;
+      } else if (value2 == null) {
+        return 1;
+      }
+      return value1.compareTo(value2) as int;
+    } else {
+      if (value1 == null) {
+        return 1;
+      } else if (value2 == null) {
+        return -1;
+      }
+      return value2.compareTo(value1) as int;
+    }
   }
 
   void updateDataSource() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/extensions/list_extensions.dart';
 import 'package:bab/controller/forms/form_style_page.dart';
 import 'package:bab/helpers/color_helper.dart';
 import 'package:bab/helpers/device_helper.dart';
@@ -23,30 +24,6 @@ class StylePage extends StatefulWidget {
 
   @override
   _StylePageState createState() => _StylePageState();
-}
-
-extension ListExpanded on List {
-  bool isExpanded(int n) {
-    for (Map element in this) {
-      if (element.containsKey(n)) {
-        return element[n];
-      }
-    }
-    return true;
-  }
-
-  void set(int n, bool b) {
-    bool found = false;
-    for (Map element in this) {
-      if (element.containsKey(n)) {
-        element[n] = b;
-        found = true;
-      }
-    }
-    if (!found) {
-      add({n: b});
-    }
-  }
 }
 
 class _StylePageState extends State<StylePage> {
@@ -185,7 +162,7 @@ class _StylePageState extends State<StylePage> {
               expandedHeaderPadding: EdgeInsets.zero,
               expansionCallback: (int index, bool isExpanded) {
                 setState(() {
-                  _expands.set(index, isExpanded);
+                  _expands.update(index, isExpanded);
                 });
               },
               children: [

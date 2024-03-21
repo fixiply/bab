@@ -1,4 +1,5 @@
 // Internal package
+import 'package:bab/extensions/string_extensions.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/utils/constants.dart';
@@ -216,14 +217,14 @@ class FermentableModel<T> extends Model {
         return data.toMap();
       }
       if (data is List) {
-        List<dynamic> values = [];
+        List<Quantity> values = [];
         for(final item in data) {
           Quantity model = Quantity();
           model.uuid = item.uuid;
           model.amount = item.amount;
           model.use = item.use?.index;
           if (item.measurement != null) model.measurement = item.measurement;
-          values.add(Quantity.serialize(model));
+          values.add(model);
         }
         return values;
       }

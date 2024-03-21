@@ -30,51 +30,6 @@ const double DEFAULT_WORT_SHRINKAGE = 1.04;
 //User Global
 UserModel? currentUser;
 
-extension DoubleParsing on double {
-  double toPrecision(int n) => double.parse(toStringAsFixed(n));
-}
-
-extension StringParsing on String {
-  bool containsWord(String? value, List<String> excludes) {
-    if (value == null || value.isEmpty) return false;
-    if (this.withoutDiacriticalMarks.toLowerCase() == value.withoutDiacriticalMarks.toLowerCase()) return true;
-    for (final item in value.toLowerCase().split(' ')) {
-      if (excludes.contains(RegExp(item.withoutDiacriticalMarks, caseSensitive: false))) continue;
-      if (!this.withoutDiacriticalMarks.contains(RegExp(item.withoutDiacriticalMarks, caseSensitive: false))) return false;
-    }
-    return true;
-  }
-
-  bool containsOccurrence(List<String> values) {
-    for (String item in values) {
-      if (this.contains(RegExp(item.withoutDiacriticalMarks, caseSensitive: false))) return true;
-    }
-    return false;
-  }
-
-  String clean(List<String> values) {
-    String value = this;
-    for (final item in values) {
-      value = value.replaceAll(RegExp(item.withoutDiacriticalMarks, caseSensitive: false), '');
-    }
-    value = value.replaceAll(new RegExp(r'[^\w\s]+'), '');
-    // value = value.replaceAll(new RegExp(r'\p{Punctuation}'), '');
-    // value = value.replaceAll(new RegExp(r'\p{Separator}'), '');
-    // value = value.replaceAll(new RegExp(r'\p{General_Category=Math_Symbol}'), '');
-    // value = value.replaceAll(new RegExp(r'\p{General_Category=Math_Symbol}'), '');
-    value = value.trim();
-    return value;
-  }
-
-  static const diacritics = 'ÀÁÂÃÄÅàáâãäåÒÓÔÕÕÖØòóôõöøÈÉÊËĚèéêëěðČÇçčÐĎďÌÍÎÏìíîïĽľÙÚÛÜŮùúûüůŇÑñňŘřŠšŤťŸÝÿýŽž';
-  static const nonDiacritics = 'AAAAAAaaaaaaOOOOOOOooooooEEEEEeeeeeeCCccDDdIIIIiiiiLlUUUUUuuuuuNNnnRrSsTtYYyyZz';
-
-  String get withoutDiacriticalMarks => this.splitMapJoin('',
-      onNonMatch: (char) => char.isNotEmpty && diacritics.contains(char)
-          ? nonDiacritics[diacritics.indexOf(char)]
-          : char);
-}
-
 mixin Enums<T extends Enum> on Enum implements Comparable<Enum>  {
   List<Enum> get enums;
   String getLabel(BuildContext context) {

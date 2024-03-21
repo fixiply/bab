@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' as foundation;
 // Internal package
 import 'package:bab/controller/forms/form_recipe_page.dart';
 import 'package:bab/controller/login_page.dart';
+import 'package:bab/extensions/string_extensions.dart';
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/models/fermentable_model.dart' as fm;
 import 'package:bab/models/hop_model.dart' as hm;
