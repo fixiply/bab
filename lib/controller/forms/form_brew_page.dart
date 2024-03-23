@@ -74,8 +74,11 @@ class _FormBrewPageState extends CustomState<FormBrewPage> {
             padding: EdgeInsets.zero,
             tooltip: AppLocalizations.of(context)!.text('calculate_specific_profile'),
             icon: const Icon(Icons.calculate_outlined),
-            onPressed: () {
-              _calculate();
+            onPressed: () async {
+              await _calculate();
+              setState(() {
+                _modified = true;
+              });
             }
           ),
           IconButton(

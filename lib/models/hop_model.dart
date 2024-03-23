@@ -137,7 +137,7 @@ class HopModel<T> extends Model {
   ///
   /// The `volume` argument is relative to the final volume.
   double? ibu(double? og, int? duration, double? volume, {double? maximum})  {
-    if (volume != null) {
+    if (volume == null || this.amount == null) {
       return null;
     }
     return FormulaHelper.ibu((this.amount! * 1000), this.alpha, og, this.duration, volume, maximum: maximum);
