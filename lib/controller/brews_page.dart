@@ -304,7 +304,7 @@ class _BrewsPageState extends CustomState<BrewsPage> with AutomaticKeepAliveClie
             onPressed: () {
               Navigator.push(context,
                   MaterialPageRoute(builder: (BuildContext context) {
-                    return StepperPage(model);
+                    return StepperPage(model, currentStep: model.last_step ?? 0);
                   })).then((value) {
               });
             },

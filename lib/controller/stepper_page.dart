@@ -35,7 +35,8 @@ import 'package:uuid/uuid.dart';
 
 class StepperPage extends StatefulWidget {
   final BrewModel model;
-  StepperPage(this.model);
+  int currentStep;
+  StepperPage(this.model, {this.currentStep = 0});
 
   @override
   _StepperPageState createState() => _StepperPageState();
@@ -56,7 +57,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
   double _grainTemp = 20;
-  int _currentStep = 0;
   Future<double>? _initialBrewTemp;
 
   List<MyStep> _steps = [];
@@ -124,7 +124,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
             }
           ),
           actions: <Widget>[
-            if (_currentStep > 0)
+            if (widget.currentStep > 0)
               IconButton(
                 icon: const Icon(Icons.restart_alt),
                 tooltip: AppLocalizations.of(context)!.text('reset'),
@@ -133,7 +133,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                   widget.model.last_step = 0;
                   Database().update(widget.model, updateLogs: false);
                   setState(() {
-                    _currentStep = 0;
+                    widget.currentStep = 0;
                   });
                 },
               ),
@@ -141,7 +141,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         ),
         body: CustomStepper(
           steps: _steps,
-          currentStep: _currentStep,
+          currentStep: widget.currentStep,
           onLastStep: (index) {
             widget.model.last_step = index;
             Database().update(widget.model, updateLogs: false);
@@ -152,7 +152,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   }
 
   _initialize() async {
-    _currentStep = widget.model.last_step ?? 0;
     _temp = SfRadialGauge(
         animationDuration: 3500,
         enableLoadingAnimation: true,

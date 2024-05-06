@@ -383,7 +383,7 @@ class _BrewPageState extends State<BrewPage> {
       onPressed: () {
         Navigator.push(context,
             MaterialPageRoute(builder: (BuildContext context) {
-              return StepperPage(widget.model);
+              return StepperPage(widget.model, currentStep: widget.model.last_step ?? 0);
             })).then((value) {
         });
       },
