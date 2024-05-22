@@ -1,14 +1,14 @@
-import 'package:bab/utils/locale_notifier.dart';
-import 'package:bab/utils/localized_text.dart';
+
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
+import 'package:bab/utils/localized_text.dart';
 import 'package:bab/widgets/form_decoration.dart';
 import 'package:markdown_editable_textinput/format_markdown.dart';
 import 'package:markdown_editable_textinput/markdown_text_input.dart';
-import 'package:provider/provider.dart';
 
 class TextInputField extends FormField<dynamic> {
   final String title;
@@ -43,7 +43,6 @@ class _TextInputFieldState extends FormFieldState<dynamic> {
       _locale = AppLocalizations.of(context)!.locale;
       _initialize();
     });
-    final localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
     localeNotifier.addListener(() {
       _locale = localeNotifier.locale;
       _initialize();

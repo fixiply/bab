@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/helpers/class_helper.dart';
 import 'package:bab/models/basket_model.dart';
 import 'package:bab/models/brew_model.dart';
@@ -26,7 +27,6 @@ import 'package:bab/utils/rating.dart';
 // External package
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:provider/provider.dart';
 
 class Database {
   static final firestore = FirebaseFirestore.instance;
@@ -117,7 +117,7 @@ class Database {
       rethrow;
     }
     if (context != null) {
-      Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.added);
+      changesNotifier.set(d, Changes.added);
     }
     return d.uuid;
   }
@@ -129,7 +129,7 @@ class Database {
       }
       bool updated = await getTableName(d)!.doc(id).set(d.toMap()).then((value) {
         if (context != null) {
-          Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.modified);
+          changesNotifier.set(d, Changes.modified);
         }
         return true;
       }).catchError((error) {
@@ -159,7 +159,7 @@ class Database {
       }
       await getTableName(d)!.doc(d.uuid).update(d.toMap());
       if (context != null) {
-        Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.modified);
+        changesNotifier.set(d, Changes.modified);
       }
     }
     catch (e, s) {
@@ -180,7 +180,7 @@ class Database {
         }
         await getTableName(d)!.doc(d.uuid).update(d.toMap());
         if (context != null) {
-          Provider.of<ChangesNotifier>(context, listen: false).set(d, Changes.deleted);
+          changesNotifier.set(d, Changes.deleted);
         }
       }
     }

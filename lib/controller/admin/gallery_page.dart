@@ -215,6 +215,7 @@ class _GalleryPageState extends CustomState<GalleryPage> with SingleTickerProvid
       ),
       bottomNavigationBar: _bottomBar(),
       floatingActionButton: !DeviceHelper.isDesktop || _path != 'camera' ? FloatingActionButton(
+        heroTag: null,
         onPressed: _add,
         tooltip: AppLocalizations.of(context)!.text('add_image'),
         child: Icon(_path == 'camera' ? Icons.camera : Icons.add_photo_alternate_rounded)

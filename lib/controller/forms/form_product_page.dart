@@ -202,7 +202,7 @@ class _FormProductPageState extends State<FormProductPage> {
                 initialValue: widget.model.price?.toString(),
                 keyboardType: TextInputType.number,
                 onChanged: (value) => setState(() {
-                  widget.model.price = double.tryParse(value);
+                  widget.model.price = AppLocalizations.of(context)!.decimal(value);
                 }),
                 decoration: FormDecoration(
                   icon: const Icon(Icons.euro),

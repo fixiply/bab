@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/controller/forms/form_brew_page.dart';
 import 'package:bab/controller/stepper_page.dart';
 import 'package:bab/controller/tables/fermentables_data_table.dart';
@@ -18,7 +19,6 @@ import 'package:bab/models/misc_model.dart';
 import 'package:bab/models/recipe_model.dart';
 import 'package:bab/models/yeast_model.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/changes_notifier.dart';
 import 'package:bab/utils/constants.dart' as constants;
 import 'package:bab/widgets/animated_action_button.dart';
 import 'package:bab/widgets/basket_button.dart';
@@ -29,7 +29,6 @@ import 'package:bab/widgets/paints/circle_clipper.dart';
 
 // External package
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:provider/provider.dart';
 
 class BrewPage extends StatefulWidget {
   BrewModel model;
@@ -411,12 +410,11 @@ class _BrewPageState extends State<BrewPage> {
   }
 
   _initialize() async {
-    final changesProvider = Provider.of<ChangesNotifier>(context, listen: false);
-    changesProvider.addListener(() {
-      if (changesProvider.model == widget.model.recipe) {
+    changesNotifier.addListener(() {
+      if (changesNotifier.model == widget.model.recipe) {
         if (!mounted) return;
         setState(() {
-          widget.model.recipe = (changesProvider.model as RecipeModel).copy();
+          widget.model.recipe = (changesNotifier.model as RecipeModel).copy();
           _key = UniqueKey();
         });
       }
@@ -430,7 +428,7 @@ class _BrewPageState extends State<BrewPage> {
       if (value != null) {
         setState(() {
           widget.model = value;
-          _key = UniqueKey();
+          _key = UniqueKey(); // refresh the page
         });
       }
     });

@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
-import 'package:bab/utils/database.dart';
-import 'package:bab/utils/locale_notifier.dart';
 import 'package:bab/widgets/modal_bottom_sheet.dart';
 
 // External package
 import 'package:app_settings/app_settings.dart';
-import 'package:provider/provider.dart';
 
 enum Menu {settings, options, publish, archived, pending, imported}
 
@@ -50,7 +48,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text(AppLocalizations.of(context)!.text('english')),
               value: const Locale('en', 'US') == AppLocalizations.of(context)!.locale,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setLocale(const Locale('en', 'US'));
+                localeNotifier.setLocale(const Locale('en', 'US'));
                 widget.onSelected?.call(const Locale('en', 'US'));
               }
             ),
@@ -58,7 +56,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text(AppLocalizations.of(context)!.text('french')),
               value: const Locale('fr', 'FR') == AppLocalizations.of(context)!.locale,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setLocale(const Locale('fr', 'FR'));
+                localeNotifier.setLocale(const Locale('fr', 'FR'));
                 widget.onSelected?.call(const Locale('fr', 'FR'));
               }
             ),
@@ -71,7 +69,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text(AppLocalizations.of(context)!.text('metric')),
               value: Unit.metric == AppLocalizations.of(context)!.unit,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setUnit(Unit.metric);
+                localeNotifier.setUnit(Unit.metric);
                 widget.onSelected?.call(Unit.metric);
               }
             ),
@@ -79,7 +77,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text(AppLocalizations.of(context)!.text('us_standard')),
               value: Unit.us == AppLocalizations.of(context)!.unit,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setUnit(Unit.us);
+                localeNotifier.setUnit(Unit.us);
                 widget.onSelected?.call(Unit.us);
               }
             ),
@@ -92,7 +90,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text(AppLocalizations.of(context)!.text('gravity')),
               value: Gravity.sg == AppLocalizations.of(context)!.gravity,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setGravity(Gravity.sg);
+                localeNotifier.setGravity(Gravity.sg);
                 widget.onSelected?.call(Gravity.sg);
               }
             ),
@@ -100,7 +98,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text('Plato °P'),
               value: Gravity.plato == AppLocalizations.of(context)!.gravity,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setGravity(Gravity.plato);
+                localeNotifier.setGravity(Gravity.plato);
                 widget.onSelected?.call(Gravity.plato);
               }
             ),
@@ -108,7 +106,7 @@ class CustomMenuAnchorState extends State<CustomMenuAnchor>  {
               child: Text('Brix °Bx'),
               value: Gravity.brix == AppLocalizations.of(context)!.gravity,
               onChanged: (value) {
-                Provider.of<LocaleNotifier>(context, listen: false).setGravity(Gravity.brix);
+                localeNotifier.setGravity(Gravity.brix);
                 widget.onSelected?.call(Gravity.brix);
               }
             ),

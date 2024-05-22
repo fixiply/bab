@@ -118,6 +118,7 @@ class _ProductsPageState extends State<ProductsPage> with AutomaticKeepAliveClie
         )
       ),
       floatingActionButton: FloatingActionButton(
+        heroTag: null,
         onPressed: _new,
         backgroundColor: Theme.of(context).primaryColor,
         tooltip: AppLocalizations.of(context)!.text('new'),

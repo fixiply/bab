@@ -102,7 +102,7 @@ class _ProductPageState extends State<ProductPage> {
                                       Positioned(
                                           left: 22,
                                           top: 9,
-                                          child: Text('${widget.model.price!.toStringAsPrecision(3)} €', style: const TextStyle(fontSize: 16, color: Colors.white))
+                                          child: Text(AppLocalizations.of(context)!.currencyFormat(widget.model.price) ?? '', style: const TextStyle(fontSize: 16, color: Colors.white))
                                       )
                                     ],
                                   )

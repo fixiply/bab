@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/controller/forms/form_address_page.dart';
 import 'package:bab/controller/information_page.dart';
 import 'package:bab/models/basket_model.dart';
@@ -42,11 +43,10 @@ class _BasketPageState extends CustomState<BasketPage> {
   @override
   void initState() {
     super.initState();
-    final provider = Provider.of<BasketNotifier>(context, listen: false);
-    _populate = provider.size > 0;
-    provider.addListener(() {
+    _populate = basketNotifier.size > 0;
+    basketNotifier.addListener(() {
       setState(() {
-        _populate = provider.size > 0;
+        _populate = basketNotifier.size > 0;
       });
     });
     _controller = ScrollController();
@@ -286,7 +286,7 @@ class _BasketPageState extends CustomState<BasketPage> {
                     return Container();
                   },
                 ),
-                Text('${snapshot1.data.price!.toStringAsPrecision(3)} €', style: TextStyle(color: Theme.of(context).primaryColor)),
+                Text(AppLocalizations.of(context)!.currencyFormat(snapshot1.data.price) ?? '', style: TextStyle(color: Theme.of(context).primaryColor)),
               ]
             ),
             trailing: Row(
@@ -321,7 +321,7 @@ class _BasketPageState extends CustomState<BasketPage> {
                     if (value == 'modify') {
                       ModalBottomSheet.showAddToCart(context, snapshot1.data, basket: model);
                     } else if (value == 'remove') {
-                      Provider.of<BasketNotifier>(context, listen: false).remove(model);
+                      basketNotifier.remove(model);
                     }
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[

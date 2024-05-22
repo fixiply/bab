@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/controller/account_page.dart';
 import 'package:bab/controller/admin/gallery_page.dart';
 import 'package:bab/controller/brew_page.dart';
@@ -20,18 +21,15 @@ import 'package:bab/controller/recipes_page.dart';
 import 'package:bab/controller/styles_page.dart';
 import 'package:bab/controller/tools_page.dart';
 import 'package:bab/helpers/device_helper.dart';
-import 'package:bab/main.dart';
 import 'package:bab/models/brew_model.dart';
 import 'package:bab/models/event_model.dart';
 import 'package:bab/models/user_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/database.dart';
-import 'package:bab/utils/user_notifier.dart';
 
 // External package
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:provider/provider.dart';
 import 'package:sidebarx/sidebarx.dart';
 
 class HomePage extends StatefulWidget {
@@ -132,7 +130,6 @@ class _HomeState extends State<HomePage> {
 
   _initialize() async {
     _generateItems();
-    final userNotifier = Provider.of<UserNotifier>(context, listen: false);
     userNotifier.addListener(() {
       _generateItems();
       if (_page.hasClients && ((userNotifier.user != null && _page.page == 4) || (userNotifier.user == null && _page.page == 9))) {
@@ -255,7 +252,7 @@ class _HomeState extends State<HomePage> {
   }
 
   void _generateItems() {
-    final UserModel? user = Provider.of<UserNotifier>(context, listen: false).user;
+    final UserModel? user = userNotifier.user;
     final isLargeScreen = DeviceHelper.isLargeScreen(context);
     setState(() {
       _pages = [

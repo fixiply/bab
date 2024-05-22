@@ -146,7 +146,6 @@ class _AppState extends State<MyApp> {
     _authStateChanges();
     _subscribe();
     _initBuilders();
-    final localeNotifier = Provider.of<LocaleNotifier>(context, listen: false);
     localeNotifier.addListener(() {
       if (!mounted) return;
       onLocaleChange(localeNotifier.locale, localeNotifier.unit, localeNotifier.gravity);
@@ -245,7 +244,7 @@ class _AppState extends State<MyApp> {
         logger.d('[$APP_NAME] User "${user.email}" is signed in with "${model.role}".');
       }
     }
-    Provider.of<UserNotifier>(context, listen: false).set(model);
+    userNotifier.set(model);
     setState(() {
       currentUser = model;
     });

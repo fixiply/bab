@@ -53,7 +53,7 @@ class AbstractContainerState extends State<AbstractContainer> {
     return SizedBox(
       width: 100,
       child: TextButton(
-        child: Text('${model.price!.toStringAsPrecision(3)} €', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+        child: Text(AppLocalizations.of(context)!.currencyFormat(model.price) ?? '', style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
         style: TextButton.styleFrom(
           backgroundColor: Theme.of(context).primaryColor,
           shape: RoundedRectangleBorder(

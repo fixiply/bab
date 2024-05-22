@@ -102,6 +102,7 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
   Widget buildScanButton(BuildContext context) {
     if (FlutterBluePlus.isScanningNow) {
       return FloatingActionButton(
+        heroTag: null,
         child: const Icon(Icons.stop),
         onPressed: onStopPressed,
         backgroundColor: Colors.red,

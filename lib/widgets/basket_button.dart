@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/controller/basket_page.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 
 // External package
 import 'package:badges/badges.dart' as badge;
-import 'package:provider/provider.dart';
 
 class BasketButton extends StatefulWidget {
   const BasketButton({Key? key}) : super(key: key);
@@ -22,12 +21,11 @@ class _BasketButtonState extends State<BasketButton> with SingleTickerProviderSt
   @override
   void initState() {
     super.initState();
-    final basketProvider = Provider.of<BasketNotifier>(context, listen: false);
-    _baskets = basketProvider.size;
-    basketProvider.addListener(() {
+    _baskets = basketNotifier.size;
+    basketNotifier.addListener(() {
       if (!mounted) return;
       setState(() {
-        _baskets = basketProvider.size;
+        _baskets = basketNotifier.size;
       });
     });
   }

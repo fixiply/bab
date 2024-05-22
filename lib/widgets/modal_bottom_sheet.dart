@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/main.dart';
 import 'package:bab/helpers/date_helper.dart';
 import 'package:bab/models/basket_model.dart';
 import 'package:bab/models/model.dart';
 import 'package:bab/models/product_model.dart';
 import 'package:bab/utils/app_localizations.dart';
-import 'package:bab/utils/basket_notifier.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/widgets/days.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -182,8 +182,8 @@ class ModalBottomSheet {
                         )),
                         onPressed: () async {
                           newBasket.quantity = quantity;
-                          if (update) Provider.of<BasketNotifier>(context, listen: false).set(newBasket);
-                          else Provider.of<BasketNotifier>(context, listen: false).add(newBasket);
+                          if (update) basketNotifier.set(newBasket);
+                          else basketNotifier.add(newBasket);
                           Navigator.pop(context);
                         },
                       )
@@ -283,8 +283,8 @@ class ModalBottomSheet {
                         ),
                         onPressed: () async {
                           newBasket.quantity = quantity;
-                          if (update) Provider.of<BasketNotifier>(context, listen: false).set(newBasket);
-                          else Provider.of<BasketNotifier>(context, listen: false).add(newBasket);
+                          if (update) basketNotifier.set(newBasket);
+                          else basketNotifier.add(newBasket);
                           Navigator.pop(context);
                         },
                       )
