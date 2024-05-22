@@ -8,7 +8,10 @@ import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class RegistrationBuilder extends JsonWidgetBuilder {
-  static const type = 'registration';
+  static const name = 'registration';
+
+  @override
+  String get type => name;
 
   RegistrationBuilder() : super(numSupportedChildren: 1);
 

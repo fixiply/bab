@@ -9,11 +9,11 @@ import 'package:highlight/languages/dart.dart';
 import 'package:code_text_field/code_text_field.dart';
 
 class CodeEditorPage extends StatefulWidget {
-  String? initialValue;
+  final String? initialValue;
   final String? title;
   final String? hintText;
   final int? maxLines;
-  CodeEditorPage({this.initialValue, this.title, this.hintText, this.maxLines});
+  const CodeEditorPage({super.key, this.initialValue, this.title, this.hintText, this.maxLines});
 
   @override
   _CodeEditorPageState createState() => _CodeEditorPageState();

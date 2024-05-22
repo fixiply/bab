@@ -9,7 +9,10 @@ import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:json_class/json_class.dart';
 
 class MarkdownBuilder extends JsonWidgetBuilder {
-  static const type = 'markdown';
+  static const name = 'markdown';
+
+  @override
+  String get type => name;
 
   String text;
   double? textScaleFactor;

@@ -42,7 +42,7 @@ class _ImageCropPageState extends State<ImageCropPage> {
           titleSpacing: 0.0,
           title: Text(AppLocalizations.of(context)!.text('image_editor')),
           iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
-          titleTextStyle: Theme.of(context).textTheme.headline6,
+          titleTextStyle: Theme.of(context).textTheme.titleLarge,
           backgroundColor: Colors.transparent,
           bottomOpacity: 0.0,
           elevation: 0.0,

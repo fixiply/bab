@@ -78,5 +78,7 @@
     <array>
         <string>fr.bab.delayed-notification</string>
     </array>
+    <key>FLTEnableImpeller</key>
+    <false />
 </dict>
 </plist>

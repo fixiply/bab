@@ -176,7 +176,7 @@ class _GalleryPageState extends CustomState<GalleryPage> with SingleTickerProvid
           )
         ],
         iconTheme: IconThemeData(color: Theme.of(context).primaryColor),
-        titleTextStyle: Theme.of(context).textTheme.headline6,
+        titleTextStyle: Theme.of(context).textTheme.titleLarge,
         backgroundColor: Colors.transparent,
         // bottomOpacity: 0.0,
         elevation: 0.0,

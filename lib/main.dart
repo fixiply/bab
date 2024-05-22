@@ -315,43 +315,43 @@ class _AppState extends State<MyApp> {
   _initBuilders() async {
     var registry = JsonWidgetRegistry.instance;
     registry.registerCustomBuilder(
-      CarouselBuilder.type,
+      CarouselBuilder.name,
       const JsonWidgetBuilderContainer(
         builder: CarouselBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
-      ParallaxBuilder.type,
+      ParallaxBuilder.name,
       const JsonWidgetBuilderContainer(
           builder: ParallaxBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
-      ListBuilder.type,
+      ListBuilder.name,
       const JsonWidgetBuilderContainer(
           builder: ListBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
-      MarkdownBuilder.type,
+      MarkdownBuilder.name,
       const JsonWidgetBuilderContainer(
           builder: MarkdownBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
-      ChatGPTBuilder.type,
+      ChatGPTBuilder.name,
       const JsonWidgetBuilderContainer(
           builder: ChatGPTBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
-      SubscriptionBuilder.type,
+      SubscriptionBuilder.name,
       const JsonWidgetBuilderContainer(
           builder: SubscriptionBuilder.fromDynamic
       ),
     );
     registry.registerCustomBuilder(
-      RegistrationBuilder.type,
+      RegistrationBuilder.name,
       const JsonWidgetBuilderContainer(
           builder: RegistrationBuilder.fromDynamic
       ),

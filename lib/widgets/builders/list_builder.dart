@@ -8,7 +8,10 @@ import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class ListBuilder extends JsonWidgetBuilder {
-  static const type = 'list';
+  static const name = 'list';
+
+  @override
+  String get type => name;
 
   String? company;
   String? recipe;

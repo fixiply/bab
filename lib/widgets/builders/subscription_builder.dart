@@ -8,7 +8,10 @@ import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class SubscriptionBuilder extends JsonWidgetBuilder {
-  static const type = 'subscription';
+  static const name = 'subscription';
+
+  @override
+  String get type => name;
 
   SubscriptionBuilder() : super(numSupportedChildren: 1);
 

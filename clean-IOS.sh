@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "flutter clean ..."
-/Users/tlinxe/Development/flutter/bin/flutter clean
+/users/tlinxe/Documents/Development/SDK/flutter/bin/flutter clean
 echo "Deleting .flutter-plugins ..."
 rm -rf .flutter-plugins
 echo "Deleting .packages ..."
@@ -14,5 +14,5 @@ echo "Deleting ios/Podfile* ..."
 rm ios/Podfile.lock
 echo "Deleting pubspec.lock ..."
 rm pubspec.lock
-/Users/tlinxe/Development/flutter/bin/flutter packages get
+/users/tlinxe/Documents/Development/SDK/flutter/bin/flutter packages get
 echo "Done."

@@ -8,7 +8,10 @@ import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
 class ChatGPTBuilder extends JsonWidgetBuilder {
-  static const type = 'chatgpt';
+  static const name = 'chatgpt';
+
+  @override
+  String get type => name;
 
   ChatGPTBuilder() : super(numSupportedChildren: 1);
 

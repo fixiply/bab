@@ -7,8 +7,11 @@ import 'package:bab/widgets/containers/carousel_container.dart';
 import 'package:child_builder/child_builder.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 
-class CarouselBuilder extends JsonWidgetBuilder {
-  static const type = 'carousel';
+ class CarouselBuilder extends JsonWidgetBuilder {
+  static const name = 'carousel';
+
+  @override
+  String get type => name;
 
   String? company;
   String? recipe;
