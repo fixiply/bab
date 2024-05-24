@@ -169,7 +169,7 @@ class HopsDataTableState extends State<HopsDataTable> with AutomaticKeepAliveCli
       onRemove: (int rowIndex) {
         _remove(rowIndex);
       },
-      onCellTap: !DeviceHelper.isDesktop ? (DataGridCellTapDetails details) async {
+      onCellTap: !DeviceHelper.isDesktop && widget.allowEditing ? (DataGridCellTapDetails details) async {
         if (details.column.columnName == 'duration') {
           DataGridRow dataGridRow = _dataSource.rows[details.rowColumnIndex.rowIndex-1];
           var value = _dataSource.getValue(dataGridRow, details.column.columnName);

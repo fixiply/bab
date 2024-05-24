@@ -63,7 +63,7 @@ class _StylesPageState extends State<StylesPage> with AutomaticKeepAliveClientMi
     super.build(context);
     return Scaffold(
       key: _scaffoldKey,
-      backgroundColor: FillColor,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         title: SearchText(
           _searchQueryController,

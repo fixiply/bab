@@ -171,14 +171,14 @@ class _BrewsPageState extends CustomState<BrewsPage> with AutomaticKeepAliveClie
                 );
               }
               return ListView.builder(
-                  controller: _controller,
-                  shrinkWrap: true,
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  itemCount: snapshot.hasData ? snapshot.data!.length : 0,
-                  itemBuilder: (context, index) {
-                    BrewModel model = snapshot.data![index];
-                    return _item(model);
-                  }
+                controller: _controller,
+                shrinkWrap: true,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: snapshot.hasData ? snapshot.data!.length : 0,
+                itemBuilder: (context, index) {
+                  BrewModel model = snapshot.data![index];
+                  return _item(model);
+                }
               );
             }
             if (snapshot.hasError) {
@@ -214,15 +214,15 @@ class _BrewsPageState extends CustomState<BrewsPage> with AutomaticKeepAliveClie
   Widget _item(BrewModel model) {
     if (model.isEditable() && !DeviceHelper.isDesktop) {
       return CustomDismissible(
-          context,
-          key: Key(model.uuid!),
-          child: _card(model),
-          onStart: () {
-            _edit(model);
-          },
-          onEnd: () async {
-            await _delete(model);
-          }
+        context,
+        key: Key(model.uuid!),
+        child: _card(model),
+        onStart: () {
+          _edit(model);
+        },
+        onEnd: () async {
+          await _delete(model);
+        }
       );
     }
     return _card(model);

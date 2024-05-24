@@ -357,7 +357,7 @@ class RecipeModel<T> extends Model {
         item.amount = (item.amount! * (volume / this.volume!)).abs();
       }
     }
-    calculate(volume: volume);
+    // calculate(volume: volume);
   }
 
   resizeHops(double? volume) {
@@ -369,7 +369,7 @@ class RecipeModel<T> extends Model {
         item.amount = (item.amount! * (volume / this.volume!)).abs();
       }
     }
-    calculate(volume: volume);
+    // calculate(volume: volume);
   }
 
   resizeYeasts(double? volume) {
@@ -382,7 +382,7 @@ class RecipeModel<T> extends Model {
       }
     }
 
-    calculate(volume: volume);
+    // calculate(volume: volume);
   }
 
   resizeMisc(double? volume) {
@@ -395,7 +395,7 @@ class RecipeModel<T> extends Model {
       }
     }
 
-    calculate(volume: volume);
+    // calculate(volume: volume);
   }
 
   calculate({double? volume}) async {
