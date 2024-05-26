@@ -163,15 +163,15 @@ const sendToDevice = async (user, title, body, id, route) => {
 }
 
 const sendMail = async (to, subject, text, html) => {
-  // send mail with defined transport object
-  const info = await transporter.sendMail({
-    from: '"BeAndBrew" <contact@beandbrew.com>', // sender address
-    to: to, // list of receivers
-    subject: subject, // Subject line
-    text: text, // plain text body
-    html: html, // html body
-  });
-
+    // send mail with defined transport object
+    const info = await transporter.sendMail({
+        from: '"BeAndBrew" <contact@beandbrew.com>', // sender address
+        to: to, // list of receivers
+        subject: subject, // Subject line
+        text: text, // plain text body
+        html: html // html body
+    });
+    functions.logger.log("Message sent: ", info.messageId);
 }
 
 function isToday(date) {
