@@ -2,6 +2,7 @@
 
 const admin = require('firebase-admin');
 const functions = require('firebase-functions');
+const nodemailer = require('nodemailer');
 
 const i18next = require('i18next')
 
@@ -99,7 +100,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                                 dryhop.setDate(dryhop.getDate() - item.duration);
                                                 // log('   '+doc.id+' dryhop: '+dryhop);
                                                 if (isTime(dryhop)) {
-                                                    await sendMail(user.emai, title, i18next.t('dryhop') + ".");
+                                                    await sendMail(user.email, title, i18next.t('dryhop') + ".");
                                                     await sendToDevice(user, title, i18next.t('dryhop') + ".", doc.id, 'brew');
                                                     break;
                                                 }
