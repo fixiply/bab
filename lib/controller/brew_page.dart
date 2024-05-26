@@ -314,7 +314,7 @@ class _BrewPageState extends State<BrewPage> {
                   );
                 }
                 return Container();
-            }
+              }
             ),
             FutureBuilder<List<MiscModel>>(
               future: widget.model.recipe!.getMisc(volume: widget.model.volume, forceResizing: true),
@@ -436,62 +436,63 @@ class _BrewPageState extends State<BrewPage> {
 
   _backgroundFlexible() {
     return Stack(
-        children: [
-          Opacity(
-            //semi red clippath with more height and with 0.5 opacity
-            opacity: 0.5,
-            child: ClipPath(
-              clipper: BezierClipper(), //set our custom wave clipper
-              child: Container(
-                color: Colors.black,
-                height: 200,
-              ),
+      children: [
+        Opacity(
+          //semi red clippath with more height and with 0.5 opacity
+          opacity: 0.5,
+          child: ClipPath(
+            clipper: BezierClipper(), //set our custom wave clipper
+            child: Container(
+              color: Colors.black,
+              height: 200,
             ),
           ),
-          Row(
+        ),
+        Row(
+          children: [
+            Stack(
               children: [
-                Stack(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Image.asset('assets/images/beer_1.png',
-                            color: ColorHelper.color(widget.model.recipe!.ebc) ?? Colors.white,
-                            colorBlendMode: BlendMode.modulate
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.only(left: 30),
-                        child: Image.asset('assets/images/beer_2.png'),
-                      ),
-                    ]
+                Container(
+                  padding: const EdgeInsets.only(left: 30),
+                  child: Image.asset('assets/images/beer_1.png',
+                      color: ColorHelper.color(widget.model.recipe!.ebc) ?? Colors.white,
+                      colorBlendMode: BlendMode.modulate
+                  ),
                 ),
-                Expanded(
-                    child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          ClipPath(
-                            clipper: CircleClipper(radius: 65), //set our custom wave clipper
-                            child: Container(
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                if (widget.model.recipe!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.recipe!.ebc)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
-                                if (widget.model.recipe!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.recipe!.ibu)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
-                                if (widget.model.recipe!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.recipe!.abv)!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
-                              ],
-                            ),
-                          ),
-                        ]
-                    )
-                )
+                Container(
+                  padding: const EdgeInsets.only(left: 30),
+                  child: Image.asset('assets/images/beer_2.png'),
+                ),
               ]
-          )
-        ]);
+            ),
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  ClipPath(
+                    clipper: CircleClipper(radius: 65), //set our custom wave clipper
+                    child: Container(
+                      color: Theme.of(context).primaryColor,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.only(top: DeviceHelper.isDesktop ? 10 : 0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        if (widget.model.recipe!.ebc != null) Text('${AppLocalizations.of(context)!.colorUnit}: ${AppLocalizations.of(context)!.colorFormat(widget.model.recipe!.ebc)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
+                        if (widget.model.recipe!.ibu != null) Text('IBU: ${AppLocalizations.of(context)!.numberFormat(widget.model.recipe!.ibu)}', style: const TextStyle(fontSize: 18, color: Colors.white)),
+                        if (widget.model.recipe!.abv != null) Text(AppLocalizations.of(context)!.percentFormat(widget.model.recipe!.abv)!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ]
+              )
+            )
+          ]
+        )
+      ]
+    );
   }
 }

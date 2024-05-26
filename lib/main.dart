@@ -40,7 +40,6 @@ import 'package:g_recaptcha_v3/g_recaptcha_v3.dart';
 import 'package:json_dynamic_widget/json_dynamic_widget.dart';
 import 'package:logger/logger.dart';
 import 'package:provider/provider.dart';
-import 'package:workmanager/workmanager.dart';
 
 final StreamController<String?> selectNotificationStream = StreamController<String?>.broadcast();
 String? selectedNotificationPayload;
@@ -73,14 +72,6 @@ Future<void> showNotification(RemoteMessage message) async {
   }
 }
 
-@pragma('vm:entry-point') // Mandatory if the App is obfuscated or using Flutter 3.1+
-void callbackDispatcher() {
-  Workmanager().executeTask((task, inputData) {
-    print("Native called background task: $task"); //simpleTask will be emitted here.
-    return Future.value(true);
-  });
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -89,9 +80,6 @@ Future<void> main() async {
   _configureFirebaseMessaging();
   if (!foundation.kIsWeb) {
     NotificationService.instance.initialize();
-    Workmanager().initialize(
-      callbackDispatcher, // The top level function, aka callbackDispatcher
-    );
   } else if (!foundation.kDebugMode) {
       await GRecaptchaV3.ready("6LfjMIIpAAAAAK-R4zKfDbn4DelHvE71roCQgFqn", showBadge: false); //--2
   }

@@ -10,6 +10,16 @@ admin.initializeApp();
 const firestore = admin.firestore();
 const messaging = admin.messaging();
 
+const transporter = nodemailer.createTransport({
+  host: "ssl0.ovh.net",
+  port: 465,
+  secure: true, // Use `true` for port 465, `false` for all other ports
+  auth: {
+    user: "contact@beandbrew.com",
+    pass: "Yell0-Submarine",
+  },
+});
+
 exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
     .timeZone('Europe/Paris') // Users can choose timezone - default is America/Los_Angeles
     .onRun(async (context) => {
@@ -79,6 +89,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                         text = 'tertiary';
                                     }
                                     const body = i18next.t(text);
+                                    await sendMail(user.email, title, body + ".");
                                     await sendToDevice(user, title, body + ".", doc.id, 'brew');
                                 } else if (i === 0) {
                                     if (recipe.hops != null) {
@@ -88,6 +99,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                                 dryhop.setDate(dryhop.getDate() - item.duration);
                                                 // log('   '+doc.id+' dryhop: '+dryhop);
                                                 if (isTime(dryhop)) {
+                                                    await sendMail(user.emai, title, i18next.t('dryhop') + ".");
                                                     await sendToDevice(user, title, i18next.t('dryhop') + ".", doc.id, 'brew');
                                                     break;
                                                 }
@@ -148,6 +160,18 @@ const sendToDevice = async (user, title, body, id, route) => {
             functions.logger.log("Successfully sent message: ", user.full_name, '=>', device.name, device.token);
         }
     }
+}
+
+const sendMail = async (to, subject, text, html) => {
+  // send mail with defined transport object
+  const info = await transporter.sendMail({
+    from: '"BeAndBrew" <contact@beandbrew.com>', // sender address
+    to: to, // list of receivers
+    subject: subject, // Subject line
+    text: text, // plain text body
+    html: html, // html body
+  });
+
 }
 
 function isToday(date) {
