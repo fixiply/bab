@@ -4,7 +4,7 @@ const admin = require('firebase-admin');
 const functions = require('firebase-functions');
 const nodemailer = require('nodemailer');
 
-const i18next = require('i18next')
+const i18next = require('i18next');
 
 admin.initializeApp();
 
@@ -48,6 +48,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                         const userDoc = await firestore.collection('users').doc(brew.creator).get();
                         if (userDoc.exists) {
                             user = userDoc.data();
+                            console.log('User '+brew.creator+ ' language: '+user.language+' email: '+user.email);
                         }
                         i18next.init({
                             // initImmediate: false,
@@ -59,8 +60,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                     translation: {
                                         brew: 'Brassin',
                                         end: 'Fin du brassin',
-                                        secondary: 'Début de fermentation secondaire',
-                                        tertiary: 'Début de fermentation tertiaire',
+                                        start: 'Début',
                                         dryhop: 'Début du houblonnage à cru',
                                     },
                                 },
@@ -68,8 +68,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                     translation: {
                                         brew: 'Brew',
                                         end: 'End brew',
-                                        secondary: 'Start secondary fermentation',
-                                        tertiary: 'Start tertiary fermentation',
+                                        start: 'Start',
                                         dryhop: 'Start dry hopping',
                                     },
                                 },
@@ -80,16 +79,12 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                         if (recipe.fermentation != null) {
                             for (var i= 0; i < recipe.fermentation.length; i++) {
                                 started.setDate(started.getDate() + recipe.fermentation[i].duration);
+                                console.log('\t Fermentation '+recipe.fermentation[i].name+' started: '+started + " now: "+isTime(started));
                                 if (isTime(started)) {
-                                    var text = 'end';
+                                    var body = i18next.t('start') + " «"  + recipe.fermentation[i].name + "»";
                                     if ((i + 1) < recipe.fermentation.length ) {
-                                        text = 'end';
-                                    } else if (i === 0) {
-                                        text = 'secondary';
-                                    } else if (i === 1) {
-                                        text = 'tertiary';
+                                        body = i18next.t('end');
                                     }
-                                    const body = i18next.t(text);
                                     await sendMail(user.email, title, body + ".");
                                     await sendToDevice(user, title, body + ".", doc.id, 'brew');
                                 } else if (i === 0) {
@@ -98,6 +93,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                             if (item.use === 4) { // Dry hppping
                                                 var dryhop = new Date(started.getTime())
                                                 dryhop.setDate(dryhop.getDate() - item.duration);
+                                                console.log('\t Dryhop started: '+started + " now: "+isTime(dryhop));
                                                 // log('   '+doc.id+' dryhop: '+dryhop);
                                                 if (isTime(dryhop)) {
                                                     await sendMail(user.email, title, i18next.t('dryhop') + ".");
@@ -166,7 +162,7 @@ const sendToDevice = async (user, title, body, id, route) => {
 const sendMail = async (to, subject, text, html) => {
     // send mail with defined transport object
     const info = await transporter.sendMail({
-        from: '"BeAndBrew" <contact@beandbrew.com>', // sender address
+        from: 'BeAndBrew <noreply@beandbrew.com>', // sender address
         to: to, // list of receivers
         subject: subject, // Subject line
         text: text, // plain text body

@@ -470,7 +470,7 @@ class _ChatGPTContainerState extends AbstractContainerState {
         );
         final request = CompleteText(
             prompt: prompt,
-            model: ModelFromValue(model: 'gpt-3.5-turbo-instruct'),
+            model: Gpt3TurboInstruct(),
             maxTokens: 2048
         );
         EasyLoading.show(status: AppLocalizations.of(context)!.text('work_in_progress'));
