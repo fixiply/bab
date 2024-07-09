@@ -28,6 +28,7 @@ class _DescriptorTileState extends CustomState<DescriptorTile> {
     super.initState();
     _lastValueSubscription = widget.descriptor.lastValueStream.listen((value) {
       _value = value;
+      debugPrint('Descriptor ${widget.descriptor.characteristicUuid} value: ${String.fromCharCodes(value)}');
       if (mounted) {
         setState(() {});
       }
@@ -71,8 +72,7 @@ class _DescriptorTileState extends CustomState<DescriptorTile> {
   }
 
   Widget buildValue(BuildContext context) {
-    String data = _value.toString();
-    return Text(data, style: TextStyle(fontSize: 13, color: Colors.grey));
+    return Text(String.fromCharCodes(_value), style: TextStyle(fontSize: 13, color: Colors.grey));
   }
 
   Widget buildReadButton(BuildContext context) {

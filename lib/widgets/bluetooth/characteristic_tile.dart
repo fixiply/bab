@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
@@ -29,7 +30,7 @@ class _CharacteristicTileState extends CustomState<CharacteristicTile> {
     super.initState();
     _lastValueSubscription = widget.characteristic.lastValueStream.listen((value) {
       _value = value;
-      debugPrint('Characteristic ${widget.characteristic.characteristicUuid} value: $_value');
+      debugPrint('Characteristic ${widget.characteristic.characteristicUuid} value: ${String.fromCharCodes(value)}');
       if (mounted) {
         setState(() {});
       }
@@ -92,8 +93,7 @@ class _CharacteristicTileState extends CustomState<CharacteristicTile> {
   }
 
   Widget buildValue(BuildContext context) {
-    String data = _value.toString();
-    return Text(data, style: TextStyle(fontSize: 13, color: Colors.grey));
+    return Text(String.fromCharCodes(_value), style: TextStyle(fontSize: 13, color: Colors.grey));
   }
 
   Widget buildReadButton(BuildContext context) {

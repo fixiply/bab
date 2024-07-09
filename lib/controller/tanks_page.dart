@@ -2,7 +2,7 @@ import 'package:bab/widgets/containers/image_container.dart';
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/controller/bluetooth_page.dart';
+import 'package:bab/widgets/bluetooth/scan_page.dart';
 import 'package:bab/controller/forms/form_equipment_page.dart';
 import 'package:bab/controller/tables/edit_sfdatagrid.dart';
 import 'package:bab/controller/tables/equipments_data_table.dart';
@@ -335,7 +335,7 @@ class TanksPageState extends CustomState<TanksPage> with AutomaticKeepAliveClien
           child: const Icon(Icons.bluetooth_outlined),
           onPressed: () {
             Navigator.push(context, MaterialPageRoute(builder: (context) {
-              return BluetoothPage(model);
+              return ScanPage(model);
             }));
           },
         ) : null,
@@ -408,7 +408,7 @@ class TanksPageState extends CustomState<TanksPage> with AutomaticKeepAliveClien
 
   _connect(EquipmentModel model) {
     Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return BluetoothPage(model);
+      return ScanPage(model);
     }));
   }
 

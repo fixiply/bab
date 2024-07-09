@@ -3,6 +3,7 @@ import 'package:bab/helpers/device_helper.dart';
 import 'package:bab/helpers/formula_helper.dart';
 import 'package:bab/models/image_model.dart';
 import 'package:bab/models/model.dart';
+import 'package:bab/utils/bluetooth.dart';
 import 'package:bab/utils/constants.dart';
 import 'package:bab/utils/localized_text.dart';
 
@@ -28,6 +29,7 @@ class EquipmentModel<T> extends Model {
   double? shrinkage;
   double? head_loss;
   bool? bluetooth = false;
+  Bluetooth? controller;
   dynamic notes;
   ImageModel? image;
   bool selected = false;
@@ -52,6 +54,7 @@ class EquipmentModel<T> extends Model {
     this.shrinkage = DEFAULT_WORT_SHRINKAGE,
     this.head_loss,
     this.bluetooth,
+    this.controller,
     this.notes,
     this.image,
   }) : super(uuid: uuid, inserted_at: inserted_at, updated_at: updated_at, creator: creator, isEdited: isEdited, isSelected: isSelected);
@@ -72,6 +75,7 @@ class EquipmentModel<T> extends Model {
     if (map['shrinkage'] != null) this.shrinkage = map['shrinkage'].toDouble();
     if (map['head_loss'] != null) this.head_loss = map['head_loss'].toDouble();
     if (map['bluetooth'] != null) this.bluetooth = map['bluetooth'];
+    if (map['controller'] != null) this.controller = Bluetooth.deserialize(map['controller']);
     this.notes = LocalizedText.deserialize(map['notes']);
     this.image = ImageModel.fromJson(map['image']);
   }
@@ -92,6 +96,8 @@ class EquipmentModel<T> extends Model {
       'boil_loss': this.boil_loss,
       'shrinkage': this.shrinkage,
       'head_loss': this.head_loss,
+      'bluetooth': this.bluetooth,
+      'controller': Bluetooth.serialize(this.controller),
       'notes': LocalizedText.serialize(this.notes),
       'image': ImageModel.serialize(this.image),
     });
@@ -116,6 +122,8 @@ class EquipmentModel<T> extends Model {
       boil_loss: this.boil_loss,
       shrinkage: this.shrinkage,
       head_loss: this.head_loss,
+      bluetooth: this.bluetooth,
+      controller: this.controller,
       notes: this.notes,
       image: this.image,
     );

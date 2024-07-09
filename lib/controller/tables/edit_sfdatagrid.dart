@@ -23,6 +23,7 @@ class EditSfDataGrid extends SfDataGrid {
     DataGridController? controller,
     bool allowEditing = true,
     bool allowSorting = true,
+    bool allowSwiping = true,
     bool showCheckboxColumn = false,
     bool? loadMoreRows,
     SelectionMode? selectionMode,
@@ -39,6 +40,7 @@ class EditSfDataGrid extends SfDataGrid {
     columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablette(context) ? ColumnWidthMode.fill : ColumnWidthMode.none,
     allowEditing: allowEditing,
     allowSorting: allowSorting,
+    allowSwiping: allowSwiping && allowEditing,
     allowMultiColumnSorting: false,
     navigationMode: GridNavigationMode.cell,
     editingGestureType: EditingGestureType.tap,
@@ -79,7 +81,6 @@ class EditSfDataGrid extends SfDataGrid {
       );
     } : null,
     gridLinesVisibility: GridLinesVisibility.horizontal,
-    allowSwiping: !DeviceHelper.isDesktop && allowEditing == true,
     endSwipeActionsBuilder: (BuildContext context, DataGridRow row, int rowIndex) {
       return GestureDetector(
         onTap: () {

@@ -1,3 +1,4 @@
+import 'package:bab/widgets/forms/switch_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -13,6 +14,7 @@ import 'package:bab/widgets/custom_state.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/dialogs/delete_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
+import 'package:bab/widgets/forms/bluetooth_field.dart';
 import 'package:bab/widgets/forms/image_field.dart';
 
 // External package
@@ -408,6 +410,23 @@ class _FormEquipmentPageState extends CustomState<FormEquipmentPage> {
                     fillColor: FillColor, filled: true
                   )
                 )
+              ),
+              const Divider(height: 10),
+              SwitchField(
+                context: context,
+                value: widget.model.bluetooth ?? false,
+                icon: const Icon(Icons.bluetooth),
+                hintText: 'Bluetooth',
+                onChanged: (value) => setState(() {
+                  widget.model.bluetooth = value;
+                })
+              ),
+              if (widget.model.bluetooth == true) BluetoothField(
+                context: context,
+                data: widget.model.controller,
+                onChanged: (value) {
+                  widget.model.controller = value;
+                },
               ),
               const Divider(height: 10),
               MarkdownTextInput((String value) => widget.model.notes = value,

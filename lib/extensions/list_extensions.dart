@@ -30,7 +30,7 @@ extension ListExtension on List {
         return element[n];
       }
     }
-    return false;
+    return true;
   }
 
   void update(int n, bool b) {

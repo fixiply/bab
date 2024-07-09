@@ -79,7 +79,6 @@ abstract class EditDataSource extends DataGridSource {
   }
 
   Widget textFieldWidget(String displayText, GridColumn column, CellSubmit submitCell) {
-    RegExp regExp = isNumericType(column.columnName) ? RegExp('[0-9.,]') : RegExp('[a-zA-Z ]');
     return TextField(
       autofocus: true,
       controller: editingController..text = displayText,
@@ -90,7 +89,7 @@ abstract class EditDataSource extends DataGridSource {
       ),
       keyboardType: isNumericType(column.columnName) ? TextInputType.number : TextInputType.text,
       inputFormatters: <TextInputFormatter>[
-        FilteringTextInputFormatter.allow(regExp)
+        if (isNumericType(column.columnName)) FilteringTextInputFormatter.allow(RegExp('[0-9.,]'))
       ],
       onChanged: (String value) {
         if (value.isNotEmpty) {

@@ -1,27 +1,29 @@
 import 'dart:async';
 
+import 'package:flutter/material.dart';
+
+// Internal package
+import 'package:bab/controller/device_page.dart';
 import 'package:bab/models/equipment_model.dart';
 import 'package:bab/utils/app_localizations.dart';
 import 'package:bab/widgets/animated_action_button.dart';
-import 'package:flutter/material.dart';
-
-import 'package:bab/controller/device_page.dart';
 import 'package:bab/widgets/bluetooth/extra.dart';
 import 'package:bab/widgets/bluetooth/scan_result_tile.dart';
 import 'package:bab/widgets/bluetooth/system_device_tile.dart';
 import 'package:bab/widgets/custom_state.dart';
 
+// External package
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-class BluetoothPage extends StatefulWidget {
+class ScanPage extends StatefulWidget {
   EquipmentModel model;
-  BluetoothPage(this.model, {Key? key}) : super(key: key);
+  ScanPage(this.model, {Key? key}) : super(key: key);
 
   @override
-  _BluetoothPageState createState() => _BluetoothPageState();
+  _ScanPageState createState() => _ScanPageState();
 }
 
-class _BluetoothPageState extends CustomState<BluetoothPage> {
+class _ScanPageState extends CustomState<ScanPage> {
   List<BluetoothDevice> _systemDevices = [];
   List<ScanResult> _scanResults = [];
   bool _isScanning = false;
@@ -85,7 +87,7 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
       showSnackbar(prettyException("Connect Error:", e), success: false);
     });
     MaterialPageRoute route = MaterialPageRoute(
-        builder: (context) => DevicePage(device: device), settings: RouteSettings(name: '/DeviceScreen'));
+        builder: (context) => DevicePage(device: device, model: widget.model), settings: RouteSettings(name: '/DevicePage'));
     Navigator.of(context).push(route);
   }
 
@@ -121,8 +123,8 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
         device: d,
         onOpen: () => Navigator.of(context).push(
           MaterialPageRoute(
-            builder: (context) => DevicePage(device: d),
-            settings: RouteSettings(name: '/DeviceScreen'),
+            builder: (context) => DevicePage(device: d, model: widget.model),
+            settings: RouteSettings(name: '/DevicePage'),
           ),
         ),
         onConnect: () => onConnectPressed(d),
@@ -143,10 +145,26 @@ class _BluetoothPageState extends CustomState<BluetoothPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(AppLocalizations.of(context)!.text('available_devices')),
+        elevation: 0,
+        foregroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
       ),
       body: RefreshIndicator(
         onRefresh: onRefresh,
-        child: ListView(
+        child: _isScanning == false ? Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Flexible(child: Icon(Icons.bluetooth_outlined, size: 80, color: Theme.of(context).primaryColor)),
+              Text(AppLocalizations.of(context)!.text('no_result'),
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.clip,
+                style: TextStyle(fontSize: 18, color: Theme.of(context).primaryColor)
+              )
+            ],
+          )
+        ) :
+        ListView(
           children: <Widget>[
             ..._buildSystemDeviceTiles(context),
             ..._buildScanResultTiles(context),

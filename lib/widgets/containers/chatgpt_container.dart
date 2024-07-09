@@ -539,7 +539,6 @@ class _ChatGPTContainerState extends AbstractContainerState {
                     }),
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.text('default_malt'),
-                      suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                       border: InputBorder.none,
                       fillColor: FillColor, filled: true
                     ),
@@ -559,7 +558,6 @@ class _ChatGPTContainerState extends AbstractContainerState {
                       }),
                     decoration: InputDecoration(
                       labelText: AppLocalizations.of(context)!.text('default_yeast'),
-                      suffixText: AppLocalizations.of(context)!.liquid.toLowerCase(),
                       border: InputBorder.none,
                       fillColor: FillColor, filled: true
                     ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 // Internal package
-import 'package:bab/models/model.dart';
 import 'package:bab/utils/app_localizations.dart';
 
 class CustomDismissible<Object> extends Dismissible {

@@ -21,6 +21,7 @@ import 'package:bab/utils/notification_service.dart';
 import 'package:bab/widgets/circular_timer.dart';
 import 'package:bab/widgets/containers/ph_container.dart';
 import 'package:bab/widgets/countdown_text.dart';
+import 'package:bab/widgets/custom_gauge.dart';
 import 'package:bab/widgets/custom_stepper.dart';
 import 'package:bab/widgets/dialogs/confirm_dialog.dart';
 import 'package:bab/widgets/form_decoration.dart';
@@ -60,7 +61,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   Future<double>? _initialBrewTemp;
 
   List<MyStep> _steps = [];
-  late SfRadialGauge _temp;
+  late SfRadialGauge _tempGauge;
 
   CountDownController _boilController = CountDownController();
 
@@ -152,75 +153,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   }
 
   _initialize() async {
-    _temp = SfRadialGauge(
-        animationDuration: 3500,
-        enableLoadingAnimation: true,
-        axes: <RadialAxis>[
-          RadialAxis(
-              ranges: <GaugeRange>[
-                GaugeRange(
-                    startValue: 0,
-                    endValue: 10,
-                    startWidth: 0.265,
-                    sizeUnit: GaugeSizeUnit.factor,
-                    endWidth: 0.265,
-                    color: const Color.fromRGBO(34, 195, 199, 0.75)),
-                GaugeRange(
-                    startValue: 10,
-                    endValue: 30,
-                    startWidth: 0.265,
-                    sizeUnit: GaugeSizeUnit.factor,
-                    endWidth: 0.265,
-                    color: const Color.fromRGBO(123, 199, 34, 0.75)),
-                GaugeRange(
-                    startValue: 30,
-                    endValue: 40,
-                    startWidth: 0.265,
-                    sizeUnit: GaugeSizeUnit.factor,
-                    endWidth: 0.265,
-                    color: const Color.fromRGBO(238, 193, 34, 0.75)),
-                GaugeRange(
-                    startValue: 40,
-                    endValue: 70,
-                    startWidth: 0.265,
-                    sizeUnit: GaugeSizeUnit.factor,
-                    endWidth: 0.265,
-                    color: const Color.fromRGBO(238, 79, 34, 0.65)),
-                GaugeRange(
-                    startValue: 70,
-                    endValue: 100,
-                    startWidth: 0.265,
-                    sizeUnit: GaugeSizeUnit.factor,
-                    endWidth: 0.265,
-                    color: const Color.fromRGBO(255, 0, 0, 0.65)),
-              ],
-              annotations: <GaugeAnnotation>[
-                GaugeAnnotation(
-                    angle: 90,
-                    positionFactor: 0.35,
-                    widget: Text(
-                        'Temp.${AppLocalizations.of(context)!.tempMeasure}',
-                        style: const TextStyle(
-                            color: Color(0xFFF8B195), fontSize: 9))),
-                const GaugeAnnotation(
-                  angle: 90,
-                  positionFactor: 0.8,
-                  widget: Text('  0  ',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
-                  ),
-                )
-              ],
-              pointers: const <GaugePointer>[
-                NeedlePointer(
-                  value: 0,
-                  needleStartWidth: 0,
-                  needleEndWidth: 3,
-                  knobStyle: KnobStyle(knobRadius: 0.05),
-                )
-              ]
-          )
-        ]
-    );
+    _tempGauge = CustomGauge(context);
     _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
     _generate();
   }
@@ -337,7 +270,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 if (widget.model.tank!.hasBluetooth()) SizedBox(
                   width: 140,
                   height: 140,
-                  child: _temp,
+                  child: _tempGauge,
                 )
               ],
             )
@@ -477,7 +410,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         child: SizedBox(
           width: 140,
           height: 140,
-          child: _temp,
+          child: _tempGauge,
         )
       ) : Container(),
       onStepContinue: (int index) {

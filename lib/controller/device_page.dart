@@ -1,61 +1,98 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
 
 // Internal package
+import 'package:bab/models/equipment_model.dart';
+import 'package:bab/utils/app_localizations.dart';
+import 'package:bab/utils/bluetooth.dart';
+import 'package:bab/utils/constants.dart';
+import 'package:bab/widgets/bluetooth/service_page.dart';
+import 'package:bab/widgets/custom_dual_switch.dart';
+import 'package:bab/widgets/custom_gauge.dart';
 import 'package:bab/widgets/custom_state.dart';
-import 'package:bab/widgets/bluetooth/characteristic_tile.dart';
-import 'package:bab/widgets/bluetooth/descriptor_tile.dart';
 import 'package:bab/widgets/bluetooth/extra.dart';
-import 'package:bab/widgets/bluetooth/service_tile.dart';
 
 // External package
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:syncfusion_flutter_gauges/gauges.dart';
 
 class DevicePage extends StatefulWidget {
   final BluetoothDevice device;
+  final EquipmentModel model;
 
-  const DevicePage({Key? key, required this.device}) : super(key: key);
+  const DevicePage({Key? key, required this.device, required this.model}) : super(key: key);
 
   @override
-  _DeviceScreenState createState() => _DeviceScreenState();
+  _DevicePageState createState() => _DevicePageState();
 }
 
-class _DeviceScreenState extends CustomState<DevicePage> {
-  int? _rssi;
-  int? _mtuSize;
-  BluetoothConnectionState _connectionState = BluetoothConnectionState.disconnected;
-  List<BluetoothService> _services = [];
-  bool _isDiscoveringServices = false;
-  bool _isConnecting = false;
-  bool _isDisconnecting = false;
-
+class _DevicePageState extends CustomState<DevicePage> with AutomaticKeepAliveClientMixin<DevicePage> {
   late StreamSubscription<BluetoothConnectionState> _connectionStateSubscription;
   late StreamSubscription<bool> _isConnectingSubscription;
   late StreamSubscription<bool> _isDisconnectingSubscription;
-  late StreamSubscription<int> _mtuSubscription;
+
+  BluetoothConnectionState _connectionState = BluetoothConnectionState.disconnected;
+  BluetoothCharacteristic? _read_characteristic;
+  StreamSubscription? _scanResultsSubscription;
+  double _targetTemp = 0;
+  double _currentTemp = 0;
+  bool _heat = false;
+  bool _pump = false;
+
+  bool _isConnecting = false;
+  bool _isDisconnecting = false;
+
+  @override
+  bool get wantKeepAlive => true;
+
+  TabBar get _tabBar => TabBar(
+    indicatorSize: TabBarIndicatorSize.tab,
+    indicator: ShapeDecoration(
+      color: Theme.of(context).primaryColor.withOpacity(0.2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+    ),
+    tabs: [
+      Tab(icon: Icon(Icons.takeout_dining_outlined, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('tank'), overflow: TextOverflow.ellipsis, style: TextStyle(color: Theme.of(context).primaryColor))),
+      Tab(icon: Icon(Icons.bluetooth, color: Theme.of(context).primaryColor), iconMargin: EdgeInsets.zero, child: Text(AppLocalizations.of(context)!.text('services'), overflow: TextOverflow.ellipsis, style: TextStyle(color: Theme.of(context).primaryColor))),
+    ],
+  );
 
   @override
   void initState() {
     super.initState();
-
     _connectionStateSubscription = widget.device.connectionState.listen((state) async {
       _connectionState = state;
-      if (state == BluetoothConnectionState.connected) {
-        _services = []; // must rediscover services
-      }
-      if (state == BluetoothConnectionState.connected && _rssi == null) {
-        _rssi = await widget.device.readRssi();
-      }
-      if (mounted) {
-        setState(() {});
-      }
-    });
 
-    _mtuSubscription = widget.device.mtu.listen((value) {
-      _mtuSize = value;
-      if (mounted) {
-        setState(() {});
+      if (state == BluetoothConnectionState.connected) {
+        Bluetooth? controller = widget.model.controller;
+        if (controller != null) {
+          _read_characteristic =
+          await controller.getReadCharateristic(widget.device);
+          if (_read_characteristic != null) {
+            _scanResultsSubscription =
+                _read_characteristic!.onValueReceived.listen((value) {
+                  double? target = controller.getTargetTemperature(
+                      String.fromCharCodes(value));
+                  if (target != null) {
+                    setState(() {
+                      _targetTemp = target;
+                    });
+                  }
+                  double? current = controller.getCurrentTemperature(
+                      String.fromCharCodes(value));
+                  if (current != null) {
+                    setState(() {
+                      _currentTemp = current;
+                    });
+                  }
+                });
+            widget.device.cancelWhenDisconnected(_scanResultsSubscription!);
+            await _read_characteristic!.setNotifyValue(true);
+          }
+        }
       }
     });
 
@@ -77,10 +114,209 @@ class _DeviceScreenState extends CustomState<DevicePage> {
   @override
   void dispose() {
     _connectionStateSubscription.cancel();
-    _mtuSubscription.cancel();
     _isConnectingSubscription.cancel();
     _isDisconnectingSubscription.cancel();
+    _scanResultsSubscription?.cancel();
     super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (foundation.kDebugMode || currentUser != null && currentUser!.isAdmin()) {
+      return DefaultTabController(
+        length: 2,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text(widget.device.platformName),
+            elevation: 0,
+            foregroundColor: Theme.of(context).primaryColor,
+            backgroundColor: Colors.white,
+            actions: [buildConnectButton(context)],
+            bottom: PreferredSize(
+              preferredSize: _tabBar.preferredSize,
+              child: ColoredBox(
+                color: FillColor,
+                child: _tabBar,
+              ),
+            ),
+          ),
+          body: TabBarView(
+            children: [
+              _body(),
+              ServicePage(device: widget.device)
+            ]
+          )
+        )
+      );
+    }
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(widget.device.platformName),
+        elevation: 0,
+        foregroundColor: Theme.of(context).primaryColor,
+        backgroundColor: Colors.white,
+        actions: [buildConnectButton(context)],
+      ),
+      body: _body()
+    );
+    return _body();
+  }
+
+  Widget _body() {
+    return SingleChildScrollView(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget> [
+          Expanded(
+            child: Column(
+              children: [
+                CustomGauge(
+                    context,
+                    annotations: <GaugeAnnotation>[
+                      GaugeAnnotation(
+                          angle: 90,
+                          positionFactor: 0.35,
+                          widget: Text(
+                              'Actuelle',
+                              style: const TextStyle(fontSize: 22))),
+                      GaugeAnnotation(
+                        angle: 90,
+                        positionFactor: 0.8,
+                        widget: Text('  ${AppLocalizations.of(context)!.tempFormat(_currentTemp)}  ',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                        ),
+                      )
+                    ],
+                    pointers: <GaugePointer>[
+                      NeedlePointer(
+                        value: _currentTemp,
+                        needleStartWidth: 0,
+                        needleEndWidth: 3,
+                        knobStyle: KnobStyle(knobRadius: 0.05),
+                      )
+                    ]
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 100,
+                      alignment: Alignment.centerRight,
+                      child: Text('Chaleur', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(width: 20),
+                    CustomDualSwitch<bool>.dual(
+                      current: _heat,
+                      onChanged: (b) async {
+                        setState(() => _heat = b);
+                        Bluetooth? controller = widget.model.controller;
+                        if (controller != null) {
+                          try {
+                            await controller.setHeat(widget.device, _heat);
+                            showSnackbar("Descriptor Write : Success");
+                          } catch (e) {
+                            debugPrint(e.toString());
+                            showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
+                          }
+                        }
+                      },
+                    ),
+                  ]
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 100,
+                      alignment: Alignment.centerRight,
+                      child: Text('Pompe', style: TextStyle(fontSize: 20)),
+                    ),
+                    const SizedBox(width: 20),
+                    CustomDualSwitch<bool>.dual(
+                      current: _pump,
+                      onChanged: (b) async {
+                        setState(() => _pump = b);
+                        Bluetooth? controller = widget.model.controller;
+                        if (controller != null) {
+                          try {
+                            await controller.setHeat(widget.device, _pump);
+                            showSnackbar("Descriptor Write : Success");
+                          } catch (e) {
+                            debugPrint(e.toString());
+                            showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
+                          }
+                        }
+                      },
+                    ),
+                  ]
+                )
+              ],
+            ),
+          ),
+          Expanded(
+            child: CustomGauge(
+              context,
+              annotations: <GaugeAnnotation>[
+                GaugeAnnotation(
+                  angle: 90,
+                  positionFactor: 0.35,
+                  widget: Text(
+                      'Cible',
+                      style: const TextStyle(fontSize: 22))
+                ),
+                GaugeAnnotation(
+                  angle: 90,
+                  positionFactor: 0.8,
+                  widget: Text('  ${AppLocalizations.of(context)!.tempFormat(_targetTemp)}  ',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                  ),
+                )
+              ],
+              pointers: <GaugePointer>[
+                RangePointer(
+                  value: _targetTemp,
+                  onValueChanged: (value) => setState(() {
+                    _targetTemp = value.roundToDouble();
+                  }),
+                  onValueChangeEnd: tempValueChanged,
+                  enableDragging: true,
+                  width: 0.26,
+                  sizeUnit: GaugeSizeUnit.factor
+                ),
+                MarkerPointer(
+                  value: _targetTemp,
+                  color: Colors.white,
+                  markerHeight: 30,
+                  markerWidth: 30,
+                  markerOffset: 15,
+                  markerType: MarkerType.circle,
+                ),
+              ]
+            )
+          )
+        ],
+      ),
+    );
+  }
+
+  /// Dragged pointer new value is updated to pointer and
+  /// annotation current value.
+  void tempValueChanged(dynamic value) async {
+    setState(() {
+      _targetTemp = value.roundToDouble();
+    });
+    Bluetooth? controller = widget.model.controller;
+    if (controller != null) {
+      try {
+        await controller.setTargetTemperature(widget.device, _targetTemp);
+        showSnackbar("Descriptor Write : Success");
+      } catch (e) {
+        debugPrint(e.toString());
+        showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
+      }
+    }
   }
 
   bool get isConnected {
@@ -95,8 +331,25 @@ class _DeviceScreenState extends CustomState<DevicePage> {
       if (e is FlutterBluePlusException && e.code == FbpErrorCode.connectionCanceled.index) {
         // ignore connections canceled by the user
       } else {
+        debugPrint(e.toString());
         showSnackbar(prettyException("Connect Error:", e), success: false);
       }
+    }
+  }
+
+  Future onDisconnectPressed() async {
+    try {
+      await widget.device.disconnectAndUpdateStream();
+      setState(() {
+        _currentTemp = 0;
+        _targetTemp = 0;
+        _heat = false;
+        _pump = false;
+      });
+      showSnackbar("Disconnect: Success");
+    } catch (e) {
+      debugPrint(e.toString());
+      showSnackbar(prettyException("Disconnect Error:", e), success: false);
     }
   }
 
@@ -105,60 +358,9 @@ class _DeviceScreenState extends CustomState<DevicePage> {
       await widget.device.disconnectAndUpdateStream(queue: false);
       showSnackbar("Cancel: Success");
     } catch (e) {
+      debugPrint(e.toString());
       showSnackbar(prettyException("Cancel Error:", e), success: false);
     }
-  }
-
-  Future onDisconnectPressed() async {
-    try {
-      await widget.device.disconnectAndUpdateStream();
-      showSnackbar("Disconnect: Success");
-    } catch (e) {
-      showSnackbar(prettyException("Disconnect Error:", e), success: false);
-    }
-  }
-
-  Future onDiscoverServicesPressed() async {
-    if (mounted) {
-      setState(() {
-        _isDiscoveringServices = true;
-      });
-    }
-    try {
-      _services = await widget.device.discoverServices();
-      showSnackbar("Discover Services: Success");
-    } catch (e) {
-      showSnackbar(prettyException("Discover Services Error:", e), success: false);
-    }
-    if (mounted) {
-      setState(() {
-        _isDiscoveringServices = false;
-      });
-    }
-  }
-
-  Future onRequestMtuPressed() async {
-    try {
-      await widget.device.requestMtu(223, predelay: 0);
-      showSnackbar("Request Mtu: Success");
-    } catch (e) {
-      showSnackbar(prettyException("Change Mtu Error:", e), success: false);
-    }
-  }
-
-  List<Widget> _buildServiceTiles(BuildContext context, BluetoothDevice d) {
-    return _services.map((s) => ServiceTile(
-        service: s,
-        characteristicTiles: s.characteristics.map((c) => _buildCharacteristicTile(c)).toList(),
-      ),
-    ).toList();
-  }
-
-  CharacteristicTile _buildCharacteristicTile(BluetoothCharacteristic c) {
-    return CharacteristicTile(
-      characteristic: c,
-      descriptorTiles: c.descriptors.map((d) => DescriptorTile(descriptor: d)).toList(),
-    );
   }
 
   Widget buildSpinner(BuildContext context) {
@@ -174,90 +376,13 @@ class _DeviceScreenState extends CustomState<DevicePage> {
     );
   }
 
-  Widget buildRemoteId(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Text('${widget.device.remoteId}'),
-    );
-  }
-
-  Widget buildRssiTile(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        isConnected ? const Icon(Icons.bluetooth_connected) : const Icon(Icons.bluetooth_disabled),
-        Text(((isConnected && _rssi != null) ? '${_rssi!} dBm' : ''), style: Theme.of(context).textTheme.bodySmall)
-      ],
-    );
-  }
-
-  Widget buildGetServices(BuildContext context) {
-    return IndexedStack(
-      index: (_isDiscoveringServices) ? 1 : 0,
-      children: <Widget>[
-        TextButton(
-          child: const Text("Get Services"),
-          onPressed: onDiscoverServicesPressed,
-        ),
-        const IconButton(
-          icon: SizedBox(
-            child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(Colors.grey),
-            ),
-            width: 18.0,
-            height: 18.0,
-          ),
-          onPressed: null,
-        )
-      ],
-    );
-  }
-
-  Widget buildMtuTile(BuildContext context) {
-    return ListTile(
-        title: const Text('MTU Size'),
-        subtitle: Text('$_mtuSize bytes'),
-        trailing: IconButton(
-          icon: const Icon(Icons.edit),
-          onPressed: onRequestMtuPressed,
-        ));
-  }
-
   Widget buildConnectButton(BuildContext context) {
     return Row(children: [
       if (_isConnecting || _isDisconnecting) buildSpinner(context),
       TextButton(
           onPressed: _isConnecting ? onCancelPressed : (isConnected ? onDisconnectPressed : onConnectPressed),
-          child: Text(
-            _isConnecting ? "CANCEL" : (isConnected ? "DISCONNECT" : "CONNECT"),
-            style: Theme.of(context).primaryTextTheme.labelLarge?.copyWith(color: Colors.white),
+          child: Text( _isConnecting ? "CANCEL" : (isConnected ? "DISCONNECT" : "CONNECT")
           ))
     ]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return ScaffoldMessenger(
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.device.platformName),
-          actions: [buildConnectButton(context)],
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              buildRemoteId(context),
-              ListTile(
-                leading: buildRssiTile(context),
-                title: Text('Device is ${_connectionState.toString().split('.')[1]}.'),
-                trailing: buildGetServices(context),
-              ),
-              buildMtuTile(context),
-              ..._buildServiceTiles(context, widget.device),
-            ],
-          ),
-        ),
-      ),
-    );
   }
 }
