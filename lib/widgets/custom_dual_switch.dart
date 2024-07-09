@@ -13,7 +13,7 @@ class CustomDualSwitch<bool> extends AnimatedToggleSwitch {
     current: current,
     first: false,
     second: true,
-    spacing: 50.0,
+    spacing: 30.0,
     animationDuration: const Duration(milliseconds: 600),
     style: ToggleStyle(
       borderColor: Colors.transparent,

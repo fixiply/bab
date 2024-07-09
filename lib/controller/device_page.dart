@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:bab/helpers/device_helper.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:flutter/material.dart';
@@ -164,137 +165,108 @@ class _DevicePageState extends CustomState<DevicePage> with AutomaticKeepAliveCl
 
   Widget _body() {
     return SingleChildScrollView(
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget> [
-          Expanded(
-            child: Column(
-              children: [
-                CustomGauge(
-                    context,
-                    annotations: <GaugeAnnotation>[
-                      GaugeAnnotation(
-                          angle: 90,
-                          positionFactor: 0.35,
-                          widget: Text(
-                              'Actuelle',
-                              style: const TextStyle(fontSize: 22))),
-                      GaugeAnnotation(
-                        angle: 90,
-                        positionFactor: 0.8,
-                        widget: Text('  ${AppLocalizations.of(context)!.tempFormat(_currentTemp)}  ',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-                        ),
-                      )
-                    ],
-                    pointers: <GaugePointer>[
-                      NeedlePointer(
-                        value: _currentTemp,
-                        needleStartWidth: 0,
-                        needleEndWidth: 3,
-                        knobStyle: KnobStyle(knobRadius: 0.05),
-                      )
-                    ]
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 100,
-                      alignment: Alignment.centerRight,
-                      child: Text('Chaleur', style: TextStyle(fontSize: 20)),
-                    ),
-                    const SizedBox(width: 20),
-                    CustomDualSwitch<bool>.dual(
-                      current: _heat,
-                      onChanged: (b) async {
-                        setState(() => _heat = b);
-                        Bluetooth? controller = widget.model.controller;
-                        if (controller != null) {
-                          try {
-                            await controller.setHeat(widget.device, _heat);
-                            showSnackbar("Descriptor Write : Success");
-                          } catch (e) {
-                            debugPrint(e.toString());
-                            showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
-                          }
-                        }
-                      },
-                    ),
-                  ]
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      width: 100,
-                      alignment: Alignment.centerRight,
-                      child: Text('Pompe', style: TextStyle(fontSize: 20)),
-                    ),
-                    const SizedBox(width: 20),
-                    CustomDualSwitch<bool>.dual(
-                      current: _pump,
-                      onChanged: (b) async {
-                        setState(() => _pump = b);
-                        Bluetooth? controller = widget.model.controller;
-                        if (controller != null) {
-                          try {
-                            await controller.setHeat(widget.device, _pump);
-                            showSnackbar("Descriptor Write : Success");
-                          } catch (e) {
-                            debugPrint(e.toString());
-                            showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
-                          }
-                        }
-                      },
-                    ),
-                  ]
-                )
-              ],
-            ),
-          ),
-          Expanded(
-            child: CustomGauge(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          CustomGauge(
               context,
               annotations: <GaugeAnnotation>[
                 GaugeAnnotation(
-                  angle: 90,
-                  positionFactor: 0.35,
-                  widget: Text(
-                      'Cible',
-                      style: const TextStyle(fontSize: 22))
+                    angle: 90,
+                    positionFactor: 0.35,
+                    widget: Text(
+                        AppLocalizations.of(context)!.tempFormat(_targetTemp)!,
+                        style: const TextStyle(fontSize: 22))
                 ),
                 GaugeAnnotation(
                   angle: 90,
                   positionFactor: 0.8,
-                  widget: Text('  ${AppLocalizations.of(context)!.tempFormat(_targetTemp)}  ',
+                  widget: Text(AppLocalizations.of(context)!.tempFormat(_currentTemp)!,
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
                   ),
                 )
               ],
               pointers: <GaugePointer>[
+                NeedlePointer(
+                  value: _currentTemp,
+                  needleStartWidth: 0,
+                  needleEndWidth: 3,
+                  knobStyle: KnobStyle(knobRadius: 0.05),
+                ),
                 RangePointer(
-                  value: _targetTemp,
-                  onValueChanged: (value) => setState(() {
-                    _targetTemp = value.roundToDouble();
-                  }),
-                  onValueChangeEnd: tempValueChanged,
-                  enableDragging: true,
-                  width: 0.26,
-                  sizeUnit: GaugeSizeUnit.factor
+                    value: _targetTemp,
+                    onValueChanged: (value) => setState(() {
+                      _targetTemp = value.roundToDouble();
+                    }),
+                    onValueChangeEnd: tempValueChanged,
+                    enableDragging: true,
+                    width: 0.26,
+                    sizeUnit: GaugeSizeUnit.factor
                 ),
                 MarkerPointer(
                   value: _targetTemp,
                   color: Colors.white,
-                  markerHeight: 30,
-                  markerWidth: 30,
-                  markerOffset: 15,
-                  markerType: MarkerType.circle,
+                  markerHeight: 45,
+                  markerWidth: 45,
+                  markerOffset: DeviceHelper.isMobile(context) ? 15 : 15,
+                  markerType: MarkerType.invertedTriangle,
                 ),
               ]
-            )
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 100,
+                alignment: Alignment.centerRight,
+                child: Text('Chaleur', style: TextStyle(fontSize: 20)),
+              ),
+              const SizedBox(width: 10),
+              CustomDualSwitch<bool>.dual(
+                current: _heat,
+                onChanged: (b) async {
+                  setState(() => _heat = b);
+                  Bluetooth? controller = widget.model.controller;
+                  if (controller != null) {
+                    try {
+                      await controller.setHeat(widget.device, _heat);
+                      showSnackbar("Descriptor Write : Success");
+                    } catch (e) {
+                      debugPrint(e.toString());
+                      showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
+                    }
+                  }
+                },
+              ),
+            ]
+          ),
+          const SizedBox(height: 12),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 100,
+                alignment: Alignment.centerRight,
+                child: Text('Pompe', style: TextStyle(fontSize: 20)),
+              ),
+              const SizedBox(width: 10),
+              CustomDualSwitch<bool>.dual(
+                current: _pump,
+                onChanged: (b) async {
+                  setState(() => _pump = b);
+                  Bluetooth? controller = widget.model.controller;
+                  if (controller != null) {
+                    try {
+                      await controller.setHeat(widget.device, _pump);
+                      showSnackbar("Descriptor Write : Success");
+                    } catch (e) {
+                      debugPrint(e.toString());
+                      showSnackbar(prettyException("Descriptor Write Error:", e), success: false);
+                    }
+                  }
+                },
+              ),
+            ]
           )
         ],
       ),

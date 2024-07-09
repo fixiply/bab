@@ -102,7 +102,7 @@ class Bluetooth<T> {
   }
 
   Future setTargetTemperature(BluetoothDevice device, double value) async {
-    await write(device, '\$${value.toString()}');
+    await write(device, 'X${value.toString()}');
   }
 
   double? getCurrentTemperature(String value) {
@@ -126,16 +126,17 @@ class Bluetooth<T> {
   }
   //
   Future write(BluetoothDevice device, String value) async {
-    List<int> values = AsciiEncoder().convert(value.padRight(19));
+    List<int> values = AsciiEncoder().convert(value);
+    debugPrint('Write $value $values');
     BluetoothCharacteristic? wc = await getWriteCharateristic(device);
     if (wc != null) {
-      debugPrint('Write ${wc.toString()}');
+      debugPrint('Characteristic ${wc.toString()}');
       // await wc.descriptors.first.write(values);
     }
     BluetoothCharacteristic? rc = await getReadCharateristic(device);
     if (rc != null) {
       await rc.setNotifyValue(false);
-      debugPrint('Read ${rc.toString()}');
+      debugPrint('Characteristic ${rc.toString()}');
       await rc.descriptors.first.write(values);
       // await rc.write(values);
     }

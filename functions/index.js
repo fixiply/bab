@@ -87,6 +87,7 @@ exports.brews = functions.region('europe-west1').pubsub.schedule('*/15 * * * *')
                                     }
                                     await sendMail(user.email, title, body + ".");
                                     await sendToDevice(user, title, body + ".", doc.id, 'brew');
+                                    break;
                                 } else if (i === 0) {
                                     if (recipe.hops != null) {
                                         for (const item of recipe.hops) {
