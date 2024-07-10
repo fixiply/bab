@@ -172,11 +172,12 @@ class _DevicePageState extends CustomState<DevicePage> with AutomaticKeepAliveCl
               context,
               annotations: <GaugeAnnotation>[
                 GaugeAnnotation(
-                    angle: 90,
-                    positionFactor: 0.35,
-                    widget: Text(
-                        AppLocalizations.of(context)!.tempFormat(_targetTemp)!,
-                        style: const TextStyle(fontSize: 22))
+                  angle: 90,
+                  positionFactor: 0.35,
+                  widget: Text(
+                      AppLocalizations.of(context)!.tempFormat(_targetTemp)!,
+                      style: const TextStyle(fontSize: 22)
+                  )
                 ),
                 GaugeAnnotation(
                   angle: 90,
@@ -194,22 +195,26 @@ class _DevicePageState extends CustomState<DevicePage> with AutomaticKeepAliveCl
                   knobStyle: KnobStyle(knobRadius: 0.05),
                 ),
                 RangePointer(
-                    value: _targetTemp,
-                    onValueChanged: (value) => setState(() {
-                      _targetTemp = value.roundToDouble();
-                    }),
-                    onValueChangeEnd: tempValueChanged,
-                    enableDragging: true,
-                    width: 0.26,
-                    sizeUnit: GaugeSizeUnit.factor
+                  value: _targetTemp,
+                  onValueChanged: (value) => setState(() {
+                    _targetTemp = value.roundToDouble();
+                  }),
+                  onValueChangeEnd: tempValueChanged,
+                  enableDragging: true,
+                  width: 0.26,
+                  sizeUnit: GaugeSizeUnit.factor,
                 ),
                 MarkerPointer(
                   value: _targetTemp,
                   color: Colors.white,
-                  markerHeight: 45,
-                  markerWidth: 45,
+                  borderColor: Theme.of(context).primaryColor,
+                  borderWidth: 3,
+                  markerHeight: 35,
+                  markerWidth: 35,
                   markerOffset: DeviceHelper.isMobile(context) ? 15 : 15,
-                  markerType: MarkerType.invertedTriangle,
+                  markerType: MarkerType.circle,
+                  overlayColor: Theme.of(context).primaryColor.withOpacity(.2),
+                  overlayRadius: 30
                 ),
               ]
           ),

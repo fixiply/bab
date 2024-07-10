@@ -11,7 +11,9 @@ class DeviceHelper {
   }
 
   static bool isTablette(BuildContext context) {
-    return MediaQuery.of(context).size.shortestSide >= 600;
+    final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
+    final logicalShortestSide = firstView.physicalSize.shortestSide / firstView.devicePixelRatio;
+    return logicalShortestSide > 600;
   }
 
   static bool isLargeScreen(BuildContext context) {
