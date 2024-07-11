@@ -61,7 +61,7 @@ class _RecipePageState extends State<RecipePage> {
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
           leading: IconButton(
-            icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen ? const Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }

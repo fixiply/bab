@@ -38,7 +38,7 @@ class _CarbonationContainerState extends State<CarbonationContainer> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: DeviceHelper.isLargeScreen(context) ? 350: null,
+      width: DeviceHelper.isLargeScreen ? 350: null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

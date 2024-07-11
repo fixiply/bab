@@ -40,12 +40,15 @@ class HomePage extends StatefulWidget {
   _HomeState createState() => _HomeState();
 }
 
-class _HomeState extends State<HomePage> {
+class _HomeState extends State<HomePage> with AutomaticKeepAliveClientMixin<HomePage> {
   int _selectedIndex = 0;
   final PageController _page = PageController(initialPage: 0);
   final SidebarXController _controller = SidebarXController(selectedIndex: 0, extended: true);
 
   List<Widget> _pages = [];
+
+  @override
+  bool get wantKeepAlive => true;
 
   @override
   void dispose() {
@@ -65,7 +68,7 @@ class _HomeState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLargeScreen = DeviceHelper.isLargeScreen(context);
+    final isLargeScreen = DeviceHelper.isLargeScreen;
     return Scaffold(
       bottomNavigationBar: !isLargeScreen ? BottomNavigationBar(
         showUnselectedLabels: true,
@@ -191,19 +194,19 @@ class _HomeState extends State<HomePage> {
         );
       },
       items: [
-        if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
+        if (DeviceHelper.isLargeScreen) SidebarXItem(
             icon: Icons.home_outlined,
             label: AppLocalizations.of(context)!.text('home')
         ),
-        if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
+        if (DeviceHelper.isLargeScreen) SidebarXItem(
           icon: Icons.sports_bar_outlined,
           label: AppLocalizations.of(context)!.text('recipes'),
         ),
-        if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
+        if (DeviceHelper.isLargeScreen) SidebarXItem(
           icon: Icons.style_outlined,
           label: AppLocalizations.of(context)!.text('beer_styles'),
         ),
-        if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
+        if (DeviceHelper.isLargeScreen) SidebarXItem(
           icon: Icons.science_outlined,
           label: AppLocalizations.of(context)!.text('ingredients'),
         ),
@@ -243,7 +246,7 @@ class _HomeState extends State<HomePage> {
           icon: Icons.groups_outlined,
           label: AppLocalizations.of(context)!.text('companies'),
         ),
-        if (DeviceHelper.isLargeScreen(context)) SidebarXItem(
+        if (DeviceHelper.isLargeScreen) SidebarXItem(
           icon: Icons.person_outline,
           label: AppLocalizations.of(context)!.text('my_account'),
         ),
@@ -253,7 +256,7 @@ class _HomeState extends State<HomePage> {
 
   void _generateItems() {
     final UserModel? user = userNotifier.user;
-    final isLargeScreen = DeviceHelper.isLargeScreen(context);
+    final isLargeScreen = DeviceHelper.isLargeScreen;
     setState(() {
       _pages = [
         Navigator(

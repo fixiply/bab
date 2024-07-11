@@ -41,7 +41,7 @@ class _AccountPageState extends State<AccountPage> {
           CustomMenuAnchor()
         ]
       ),
-      drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isLargeScreen && currentUser != null ? CustomDrawer(context) : null,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(8.0, 0.0, 8.0, 0),
         child: Column(

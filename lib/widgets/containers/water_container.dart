@@ -34,7 +34,7 @@ class _WaterContainerState extends State<WaterContainer> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: DeviceHelper.isLargeScreen(context) ? 320: null,
+      width: DeviceHelper.isLargeScreen ? 320: null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

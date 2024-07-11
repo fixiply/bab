@@ -62,7 +62,7 @@ class _TestPageState extends State<TestPage> {
                             allowEditing: true,
                             navigationMode: GridNavigationMode.cell,
                             selectionMode: SelectionMode.single,
-                            columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablette(context) ? ColumnWidthMode.fill : ColumnWidthMode.none,
+                            columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablet ? ColumnWidthMode.fill : ColumnWidthMode.none,
                             columns: <GridColumn>[
                               GridColumn(
                                 columnName: 'id',
@@ -114,7 +114,7 @@ class _TestPageState extends State<TestPage> {
                                   allowEditing: true,
                                   navigationMode: GridNavigationMode.cell,
                                   selectionMode: SelectionMode.single,
-                                  columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablette(context) ? ColumnWidthMode.fill : ColumnWidthMode.none,
+                                  columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablet ? ColumnWidthMode.fill : ColumnWidthMode.none,
                                   columns: <GridColumn>[
                                     GridColumn(
                                         columnName: 'id',

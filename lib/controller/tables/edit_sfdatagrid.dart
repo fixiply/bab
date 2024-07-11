@@ -37,7 +37,7 @@ class EditSfDataGrid extends SfDataGrid {
     controller: controller,
     onCellTap: onCellTap,
     onSelectionChanged: onSelectionChanged,
-    columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablette(context) ? ColumnWidthMode.fill : ColumnWidthMode.none,
+    columnWidthMode: DeviceHelper.isDesktop || DeviceHelper.isTablet ? ColumnWidthMode.fill : ColumnWidthMode.none,
     allowEditing: allowEditing,
     allowSorting: allowSorting,
     allowSwiping: allowSwiping && allowEditing,

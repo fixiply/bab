@@ -79,7 +79,7 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
           )
         ]
       ),
-      drawer: !DeviceHelper.isLargeScreen(context) && currentUser != null ? CustomDrawer(context) : null,
+      drawer: !DeviceHelper.isLargeScreen && currentUser != null ? CustomDrawer(context) : null,
       body: RefreshIndicator(
         onRefresh: () => _fetch(),
         child: FutureBuilder<List<EventModel>>(
@@ -142,17 +142,17 @@ class _EventsPageState extends State<EventsPage> with AutomaticKeepAliveClientMi
     if (Foundation.kIsWeb) {
       return true;
     }
-    if (DeviceHelper.isMobile(context)) {
+    if (DeviceHelper.isMobile) {
       return DeviceHelper.landscapeOrientation(context);
     }
-    return DeviceHelper.isDesktop || DeviceHelper.isTablette(context);
+    return DeviceHelper.isDesktop || DeviceHelper.isTablet;
   }
 
   int getDeviceAxisCount() {
     if (DeviceHelper.isDesktop) {
       return 3;
     }
-    if (DeviceHelper.isMobile(context)) {
+    if (DeviceHelper.isMobile) {
       return 2;
     }
     return DeviceHelper.landscapeOrientation(context) ? 3 : 2;

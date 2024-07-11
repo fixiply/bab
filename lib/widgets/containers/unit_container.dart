@@ -63,7 +63,7 @@ class _UnitContainerState extends State<UnitContainer> {
           runSpacing: 12.0,
           children: [
             SizedBox(
-              width: DeviceHelper.isLargeScreen(context) ? 320: null,
+              width: DeviceHelper.isLargeScreen ? 320: null,
               child: Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -137,7 +137,7 @@ class _UnitContainerState extends State<UnitContainer> {
               )
             ),
             SizedBox(
-              width: DeviceHelper.isLargeScreen(context) ? 320: null,
+              width: DeviceHelper.isLargeScreen ? 320: null,
               child: Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -219,7 +219,7 @@ class _UnitContainerState extends State<UnitContainer> {
               )
             ),
             SizedBox(
-              width: DeviceHelper.isLargeScreen(context) ? 320: null,
+              width: DeviceHelper.isLargeScreen ? 320: null,
               child: Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,7 +293,7 @@ class _UnitContainerState extends State<UnitContainer> {
               )
             ),
             SizedBox(
-              width: DeviceHelper.isLargeScreen(context) ? 320: null,
+              width: DeviceHelper.isLargeScreen ? 320: null,
               child: Card(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

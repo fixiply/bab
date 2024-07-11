@@ -135,9 +135,9 @@ class Bluetooth<T> {
     }
     BluetoothCharacteristic? rc = await getReadCharateristic(device);
     if (rc != null) {
-      await rc.setNotifyValue(false);
       debugPrint('Characteristic ${rc.toString()}');
       await rc.descriptors.first.write(values);
+      debugPrint('OK');
       // await rc.write(values);
     }
   }

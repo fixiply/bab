@@ -43,7 +43,7 @@ class _EventPageState extends State<EventPage> {
           child: Text(AppLocalizations.of(context)!.localizedText(widget.model.title)),
         ),
         leading: IconButton(
-          icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+          icon: DeviceHelper.isLargeScreen ? const Icon(Icons.close) : const BackButtonIcon(),
           onPressed:() async {
             Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
           }
@@ -74,7 +74,7 @@ class _EventPageState extends State<EventPage> {
             foregroundColor: _dominantColor,
             backgroundColor: Theme.of(context).primaryColor,
             leading: IconButton(
-              icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+              icon: DeviceHelper.isLargeScreen ? const Icon(Icons.close) : const BackButtonIcon(),
               onPressed:() async {
                 Navigator.popUntil(context, (Route<dynamic> route) => route.isFirst);
               }

@@ -31,7 +31,7 @@ class _RegistrationContainerState extends AbstractContainerState with TickerProv
 
   @override
   Widget build(BuildContext context) {
-    bool isMobile = DeviceHelper.isMobile(context);
+    bool isMobile = DeviceHelper.isMobile;
     double? maxHeight;
     TextStyle titleStyle = TextStyle().copyWith(fontSize: 16, fontWeight: FontWeight.bold);
     TextStyle subtitleStyle = TextStyle();

@@ -113,7 +113,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
           foregroundColor: Theme.of(context).primaryColor,
           backgroundColor: Colors.white,
           leading: IconButton(
-            icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen ? const Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               bool? exitResult = await showDialog(
                 context: context,
@@ -244,7 +244,7 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
               children: [
                 Text(AppLocalizations.of(context)!.text('grain_temperature')),
                 SizedBox(
-                  width: DeviceHelper.isLargeScreen(context) ? 320: null,
+                  width: DeviceHelper.isLargeScreen ? 320: null,
                   child: TextFormField(
                     initialValue: _grainTemp.toString(),
                     keyboardType: const TextInputType.numberWithOptions(decimal: true),

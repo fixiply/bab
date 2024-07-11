@@ -58,7 +58,7 @@ class _BrewPageState extends State<BrewPage> {
           foregroundColor: Colors.white,
           backgroundColor: Theme.of(context).primaryColor,
           leading: IconButton(
-            icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
+            icon: DeviceHelper.isLargeScreen ? const Icon(Icons.close) : const BackButtonIcon(),
             onPressed:() async {
               Navigator.pop(context);
             }
@@ -76,7 +76,7 @@ class _BrewPageState extends State<BrewPage> {
                     style: Theme.of(context).primaryTextTheme.titleLarge!,
                     children: <TextSpan>[
                       TextSpan(text: '#${widget.model.reference}', style: const TextStyle(fontWeight: FontWeight.bold)),
-                      if (widget.model.started_at != null && !DeviceHelper.isMobile(context)) TextSpan(text: '  - ${AppLocalizations.of(context)!.dateFormat(widget.model.started_at)}'),
+                      if (widget.model.started_at != null && !DeviceHelper.isMobile) TextSpan(text: '  - ${AppLocalizations.of(context)!.dateFormat(widget.model.started_at)}'),
                     ],
                   ),
                 ),

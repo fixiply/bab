@@ -6,25 +6,27 @@ import 'package:flutter/foundation.dart' as foundation;
 import 'package:device_info_plus/device_info_plus.dart';
 
 class DeviceHelper {
-  static bool isMobile(BuildContext context) {
-    return MediaQuery.of(context).size.shortestSide < 600;
-  }
-
-  static bool isTablette(BuildContext context) {
+  static bool get isMobile {
     final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
     final logicalShortestSide = firstView.physicalSize.shortestSide / firstView.devicePixelRatio;
-    return logicalShortestSide > 600;
+    return logicalShortestSide < 600;
   }
 
-  static bool isLargeScreen(BuildContext context) {
-    if (isDesktop || isTablette(context)) {
+  static bool get isTablet {
+    final firstView = WidgetsBinding.instance.platformDispatcher.views.first;
+    final logicalShortestSide = firstView.physicalSize.shortestSide / firstView.devicePixelRatio;
+    return logicalShortestSide >= 600;
+  }
+
+  static bool get isLargeScreen {
+    if (isDesktop || isTablet) {
       return true;
     }
     return false;
   }
 
   static bool isSmallScreen(BuildContext context) {
-    if (isMobile(context) && MediaQuery.of(context).orientation == Orientation.portrait) {
+    if (isMobile && MediaQuery.of(context).orientation == Orientation.portrait) {
       return true;
     }
     return false;
@@ -58,7 +60,7 @@ class DeviceHelper {
     if (isDesktop) {
       return 0.6;
     }
-    if (!DeviceHelper.isMobile(context) && DeviceHelper.landscapeOrientation(context)) {
+    if (!DeviceHelper.isMobile && DeviceHelper.landscapeOrientation(context)) {
       return 0.6;
     }
     return null;

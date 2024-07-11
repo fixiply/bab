@@ -147,8 +147,8 @@ class TanksPageState extends CustomState<TanksPage> with AutomaticKeepAliveClien
             ),
             Flexible(
               child: IconButton(
-                icon: DeviceHelper.isLargeScreen(context) ? const Icon(Icons.close) : const BackButtonIcon(),
-                tooltip: DeviceHelper.isLargeScreen(context) ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
+                icon: DeviceHelper.isLargeScreen ? const Icon(Icons.close) : const BackButtonIcon(),
+                tooltip: DeviceHelper.isLargeScreen ? MaterialLocalizations.of(context).closeButtonLabel : MaterialLocalizations.of(context).cancelButtonLabel,
                 onPressed:() async {
                   Navigator.pop(context, []);
                 }

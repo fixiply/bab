@@ -370,7 +370,7 @@ class _GalleryPageState extends CustomState<GalleryPage> with SingleTickerProvid
     if (DeviceHelper.isDesktop) {
       return 8;
     }
-    return !DeviceHelper.isMobile(context) || DeviceHelper.landscapeOrientation(context) ? 4 : 2;
+    return !DeviceHelper.isMobile || DeviceHelper.landscapeOrientation(context) ? 4 : 2;
   }
 
   Widget item(ImageModel image) {

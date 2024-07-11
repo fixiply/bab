@@ -190,6 +190,7 @@ class _DevicePageState extends CustomState<DevicePage> with AutomaticKeepAliveCl
               pointers: <GaugePointer>[
                 NeedlePointer(
                   value: _currentTemp,
+                  enableAnimation: true,
                   needleStartWidth: 0,
                   needleEndWidth: 3,
                   knobStyle: KnobStyle(knobRadius: 0.05),
@@ -211,7 +212,7 @@ class _DevicePageState extends CustomState<DevicePage> with AutomaticKeepAliveCl
                   borderWidth: 3,
                   markerHeight: 35,
                   markerWidth: 35,
-                  markerOffset: DeviceHelper.isMobile(context) ? 15 : 15,
+                  markerOffset: DeviceHelper.isMobile ? 15 : 15,
                   markerType: MarkerType.circle,
                   overlayColor: Theme.of(context).primaryColor.withOpacity(.2),
                   overlayRadius: 30
