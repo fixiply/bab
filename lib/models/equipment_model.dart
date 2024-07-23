@@ -177,7 +177,7 @@ class EquipmentModel<T> extends Model {
   }
 
   bool hasBluetooth() {
-    return bluetooth == true && (DeviceHelper.isAndroid ||  DeviceHelper.isIOS);
+    return this.bluetooth == true && (DeviceHelper.isAndroid ||  DeviceHelper.isIOS);
   }
 
   static dynamic serialize(dynamic data) {

@@ -58,10 +58,10 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _index = 0;
   double _grainTemp = 20;
+  double _currentTemp = 0;
   Future<double>? _initialBrewTemp;
 
   List<MyStep> _steps = [];
-  late SfRadialGauge _tempGauge;
 
   CountDownController _boilController = CountDownController();
 
@@ -153,7 +153,6 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
   }
 
   _initialize() async {
-    _tempGauge = CustomGauge(context);
     _initialBrewTemp = widget.model.initialBrewTemp(_grainTemp);
     _generate();
   }
@@ -268,9 +267,44 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
                 ),
                 if (widget.model.tank!.hasBluetooth()) const SizedBox(height: 6),
                 if (widget.model.tank!.hasBluetooth()) SizedBox(
-                  width: 140,
-                  height: 140,
-                  child: _tempGauge,
+                  width: DeviceHelper.isLargeScreen ?  220 : 140,
+                  height: DeviceHelper.isLargeScreen ?  220 : 140,
+                  child: CustomGauge(
+                    context,
+                    annotations: <GaugeAnnotation>[
+                      GaugeAnnotation(
+                        angle: 90,
+                        positionFactor: 0.35,
+                        widget: FutureBuilder<double?>(
+                          future: _initialBrewTemp,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return Text(
+                                AppLocalizations.of(context)!.tempFormat(snapshot.data)!
+                              );
+                            }
+                            return Container();
+                          }
+                        )
+                      ),
+                      GaugeAnnotation(
+                        angle: 90,
+                        positionFactor: 0.8,
+                        widget: Text(AppLocalizations.of(context)!.tempFormat(_currentTemp)!,
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                        ),
+                      )
+                    ],
+                    pointers: <GaugePointer>[
+                      NeedlePointer(
+                        value: _currentTemp,
+                        enableAnimation: true,
+                        needleStartWidth: 0,
+                        needleEndWidth: 3,
+                        knobStyle: KnobStyle(knobRadius: 0.05),
+                      ),
+                    ]
+                  ),
                 )
               ],
             )
@@ -408,9 +442,36 @@ class _StepperPageState extends State<StepperPage> with AutomaticKeepAliveClient
         alignment: Alignment.centerLeft,
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
-          width: 140,
-          height: 140,
-          child: _tempGauge,
+          width: DeviceHelper.isLargeScreen ?  220 : 140,
+          height: DeviceHelper.isLargeScreen ?  220 : 140,
+          child: CustomGauge(
+            context,
+            annotations: <GaugeAnnotation>[
+              GaugeAnnotation(
+                angle: 90,
+                positionFactor: 0.35,
+                widget: Text(
+                    AppLocalizations.of(context)!.tempFormat(100)!
+                )
+              ),
+              GaugeAnnotation(
+                angle: 90,
+                positionFactor: 0.8,
+                widget: Text(AppLocalizations.of(context)!.tempFormat(_currentTemp)!,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+                ),
+              )
+            ],
+            pointers: <GaugePointer>[
+              NeedlePointer(
+                value: _currentTemp,
+                enableAnimation: true,
+                needleStartWidth: 0,
+                needleEndWidth: 3,
+                knobStyle: KnobStyle(knobRadius: 0.05),
+              ),
+            ]
+          )
         )
       ) : Container(),
       onStepContinue: (int index) {
